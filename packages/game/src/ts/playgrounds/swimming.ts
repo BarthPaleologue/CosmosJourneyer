@@ -40,6 +40,11 @@ import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing swimming controls.
+ */
 export async function CreateSwimmingScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

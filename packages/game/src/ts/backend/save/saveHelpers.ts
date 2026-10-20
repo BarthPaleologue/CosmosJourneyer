@@ -20,6 +20,10 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { ISaveBackend } from "./saveBackend";
 import type { Save } from "./saveFileData";
 
+/**
+ * @param saveBackend - Backend supplying commander IDs and save collections.
+ * @returns Save with the greatest timestamp, or `null` when none exist.
+ */
 export async function getLatestSaveFromBackend(saveBackend: ISaveBackend): Promise<DeepReadonly<Save> | null> {
     const cmdrUuids = await saveBackend.getCmdrUuids();
 

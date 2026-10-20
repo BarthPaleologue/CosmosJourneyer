@@ -62,6 +62,13 @@ export type Objects = {
     };
 };
 
+/**
+ * Loads and assembles the meshes and prefab resources used throughout the game.
+ * @param materials Materials assigned to the created objects.
+ * @param scene Scene that owns the loaded and procedural meshes.
+ * @param progressMonitor Tracks completion of individual object-loading tasks.
+ * @returns Reusable meshes, humanoid prefabs, and collision shapes for game objects.
+ */
 export async function loadObjects(
     materials: Materials,
     scene: Scene,

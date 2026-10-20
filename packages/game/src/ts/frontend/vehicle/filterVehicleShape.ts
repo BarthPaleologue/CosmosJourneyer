@@ -19,6 +19,11 @@ import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 
 import { CollisionMask } from "@/settings";
 
+/**
+ * Configures a vehicle part's collision masks against the rest of the world.
+ * @param shape Physics shape whose membership and collision masks are set.
+ * @param vehiclePartsMask Collision bit mask shared by vehicle parts.
+ */
 export function filterVehicleShape(shape: PhysicsShape, vehiclePartsMask: number): void {
     shape.filterMembershipMask = vehiclePartsMask | CollisionMask.DYNAMIC_OBJECTS;
     shape.filterCollideMask = CollisionMask.EVERYTHING & ~vehiclePartsMask;

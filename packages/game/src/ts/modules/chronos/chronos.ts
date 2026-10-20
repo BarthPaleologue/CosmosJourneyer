@@ -30,6 +30,7 @@ import { CropType } from "@/utils/agriculture";
 
 import type { DarkKnightModel } from "../darkKnight/darkKnightModel";
 
+/** @returns The authored Chronos system. */
 export function getChronosModel(): { systemModel: StarSystemModel; systemEntityModels: Array<SystemEntityModel> } {
     const coordinates: StarSystemCoordinates = {
         starSectorX: 0,

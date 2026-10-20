@@ -27,6 +27,11 @@ export type NoiseTextures = {
     seamlessPerlin: Texture;
 };
 
+/**
+ * @param engine Engine used to create the texture.
+ * @param progressMonitor Progress monitor notified when the image loads.
+ * @returns The repeating Perlin-noise map.
+ */
 export async function loadNoiseTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

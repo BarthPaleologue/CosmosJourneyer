@@ -24,23 +24,12 @@ import type { Itinerary } from "@/backend/player/serializedPlayer";
 import type { StarSystemController } from "@/frontend/universe/starSystemController";
 
 /**
- * Describes information used by mission nodes to update their state
+ * Player and universe state consumed when mission nodes update.
  */
 export type MissionContext = {
-    /**
-     * The current star system the player is in
-     */
     currentSystem: StarSystemController;
-    /**
-     * The current itinerary of the player
-     */
     currentItinerary: DeepReadonly<Itinerary> | null;
-    /**
-     * The world position of the player
-     */
     playerPosition: Vector3;
-    /**
-     * Reference to the physics engine for ray/shape casting
-     */
+    /** Enables ray and shape casts for mission checks. */
     physicsEngine: PhysicsEngineV2;
 };

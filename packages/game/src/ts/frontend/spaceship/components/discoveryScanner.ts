@@ -49,6 +49,13 @@ export class DiscoveryScanner {
     }
 }
 
+/**
+ * Checks whether a celestial body falls within a scanner's effective range.
+ * @param scanner Scanner specification that determines relative range.
+ * @param playerPosition Player's world-space position.
+ * @param celestialBody Body whose distance is checked.
+ * @returns Whether the body is close enough to scan.
+ */
 export function isScannerInRange(
     scanner: DiscoveryScanner,
     playerPosition: Vector3,

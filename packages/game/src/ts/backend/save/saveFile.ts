@@ -24,6 +24,11 @@ import { safeParseSave } from "./saveFileData";
 import type { Save } from "./saveFileData";
 import type { SaveLoadingError } from "./saveLoadingError";
 
+/**
+ * Reads a browser `File` as JSON and validates it against the current save schema.
+ * @param rawSaveFile - File selected or provided as a save import.
+ * @returns Validated save data, or an error value for invalid JSON or save shape.
+ */
 export async function parseSaveFile(rawSaveFile: File): Promise<Result<Save, SaveLoadingError>> {
     return new Promise((resolve) => {
         const reader = new FileReader();

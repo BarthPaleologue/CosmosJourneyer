@@ -18,6 +18,12 @@
 import { clamp, lerp } from "#/utils/math";
 import { EarthSeaLevelPressure } from "@cosmos-journeyer/physics";
 
+/**
+ * @param effectiveTemperature Effective temperature in kelvins.
+ * @param greenHouseOffset Greenhouse warming offset in kelvins.
+ * @param atmospherePressure Surface pressure in pascals.
+ * @returns Minimum and maximum surface temperatures in kelvins.
+ */
 export function getTemperatureRange(
     effectiveTemperature: number,
     greenHouseOffset: number,

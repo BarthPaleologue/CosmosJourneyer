@@ -20,6 +20,7 @@
  * @param efficiency The efficiency of the solar panel between 0 and 1.
  * @param energyRequirement The energy requirement in watts.
  * @param stellarEnergyFlux The incoming average energy flux from the stars in watts per square meter.
+ * @returns Required panel surface area in square meters.
  */
 export function getSolarPanelSurfaceFromEnergyRequirement(
     efficiency: number,

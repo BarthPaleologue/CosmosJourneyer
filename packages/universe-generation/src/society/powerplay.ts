@@ -42,6 +42,10 @@ export type PowerPlayData = {
     readonly capitalistCommunist: number;
 };
 
+/**
+ * @param systemGalacticPosition Star system position in galactic coordinates.
+ * @returns Powerplay influence and control data for the system.
+ */
 export function getPowerPlayData(systemGalacticPosition: Readonly<Vector3Like>): PowerPlayData {
     const coords = systemGalacticPosition;
 

@@ -49,6 +49,11 @@ import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing character interactions with physics objects.
+ */
 export async function createInteractionDemo(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
@@ -198,6 +203,14 @@ export async function createInteractionDemo(
     return scene;
 }
 
+/**
+ * @param options - Box placement.
+ * @param options.position - World-space center.
+ * @param options.size - Side length in meters.
+ * @param scene - Owning scene.
+ * @param interactionSystem - Registry for the box’s push action.
+ * @returns Physics aggregate for the interactive box.
+ */
 function spawnBoxAtPosition(
     { position, size }: { position: Vector3; size: number },
     scene: Scene,

@@ -31,6 +31,12 @@ import asteroid2Path from "@assets/asteroid/asteroid2.glb";
 
 export type Asteroid = { mesh: Mesh; physicsShape: PhysicsShape };
 
+/**
+ * Builds the enabled asteroid variants and assigns each one an environment collision shape.
+ * @param scene Scene that owns the asteroid meshes and physics shapes.
+ * @param progressMonitor Progress monitor whose task is completed after loading.
+ * @returns Asteroid meshes paired with their physics collision shapes.
+ */
 export async function loadAsteroids(scene: Scene, progressMonitor: ILoadingProgressMonitor): Promise<Array<Asteroid>> {
     const assetContainers = await loadAsteroidModels(scene, progressMonitor);
     const scalings = [0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7, 1.9, 2.1] as const;
@@ -46,6 +52,12 @@ export async function loadAsteroids(scene: Scene, progressMonitor: ILoadingProgr
     });
 }
 
+/**
+ * Loads both source asteroid models into containers attached to the scene.
+ * @param scene Scene that owns the model containers.
+ * @param progressMonitor Progress monitor whose task is completed after loading.
+ * @returns Containers for the two source asteroid models.
+ */
 export async function loadAsteroidModels(
     scene: Scene,
     progressMonitor: ILoadingProgressMonitor,
@@ -58,6 +70,12 @@ export async function loadAsteroidModels(
     return Promise.all(asteroidPromises);
 }
 
+/**
+ * Creates scaled variations of the supplied mesh.
+ * @param asteroid Asteroid mesh to transform or configure.
+ * @param scalings Scale factors applied to the asteroid geometry.
+ * @returns Independent mesh copies with the requested scales baked into their vertices.
+ */
 export function diversifyAsteroid(asteroid: Mesh, scalings: ReadonlyArray<number>): Mesh[] {
     const asteroids: Array<Mesh> = [];
     for (const scaling of scalings) {
@@ -72,6 +90,12 @@ export function diversifyAsteroid(asteroid: Mesh, scalings: ReadonlyArray<number
     return asteroids;
 }
 
+/**
+ * Normalizes the source mesh, creates scaled variants, and adds the disabled instances to the scene.
+ * @param container Mesh container whose geometry is being configured.
+ * @param scalings Scale factors applied to the asteroid geometry.
+ * @returns The source mesh and its scaled variants, all initially disabled.
+ */
 export function processAsteroids(container: AssetContainer, scalings: ReadonlyArray<number>): Mesh[] {
     const asteroids: Array<Mesh> = [];
 
@@ -97,6 +121,12 @@ export function processAsteroids(container: AssetContainer, scalings: ReadonlyAr
     return asteroids;
 }
 
+/**
+ * Configures a mesh-backed collision shape for environment-versus-dynamic-object contacts.
+ * @param asteroid Asteroid mesh to transform or configure.
+ * @param scene Scene that owns the collision shape.
+ * @returns A mesh collision shape with the asteroid collision masks applied.
+ */
 export function createAsteroidPhysicsShape(asteroid: Mesh, scene: Scene): PhysicsShape {
     const physicsShape = new PhysicsShapeMesh(asteroid, scene);
     physicsShape.filterMembershipMask = CollisionMask.ENVIRONMENT;

@@ -19,6 +19,12 @@ import type { TFunction } from "i18next";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
+/**
+ * Shows a message with a single confirmation button and waits for it to close.
+ * @param message Message displayed in the dialog.
+ * @param soundPlayer Plays the confirmation sound when the dialog closes.
+ * @param t Translation function for the confirmation button.
+ */
 export async function alertModal(message: string, soundPlayer: ISoundPlayer, t: TFunction): Promise<void> {
     const modal = document.createElement("dialog");
     modal.innerHTML = `

@@ -17,6 +17,11 @@
 
 import type { TransformNode } from "@babylonjs/core/pure";
 
+/**
+ * Bounds the whole transform hierarchy with a sphere centered on its absolute position.
+ * @param transform - Transform whose hierarchy is measured.
+ * @returns The enclosing radius in world units.
+ */
 export function getBoundingRadius(transform: TransformNode): number {
     const { min: boundingMin, max: boundingMax } = transform.getHierarchyBoundingVectors();
     const origin = transform.getAbsolutePosition();

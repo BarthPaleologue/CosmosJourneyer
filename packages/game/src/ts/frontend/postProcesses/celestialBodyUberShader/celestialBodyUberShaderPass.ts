@@ -254,6 +254,10 @@ export class CelestialBodyUberShaderPass extends PostProcess implements Updatabl
     }
 }
 
+/**
+ * @param raymarchedBody Model of the raymarched body rendered by the shader.
+ * @returns Define name used to compile the body's distance estimator.
+ */
 function getRaymarchedBodyDefine(raymarchedBody: DeepReadonly<RaymarchedBodyModel>): string {
     switch (raymarchedBody.type) {
         case "mandelbulb":
@@ -271,6 +275,13 @@ function getRaymarchedBodyDefine(raymarchedBody: DeepReadonly<RaymarchedBodyMode
     }
 }
 
+/**
+ * Binds the shape-specific parameters for a raymarched body to the shader.
+ * @param effect Effect receiving the body's uniforms.
+ * @param raymarchedBody Model supplying the shape and material parameters.
+ * @param averageScreenSize Body's average projected size used for shader detail.
+ * @returns No value; writes the body's uniforms to `effect`.
+ */
 function setRaymarchedBodyUniforms(
     effect: Effect,
     raymarchedBody: DeepReadonly<RaymarchedBodyModel>,

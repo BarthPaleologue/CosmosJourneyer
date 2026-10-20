@@ -18,6 +18,10 @@
 import { getRngFromSeed } from "@cosmos-journeyer/random";
 import type { LandingBayModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param seed Seed for reproducible procedural choices.
+ * @returns A landing bay section model.
+ */
 export function generateLandingBayModel(seed: number): LandingBayModel {
     const rng = getRngFromSeed(seed);
     return {

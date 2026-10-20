@@ -59,6 +59,11 @@ export class StarSystemLoader {
     /**
      * Loads the star system from the underlying data model.
      * This instantiates all stars, planets, satellites, anomalies and space stations in the star system.
+     * @param systemModel - The data model describing the star system to instantiate.
+     * @param assets - The loaded models and textures needed by the facility sections.
+     * @param scene - The Babylon.js scene that owns the rendered meshes.
+     * @param progressMonitor - The monitor that reports system-loading progress.
+     * @returns The instantiated star-system controller.
      */
     public async load(
         systemModel: DeepReadonly<StarSystemModel>,

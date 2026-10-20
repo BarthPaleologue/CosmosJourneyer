@@ -9,6 +9,12 @@ const mockDownloadStepIntervalMs = 250;
 const mockDownloadStepCount = 20;
 const mockDownloadSizeBytes = 125_000_000;
 
+/**
+ * Creates the simulated updater only when explicitly enabled in an unpackaged development app.
+ * @param app - Desktop application lifecycle and version access.
+ * @param isDevelopment - Whether the application runs in development mode.
+ * @returns The simulated updater, or null when disabled.
+ */
 export function createDevelopmentAutoUpdater(
     app: Pick<App, "getVersion" | "isPackaged" | "quit">,
     isDevelopment: boolean,
@@ -81,6 +87,11 @@ export class MockAutoUpdaterClient extends EventEmitter implements AutoUpdaterCl
     }
 }
 
+/**
+ * Resolves after the requested simulated update delay.
+ * @param durationMs - Delay in milliseconds.
+ * @returns A promise resolved after the delay.
+ */
 async function wait(durationMs: number): Promise<void> {
     return new Promise((resolve) => {
         setTimeout(resolve, durationMs);

@@ -38,6 +38,12 @@ import gettingCloseToSurfaceImageSrc from "@assets/tutorials/planetaryLandingTut
 import landingImageSrc from "@assets/tutorials/planetaryLandingTutorial/landing.webp";
 import saveData from "@assets/tutorials/planetaryLandingTutorial/save.json";
 
+/**
+ * Gets the keyboard keys bound to spaceship vertical movement.
+ * @param keyboardLayoutMap Current keyboard layout, when available.
+ * @param t Translation function used to join alternative keys.
+ * @returns A display string containing the available upward movement keys.
+ */
 function getSpaceshipUpKeys(keyboardLayoutMap: Map<string, string> | null, t: TFunction): string {
     const upDownBinding = SpaceShipControlsInputs.map.upDown.bindings[0];
     if (upDownBinding === undefined) {

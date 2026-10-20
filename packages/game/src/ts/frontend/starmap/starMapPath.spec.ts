@@ -22,6 +22,11 @@ import { describe, expect, it } from "vitest";
 
 import { getGreasedLinePathFromSystemSegments, getUniqueSystemSegments } from "./starMapPath";
 
+/**
+ * Creates coordinates for a system in the origin star sector.
+ * @param localX Local x-coordinate within the sector.
+ * @returns Coordinates with zero y and z components.
+ */
 function makeCoordinates(localX: number): StarSystemCoordinates {
     return {
         starSectorX: 0,

@@ -28,45 +28,36 @@ import type { CmdrSaves, Save } from "./saveFileData";
 import type { SaveLoadingError } from "./saveLoadingError";
 
 /**
- * Interface defining the storage backend for save data.
  */
 export interface IFile {
     /**
-     * Writes save data to the storage backend.
      * @param content - JSON string containing all commander saves
-     * @returns Boolean indicating success or failure of the write operation
+     * @returns Boolean indicating success or failure of the write operation.
      */
     write(content: string): Promise<boolean>;
 
     /**
-     * Reads save data from the storage backend.
-     * @returns Result containing either the loaded saves or an error
+     * @returns Result containing either the loaded saves or an error.
      */
     read(): Promise<string | null>;
 }
 
 /**
- * Implements save storage using a single storage file.
- * The entire file is rewritten when changes need to be saved
  */
 export class SaveBackendSingleFile implements ISaveBackend {
     /**
      * The storage backend used for persisting save data
-     * @private
      */
     private readonly backend: IFile;
 
     /**
      * Map storing commander saves, keyed by commander string
-     * @private
      */
     private readonly saves: Map<string, CmdrSaves>;
 
     /**
-     * Creates a new SaveManager instance.
-     * @param backend - The storage backend to use
-     * @param saves - Map of commander saves
-     * @private
+     * @param backend - File abstraction used to persist the main save document.
+     * @param saves - Commander save collections loaded from storage.
      */
     private constructor(backend: IFile, saves: Map<string, CmdrSaves>) {
         this.backend = backend;
@@ -74,10 +65,9 @@ export class SaveBackendSingleFile implements ISaveBackend {
     }
 
     /**
-     * Factory method to create a SaveManager instance.
-     * Reads save data from the provided backend and initializes the manager.
      * @param mainFile - The storage backend to use
-     * @returns Result containing either the created SaveManager or an error
+     * @param backupFile - File abstraction used to read and write the backup document.
+     * @returns Result containing either the created SaveManager or an error.
      */
     public static async CreateAsync(
         mainFile: IFile,
@@ -166,8 +156,7 @@ export class SaveBackendSingleFile implements ISaveBackend {
     }
 
     /**
-     * Persists the current saves to the storage backend.
-     * @returns Boolean indicating success or failure of the save operation
+     * @returns Boolean indicating success or failure of the save operation.
      */
     private async save(): Promise<boolean> {
         const savesJson = Object.fromEntries(this.saves);

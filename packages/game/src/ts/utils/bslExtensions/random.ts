@@ -23,6 +23,12 @@ export type DiskSampleOptions = {
     maxRadius: number;
 };
 
+/**
+ * Generates a stable shader-space annulus point with a square-root-distributed radius.
+ * @param id - Shader value used as the deterministic seed for the sample.
+ * @param options - Minimum and maximum radial distances used to scale the sample.
+ * @returns Shader X and Y coordinates for the sampled point.
+ */
 export function sampleDisk(
     id: NodeMaterialConnectionPoint,
     options: DiskSampleOptions,

@@ -24,6 +24,12 @@ import type { TFunction } from "i18next";
 import type { OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { KeplerianObject } from "../universe/keplerianOrbitalSimulation";
 
+/**
+ * Translates an orbital object’s category, including the spectral class for ordinary stars.
+ * @param model - Orbital object model to categorize.
+ * @param t - Translation function for player-facing text.
+ * @returns The localized category label.
+ */
 export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObjectModel>, t: TFunction): string {
     switch (model.type) {
         case "mandelbulb":
@@ -57,6 +63,10 @@ export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObje
     }
 }
 
+/**
+ * @param orbitalObject - Rendered object providing orbital data and a transform.
+ * @returns Simulation view retaining the same model data and transform.
+ */
 export function toKeplerian(orbitalObject: OrbitalObject): KeplerianObject {
     return {
         id: orbitalObject.model.id,

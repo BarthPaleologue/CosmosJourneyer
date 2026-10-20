@@ -34,6 +34,11 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 import { ItemPool } from "../utils/itemPool";
 import { enablePhysics } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting gas-planet rendering.
+ */
 export async function createGasPlanetScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

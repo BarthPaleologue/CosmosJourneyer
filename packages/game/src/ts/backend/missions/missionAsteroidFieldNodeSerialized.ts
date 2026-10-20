@@ -26,6 +26,10 @@ export const AsteroidFieldMissionState = {
 
 export type AsteroidFieldMissionState = (typeof AsteroidFieldMissionState)[keyof typeof AsteroidFieldMissionState];
 
+/**
+ * @param state - Legacy numeric value or already-string asteroid-field mission state.
+ * @returns Mapped state for values 0–2; other values pass through for schema validation.
+ */
 function preprocessLegacyAsteroidFieldMissionState(state: unknown): unknown {
     if (typeof state !== "number") {
         return state;

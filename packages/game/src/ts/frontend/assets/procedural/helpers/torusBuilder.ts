@@ -18,23 +18,15 @@ const computeLpCirclePoint = (angle: number, radius: number, exponent: number): 
 
 /**
  * Creates the VertexData for a torus
- * @param options an object used to set the following optional parameters for the box, required but can be empty
- * * diameter the diameter of the torus, optional default 1
- * * thickness the diameter of the tube forming the torus, optional default 0.5
- * * tessellation the number of prism sides, 3 for a triangular prism, optional, default 24
- * * sideOrientation optional and takes the values : Mesh.FRONTSIDE (default), Mesh.BACKSIDE or Mesh.DOUBLESIDE
- * * frontUvs only usable when you create a double-sided mesh, used to choose what parts of the texture image to crop and apply on the front side, optional, default vector4 (0, 0, 1, 1)
- * * backUVs only usable when you create a double-sided mesh, used to choose what parts of the texture image to crop and apply on the back side, optional, default vector4 (0, 0, 1, 1)
- * * majorLpExponent exponent used to shape the major circle using an Lp (Minkowski) norm, optional default 2
- * * minorLpExponent exponent used to shape the minor circle using an Lp (Minkowski) norm, optional default 2
- * @param options.diameter
- * @param options.thickness
- * @param options.tessellation
- * @param options.sideOrientation
- * @param options.frontUVs
- * @param options.backUVs
- * @param options.majorLpExponent
- * @param options.minorLpExponent
+ * @param options Optional geometry and UV settings.
+ * @param options.diameter Outer diameter; defaults to 1.
+ * @param options.thickness Tube diameter; defaults to 0.5.
+ * @param options.tessellation Number of subdivisions; defaults to 24.
+ * @param options.sideOrientation Face orientation; defaults to `Mesh.FRONTSIDE`.
+ * @param options.frontUVs UV rectangle for the front face when using double-sided geometry.
+ * @param options.backUVs UV rectangle for the back face when using double-sided geometry.
+ * @param options.majorLpExponent Exponent for the major ring's Lp shape; defaults to 2.
+ * @param options.minorLpExponent Exponent for the tube cross-section's Lp shape; defaults to 2.
  * @returns the VertexData of the torus
  */
 export function CreateTorusVertexData(options: {

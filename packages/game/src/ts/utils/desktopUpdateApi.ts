@@ -28,6 +28,10 @@ declare global {
     }
 }
 
+/**
+ * Reads the desktop bridge's update API when the game runs inside the desktop app.
+ * @returns Update controls exposed by Electron, or `null` in a browser without the bridge.
+ */
 export function getDesktopUpdateApi(): DesktopUpdateApi | null {
     return window.cosmosDesktop?.updates ?? null;
 }

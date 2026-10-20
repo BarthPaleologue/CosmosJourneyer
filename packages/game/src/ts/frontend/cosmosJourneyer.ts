@@ -431,6 +431,7 @@ export class CosmosJourneyer {
 
     /**
      * Creates the engine and the scenes and loads the assets async
+     * @param t Translation function used to render player-facing text.
      * @returns A promise that resolves when the engine and the scenes are created and the assets are loaded
      */
     public static async New(t: TFunction): Promise<Result<CosmosJourneyer, Error>> {
@@ -734,6 +735,7 @@ export class CosmosJourneyer {
 
     /**
      * Inits the current star system
+     * @param skipMainMenu Whether to initialize directly into the current system.
      */
     public async init(skipMainMenu = false): Promise<void> {
         if (!skipMainMenu) {
@@ -991,6 +993,7 @@ export class CosmosJourneyer {
 
     /**
      * Generates a save file data object from the current star system and the player's position
+     * @returns A serialized save containing the player's current location and state.
      */
     public async generateSaveData(): Promise<Save> {
         const spaceShipControls = this.starSystemView.getSpaceshipControls();

@@ -47,6 +47,11 @@ import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing QR-code scanning from the camera view.
+ */
 export async function createQrScanScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

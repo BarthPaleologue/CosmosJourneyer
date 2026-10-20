@@ -27,6 +27,12 @@ export type EnvironmentTextures = {
     readonly milkyWay: CubeTexture;
 };
 
+/**
+ * Loads the Milky Way cube map used for the skybox.
+ * @param scene Scene that owns the environment texture.
+ * @param progressMonitor Tracks completion of the cube-map load.
+ * @returns The skybox texture with gamma-space sampling enabled.
+ */
 export async function loadEnvironmentTextures(
     scene: Scene,
     progressMonitor: ILoadingProgressMonitor,

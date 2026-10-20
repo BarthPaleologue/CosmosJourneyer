@@ -35,6 +35,11 @@ import { GravitySystem } from "@/frontend/universe/gravitySystem";
 
 import { enablePhysics, enableShadows } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing gravity effects on physics bodies.
+ */
 export async function createGravitySystemScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

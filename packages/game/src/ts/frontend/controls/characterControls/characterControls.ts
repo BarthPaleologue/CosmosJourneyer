@@ -219,6 +219,7 @@ export class CharacterControls implements Controls {
 
     /**
      * Adjusts the 3rd person camera framing to obey the rule of thirds.
+     * @param deltaSeconds Time elapsed since the previous update.
      */
     private updateThirdPersonCameraFraming(deltaSeconds: number): void {
         if (this.elapsedSeconds - this.lastUserCameraChangeTime < this.autoFramingCooldown) {

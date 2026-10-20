@@ -35,6 +35,11 @@ self.onmessage = ({ data }: MessageEvent<TerrainSystemWorkerTask>): void => {
     self.postMessage(output satisfies TerrainSystemWorkerOutput, { transfer });
 };
 
+/**
+ * Routes a worker message to the chunk-building or height-computation handler.
+ * @param task - The terrain task containing the inputs for this computation.
+ * @returns The worker response produced by the selected task handler.
+ */
 function handleTask(task: TerrainSystemWorkerTask): ReturnPayload {
     switch (task.payload.type) {
         case "buildChunk":
@@ -44,6 +49,12 @@ function handleTask(task: TerrainSystemWorkerTask): ReturnPayload {
     }
 }
 
+/**
+ * Builds terrain mesh buffers and packages them with the originating task identifier.
+ * @param taskId - Identifier assigned to the terrain task.
+ * @param task - The terrain task containing the inputs for this computation.
+ * @returns The chunk buffers and transferable buffers for the worker response.
+ */
 function handleBuildChunkTask(taskId: TaskId, task: BuildChunkWorkerPayload): ReturnPayload {
     const { positions, indices, normals, scatteredInstances } = createChunkBuffers(task);
 
@@ -70,6 +81,12 @@ function handleBuildChunkTask(taskId: TaskId, task: BuildChunkWorkerPayload): Re
     };
 }
 
+/**
+ * Computes terrain height samples and packages them with the originating task identifier.
+ * @param taskId - Identifier assigned to the terrain task.
+ * @param task - The terrain task containing the inputs for this computation.
+ * @returns The height samples and their transferable buffer for the worker response.
+ */
 function handleComputeHeightsTask(taskId: TaskId, task: ComputeHeightsWorkerPayload): ReturnPayload {
     const heights = computeHeights(task);
 

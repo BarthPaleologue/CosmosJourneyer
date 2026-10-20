@@ -40,8 +40,9 @@ import { MissionXorNode } from "./logic/missionXorNode";
 import type { MissionNode } from "./missionNode";
 
 /**
- * Deserialize recursively a mission node.
- * @param missionNodeSerialized The serialized mission node.
+ * @param missionNodeSerialized - Saved mission-node state.
+ * @param universeBackend - Universe lookup for targets.
+ * @returns The restored mission node, or null for an unavailable target.
  */
 export function deserializeMissionNode(
     missionNodeSerialized: DeepReadonly<MissionNodeSerialized>,
@@ -68,6 +69,12 @@ export function deserializeMissionNode(
     }
 }
 
+/**
+ * Drops children that cannot be restored.
+ * @param serialized - Saved node state.
+ * @param universeBackend - Universe lookup for targets.
+ * @returns The restored AND node.
+ */
 function deserializeMissionAndNode(
     serialized: DeepReadonly<MissionAndNodeSerialized>,
     universeBackend: UniverseBackend,
@@ -79,6 +86,12 @@ function deserializeMissionAndNode(
     );
 }
 
+/**
+ * Drops children that cannot be restored.
+ * @param serialized - Saved node state.
+ * @param universeBackend - Universe lookup for targets.
+ * @returns The restored OR node.
+ */
 function deserializeMissionOrNode(
     serialized: DeepReadonly<MissionOrNodeSerialized>,
     universeBackend: UniverseBackend,
@@ -90,6 +103,12 @@ function deserializeMissionOrNode(
     );
 }
 
+/**
+ * Drops children that cannot be restored.
+ * @param serialized - Saved node state.
+ * @param universeBackend - Universe lookup for targets.
+ * @returns The restored XOR node.
+ */
 function deserializeMissionXorNode(
     serialized: DeepReadonly<MissionXorNodeSerialized>,
     universeBackend: UniverseBackend,
@@ -101,6 +120,11 @@ function deserializeMissionXorNode(
     );
 }
 
+/**
+ * @param serialized - Saved sequence state.
+ * @param universeBackend - Universe lookup for targets.
+ * @returns Sequence with valid children and its saved active-child index.
+ */
 function deserializeMissionSequenceNode(
     serialized: DeepReadonly<MissionSequenceNodeSerialized>,
     universeBackend: UniverseBackend,
@@ -114,6 +138,12 @@ function deserializeMissionSequenceNode(
     return missionNode;
 }
 
+/**
+ * Restores an asteroid-field action and its progress when the target is available.
+ * @param serialized - Saved asteroid-field action state.
+ * @param universeBackend - Universe lookup for the target.
+ * @returns The restored action, or null when the target is unavailable.
+ */
 function deserializeMissionAsteroidFieldNode(
     serialized: DeepReadonly<MissionAsteroidFieldNodeSerialized>,
     universeBackend: UniverseBackend,
@@ -123,12 +153,22 @@ function deserializeMissionAsteroidFieldNode(
     return missionNode;
 }
 
+/**
+ * Restores a fly-by target and its saved progress.
+ * @param serialized - Saved fly-by action state.
+ * @returns The restored fly-by action.
+ */
 function deserializeMissionFlyByNode(serialized: DeepReadonly<MissionFlyByNodeSerialized>): MissionFlyByNode {
     const missionNode = new MissionFlyByNode(serialized.objectId);
     missionNode.setState(serialized.state);
     return missionNode;
 }
 
+/**
+ * Restores a terminator-landing target and its saved progress.
+ * @param serialized - Saved terminator-landing action state.
+ * @returns The restored landing action.
+ */
 function deserializeMissionTerminatorLandingNode(
     serialized: DeepReadonly<MissionTerminatorLandingNodeSerialized>,
 ): MissionTerminatorLandingNode {

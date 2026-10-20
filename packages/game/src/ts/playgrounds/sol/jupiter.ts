@@ -33,6 +33,11 @@ import { ItemPool } from "@/utils/itemPool";
 
 import { enablePhysics } from "../utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting Jupiter’s appearance.
+ */
 export async function createJupiterScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

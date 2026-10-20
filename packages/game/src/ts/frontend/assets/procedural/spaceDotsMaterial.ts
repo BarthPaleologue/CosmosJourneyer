@@ -217,6 +217,12 @@ export class SpaceDotsMaterial {
     }
 }
 
+/**
+ * Creates a vector uniform initialized to `value`.
+ * @param name Shader uniform name.
+ * @param value Initial vector value.
+ * @returns The node material input block for the uniform.
+ */
 function createUniformVector3(name: string, value: Vector3): InputBlock {
     const inputBlock = new InputBlock(name);
     inputBlock.target = NodeMaterialBlockTargets.Neutral;

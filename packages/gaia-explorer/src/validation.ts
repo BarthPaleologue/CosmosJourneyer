@@ -32,6 +32,12 @@ export type ValidationResult = Readonly<{
     issues: ReadonlyArray<string>;
 }>;
 type ValidatedStar = z.infer<typeof StarSchema>;
+/**
+ * Checks a star's classification and temperature against dataset limits.
+ * @param star Star entry parsed from the dataset schema.
+ * @param cubeId Identifier of the cube containing the star.
+ * @returns Validation issues found for the star.
+ */
 function validateStar(star: DeepReadonly<ValidatedStar>, cubeId: string): ReadonlyArray<string> {
     const issues: string[] = [];
     if (star.nature === null) {
@@ -57,6 +63,11 @@ function validateStar(star: DeepReadonly<ValidatedStar>, cubeId: string): Readon
     }
     return issues;
 }
+/**
+ * Validates the dataset structure and checks stellar metadata constraints.
+ * @param input Dataset value to validate.
+ * @returns Schema errors and semantic issues, with success true when both are empty.
+ */
 export function validateDataset(input: unknown): ValidationResult {
     const parsed = DatasetSchema.safeParse(input);
     if (!parsed.success) {
@@ -74,6 +85,11 @@ export function validateDataset(input: unknown): ValidationResult {
     }
     return { success: issues.length === 0, schemaIssues: [], issues };
 }
+/**
+ * Reads a JSON dataset file and validates its contents.
+ * @param path Filesystem path to the dataset JSON file.
+ * @returns The schema and semantic validation result.
+ */
 export async function validateFile(path: string): Promise<ValidationResult> {
     return validateDataset(JSON.parse(await readFile(path, "utf8")) as unknown);
 }

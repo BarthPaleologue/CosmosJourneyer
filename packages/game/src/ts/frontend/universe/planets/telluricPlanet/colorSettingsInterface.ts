@@ -20,6 +20,11 @@ import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 export type ColorMode = "default" | "moisture" | "temperature" | "normal" | "height";
 
+/**
+ * Maps the selected planet color view to its shader uniform index.
+ * @param colorMode - The selected planet color mode.
+ * @returns The numeric index corresponding to the color mode.
+ */
 export function getColorModeIndex(colorMode: ColorMode): number {
     switch (colorMode) {
         case "default":

@@ -179,12 +179,27 @@ export class SpaceDots implements Transformable {
     }
 }
 
+/**
+ * Projects a direction onto the plane perpendicular to `normal`.
+ * @param vector Direction to project.
+ * @param normal Normalized plane normal.
+ * @param ref Vector that receives the projected direction.
+ * @returns The projected direction in `ref`.
+ */
 function projectOntoPlaneToRef(vector: Vector3, normal: Vector3, ref: Vector3): Vector3 {
     ref.copyFrom(normal).scaleInPlace(Vector3.Dot(vector, normal));
     ref.scaleInPlace(-1).addInPlace(vector);
     return ref;
 }
 
+/**
+ * Computes the signed angle from one direction to another around an axis.
+ * @param from Normalized starting direction.
+ * @param to Normalized destination direction.
+ * @param axis Normalized rotation axis.
+ * @param tmpCross Scratch vector for the cross product.
+ * @returns Signed angle in radians.
+ */
 function computeSignedAngleAroundAxis(from: Vector3, to: Vector3, axis: Vector3, tmpCross: Vector3): number {
     Vector3.CrossToRef(from, to, tmpCross);
     return Math.atan2(Vector3.Dot(axis, tmpCross), Vector3.Dot(from, to));

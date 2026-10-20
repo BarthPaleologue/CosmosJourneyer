@@ -34,6 +34,11 @@ import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 
 import { enablePhysics } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting procedural forest rendering.
+ */
 export async function createForestScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

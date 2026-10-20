@@ -277,12 +277,25 @@ describe("packer core", () => {
     });
 });
 
+/**
+ * Builds a test packing request from its four channel assignments.
+ * @param rows - Four output channel assignments in RGBA order.
+ * @returns A request containing the supplied assignments.
+ */
 function createPackRequest(
     rows: [ChannelAssignment, ChannelAssignment, ChannelAssignment, ChannelAssignment],
 ): PackRequest {
     return { rows };
 }
 
+/**
+ * Creates a test route from a source channel or constant fill to an output channel.
+ * @param outputChannel - Destination RGBA channel.
+ * @param inputKey - Source input key, or null to use a constant.
+ * @param sourceChannel - RGBA channel to read from the source image.
+ * @param constantFill - Byte value used without a source image.
+ * @returns The output channel assignment.
+ */
 function assignment(
     outputChannel: ColorChannel,
     inputKey: string | null,
@@ -297,6 +310,16 @@ function assignment(
     };
 }
 
+/**
+ * Creates a decoded test input with a supplied or deterministic file signature.
+ * @param name - Test input display name.
+ * @param width - Image width in pixels.
+ * @param height - Image height in pixels.
+ * @param rgba - Single RGBA pixel to repeat, or full image bytes.
+ * @param options - Optional test input signature override.
+ * @param options.signature - File signature to use instead of the deterministic fixture signature.
+ * @returns The input fixture with decoded pixels and signature.
+ */
 function createInput(
     name: string,
     width: number,
@@ -317,6 +340,13 @@ function createInput(
     };
 }
 
+/**
+ * Creates test RGBA pixels, repeating a single pixel or copying the supplied image data.
+ * @param width - Image width in pixels.
+ * @param height - Image height in pixels.
+ * @param rgba - Single RGBA pixel to repeat, or full image bytes.
+ * @returns The decoded image fixture.
+ */
 function createImage(width: number, height: number, rgba: readonly number[]): DecodedImage {
     const pixels = new Uint8ClampedArray(width * height * 4);
 
@@ -335,6 +365,12 @@ function createImage(width: number, height: number, rgba: readonly number[]): De
     };
 }
 
+/**
+ * Resamples test pixels to fit the preview edge limit using nearest-neighbor sampling.
+ * @param packed - Full-resolution packed pixels and dimensions.
+ * @param maxEdge - Maximum preview width or height in pixels.
+ * @returns The original texture if it fits, otherwise the resampled preview.
+ */
 function resizePreview(packed: PackedTexture, maxEdge: number): PackedTexture {
     if (packed.width <= maxEdge && packed.height <= maxEdge) {
         return packed;

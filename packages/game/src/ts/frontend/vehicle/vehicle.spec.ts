@@ -63,6 +63,12 @@ type TestWheelLayout = {
     readonly radius?: number;
 };
 
+/**
+ * Builds a vehicle fixture with the requested wheel layout and overrides.
+ * @param layout Test wheel positions and capabilities.
+ * @param options Optional vehicle parameters to override in the fixture.
+ * @returns The vehicle and Babylon physics objects used by its tests.
+ */
 function createVehicle(
     layout: ReadonlyArray<TestWheelLayout> = [
         { z: 2.6, steerable: true },
@@ -304,6 +310,10 @@ const driveLayout: ReadonlyArray<TestWheelLayout> = [
 ];
 const driveTargets = () => fixture.driveMotors.map((motor) => motor.target.mock.lastCall?.[1]);
 const driveTorques = () => fixture.driveMotors.map((motor) => motor.torque.mock.lastCall?.[1]);
+/**
+ * Sets the fixture vehicle's forward speed for a longitudinal driving case.
+ * @param speed Forward speed in meters per second.
+ */
 function setLongitudinalVelocity(speed: number) {
     const forward = fixture.vehicle.getTransform().getDirection(Vector3.Forward());
     vi.spyOn(fixture.frame.body, "getLinearVelocity").mockReturnValue(forward.scale(speed));

@@ -19,6 +19,11 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import type { Vector3Like } from "@/utils/types";
 
+/**
+ * @param vector - Coordinates to copy.
+ * @param target - Vector to update, allocated when omitted.
+ * @returns The target vector containing the copied coordinates.
+ */
 export function wrapVector3(vector: Vector3Like, target = new Vector3()): Vector3 {
     return target.copyFromFloats(vector.x, vector.y, vector.z);
 }

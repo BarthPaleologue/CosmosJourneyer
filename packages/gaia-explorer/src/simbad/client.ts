@@ -19,6 +19,12 @@ const nullableNumber = (value: string | undefined): number | null => {
     const text = nullableText(value);
     return text === null ? null : Number(text);
 };
+/**
+ * Parses one SIMBAD response row and associates it with its Gaia source row.
+ * @param raw Raw columns returned by the SIMBAD TAP service.
+ * @param batch Gaia rows included in the corresponding query batch.
+ * @returns The source identifier and metadata, or undefined for an unmatched row.
+ */
 function parseMetadata(
     raw: Readonly<Record<string, string>>,
     batch: DeepReadonly<Array<GaiaRow>>,
@@ -84,6 +90,11 @@ export class SimbadClient {
         return ok(metadata);
     }
 }
+/**
+ * Creates a SIMBAD client backed by the synchronous TAP service.
+ * @param options TAP transport settings, batch size, and optional service endpoint.
+ * @returns A client that looks up metadata for Gaia rows.
+ */
 export function createSimbadClient(options: SimbadClientOptions = {}): SimbadClient {
     const { batchSize, endpoint = SimbadTapSyncEndpoint, ...tapOptions } = options;
     return new SimbadClient(createSyncTapClient(endpoint, tapOptions), batchSize);

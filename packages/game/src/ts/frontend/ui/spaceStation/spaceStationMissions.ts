@@ -31,6 +31,9 @@ import { MissionContainer } from "./missionContainer";
  * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
  * @param stationModel The space station model where the missions are generated
  * @param player The player for which the missions are generated
+ * @param universeBackend Backend used to resolve the station's star system.
+ * @param soundPlayer Sound player passed to each mission entry.
+ * @param t Translation function for mission labels and actions.
  * @returns The DOM element containing the generated missions as HTML
  */
 export function generateMissionsDom(

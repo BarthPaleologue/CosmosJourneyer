@@ -19,6 +19,10 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 import { TerrainSettings } from "terrain-generation";
 
+/**
+ * @param planetModel - The planet model that supplies radius and terrain parameters.
+ * @returns The terrain settings derived from the planet model.
+ */
 export function createTerrainSettings(
     planetModel: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>,
 ): TerrainSettings {

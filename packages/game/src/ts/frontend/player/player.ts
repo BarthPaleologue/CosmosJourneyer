@@ -199,6 +199,7 @@ export class Player {
     /**
      * Performs a deep copy of the player
      * @param player the player to copy from
+     * @param universeBackend Backend used to resolve and copy player system data.
      */
     public copyFrom(player: Player, universeBackend: UniverseBackend): void {
         this.uuid = player.uuid;

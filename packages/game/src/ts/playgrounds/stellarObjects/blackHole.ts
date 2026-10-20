@@ -31,6 +31,11 @@ import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHo
 
 import { enablePointerLock } from "../utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting black-hole rendering.
+ */
 export async function createBlackHoleScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

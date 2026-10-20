@@ -56,7 +56,7 @@ export const SpaceTelescopeModelSchema = z.object({
 
 export type SpaceTelescopeModel = z.infer<typeof SpaceTelescopeModelSchema> & SystemContentModel<"spaceTelescope">;
 
-/** Historical optical parameters with scaled-down insulation sheets. */
+/** @returns Default telescope geometry. */
 export function createSpaceTelescopeModel(): SpaceTelescopeModel {
     return {
         type: "spaceTelescope",

@@ -66,7 +66,10 @@ export class TelescopePrimaryMirror implements Transformable {
     }
 }
 
-/** Preserve the prototype's axial hexagonal grid, central opening and circular edge selection. */
+/**
+ * @param model - Optical and segmentation settings.
+ * @returns Conic-surface segments clipped to the aperture, excluding the central cell.
+ */
 export function createPrimaryMirrorSegments(model: DeepReadonly<PrimaryMirrorModel>): ReadonlyArray<MirrorSegment> {
     const { tileRadius, gap } = model.segmentation;
     const flat = Math.sqrt(3) * tileRadius;
@@ -91,6 +94,13 @@ export function createPrimaryMirrorSegments(model: DeepReadonly<PrimaryMirrorMod
     return segments;
 }
 
+/**
+ * @param x - Tile center X, in meters.
+ * @param z - Tile center Z, in meters.
+ * @param tileRadius - Hexagonal tile radius, in meters.
+ * @param apertureRadius - Mirror aperture radius, in meters.
+ * @returns Whether the tile center or a corner lies inside the aperture.
+ */
 function isSegmentSelected(x: number, z: number, tileRadius: number, apertureRadius: number): boolean {
     if (x * x + z * z <= apertureRadius ** 2) {
         return true;
@@ -104,7 +114,14 @@ function isSegmentSelected(x: number, z: number, tileRadius: number, apertureRad
     return false;
 }
 
-/** Conic sag and local normal, with a vertex curvature radius of 2f. */
+/**
+ * The vertex radius is twice the focal length.
+ * @param x - Surface X coordinate, in meters.
+ * @param z - Surface Z coordinate, in meters.
+ * @param focalLength - Focal length, in meters.
+ * @param conicConstant - Surface conic constant.
+ * @returns Sag in meters and unit surface normal.
+ */
 export function sampleConic(
     x: number,
     z: number,

@@ -31,7 +31,10 @@ export class WireframeTopology {
 
     /**
      * Adds a new vertex to the topology.
-     * @returns A handle to the newly created vertex you can use to connect edges.
+     * @param x Vertex x-coordinate.
+     * @param y Vertex y-coordinate.
+     * @param z Vertex z-coordinate.
+     * @returns Handle that can be used to connect edges to the new vertex.
      */
     addVertex(x: number, y: number, z: number): VertexHandle {
         const id = this.nextVertexId++;

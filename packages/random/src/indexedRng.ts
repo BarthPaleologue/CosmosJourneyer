@@ -19,7 +19,12 @@
 
 export type IndexedRng = (index: number) => number;
 
-/** Returns the same indexed noise as squirrel-noise@1.0.0. */
+/**
+ * Returns the same indexed noise as squirrel-noise@1.0.0.
+ * @param seed Seed mixed into the deterministic noise value.
+ * @param index Integer index to hash into a noise value.
+ * @returns Deterministic noise in the same range as the legacy implementation.
+ */
 export function legacySquirrelNoise(seed: number, index: number): number {
     const BIT_NOISE1 = 0x68e31da4;
     const BIT_NOISE2 = 0xb5297a4d;
@@ -38,10 +43,20 @@ export function legacySquirrelNoise(seed: number, index: number): number {
     return mangledBits / (2 ** 31 - 1);
 }
 
+/**
+ * Creates an indexed noise function using the legacy squirrel-noise algorithm.
+ * @param seed Seed shared by all generated indexed values.
+ * @returns A deterministic random source indexed by integer position.
+ */
 export function seededLegacySquirrelNoise(seed: number): IndexedRng {
     return (index) => legacySquirrelNoise(seed, index);
 }
 
+/**
+ * Creates the default indexed random source for a seed.
+ * @param seed Seed shared by all generated indexed values.
+ * @returns A deterministic random source indexed by integer position.
+ */
 export function getRngFromSeed(seed: number): IndexedRng {
     return seededLegacySquirrelNoise(seed);
 }

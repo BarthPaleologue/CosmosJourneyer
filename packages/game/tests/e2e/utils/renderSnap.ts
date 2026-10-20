@@ -1,6 +1,16 @@
 import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
+/**
+ * Waits for scene readiness before comparing the canvas to its baseline.
+ * @param page - Playground browser page.
+ * @param opts - Capture settings.
+ * @param opts.scene - Optional scene key.
+ * @param opts.shotName - Baseline filename without extension.
+ * @param opts.urlParams - Extra URL parameters.
+ * @param opts.urlParams.freeze - Simulation freeze time.
+ * @param opts.flagToWait - Canvas data attribute set to 1 when ready.
+ */
 export async function renderAndSnap(
     page: Page,
     opts: {

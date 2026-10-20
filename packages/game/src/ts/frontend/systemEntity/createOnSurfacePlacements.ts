@@ -46,6 +46,14 @@ type SurfaceTerrainResult = Readonly<{
     heights: Float32Array;
 }>;
 
+/**
+ * Resolves terrain heights and creates transforms for all surface placements.
+ * @param entityIdToPlacementModel Entity identifiers paired with placement models.
+ * @param orbitalObjects Orbital objects used to resolve placement parents.
+ * @param terrainSystem Terrain query service for surface heights.
+ * @param scene Scene that owns the resulting placement transforms.
+ * @returns Placements keyed by entity ID, or an error if a parent or height query fails.
+ */
 export async function createOnSurfacePlacements(
     entityIdToPlacementModel: Iterable<SurfacePlacementRequest>,
     orbitalObjects: ReadonlyArray<OrbitalObject>,
@@ -68,6 +76,11 @@ export async function createOnSurfacePlacements(
     return createPlacementsFromTerrainResults(terrainResults.value, scene);
 }
 
+/**
+ * Groups placement requests by their referenced parent body.
+ * @param entityIdToPlacementModel Placement requests to group.
+ * @returns Placement requests grouped by parent object ID.
+ */
 function groupPlacementModelsByParent(
     entityIdToPlacementModel: Iterable<SurfacePlacementRequest>,
 ): Map<string, Array<SurfacePlacementRequest>> {
@@ -82,6 +95,13 @@ function groupPlacementModelsByParent(
     return parentIdToPlacementModels;
 }
 
+/**
+ * Requests terrain heights for each placement group.
+ * @param parentIdToPlacements Placement groups keyed by parent object ID.
+ * @param terrainSystem Terrain service receiving height requests.
+ * @param orbitalObjects Current-system objects used to find each parent.
+ * @returns Pending task IDs and their placement batches, or an error for an invalid parent.
+ */
 function queryTerrainSystemForPlacements(
     parentIdToPlacements: Map<string, Array<SurfacePlacementRequest>>,
     terrainSystem: ITerrainSystem,
@@ -117,6 +137,12 @@ function queryTerrainSystemForPlacements(
     return ok(pending);
 }
 
+/**
+ * Waits for each requested terrain height batch to finish.
+ * @param pending Terrain tasks and the placement batches they serve.
+ * @param terrainSystem Terrain service that advances and reports task results.
+ * @returns Completed height batches, or an error if a task fails.
+ */
 async function collectTerrainResults(
     pending: Map<TaskId, SurfaceBatch>,
     terrainSystem: ITerrainSystem,
@@ -147,6 +173,12 @@ async function collectTerrainResults(
     return ok(terrainResults);
 }
 
+/**
+ * Builds surface placement transforms from completed terrain height batches.
+ * @param terrainResults Completed terrain batches and their sampled heights.
+ * @param scene Scene that owns the resulting transforms.
+ * @returns Placements keyed by entity ID, or an error when a height is missing.
+ */
 function createPlacementsFromTerrainResults(
     terrainResults: Iterable<SurfaceTerrainResult>,
     scene: Scene,
@@ -171,6 +203,15 @@ function createPlacementsFromTerrainResults(
     return ok(entityIdToPlacement);
 }
 
+/**
+ * Places one entity at its requested coordinates above a planet's terrain.
+ * @param entityId Entity identifier used to name the transform.
+ * @param model Surface position and orientation requested by the entity model.
+ * @param terrainHeight Sampled terrain elevation at the placement coordinates.
+ * @param planet Planet that owns the surface placement.
+ * @param scene Scene that owns the placement transform.
+ * @returns The placement contract backed by the created transform.
+ */
 function createOnSurfacePlacement(
     entityId: string,
     model: DeepReadonly<OnSurfacePlacementModel>,
@@ -197,6 +238,14 @@ function createOnSurfacePlacement(
     };
 }
 
+/**
+ * Computes a local surface position and orientation from spherical coordinates.
+ * @param latitude Latitude in radians.
+ * @param longitude Longitude in radians.
+ * @param radius Distance from the planet center.
+ * @param rotation Heading, pitch, and roll relative to the local surface frame.
+ * @returns Position and orientation in the planet's local coordinate system.
+ */
 function createSurfaceTransform(
     latitude: number,
     longitude: number,

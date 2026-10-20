@@ -20,6 +20,11 @@ import { compute_heights } from "terrain-generation";
 import { createTerrainSettings } from "./createTerrainSettings";
 import type { ComputeHeightsWorkerPayload } from "./workers/terrainSystemWorkerProtocol";
 
+/**
+ * Runs the terrain height computation described by the worker task.
+ * @param task - The terrain task containing the inputs for this computation.
+ * @returns The height samples produced for the terrain task.
+ */
 export function computeHeights(task: ComputeHeightsWorkerPayload): Float32Array<ArrayBuffer> {
     const pointCount = Math.floor(task.coordinates.length / 2);
     const heights = new Float32Array(pointCount);

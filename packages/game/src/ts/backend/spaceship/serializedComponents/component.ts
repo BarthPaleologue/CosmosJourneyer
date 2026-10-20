@@ -35,6 +35,12 @@ export const SerializedComponentSchema = z.discriminatedUnion("type", [
 
 export type SerializedComponent = z.infer<typeof SerializedComponentSchema>;
 
+/**
+ * Resolves a serialized component discriminator to its localized display label.
+ * @param type - Component discriminator from the serialized component union.
+ * @param t - The translation function used to localize player-facing text.
+ * @returns Translated component name for interface display.
+ */
 export function getComponentTypeI18n(type: SerializedComponent["type"], t: TFunction): string {
     switch (type) {
         case "warpDrive":

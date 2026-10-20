@@ -23,11 +23,11 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectModel, Orbit, NeutronStarModel, SpinModel } from "@cosmos-journeyer/universe-model";
 
 /**
- * Creates a new pseudo-random neutron star model
- * @param seed The seed to use for the pseudo-random number generator
- * @param name The name of the neutron star
- * @param parentBodies The parent bodies of the neutron star (an empty array if it is the primary body of the system)
- * @returns A new neutron star model
+ * @param id Identifier assigned to the generated object.
+ * @param seed Seed for reproducible procedural choices.
+ * @param name Display name assigned to the neutron star.
+ * @param parentBodies Orbital ancestors; empty when the star is primary.
+ * @returns A neutron star model with seeded physical and orbital properties.
  * @see https://arxiv.org/pdf/2402.14030 "On the initial spin period distribution of neutron stars"
  */
 export function generateNeutronStarModel(

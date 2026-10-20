@@ -28,6 +28,12 @@ import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManag
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
+/**
+ * @param scene - Scene receiving physics support.
+ * @param gravity - Acceleration in meters per second squared.
+ * @param havokInstance - Existing Havok bindings, if available.
+ * @returns Havok engine with the playground velocity limits applied.
+ */
 export async function enablePhysics(
     scene: Scene,
     gravity = Vector3.Zero(),
@@ -39,12 +45,22 @@ export async function enablePhysics(
     return getPhysicsEngineV2(scene);
 }
 
+/**
+ * Requests pointer lock on canvas clicks for mouse-look controls.
+ * @param engine - Engine whose canvas receives clicks.
+ */
 export function enablePointerLock(engine: AbstractEngine): void {
     engine.getRenderingCanvas()?.addEventListener("click", async () => {
         await engine.getRenderingCanvas()?.requestPointerLock();
     });
 }
 
+/**
+ * Provides a visible sky and matching environment lighting.
+ * @param sunPosition - Sun position for the sky shader.
+ * @param scene - Owning scene.
+ * @param options - Optional skybox size, defaulting to 1000.
+ */
 export function createSky(sunPosition: Vector3, scene: Scene, options?: Partial<{ size: number }>): void {
     const skyMaterial = new SkyMaterial("skyMaterial", scene);
     skyMaterial.backFaceCulling = false;
@@ -65,6 +81,13 @@ export function createSky(sunPosition: Vector3, scene: Scene, options?: Partial<
     scene.environmentTexture = rp.cubeTexture;
 }
 
+/**
+ * Shares camera depth with cascaded shadows to bound the active shadow range.
+ * @param light - Shadow-casting light.
+ * @param depthRendererManager - Camera-depth provider.
+ * @param options - Optional cascade, resolution, range, and debug settings.
+ * @returns Cascaded shadow generator.
+ */
 export function enableShadows(
     light: DirectionalLight,
     depthRendererManager: DepthRendererManager,
@@ -125,6 +148,10 @@ export function enableShadows(
     return shadowGenerator;
 }
 
+/**
+ * Adds a scannable link to the playground page.
+ * @param qrUrl - URL to encode and display.
+ */
 export async function renderQrCodeOverlay(qrUrl: string): Promise<void> {
     const qrOverlay = document.createElement("div");
     qrOverlay.style.position = "fixed";
@@ -174,6 +201,11 @@ export async function renderQrCodeOverlay(qrUrl: string): Promise<void> {
     }
 }
 
+/**
+ * Exposes a value for browser-console inspection.
+ * @param name - Window property name.
+ * @param value - Debug value.
+ */
 export function addToWindow(name: string, value: unknown): void {
     (window as typeof window & { [name]: unknown })[name] = value;
 }

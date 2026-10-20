@@ -50,6 +50,11 @@ export const StarSystemCoordinatesSchema = z.object({
  */
 export type StarSystemCoordinates = z.infer<typeof StarSystemCoordinatesSchema>;
 
+/**
+ * @param a First coordinate set to compare.
+ * @param b Second coordinate set to compare.
+ * @returns Whether the coordinates match.
+ */
 export function starSystemCoordinatesEquals(
     a: DeepReadonly<StarSystemCoordinates>,
     b: DeepReadonly<StarSystemCoordinates>,
@@ -64,15 +69,19 @@ export function starSystemCoordinatesEquals(
     );
 }
 
+/**
+ * @param coordinates Star system coordinates to serialize.
+ * @returns Colon-delimited sector and local coordinates.
+ */
 export function serializeStarSystemCoordinates(coordinates: DeepReadonly<StarSystemCoordinates>): string {
     return `${coordinates.starSectorX}:${coordinates.starSectorY}:${coordinates.starSectorZ}:${coordinates.localX}:${coordinates.localY}:${coordinates.localZ}`;
 }
 
 /**
  * Converts a star sector to a string. This is useful for using the star sector as a key in a map.
- * @param sectorX
- * @param sectorY
- * @param sectorZ
+ * @param sectorX Integer sector coordinate on the universe X axis.
+ * @param sectorY Integer sector coordinate on the universe Y axis.
+ * @param sectorZ Integer sector coordinate on the universe Z axis.
  * @returns A string representation of the star sector.
  */
 export function serializeStarSectorCoordinates(sectorX: number, sectorY: number, sectorZ: number): string {

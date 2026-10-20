@@ -26,6 +26,11 @@ import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel"
 import { loadNoiseTextures } from "@/frontend/assets/textures/noises";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting the hyperspace tunnel effect.
+ */
 export async function createHyperspaceTunnelDemo(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

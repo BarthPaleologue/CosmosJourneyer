@@ -41,6 +41,11 @@ import { GravitySystem } from "@/frontend/universe/gravitySystem";
 
 import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing character controls in zero gravity.
+ */
 export async function createCharacterDemoScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

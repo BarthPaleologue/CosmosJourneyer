@@ -19,6 +19,11 @@ import type { TFunction } from "i18next";
 
 import { renderMarkdownInline } from "@/utils/markdown";
 
+/**
+ * Checks whether the game is running from its official host or a local app origin.
+ * @param location Browser location whose origin is checked.
+ * @returns Whether the origin is considered official.
+ */
 export function isOfficialGameLocation(location: Pick<Location, "hostname" | "protocol">): boolean {
     return (
         location.protocol === "app:" ||
@@ -29,6 +34,12 @@ export function isOfficialGameLocation(location: Pick<Location, "hostname" | "pr
     );
 }
 
+/**
+ * Creates a notice for game instances opened from unofficial web origins.
+ * @param t Translation function for the notice content.
+ * @param location Browser location to check; defaults to the current page.
+ * @returns Notice element for an unofficial origin, or `null` for an official one.
+ */
 export function createOfficialOriginNotice(
     t: TFunction,
     location: Pick<Location, "hostname" | "protocol"> = window.location,

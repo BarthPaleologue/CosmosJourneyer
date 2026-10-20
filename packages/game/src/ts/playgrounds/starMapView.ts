@@ -35,6 +35,11 @@ import { jsonSafeParse } from "@/utils/json";
 
 import { initI18n } from "@/i18n";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing star-map navigation and routing.
+ */
 export async function createStarMapViewScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

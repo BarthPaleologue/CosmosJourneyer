@@ -17,6 +17,9 @@
 
 import type { EngineBayModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @returns An engine bay section model.
+ */
 export function generateEngineBayModel(): EngineBayModel {
     return {
         type: "engineBay",

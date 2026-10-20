@@ -47,6 +47,14 @@ export type TriPlanarMaterialSamples = {
     ambientOcclusion: NodeMaterialConnectionPoint;
 };
 
+/**
+ * Samples terrain material maps along three orthogonal projections and blends by surface orientation.
+ * @param textures - Albedo/roughness and normal/ambient-occlusion texture pairs.
+ * @param samplePoint - Position whose coordinates provide the three projection UV pairs.
+ * @param surfaceNormal - Surface normal used to weight the X-, Y-, and Z-facing projections.
+ * @param options - Optional normal-map strength and green-channel inversion settings.
+ * @returns Blended albedo, roughness, ambient occlusion, and normalized normal shader values.
+ */
 export function triPlanarMaterial(
     textures: TerrainTextures,
     samplePoint: NodeMaterialConnectionPoint,
@@ -92,6 +100,11 @@ export function triPlanarMaterial(
     };
 }
 
+/**
+ * Derives the three orthogonal UV pairs from a 3D shader-space position.
+ * @param samplePoint - Position whose X, Y, and Z components become projection coordinates.
+ * @returns UVs for projections onto the YZ, XZ, and XY planes.
+ */
 export function getTriPlanarUVs(samplePoint: NodeMaterialConnectionPoint): {
     uvX: NodeMaterialConnectionPoint;
     uvY: NodeMaterialConnectionPoint;
@@ -105,6 +118,14 @@ export function getTriPlanarUVs(samplePoint: NodeMaterialConnectionPoint): {
     };
 }
 
+/**
+ * Reorients each projection's tangent-space normal and combines it with the surface normal.
+ * @param tangentNormalX - Normal sample for the projection facing the X axis.
+ * @param tangentNormalY - Normal sample for the projection facing the Y axis.
+ * @param tangentNormalZ - Normal sample for the projection facing the Z axis.
+ * @param surfaceNormal - Geometric surface normal that supplies each projection's dominant axis.
+ * @returns Reoriented normals for the X, Y, and Z projections, ready for weighted blending.
+ */
 export function whiteoutBlend(
     tangentNormalX: NodeMaterialConnectionPoint,
     tangentNormalY: NodeMaterialConnectionPoint,
@@ -146,6 +167,12 @@ export function whiteoutBlend(
     };
 }
 
+/**
+ * Creates a closure that blends three projected samples using powered normal components.
+ * @param surfaceNormal - Surface normal whose absolute components determine projection weights.
+ * @param blendSharpness - Exponent controlling how strongly weights favor the dominant axis.
+ * @returns Function that blends X-, Y-, and Z-projection samples with normalized weights.
+ */
 export function getTriPlanarBlending(surfaceNormal: NodeMaterialConnectionPoint, blendSharpness: number) {
     const blendWeights = pow(abs(surfaceNormal), vec(Vector3.One().scaleInPlace(blendSharpness)));
     const blendWeightsSum = dot(blendWeights, vec(Vector3.One()));
@@ -163,6 +190,13 @@ export function getTriPlanarBlending(surfaceNormal: NodeMaterialConnectionPoint,
     };
 }
 
+/**
+ * Interpolates each channel of two tri-planar material samples.
+ * @param samplesA - First material sample set, used at blend factor zero.
+ * @param samplesB - Second material sample set, used at blend factor one.
+ * @param blendFactor - Shader interpolation factor; values outside [0, 1] extrapolate.
+ * @returns Interpolated channels with the blended normal renormalized.
+ */
 export function mixTriPlanarSamples(
     samplesA: TriPlanarMaterialSamples,
     samplesB: TriPlanarMaterialSamples,

@@ -33,6 +33,11 @@ export type TireTextures = {
     ambientOcclusion: Texture;
 };
 
+/**
+ * @param engine Engine used to create the textures.
+ * @param progressMonitor Progress monitor notified as each image loads.
+ * @returns Surface maps used to shade tire materials.
+ */
 export async function loadTireTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

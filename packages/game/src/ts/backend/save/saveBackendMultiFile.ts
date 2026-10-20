@@ -28,63 +28,54 @@ import type { CmdrSaves, Save } from "./saveFileData";
 import type { SaveLoadingError } from "./saveLoadingError";
 
 /**
- * Interface defining the file system operations for save data.
  */
 export interface IFileSystem {
     /**
-     * Creates a directory at the specified path.
      * @param path - The directory path to create
-     * @returns Boolean indicating success or failure
+     * @returns Boolean indicating success or failure.
      */
     createDirectory(path: string): Promise<boolean>;
 
     /**
-     * Deletes a directory at the specified path.
      * @param path - The directory path to delete
-     * @returns Boolean indicating success or failure
+     * @returns Boolean indicating success or failure.
      */
     deleteDirectory(path: string): Promise<boolean>;
 
     /**
-     * Lists the contents of a directory.
      * @param path - The directory path to list
-     * @returns Array of file/directory names, or null if directory doesn't exist
+     * @returns Array of file/directory names, or null if directory doesn't exist.
      */
     listDirectory(path: string): Promise<Array<string> | null>;
 
     /**
-     * Checks if a directory exists.
      * @param path - The directory path to check
-     * @returns Boolean indicating if directory exists
+     * @returns Boolean indicating if directory exists.
      */
     directoryExists(path: string): Promise<boolean>;
 
     /**
-     * Writes content to a file.
      * @param path - The file path to write to
      * @param content - The content to write
-     * @returns Boolean indicating success or failure
+     * @returns Boolean indicating success or failure.
      */
     writeFile(path: string, content: string): Promise<boolean>;
 
     /**
-     * Reads content from a file.
      * @param path - The file path to read from
-     * @returns File content or null if file doesn't exist
+     * @returns File content or null if file doesn't exist.
      */
     readFile(path: string): Promise<string | null>;
 
     /**
-     * Deletes a file.
      * @param path - The file path to delete
-     * @returns Boolean indicating success or failure
+     * @returns Boolean indicating success or failure.
      */
     deleteFile(path: string): Promise<boolean>;
 
     /**
-     * Checks if a file exists.
      * @param path - The file path to check
-     * @returns Boolean indicating if file exists
+     * @returns Boolean indicating if file exists.
      */
     fileExists(path: string): Promise<boolean>;
 }
@@ -109,18 +100,15 @@ export class SaveBackendMultiFile implements ISaveBackend {
     private static readonly SAVES_DIR = "/saves";
 
     /**
-     * Creates a new SaveBackendMultiFile instance.
-     * @param fileSystem - The file system interface to use
-     * @private
+     * @param fileSystem - Storage adapter used for commander directories and save files.
      */
     private constructor(fileSystem: IFileSystem) {
         this.fileSystem = fileSystem;
     }
 
     /**
-     * Factory method to create a SaveBackendMultiFile instance.
      * @param fileSystem - The file system interface to use
-     * @returns Result containing either the created SaveBackendMultiFile or an error
+     * @returns Result containing either the created SaveBackendMultiFile or an error.
      */
     public static async CreateAsync(fileSystem: IFileSystem): Promise<Result<SaveBackendMultiFile, SaveLoadingError>> {
         try {
@@ -135,17 +123,15 @@ export class SaveBackendMultiFile implements ISaveBackend {
     }
 
     /**
-     * Gets the corrupted saves that were encountered during operations.
-     * @returns Array of corrupted save information
+     * @returns Array of corrupted save information.
      */
     public getCorruptedSaves(): Array<CorruptedSave> {
         return [...this.corruptedSaves];
     }
 
     /**
-     * Loads a save file and validates it.
      * @param filePath - Path to the save file
-     * @returns The loaded save or null if corrupted/missing
+     * @returns The loaded save or null if corrupted/missing.
      */
     private async loadSaveFile(filePath: string): Promise<Result<Save, SaveLoadingError>> {
         const content = await this.fileSystem.readFile(filePath);
@@ -198,9 +184,8 @@ export class SaveBackendMultiFile implements ISaveBackend {
     }
 
     /**
-     * Loads all saves for a commander from their directory.
      * @param cmdrUuid - The commander UUID
-     * @returns The commander's saves or undefined if none exist
+     * @returns The commander's saves or undefined if none exist.
      */
     public async getSavesForCmdr(cmdrUuid: string): Promise<CmdrSaves | undefined> {
         const cmdrDir = `${SaveBackendMultiFile.SAVES_DIR}/${cmdrUuid}`;
@@ -251,10 +236,9 @@ export class SaveBackendMultiFile implements ISaveBackend {
     }
 
     /**
-     * Deletes a specific save for a commander.
      * @param cmdrUuid - The commander UUID
      * @param saveUuid - The save UUID to delete
-     * @returns Boolean indicating success
+     * @returns Boolean indicating success.
      */
     public async deleteSaveForCmdr(cmdrUuid: string, saveUuid: string): Promise<boolean> {
         const cmdrDir = `${SaveBackendMultiFile.SAVES_DIR}/${cmdrUuid}`;
@@ -275,9 +259,8 @@ export class SaveBackendMultiFile implements ISaveBackend {
     }
 
     /**
-     * Deletes a commander and all their saves.
      * @param cmdrUuid - The commander UUID
-     * @returns Boolean indicating success
+     * @returns Boolean indicating success.
      */
     public async deleteCmdr(cmdrUuid: string): Promise<boolean> {
         const cmdrDir = `${SaveBackendMultiFile.SAVES_DIR}/${cmdrUuid}`;
@@ -285,7 +268,8 @@ export class SaveBackendMultiFile implements ISaveBackend {
     }
 
     /**
-     * @inheritdoc
+     * Lists commanders that have at least one readable manual or automatic save.
+     * @returns UUIDs of commanders with saved data; missing saves directories produce an empty list.
      */
     public async getCmdrUuids(): Promise<Array<string>> {
         const savesDir = SaveBackendMultiFile.SAVES_DIR;
@@ -314,7 +298,10 @@ export class SaveBackendMultiFile implements ISaveBackend {
     }
 
     /**
-     * @inheritdoc
+     * Writes a manual save under the commander's manual-save directory.
+     * @param cmdrUuid - Commander UUID used to select the save directory.
+     * @param save - Save snapshot to serialize as JSON.
+     * @returns `false` if that UUID already exists; otherwise whether the file write succeeded.
      */
     public async addManualSave(cmdrUuid: string, save: DeepReadonly<Save>): Promise<boolean> {
         const cmdrDir = `${SaveBackendMultiFile.SAVES_DIR}/${cmdrUuid}`;
@@ -335,7 +322,10 @@ export class SaveBackendMultiFile implements ISaveBackend {
     }
 
     /**
-     * @inheritdoc
+     * Writes an automatic save and prunes older automatic saves after a successful write.
+     * @param cmdrUuid - Commander UUID used to select the save directory.
+     * @param save - Save snapshot to serialize as JSON.
+     * @returns `false` if the UUID already exists or writing fails; otherwise `true` after cleanup.
      */
     public async addAutoSave(cmdrUuid: string, save: DeepReadonly<Save>): Promise<boolean> {
         const cmdrDir = `${SaveBackendMultiFile.SAVES_DIR}/${cmdrUuid}`;
@@ -364,7 +354,6 @@ export class SaveBackendMultiFile implements ISaveBackend {
     }
 
     /**
-     * Cleans up old auto saves to enforce the maximum limit.
      * @param cmdrUuid - The commander UUID
      */
     private async cleanupAutoSaves(cmdrUuid: string): Promise<void> {
@@ -399,7 +388,9 @@ export class SaveBackendMultiFile implements ISaveBackend {
     }
 
     /**
-     * @inheritdoc
+     * Imports manual and automatic saves for each commander through the normal write paths.
+     * @param saves - Commander-keyed collections of manual and automatic save snapshots.
+     * @returns Whether every individual save write succeeded; duplicate UUIDs count as failures.
      */
     public async importSaves(saves: DeepReadonly<Record<string, CmdrSaves>>): Promise<boolean> {
         const promises: Array<Promise<boolean>> = [];
@@ -419,7 +410,8 @@ export class SaveBackendMultiFile implements ISaveBackend {
     }
 
     /**
-     * @inheritdoc
+     * Reads each commander directory and collects its valid manual and automatic saves.
+     * @returns Commander-keyed save collections; commanders without readable saves are omitted.
      */
     public async exportSaves(): Promise<Record<string, CmdrSaves>> {
         const result: Record<string, CmdrSaves> = {};

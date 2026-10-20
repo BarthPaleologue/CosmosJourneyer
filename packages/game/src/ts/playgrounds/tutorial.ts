@@ -30,6 +30,11 @@ import { StationLandingTutorial } from "@/frontend/ui/tutorial/tutorials/station
 
 import { initI18n } from "@/i18n";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing the station-landing tutorial.
+ */
 export async function createTutorialScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

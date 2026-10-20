@@ -52,6 +52,7 @@ import type { MonolithModel } from "../monolith/entity";
 import { createSpaceTelescopeModel } from "../spaceTelescopes/spaceTelescopeModel";
 import type { SpaceTelescopeModel } from "../spaceTelescopes/spaceTelescopeModel";
 
+/** @returns The authored Vesta system. */
 export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: Array<SystemEntityModel> } {
     const coordinates: StarSystemCoordinates = {
         starSectorX: -1,

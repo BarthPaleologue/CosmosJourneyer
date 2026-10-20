@@ -41,6 +41,11 @@ import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing station landing approaches.
+ */
 export async function createStationLandingScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

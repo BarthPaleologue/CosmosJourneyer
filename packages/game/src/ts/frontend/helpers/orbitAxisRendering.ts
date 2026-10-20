@@ -18,6 +18,10 @@
 import type { OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { StarSystemController } from "../universe/starSystemController";
 
+/**
+ * @param starSystem - Current rendered star system.
+ * @returns Rendered objects eligible for orbit-axis visualization.
+ */
 export function getOrbitAxisObjectList(starSystem: StarSystemController): Array<OrbitalObject> {
     const out: Array<OrbitalObject> = [];
 

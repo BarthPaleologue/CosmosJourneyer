@@ -19,6 +19,14 @@ import type { TFunction } from "i18next";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
+/**
+ * Prompts the player for text and returns the submitted value.
+ * @param prompt Question shown above the text field.
+ * @param defaultValue Initial value of the text field.
+ * @param soundPlayer Plays the dialog confirmation sound.
+ * @param t Translation function for the dialog buttons.
+ * @returns Submitted text, or `null` when cancelled.
+ */
 export async function promptModalString(
     prompt: string,
     defaultValue: string,

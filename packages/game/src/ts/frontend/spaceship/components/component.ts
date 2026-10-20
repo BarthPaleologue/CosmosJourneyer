@@ -27,6 +27,11 @@ import { WarpDrive } from "./warpDrive";
 
 export type Component = WarpDrive | FuelScoop | FuelTank | DiscoveryScanner | Thrusters;
 
+/**
+ * Recreates a runtime ship component from its serialized variant.
+ * @param serializedComponent Saved component data and its type discriminator.
+ * @returns The matching runtime component instance.
+ */
 export function deserializeComponent(serializedComponent: SerializedComponent): Component {
     switch (serializedComponent.type) {
         case "warpDrive":

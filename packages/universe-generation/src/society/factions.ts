@@ -5,6 +5,10 @@ import type { Faction, StarSystemCoordinates } from "@cosmos-journeyer/universe-
 
 import { getPowerPlayData } from "./powerplay";
 
+/**
+ * @param faction Faction to serialize.
+ * @returns The faction's stable string representation.
+ */
 export function factionToString(faction: Faction): string {
     switch (faction) {
         case "feynman_interstellar":
@@ -22,6 +26,11 @@ export function factionToString(faction: Faction): string {
     }
 }
 
+/**
+ * @param coordinates Star system coordinates in the galaxy.
+ * @param rng Indexed random source for reproducible selection.
+ * @returns The faction assigned to the coordinates.
+ */
 export function getFactionFromCoordinates(
     coordinates: DeepReadonly<StarSystemCoordinates>,
     rng: (index: number) => number,

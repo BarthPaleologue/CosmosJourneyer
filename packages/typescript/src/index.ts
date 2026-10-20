@@ -1,13 +1,26 @@
 export type Result<T, E> = { success: true; value: T } | { success: false; error: E };
 
+/**
+ * @param value Successful result value.
+ * @returns A success Result containing the value.
+ */
 export function ok<T, E>(value: T): Result<T, E> {
     return { success: true, value };
 }
 
+/**
+ * @param error Failure value to preserve.
+ * @returns A failure Result containing the error.
+ */
 export function err<T, E>(error: E): Result<T, E> {
     return { success: false, error };
 }
 
+/**
+ * Converts a promise into a Result, preserving a rejection as its error value.
+ * @param promise Promise whose outcome should be captured.
+ * @returns A promise that resolves to the success or failure Result.
+ */
 export async function promiseToResult<T>(promise: Readonly<Promise<T>>): Promise<Result<T, unknown>> {
     try {
         return ok(await promise);
@@ -38,10 +51,20 @@ export type DeepMutable<T> = T extends Primitive | AnyFunction
 
 export type NonEmptyArray<T> = [T, ...T[]];
 
+/**
+ * @param arr Array to inspect.
+ * @returns Whether the array has at least one element.
+ */
 export function isNonEmptyArray<T>(arr: ReadonlyArray<T>): arr is NonEmptyArray<T> {
     return arr.length > 0;
 }
 
+/**
+ * Compares two arrays for equal length and element-by-element identity.
+ * @param a First array to compare.
+ * @param b Second array to compare.
+ * @returns Whether both arrays have the same elements in the same order.
+ */
 export function arraysEqual<T>(a: ReadonlyArray<T>, b: ReadonlyArray<T>): boolean {
     if (a.length !== b.length) {
         return false;
@@ -56,6 +79,10 @@ export function arraysEqual<T>(a: ReadonlyArray<T>, b: ReadonlyArray<T>): boolea
     return true;
 }
 
+/**
+ * Marks a value as impossible after exhaustive handling of a union.
+ * @param value Value whose type should be uninhabited.
+ */
 export function assertUnreachable(value: never): never {
     throw new Error(`Unexpected value: ${String(value)}`);
 }

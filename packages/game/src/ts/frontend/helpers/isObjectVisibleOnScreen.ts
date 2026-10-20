@@ -23,6 +23,13 @@ import type { Transformable } from "@/frontend/universe/architecture/transformab
 
 export const DefaultMinProjectedDiameter = 0.005;
 
+/**
+ * @param position - Object position in world space.
+ * @param radius - Object bounding radius in world units.
+ * @param cameraPosition - Camera position in the same frame as the object.
+ * @param fov - Camera field of view in radians.
+ * @returns Angular diameter divided by `fov`, or infinity when inside the sphere.
+ */
 export function getProjectedDiameter01(
     position: Vector3,
     radius: number,
@@ -39,11 +46,10 @@ export function getProjectedDiameter01(
 }
 
 /**
- * Checks if the size of the object on the screen is bigger than the threshold
- * @param object The object to check
- * @param camera The camera looking at the object
- * @param threshold The size threshold
- * @returns Whether the object is bigger than the threshold
+ * @param object - Object whose projected size is measured.
+ * @param camera - Camera used for the projection.
+ * @param threshold - Minimum projected diameter as a fraction of the field of view.
+ * @returns Whether the projected diameter exceeds `threshold`.
  */
 export function isSizeOnScreenEnough(
     object: HasBoundingSphere & Transformable,

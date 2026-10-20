@@ -38,9 +38,9 @@ export class AxisRenderer {
     }
 
     /**
-     * Disposes all previously created axis meshes by calling reset() and then creates new axis meshes for the given objects
-     * @param objects
-     * @param scene
+     * Replaces the axis meshes with lines for the supplied orbital objects.
+     * @param objects - The orbital objects whose rotation axes should be rendered.
+     * @param scene - The Babylon.js scene that owns the rendered meshes.
      */
     setOrbitalObjects(objects: ReadonlyArray<Transformable & HasBoundingSphere>, scene: Scene): void {
         this.reset();
@@ -77,8 +77,8 @@ export class AxisRenderer {
     }
 
     /**
-     * Set the visibility of the axis of rotations
-     * @param visible
+     * Shows or hides the meshes that represent orbital rotation axes.
+     * @param visible - Whether the rotation-axis meshes should be shown.
      */
     setVisibility(visible: boolean): void {
         this._isVisible = visible;
@@ -95,8 +95,7 @@ export class AxisRenderer {
     }
 
     /**
-     * Dispose all axis meshes
-     * @private
+     * Disposes the current axis meshes and clears the rendered set.
      */
     public reset(): void {
         this.axisMeshes.forEach((orbitMesh) => {

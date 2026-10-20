@@ -1,5 +1,10 @@
 import type { HSVColor, LinearSrgbColor } from "@cosmos-journeyer/physics";
 
+/**
+ * Wraps hue into the [0, 360) range.
+ * @param hsv Color expressed as hue in degrees, saturation, and value.
+ * @returns The equivalent linear sRGB color.
+ */
 export function hsvToRgb(hsv: Readonly<HSVColor>): LinearSrgbColor {
     const { h, s, v } = hsv;
     const normalizedHue = ((h % 360) + 360) % 360;

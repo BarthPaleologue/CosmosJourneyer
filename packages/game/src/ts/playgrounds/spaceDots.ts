@@ -27,6 +27,11 @@ const DEFAULT_YAW = 0;
 const DEFAULT_PITCH = 0;
 const DEFAULT_ROLL = 0;
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for tuning the space-dots motion effect.
+ */
 export async function createSpaceDotsScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -64,6 +69,15 @@ export async function createSpaceDotsScene(
     return Promise.resolve(scene);
 }
 
+/**
+ * @param title - Control label.
+ * @param min - Lower bound.
+ * @param max - Upper bound.
+ * @param step - Value increment.
+ * @param initialValue - Starting value.
+ * @param onInput - Returns the displayed text; called initially and on input.
+ * @returns Labeled range input.
+ */
 function createSlider(
     title: string,
     min: number,
@@ -104,6 +118,11 @@ function createSlider(
     return wrapper;
 }
 
+/**
+ * @param label - Initial button text.
+ * @param onClick - Returns the new button text after a click.
+ * @returns Button that updates its label from the click result.
+ */
 function createButton(label: string, onClick: () => string): HTMLButtonElement {
     const button = document.createElement("button");
     button.type = "button";
@@ -123,6 +142,11 @@ function createButton(label: string, onClick: () => string): HTMLButtonElement {
     return button;
 }
 
+/**
+ * @param spaceDots - Motion effect to control.
+ * @param carrier - Transform steered by yaw and pitch.
+ * @returns Steering controls and a query for pause state.
+ */
 function createControlPanel(
     spaceDots: SpaceDots,
     carrier: TransformNode,

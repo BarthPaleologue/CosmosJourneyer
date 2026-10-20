@@ -23,6 +23,14 @@ export type RadialChoiceModalOptions = {
     useVirtualCursor: boolean;
 };
 
+/**
+ * Presents choices in a radial menu and resolves with the selected item.
+ * @param choices Values shown as radial menu options.
+ * @param toString Converts each choice into its visible label.
+ * @param soundPlayer Plays interface sounds while choosing.
+ * @param options Optional radial menu behavior.
+ * @returns Selected value, or `null` when no choice is available or the menu is cancelled.
+ */
 export async function radialChoiceModal<T>(
     choices: ReadonlyArray<T>,
     toString: (value: T) => string,

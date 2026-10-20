@@ -278,7 +278,9 @@ export class WarpDrive implements ReadonlyWarpDrive {
     }
 
     /**
-     * @returns the amount of fuel (L) consumed by the warp drive for a hyper jump of the given distance in light-years.
+     * Computes the fuel required for a hyperspace jump.
+     * @param distanceLy Jump distance in light-years.
+     * @returns Fuel consumed in liters.
      */
     public getHyperJumpFuelConsumption(distanceLy: number): number {
         return 2 * distanceLy;

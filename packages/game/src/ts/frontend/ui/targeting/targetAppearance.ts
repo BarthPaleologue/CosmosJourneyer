@@ -30,6 +30,12 @@ export type TargetCursorAppearance = {
     readonly maxSize: number;
 };
 
+/**
+ * Returns the localized name shown for a target, including landing pad IDs.
+ * @param target Target whose name is displayed.
+ * @param t Translation function for object type labels.
+ * @returns The proper name or localized target type name.
+ */
 export function getTargetDisplayName(target: Target, t: TFunction): string {
     if (target.type === TargetType.LANDING_PAD) {
         return t("objectTypes:landingPadName", { padIdentifier: target.padIdentifier });
@@ -37,6 +43,12 @@ export function getTargetDisplayName(target: Target, t: TFunction): string {
     return target.properName ?? getTargetTypeName(target, t);
 }
 
+/**
+ * Returns the localized label for a target's type.
+ * @param target Target whose type is translated.
+ * @param t Translation function for object type labels.
+ * @returns Localized object type name.
+ */
 export function getTargetTypeName(target: Target, t: TFunction): string {
     switch (target.type) {
         case TargetType.STAR_SYSTEM:
@@ -76,6 +88,11 @@ export function getTargetTypeName(target: Target, t: TFunction): string {
     }
 }
 
+/**
+ * Selects the cursor shape and size range used for a target type.
+ * @param target Target whose cursor appearance is needed.
+ * @returns Shape and size limits for the target cursor.
+ */
 export function getTargetCursorAppearance(target: Target): TargetCursorAppearance {
     switch (target.type) {
         case TargetType.ANOMALY:
@@ -149,7 +166,15 @@ export function getTargetCursorAppearance(target: Target): TargetCursorAppearanc
     }
 }
 
-/** Presentation-only fades; sensor range is supplied by gameplay targeting. */
+/**
+ * Computes presentation opacity from proximity and sensor detection.
+ * @param target Target represented by the cursor.
+ * @param distance Distance from the viewer to the target.
+ * @param sensorRange Detection range, or `null` when no sensor fade applies.
+ * @param isSelected Whether the target is currently selected.
+ * @param hasKnownOverride Whether gameplay explicitly marks the target as known.
+ * @returns Cursor opacity from zero (hidden) to one (fully visible).
+ */
 export function getTargetCursorOpacity(
     target: Target,
     distance: number,
@@ -169,6 +194,12 @@ export function getTargetCursorOpacity(
     return getTargetProximityOpacity(target, distance) * detectionOpacity * localOpacity;
 }
 
+/**
+ * Fades target cursors as the viewer approaches their physical bounds.
+ * @param target Target represented by the cursor.
+ * @param distance Distance from the viewer to the target.
+ * @returns Proximity-based opacity from zero (hidden) to one (fully visible).
+ */
 function getTargetProximityOpacity(target: Target, distance: number): number {
     const radius = target.getBoundingRadius();
     let minDistance: number;

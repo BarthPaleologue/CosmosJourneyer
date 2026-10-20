@@ -36,6 +36,11 @@ import { initI18n } from "@/i18n";
 
 import { enablePhysics, enableShadows } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing spaceship flight controls.
+ */
 export async function createFlightDemoScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

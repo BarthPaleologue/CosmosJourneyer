@@ -27,6 +27,11 @@ import { loadParticleTextures } from "@/frontend/assets/textures/particles";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { StarMap } from "@/frontend/starmap/starMap";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting star-map rendering.
+ */
 export async function createStarMapScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

@@ -18,6 +18,10 @@
 import { getRngFromSeed } from "@cosmos-journeyer/random";
 import type { UtilitySectionModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param seed Seed for reproducible procedural choices.
+ * @returns A utility section model.
+ */
 export function generateUtilitySectionModel(seed: number): UtilitySectionModel {
     const rng = getRngFromSeed(seed);
     return {

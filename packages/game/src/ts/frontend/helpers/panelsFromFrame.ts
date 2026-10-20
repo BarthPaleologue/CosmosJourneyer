@@ -22,37 +22,14 @@ import type { Scene } from "@babylonjs/core/scene";
 import earcut from "earcut";
 
 /**
- * Build solid panels by detecting planar face loops from an edge-only frame.
- *
- * Big picture:
- * 1) Construct undirected vertex adjacency from the edge list.
- * 2) For each vertex, sort its neighbors in a consistent circular order by
- *    projecting local neighbor directions into a stable tangent frame that
- *    uses the mesh centroid as an outward guess. This gives a clockwise
- *    ordering around each vertex.
- * 3) Trace faces via “right-hand” walks on directed edges:
- *    starting from every directed edge (u→v), always turn to the predecessor
- *    neighbor of u in v’s circular order. Each closed walk yields a candidate
- *    face loop.
- * 4) Normalize and deduplicate loops by canonical rotation and direction.
- * 5) For each unique loop, test planarity. If the vertices are co-planar
- *    within a small epsilon, project the loop to 2D in that plane, triangulate
- *    with `PolygonMeshBuilder`, then extrude by `thickness`.
- * 6) Merge all panel meshes into a single mesh.
- *
- * Assumptions and limits:
- * - `positions` is a flat array of xyz triples. Indices in `edges` reference these triples.
- * - The graph can be non-manifold. The walk may produce both interior and exterior loops.
- * - Only near-planar loops are kept (planarity epsilon controls this).
- * - Face orientation is inferred from the right-turn rule relative to the local ordering.
- *
- * @param name       Mesh name for the merged panels.
- * @param positions  Flat xyz positions array (length % 3 === 0).
- * @param edges      Pairs of vertex indices [u0,v0,u1,v1,...] describing undirected edges.
- * @param thickness  Extrusion thickness along the face normal.
- * @param scene      js scene.
- * @returns          Merged panel mesh or null if no valid panels were found.
- * @see https://playground.babylonjs.com/#8B4798#4
+ * Builds panels from near-planar face loops in an undirected edge frame.
+ * Non-manifold graphs can produce interior and exterior loops.
+ * @param name - Name assigned to the merged mesh.
+ * @param positions - Packed XYZ vertex coordinates.
+ * @param edges - Undirected vertex-index pairs.
+ * @param thickness - Extrusion distance in the same units as `positions`.
+ * @param scene - Babylon scene used to create the panels.
+ * @returns Merged mesh, or `null` when no valid panels can be built.
  */
 export function createPanelsFromFrame(
     name: string,
@@ -169,7 +146,10 @@ export function createPanelsFromFrame(
         }
     }
 
-    // Normalize a loop to a canonical key for deduplication
+    /**
+     * @param loop - Candidate face boundary, possibly with its first vertex repeated at the end.
+     * @returns Canonical boundary, or `null` when fewer than three vertices remain.
+     */
     function normalizeLoop(loop: number[]): number[] | null {
         let ring = loop;
         if (ring.length >= 2 && ring[0] === ring[ring.length - 1]) {
@@ -308,9 +288,14 @@ export function createPanelsFromFrame(
 }
 
 /**
- * Walks the directed edge (u0 -> v0) following the rightmost-turn rule until it
- * either closes on the start vertex or is interrupted. Mutates `visitedDirected`
- * with every traversed directed edge so that no face is traced twice.
+ * Traces a face by rightmost turns and marks traversed directed edges as visited.
+ * @param u0 - Starting vertex of the directed edge.
+ * @param v0 - Destination vertex of the starting edge.
+ * @param clockwiseNeighbors - Clockwise neighbor order around each vertex.
+ * @param neighborToIndex - Neighbor-to-order-index lookup for each vertex.
+ * @param directedEdgeKey - Encodes a directed vertex pair as a unique key.
+ * @param visitedDirected - Traversed directed edges, updated during the walk.
+ * @param maxSteps - Maximum number of directed edges to follow.
  * @returns The face loop (including the repeated start vertex) or null if the walk was interrupted.
  */
 function traceFace(

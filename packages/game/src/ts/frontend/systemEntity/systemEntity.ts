@@ -30,6 +30,11 @@ export type SystemContentType<TModel extends SystemContentModel, TContent extend
     { Model: TModel; Content: TContent }
 >;
 
+/**
+ * Associates a system-content tag with its matching model and runtime content types.
+ * @param type Discriminator string used by the content model.
+ * @returns The discriminator branded with the supplied model and content types.
+ */
 export function makeSystemContentType<TModel extends SystemContentModel, TContent extends SystemContent>(
     type: TModel["type"],
 ): SystemContentType<TModel, TContent> {

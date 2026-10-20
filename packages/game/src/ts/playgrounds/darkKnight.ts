@@ -26,6 +26,11 @@ import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 
 import { DarkKnight } from "@/modules/darkKnight/darkKnight";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting the Dark Knight anomaly.
+ */
 export async function createDarkKnightScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

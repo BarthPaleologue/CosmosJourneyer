@@ -9,6 +9,7 @@ import type { Scene } from "@babylonjs/core/scene";
  * @param thickness The separation between the two walls.
  * @param height The height of the cylinder.
  * @param tesselation The number of sides of the cylinder.
+ * @returns The generated mesh vertex data.
  */
 export function createRingVertexData(
     radius: number,
@@ -109,6 +110,15 @@ export function createRingVertexData(
     return vertexData;
 }
 
+/**
+ * Builds a flat-shaded mesh from the generated ring geometry.
+ * @param radius Distance from the ring center to its inner edge.
+ * @param thickness Radial width of the ring.
+ * @param height Vertical thickness of the ring mesh.
+ * @param tesselation Number of subdivisions around the geometry.
+ * @param scene Scene that owns the mesh.
+ * @returns A flat-shaded ring mesh attached to the scene.
+ */
 export function createRing(radius: number, thickness: number, height: number, tesselation: number, scene: Scene): Mesh {
     const vertexData = createRingVertexData(radius, thickness, height, tesselation);
     const ring = new Mesh("ring", scene);

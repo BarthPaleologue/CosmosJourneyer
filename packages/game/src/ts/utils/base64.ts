@@ -15,6 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Uses URI percent-encoding to preserve Unicode inside Base64.
+ * @param str - Unicode text to encode.
+ * @returns Base64 text, or `null` if encoding fails.
+ */
 export function encodeBase64(str: string): string | null {
     try {
         return window.btoa(encodeURIComponent(str));
@@ -23,6 +28,10 @@ export function encodeBase64(str: string): string | null {
     }
 }
 
+/**
+ * @param str - Base64 containing URI percent-encoded text, as produced by {@link encodeBase64}.
+ * @returns Decoded Unicode text; malformed Base64 or URI encoding throws.
+ */
 export function decodeBase64(str: string): string {
     const base64Decoded = window.atob(str);
     return decodeURIComponent(base64Decoded);

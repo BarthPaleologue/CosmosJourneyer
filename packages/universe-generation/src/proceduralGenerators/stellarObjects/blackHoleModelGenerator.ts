@@ -22,6 +22,13 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type { CelestialBodyModel, Orbit, BlackHoleModel, SpinModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param id Identifier assigned to the generated object.
+ * @param seed Seed for reproducible procedural choices.
+ * @param name Display name assigned to the generated object.
+ * @param parentBodies Orbital ancestors that define the object's parent path.
+ * @returns A black hole model with seeded physical and orbital properties.
+ */
 export function generateBlackHoleModel(
     id: string,
     seed: number,

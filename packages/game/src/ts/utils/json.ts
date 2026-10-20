@@ -19,6 +19,11 @@ import { z } from "zod";
 
 const JsonSchema = z.record(z.string(), z.unknown());
 
+/**
+ * Parses a JSON object and rejects arrays, primitives, and invalid JSON.
+ * @param jsonString JSON source text to parse.
+ * @returns The parsed string-keyed object, or `null` when parsing or validation fails.
+ */
 export function jsonSafeParse(jsonString: string): Record<string, unknown> | null {
     try {
         const parsed: unknown = JSON.parse(jsonString);

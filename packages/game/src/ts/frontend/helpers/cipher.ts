@@ -30,6 +30,11 @@ export type EncryptedCodePayloadV1 = {
 
 export type EncryptedCodePayload = EncryptedCodePayloadV1;
 
+/**
+ * @param payload - Encrypted source and key-derivation metadata.
+ * @param passphrase - Passphrase used to derive the encryption key.
+ * @returns The evaluated function, or a decryption or evaluation error.
+ */
 export async function decryptFunction<T extends (...args: never[]) => unknown>(
     payload: EncryptedCodePayload,
     passphrase: string,
@@ -54,6 +59,12 @@ export async function decryptFunction<T extends (...args: never[]) => unknown>(
     }
 }
 
+/**
+ * Encrypts a function’s source text with an authenticated passphrase-derived key.
+ * @param func - Function whose source text is encrypted.
+ * @param passphrase - Passphrase used to derive the encryption key.
+ * @returns Encrypted function source and derivation metadata.
+ */
 export async function encryptFunction(
     func: (...args: never[]) => unknown,
     passphrase: string,
@@ -61,6 +72,12 @@ export async function encryptFunction(
     const sourceCode = func.toString();
     return encryptCodeSourceV1(sourceCode, passphrase);
 }
+/**
+ * Encrypts source text using AES-256-GCM with a fresh salt and initialization vector.
+ * @param sourceCode - Function source text to encrypt.
+ * @param passphrase - Passphrase used to derive the encryption key.
+ * @returns Version-one ciphertext and derivation metadata.
+ */
 async function encryptCodeSourceV1(sourceCode: string, passphrase: string): Promise<EncryptedCodePayloadV1> {
     const salt = crypto.getRandomValues(new Uint8Array(16));
     const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -90,6 +107,12 @@ async function encryptCodeSourceV1(sourceCode: string, passphrase: string): Prom
     };
 }
 
+/**
+ * Dispatches source decryption according to the encrypted payload version.
+ * @param payload - Encrypted source and key-derivation metadata.
+ * @param passphrase - Passphrase used to derive the encryption key.
+ * @returns Decrypted source text, or an error.
+ */
 async function decryptCodeSource(payload: EncryptedCodePayload, passphrase: string): Promise<Result<string, Error>> {
     switch (payload.version) {
         case 1:
@@ -99,6 +122,12 @@ async function decryptCodeSource(payload: EncryptedCodePayload, passphrase: stri
     }
 }
 
+/**
+ * Returns authentication, key-derivation, and decoding failures as errors.
+ * @param payload - Encrypted source and key-derivation metadata.
+ * @param passphrase - Passphrase used to derive the encryption key.
+ * @returns Decrypted source text, or an error.
+ */
 async function decryptCodeSourceV1(
     payload: EncryptedCodePayloadV1,
     passphrase: string,
@@ -131,6 +160,14 @@ async function decryptCodeSourceV1(
     }
 }
 
+/**
+ * Derives a non-extractable AES-256-GCM key using PBKDF2-HMAC-SHA256.
+ * @param passphrase - Passphrase used to derive the encryption key.
+ * @param salt - Random key-derivation salt.
+ * @param iterations - PBKDF2 iteration count.
+ * @param usages - Permitted operations for the derived key.
+ * @returns The derived encryption key.
+ */
 async function deriveAesKey(
     passphrase: string,
     salt: Uint8Array<ArrayBuffer>,
@@ -159,6 +196,10 @@ async function deriveAesKey(
     );
 }
 
+/**
+ * @param bytes - Raw byte data.
+ * @returns The Base64 representation.
+ */
 function bytesToBase64(bytes: Uint8Array): string {
     let binary = "";
     for (const byte of bytes) {
@@ -167,6 +208,10 @@ function bytesToBase64(bytes: Uint8Array): string {
     return btoa(binary);
 }
 
+/**
+ * @param base64 - Base64-encoded byte data.
+ * @returns The decoded bytes.
+ */
 function base64ToBytes(base64: string): Uint8Array<ArrayBuffer> {
     const binary = atob(base64);
     return Uint8Array.from(binary, (char) => char.charCodeAt(0));

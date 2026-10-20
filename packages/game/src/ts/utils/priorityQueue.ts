@@ -22,9 +22,7 @@ const parentIndex = (i: number): number => ((i + 1) >>> 1) - 1;
 const leftIndex = (i: number): number => (i << 1) + 1;
 const rightIndex = (i: number): number => (i + 1) << 1;
 
-/**
- * Priority queue implementation using a binary heap
- */
+/** Priority queue whose comparator selects the element returned first. */
 export class PriorityQueue<T> {
     readonly #heap: T[];
     readonly #comparator: (a: T, b: T) => boolean;
@@ -34,31 +32,25 @@ export class PriorityQueue<T> {
         this.#comparator = comparator;
     }
 
-    /**
-     * Returns the number of elements in the queue
-     */
+    /** @returns Number of elements currently in the queue. */
     size(): number {
         return this.#heap.length;
     }
 
-    /**
-     * Returns true if the queue is empty, false otherwise
-     */
+    /** @returns Whether the queue contains no elements. */
     isEmpty(): boolean {
         return this.size() === 0;
     }
 
-    /**
-     * Returns the element at the top of the queue, without removing it from the queue
-     */
+    /** @returns The next element according to the comparator, or `undefined` when empty. */
     peek(): T | undefined {
         return this.#heap[topIndex];
     }
 
     /**
-     * Adds one or more elements to the queue
-     * @param values The elements to add to the queue
-     * @returns The new size of the queue
+     * Adds elements to the queue and restores heap order after each insertion.
+     * @param values Elements to enqueue.
+     * @returns The queue's new size.
      */
     push(...values: T[]): number {
         values.forEach((value) => {
@@ -68,9 +60,7 @@ export class PriorityQueue<T> {
         return this.size();
     }
 
-    /**
-     * Removes and returns the element at the top of the queue
-     */
+    /** @returns Removes and returns the next element, or `undefined` when empty. */
     pop(): T | undefined {
         const poppedValue = this.peek();
         const bottom = this.size() - 1;
@@ -82,16 +72,15 @@ export class PriorityQueue<T> {
         return poppedValue;
     }
 
-    /**
-     * Removes all elements from the queue
-     */
+    /** Removes all queued elements. */
     clear(): void {
         this.#heap.length = 0;
     }
 
     /**
-     * Returns the first element in the queue that satisfies the provided testing function. Otherwise, undefined is returned.
-     * @param predicate A function to test each element of the queue
+     * Finds an element in the heap array without changing queue order.
+     * @param predicate Test applied to each queued value.
+     * @returns The first matching value in heap storage order, or `undefined` if none matches.
      */
     find(predicate: (value: T) => boolean): T | undefined {
         return this.#heap.find(predicate);

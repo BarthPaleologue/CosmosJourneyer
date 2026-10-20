@@ -31,6 +31,11 @@ export type FoilTextures = {
     readonly roughness: Texture;
 };
 
+/**
+ * @param engine Engine used to create the textures.
+ * @param progressMonitor Progress monitor notified as each image loads.
+ * @returns Surface maps for rendering foil, with linear-space normal and roughness data.
+ */
 export async function loadFoilTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

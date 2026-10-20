@@ -26,6 +26,10 @@ export interface Door extends Interactive {
     dispose(): void;
 }
 
+/**
+ * Changes an interactive door from open to closed or from closed to open.
+ * @param door Door whose state will be toggled.
+ */
 export function toggleDoor(door: Door): void {
     switch (door.getState()) {
         case "opened":

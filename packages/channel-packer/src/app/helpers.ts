@@ -1,3 +1,6 @@
+/**
+ * Yields until the next animation frame so pending UI updates can render.
+ */
 export async function waitForNextPaint(): Promise<void> {
     return new Promise((resolve) => {
         requestAnimationFrame(() => {
@@ -6,6 +9,11 @@ export async function waitForNextPaint(): Promise<void> {
     });
 }
 
+/**
+ * Extracts a readable packing error, with a fallback for unrecognized values.
+ * @param error - Failure value to display.
+ * @returns The readable error message.
+ */
 export function formatError(error: unknown): string {
     if (typeof error === "string") {
         return error;
@@ -18,6 +26,11 @@ export function formatError(error: unknown): string {
     return "Channel packing failed. Check the selected files and try again.";
 }
 
+/**
+ * Escapes text for insertion into HTML markup.
+ * @param value - Raw text to escape.
+ * @returns The escaped text.
+ */
 export function escapeHtml(value: string): string {
     return value
         .replaceAll("&", "&amp;")
@@ -27,6 +40,11 @@ export function escapeHtml(value: string): string {
         .replaceAll("'", "&#39;");
 }
 
+/**
+ * Starts a browser download and releases its temporary object URL shortly afterward.
+ * @param blob - Payload to download.
+ * @param fileName - Download filename.
+ */
 export function downloadBlob(blob: Blob, fileName: string): void {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");

@@ -33,6 +33,11 @@ export type PvcTactileTilesTextures = {
     ambientOcclusion: Texture;
 };
 
+/**
+ * @param engine Engine used to create the textures.
+ * @param progressMonitor Progress monitor notified as each image loads.
+ * @returns Tile albedo, normal, roughness, and ambient-occlusion maps.
+ */
 export async function loadPvcTactileTilesTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

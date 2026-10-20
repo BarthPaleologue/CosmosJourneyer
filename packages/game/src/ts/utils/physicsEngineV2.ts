@@ -18,6 +18,11 @@
 import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { Scene } from "@babylonjs/core/scene";
 
+/**
+ * Retrieves the scene's physics engine using the project's v2 engine type.
+ * @param scene - Babylon.js scene whose physics engine has already been initialized.
+ * @returns The attached engine cast to the v2 API; no runtime version check is performed.
+ */
 export function getPhysicsEngineV2(scene: Scene): PhysicsEngineV2 {
     return scene.getPhysicsEngine() as PhysicsEngineV2;
 }

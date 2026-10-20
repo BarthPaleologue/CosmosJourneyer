@@ -31,6 +31,10 @@ const baseSpin = {
     initialRotationAngle: 0,
 } satisfies SpinModel;
 
+/**
+ * @param actual - Observed quaternion.
+ * @param expected - Expected quaternion.
+ */
 function expectQuaternionCloseTo(actual: Quaternion, expected: Quaternion): void {
     expect(actual.x).toBeCloseTo(expected.x);
     expect(actual.y).toBeCloseTo(expected.y);
@@ -38,6 +42,10 @@ function expectQuaternionCloseTo(actual: Quaternion, expected: Quaternion): void
     expect(actual.w).toBeCloseTo(expected.w);
 }
 
+/**
+ * @param actual - Observed vector.
+ * @param expected - Expected vector.
+ */
 function expectVectorCloseTo(actual: Vector3, expected: Vector3): void {
     expect(actual.x).toBeCloseTo(expected.x);
     expect(actual.y).toBeCloseTo(expected.y);

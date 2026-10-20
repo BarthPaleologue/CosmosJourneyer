@@ -31,6 +31,15 @@ import { Scene } from "@babylonjs/core/scene";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { ThrusterExhaust } from "@/frontend/spaceship/thrusterExhaust";
 
+/**
+ * @param title - Control label.
+ * @param min - Lower bound.
+ * @param max - Upper bound.
+ * @param step - Value increment.
+ * @param initialValue - Starting value.
+ * @param onInput - Returns the displayed text; called initially and on input.
+ * @returns Labeled range input.
+ */
 function createSlider(
     title: string,
     min: number,
@@ -71,6 +80,10 @@ function createSlider(
     return wrapper;
 }
 
+/**
+ * @param exhaust - Effect to control.
+ * @returns Panel for tuning exhaust parameters.
+ */
 function createControlPanel(exhaust: ThrusterExhaust): HTMLDivElement {
     const panel = document.createElement("div");
     panel.style.position = "fixed";
@@ -115,6 +128,11 @@ function createControlPanel(exhaust: ThrusterExhaust): HTMLDivElement {
     return panel;
 }
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for tuning thruster-exhaust rendering.
+ */
 export async function createThrusterExhaustScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

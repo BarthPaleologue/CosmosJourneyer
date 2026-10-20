@@ -16,8 +16,9 @@ export const CropTypes: ReadonlyArray<CropType> = [
 ];
 
 /**
- * Edible energy in kcal/m²/day for different plant species.
+ * @param cropType Crop whose edible energy yield is requested.
  * @see https://www.fao.org/4/t0207e/T0207E04.htm#4.%20Nutritive%20value
+ * @returns Edible energy yield in kcal/m²/day.
  */
 export function getEdibleEnergyPerAreaPerDay(cropType: CropType): number {
     switch (cropType) {

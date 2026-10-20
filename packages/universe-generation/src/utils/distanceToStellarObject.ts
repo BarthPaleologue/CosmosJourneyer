@@ -19,6 +19,12 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getObjectModelById } from "@cosmos-journeyer/universe-model";
 import type { OrbitalObjectModel, StellarObjectModel, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * Collects distances from an orbital object to each stellar ancestor in its parent chain.
+ * @param object Orbital object whose ancestor distances are requested.
+ * @param systemModel Star system containing the object and its parent hierarchy.
+ * @returns Distances keyed by the stellar objects that parent the orbital object.
+ */
 export function getDistancesToStellarObjects(
     object: DeepReadonly<OrbitalObjectModel>,
     systemModel: DeepReadonly<StarSystemModel>,

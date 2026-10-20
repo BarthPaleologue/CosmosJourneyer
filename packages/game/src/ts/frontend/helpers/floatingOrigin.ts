@@ -5,6 +5,12 @@ import type { Matrix } from "@babylonjs/core/Maths/math.vector";
 import { MultiplyMatricesToRef } from "@babylonjs/core/Maths/ThinMaths/thinMath.matrix.functions";
 import type { DeepImmutable } from "@babylonjs/core/types";
 
+/**
+ * @param offset - Floating-origin translation to subtract.
+ * @param world - Original world transform.
+ * @param ref - Destination matrix updated in place.
+ * @returns The destination matrix with its translation offset.
+ */
 export function OffsetWorldToRef(
     offset: IVector3Like,
     world: DeepImmutable<Matrix>,
@@ -18,6 +24,11 @@ export function OffsetWorldToRef(
     return ref;
 }
 
+/**
+ * @param view - Original camera view matrix.
+ * @param ref - Destination matrix updated in place.
+ * @returns The translation-free destination view matrix.
+ */
 export function OffsetViewToRef(view: DeepImmutable<Matrix>, ref: Matrix): DeepImmutable<Matrix> {
     ref.copyFrom(view);
     const refArray = ref.asArray();
@@ -27,6 +38,12 @@ export function OffsetViewToRef(view: DeepImmutable<Matrix>, ref: Matrix): DeepI
     return ref;
 }
 
+/**
+ * @param view - Original camera view matrix.
+ * @param projection - Camera projection matrix.
+ * @param ref - Destination matrix updated in place.
+ * @returns The destination view-projection matrix.
+ */
 export function OffsetViewProjectionToRef(
     view: DeepImmutable<Matrix>,
     projection: DeepImmutable<Matrix>,

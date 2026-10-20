@@ -37,6 +37,14 @@ import { VehicleBuilder } from "./vehicleBuilder";
 import type { WheelModel } from "./wheel";
 import { WireframeTopology } from "./wireframeTopology";
 
+/**
+ * Builds the Wolf Mk2 rover with its frame, canopy, wheels, and hinged rear door.
+ * @param assets Loaded materials and textures used by the vehicle.
+ * @param scene Scene that owns the vehicle meshes and physics bodies.
+ * @param spawnPosition World-space position for the completed vehicle.
+ * @param spawnRotation World-space orientation for the completed vehicle.
+ * @returns The constructed vehicle, or an error if its canopy geometry cannot be built.
+ */
 export function createWolfMk2(
     assets: RenderingAssets,
     scene: Scene,

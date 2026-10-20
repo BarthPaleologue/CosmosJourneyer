@@ -20,6 +20,15 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
 
+/**
+ * Builds a merged tubular frame with spherical joints from unique undirected edges.
+ * @param name - Name assigned to the created mesh.
+ * @param positions - Packed XYZ vertex coordinates.
+ * @param edges - Pairs of vertex indices defining frame edges.
+ * @param radius - Tube radius in mesh coordinate units.
+ * @param scene - Scene that owns the created resources.
+ * @returns The merged frame mesh, or null if merging failed.
+ */
 export function createEdgeTubeFrame(
     name: string,
     positions: Float32Array,

@@ -21,6 +21,10 @@ import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 export type FaceIndex = 0 | 1 | 2 | 3 | 4 | 5;
 
+/**
+ * @param faceIndex - The cube-sphere face index in the range 0 through 5.
+ * @returns A quaternion rotating the default face orientation onto the selected cube face.
+ */
 export function getQuaternionFromFaceIndex(faceIndex: FaceIndex): Quaternion {
     switch (faceIndex) {
         case 0:

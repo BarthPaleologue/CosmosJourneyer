@@ -114,6 +114,11 @@ const CONST: Readonly<Record<string, string>> = {
     Vol: "Volantis",
     Vul: "Vulpeculae",
 };
+/**
+ * Expands Bayer or Flamsteed abbreviations into a constellation name.
+ * @param raw SIMBAD identifier text.
+ * @returns Expanded designation, or undefined when the designation is unsupported.
+ */
 export function expandBayerFlamsteed(raw: string): string | undefined {
     const parts = raw
         .replace(/^(?:\*|V\*|\*\*|Cl\*)\s*/, "")
@@ -145,6 +150,11 @@ export function expandBayerFlamsteed(raw: string): string | undefined {
     return `${head} ${genitive} ${parts.slice(2).join(" ")}`.trim();
 }
 type ScoredName = readonly [score: number, label: string];
+/**
+ * Assigns a preference score to a recognized catalog designation.
+ * @param name Candidate stellar designation.
+ * @returns A score and the display label to use.
+ */
 function scoreCatalogName(name: string): ScoredName {
     if (/^G(?:J|LIESE)\s*\d+\w*$/i.test(name)) {
         return [88, name.replace(/^GLIESE\s*/i, "GJ ").toUpperCase()];
@@ -172,6 +182,11 @@ function scoreCatalogName(name: string): ScoredName {
     }
     return [40, name];
 }
+/**
+ * Normalizes and scores a SIMBAD identifier as a candidate display name.
+ * @param raw Raw SIMBAD identifier.
+ * @returns Candidate score and label, or undefined for an empty identifier.
+ */
 function scoreIdentifier(raw: string): ScoredName | undefined {
     const candidate = raw
         .replace(/^(?:\*|V\*|\*\*|Cl\*)\s*/, "")
@@ -188,6 +203,13 @@ function scoreIdentifier(raw: string): ScoredName | undefined {
     const expanded = expandBayerFlamsteed(clean);
     return expanded === undefined ? scoreCatalogName(clean) : [110, expanded];
 }
+/**
+ * Chooses the most useful display name from SIMBAD identifiers.
+ * @param mainId SIMBAD main identifier, when supplied.
+ * @param ids Alternative identifiers returned by SIMBAD.
+ * @param fallback Gaia designation or source identifier to use as a fallback.
+ * @returns The highest-scoring available display name.
+ */
 export function chooseBestName(mainId: string | null, ids: ReadonlyArray<string>, fallback: string): string {
     let best: ScoredName = [-1, fallback];
     for (const raw of [mainId ?? "", ...ids, fallback]) {

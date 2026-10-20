@@ -31,6 +31,12 @@ export type AudioAssets = {
     readonly speakerVoiceLines: SpeakerVoiceLines;
 };
 
+/**
+ * Loads sound effects, music tracks, and speaker voice lines.
+ * @param audioEngine Audio engine that decodes and plays the game's sounds.
+ * @param progressMonitor Tracks completion of individual audio-loading tasks.
+ * @returns Audio grouped by effects, music, and speaker.
+ */
 export async function loadAudioAssets(
     audioEngine: AudioEngineV2,
     progressMonitor: ILoadingProgressMonitor,

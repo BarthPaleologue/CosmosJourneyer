@@ -38,6 +38,11 @@ import { Settings } from "@/settings";
 
 import { addToWindow, enablePhysics } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting generated planetary terrain.
+ */
 export async function createTelluricPlanetScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

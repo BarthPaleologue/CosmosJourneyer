@@ -187,6 +187,7 @@ const greekLetters: string[] = [
  * Generates a star name given a noise based random number generator and the given sample step
  * @param rng A noise based random number generator with a range of [0, 1]
  * @param baseStep The sample step
+ * @returns A generated Greek-letter and constellation star name.
  */
 export function generateStarName(rng: (step: number) => number, baseStep: number): string {
     const constellation = constellationNames[Math.floor(rng(baseStep) * constellationNames.length)];

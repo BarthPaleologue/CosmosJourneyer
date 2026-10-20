@@ -21,6 +21,14 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
+/**
+ * Imports a model into a scene-owned asset container and completes its load task.
+ * @param name Label used for the container's loading task.
+ * @param url URL of the model to import.
+ * @param scene Scene that receives the imported model resources.
+ * @param progressMonitor Tracks completion of this model-loading task.
+ * @returns The imported model resources, kept together in an asset container.
+ */
 export async function loadAssetInContainerAsync(
     name: string,
     url: string,

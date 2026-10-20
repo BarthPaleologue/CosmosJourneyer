@@ -19,6 +19,11 @@ import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 
+/**
+ * Shears vertex positions along Y and refreshes their bounds and normals.
+ * @param mesh - Mesh whose vertices, bounds, and normals are updated.
+ * @param amountY - Y displacement at the greatest Z coordinate, in mesh units.
+ */
 export function sheerAlongY(mesh: Mesh, amountY: number): void {
     // 1. get positions
     const positions = mesh.getVerticesData(VertexBuffer.PositionKind, true);

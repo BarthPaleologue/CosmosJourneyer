@@ -99,7 +99,7 @@ export class UniverseBackend {
 
     /**
      * Adds the given system to the database
-     * @param system The system to register
+     * @param system - The system to register
      */
     public registerAuthoredSystem(system: StarSystemModel): void {
         const sectorKey = serializeStarSectorCoordinates(
@@ -129,10 +129,11 @@ export class UniverseBackend {
     }
 
     /**
-     * @param sectorX
-     * @param sectorY
-     * @param sectorZ
-     * @returns The list of only the custom systems in the given sector.
+     * Selects custom system models assigned to the given star sector.
+     * @param sectorX - The coordinate of the sector to query.
+     * @param sectorY - The coordinate of the sector to query.
+     * @param sectorZ - The coordinate of the sector to query.
+     * @returns Read-only custom systems in that sector, or an empty array when none are configured.
      */
     private getCustomSystemsFromSector(sectorX: number, sectorY: number, sectorZ: number): StarSystemModel[] {
         const sectorKey = serializeStarSectorCoordinates(sectorX, sectorY, sectorZ);
@@ -149,7 +150,7 @@ export class UniverseBackend {
 
     /**
      * Check if a system is in the human bubble.
-     * @param systemCoordinates The coordinates of the system to check.
+     * @param systemCoordinates - The coordinates of the system to check.
      * @returns true if the system is in the human bubble, false otherwise.
      */
     public isSystemInHumanBubble(systemCoordinates: StarSystemCoordinates): boolean {
@@ -170,8 +171,9 @@ export class UniverseBackend {
     }
 
     /**
-     * @param coordinates The coordinates of the system you want the model of.
-     * @returns The StarSystemModel for the given coordinates, or null if the system is not found.
+     * Looks up a generated system model, including the configured fallback system.
+     * @param coordinates - Sector and local coordinates identifying the star system.
+     * @returns Read-only model when the coordinates are known, or `null` when no model exists.
      */
     private getSystemModelAt(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemModel> | null {
         if (starSystemCoordinatesEquals(coordinates, this.fallbackSystem.coordinates)) {
@@ -232,10 +234,11 @@ export class UniverseBackend {
     }
 
     /**
-     * @param sectorX
-     * @param sectorY
-     * @param sectorZ
-     * @returns The coordinates of the systems in the given star sector.
+     * Builds coordinates for each generated system in the requested sector.
+     * @param sectorX - The coordinate of the sector to query.
+     * @param sectorY - The coordinate of the sector to query.
+     * @param sectorZ - The coordinate of the sector to query.
+     * @returns Generated coordinates, custom-system coordinates, then the fallback coordinates when present.
      */
     public getSystemCoordinatesInStarSector(
         sectorX: number,
@@ -264,10 +267,11 @@ export class UniverseBackend {
     }
 
     /**
-     * @param sectorX
-     * @param sectorY
-     * @param sectorZ
-     * @returns All system models (custom and generated) in the given star sector.
+     * Retrieves generated and configured system models located in the requested sector.
+     * @param sectorX - The coordinate of the sector to query.
+     * @param sectorY - The coordinate of the sector to query.
+     * @param sectorZ - The coordinate of the sector to query.
+     * @returns Read-only system models, including the fallback system when it belongs to the sector.
      */
     getSystemModelsInStarSector(
         sectorX: number,
@@ -302,11 +306,12 @@ export class UniverseBackend {
     }
 
     /**
-     * @param starSectorX
-     * @param starSectorY
-     * @param starSectorZ
-     * @param index The index of the generated system in the star sector.
-     * @returns The system coordinates of the system generated given the seed.
+     * Reconstructs a star system's local coordinates from its sector and deterministic index.
+     * @param starSectorX - The sector coordinate containing the star.
+     * @param starSectorY - The sector coordinate containing the star.
+     * @param starSectorZ - The sector coordinate containing the star.
+     * @param index - Zero-based system index within the sector's generated sequence.
+     * @returns Coordinates that identify the generated system in the universe grid.
      */
     public getSystemCoordinatesFromSeed(
         starSectorX: number,
@@ -333,8 +338,9 @@ export class UniverseBackend {
     }
 
     /**
-     * @param coordinates The coordinates of the system you want the position of.
-     * @returns The position of the given system in the galaxy.
+     * Converts sector and local system coordinates to absolute galactic coordinates.
+     * @param coordinates - Sector coordinates and local offset of the star system.
+     * @returns Galactic position in the same distance units as `STAR_SECTOR_SIZE`.
      */
     public getSystemGalacticPosition(coordinates: StarSystemCoordinates): Vector3Like {
         return {
@@ -345,10 +351,11 @@ export class UniverseBackend {
     }
 
     /**
-     * @param sectorX
-     * @param sectorY
-     * @param sectorZ
-     * @returns The list of all local positions of generated systems in the given star sector (range is [-0.5, 0.5]).
+     * Generates deterministic local positions for procedurally placed stars in a sector.
+     * @param sectorX - The coordinate of the sector to query.
+     * @param sectorY - The coordinate of the sector to query.
+     * @param sectorZ - The coordinate of the sector to query.
+     * @returns Local offsets within the sector; positions are reproducible for the same sector and density.
      */
     private getGeneratedLocalPositionsInStarSector(
         sectorX: number,
@@ -377,10 +384,11 @@ export class UniverseBackend {
     }
 
     /**
-     * @param sectorX
-     * @param sectorY
-     * @param sectorZ
-     * @returns The list of all local positions of systems in the given star sector (range is [-0.5, 0.5]).
+     * Collects generated, fallback, and custom system offsets within a sector.
+     * @param sectorX - The coordinate of the sector to query.
+     * @param sectorY - The coordinate of the sector to query.
+     * @param sectorZ - The coordinate of the sector to query.
+     * @returns Local offsets in sector units, including configured non-generated systems.
      */
     private getSystemLocalPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number): Array<Vector3Like> {
         const localPositions: Array<Vector3Like> = [];
@@ -413,10 +421,11 @@ export class UniverseBackend {
     }
 
     /**
-     * @param sectorX
-     * @param sectorY
-     * @param sectorZ
-     * @returns The positions of all systems in the given star sector in galactic space.
+     * Converts all generated and configured local system offsets to galactic positions.
+     * @param sectorX - The coordinate of the sector to query.
+     * @param sectorY - The coordinate of the sector to query.
+     * @param sectorZ - The coordinate of the sector to query.
+     * @returns Galactic positions scaled by `STAR_SECTOR_SIZE`.
      */
     public getSystemPositionsInStarSector(sectorX: number, sectorY: number, sectorZ: number): Array<Vector3Like> {
         const localPositions = this.getSystemLocalPositionsInStarSector(sectorX, sectorY, sectorZ);
@@ -434,8 +443,8 @@ export class UniverseBackend {
 
     /**
      * Searches the database for the given id
-     * @param universeObjectId The id to look for
-     * @returns The model if it exists, null otherwise
+     * @param universeObjectId - The id to look for
+     * @returns The model if it exists, null otherwise.
      */
     public getObjectModel(universeObjectId: UniverseObjectId): DeepReadonly<UniverseObjectModel> | null {
         const starSystemCoordinates = universeObjectId.systemCoordinates;

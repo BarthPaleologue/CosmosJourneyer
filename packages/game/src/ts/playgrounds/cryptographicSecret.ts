@@ -28,6 +28,11 @@ import { initI18n } from "@/i18n";
 
 import { addToWindow } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing passphrase-protected content.
+ */
 export async function createCryptographicSecretScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

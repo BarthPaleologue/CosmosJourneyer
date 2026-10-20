@@ -22,6 +22,9 @@ import {
 } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @returns Eclipse Test system definition at its configured sector coordinates.
+ */
 export function getEclipseTestSystemModel(): StarSystemModel {
     const systemName = "Eclipse Test";
     const systemCoordinates: StarSystemCoordinates = {

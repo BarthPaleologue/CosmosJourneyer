@@ -66,6 +66,12 @@ const logRowCount = (
         logger(`${prefix} with ${result.value.length} rows`);
     }
 };
+/**
+ * Creates a TAP client that submits and parses synchronous ADQL queries.
+ * @param endpoint Synchronous TAP endpoint URL.
+ * @param options Fetch implementation, logging callback, and timeout settings.
+ * @returns A client that executes synchronous TAP queries.
+ */
 export function createSyncTapClient(endpoint: string, options: TapClientOptions = {}): TapClient {
     const { fetchImplementation = fetch, logger = defaultLogger, timeoutMs = 30_000 } = options;
     return {
@@ -117,6 +123,12 @@ const abortJob = async (fetchImplementation: Fetch, jobUrl: string): Promise<voi
         // The original timeout or cancellation remains the actionable error.
     }
 };
+/**
+ * Creates a TAP client that submits jobs and polls for asynchronous results.
+ * @param endpoint Asynchronous TAP endpoint URL.
+ * @param options Fetch implementation, logging callback, polling interval, and timeout.
+ * @returns A client that executes asynchronous TAP queries.
+ */
 export function createAsyncTapClient(endpoint: string, options: AsyncTapClientOptions = {}): TapClient {
     const {
         fetchImplementation = fetch,

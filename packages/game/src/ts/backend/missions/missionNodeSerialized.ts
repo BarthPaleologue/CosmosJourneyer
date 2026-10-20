@@ -24,6 +24,10 @@ import type { MissionFlyByNodeSerialized } from "./missionFlyByNodeSerialized";
 import { MissionTerminatorLandingNodeSerializedSchema } from "./missionTerminatorLandingNodeSerialized";
 import type { MissionTerminatorLandingNodeSerialized } from "./missionTerminatorLandingNodeSerialized";
 
+/**
+ * @param type - Legacy numeric node tag or current string discriminator.
+ * @returns Current discriminator for known tags; unknown values pass through for schema validation.
+ */
 function preprocessLegacyMissionNodeType(type: unknown): unknown {
     if (typeof type !== "number") {
         return type;
@@ -49,6 +53,10 @@ function preprocessLegacyMissionNodeType(type: unknown): unknown {
     }
 }
 
+/**
+ * @param node - Candidate node value read from a legacy mission document.
+ * @returns Updated node value, preserving non-object and unrecognized values unchanged.
+ */
 function preprocessLegacyMissionNode(node: unknown): unknown {
     if (typeof node !== "object" || node === null) {
         return node;

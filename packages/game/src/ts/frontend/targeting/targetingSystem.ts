@@ -26,6 +26,11 @@ import type { TargetContact } from "./targetContact";
 
 export const sensorRangeFactor = 100;
 
+/**
+ * Computes the sensor detection radius from the target's bounding radius.
+ * @param target Target whose size determines its sensor range.
+ * @returns Detection distance in world units.
+ */
 export function getSensorRange(target: Target): number {
     return target.getBoundingRadius() * sensorRangeFactor;
 }
@@ -73,7 +78,10 @@ export class TargetingSystem {
         this.onTargetsRemovedObservable.notifyObservers([target]);
     }
 
-    /** Updates the observer position used by sensor acquisition, independently of any UI. */
+    /**
+     * Updates the position used to evaluate sensor range.
+     * @param observerPosition Observer's world-space position.
+     */
     public update(observerPosition: Vector3): void {
         this.observerPosition.copyFrom(observerPosition);
     }
@@ -89,7 +97,11 @@ export class TargetingSystem {
         }
     }
 
-    /** Explicit selection also supports assigned landing pads outside sensor range. */
+    /**
+     * Selects or clears a target; forced selection can bypass sensor availability.
+     * @param object Object to select, or `null` to clear the current selection.
+     * @param forcedValue Optional explicit selection state; true selects and false clears.
+     */
     public setTarget(object: Transformable | null, forcedValue?: boolean): void {
         const target = object === null ? null : (this.getContact(object)?.target ?? null);
         let shouldHide = this.target === target;
@@ -125,7 +137,11 @@ export class TargetingSystem {
         return contact !== null && (contact.acquisition === TargetAcquisition.KNOWN || this.hasKnownOverride(object));
     }
 
-    /** Sensor detection uses the observer position from the latest update. */
+    /**
+     * Checks whether a registered target is known, selected, or within sensor range.
+     * @param object Target whose availability is checked.
+     * @returns Whether the target can currently be presented as available.
+     */
     public isAvailable(object: Target): boolean {
         const contact = this.getContact(object);
         if (contact === null) {

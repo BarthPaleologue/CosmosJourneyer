@@ -21,6 +21,13 @@ import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import type { Scene } from "@babylonjs/core/scene";
 
 // rotation using https://www.wikiwand.com/en/Rodrigues%27_rotation_formula
+/**
+ * Rotates a vector around an axis using Rodrigues' rotation formula.
+ * @param vector Vector to rotate.
+ * @param axis Axis around which the vector is rotated.
+ * @param theta Rotation angle in radians.
+ * @returns A new vector oriented by the requested angle.
+ */
 function rotateAround(vector: Vector3, axis: Vector3, theta: number): Vector3 {
     // Please note that unit vector are required, i did not divide by the norms
     return vector
@@ -29,6 +36,12 @@ function rotateAround(vector: Vector3, axis: Vector3, theta: number): Vector3 {
         .addInPlace(axis.scale(Vector3.Dot(axis, vector) * (1.0 - Math.cos(theta))));
 }
 
+/**
+ * Builds a tapered, curved blade mesh from stacked vertex pairs.
+ * @param scene Scene that owns the blade mesh.
+ * @param nbStacks Number of vertex rows used to shape the blade.
+ * @returns A mesh with blade geometry and curved surface normals.
+ */
 export function createGrassBlade(scene: Scene, nbStacks: number): Mesh {
     const nbVertices = 2 * nbStacks + 1;
     const nbTriangles = 2 * (nbStacks - 1) + 1;

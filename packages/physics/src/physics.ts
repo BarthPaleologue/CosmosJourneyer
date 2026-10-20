@@ -114,6 +114,7 @@ export function getGravitationalLensFocalDistance(mass: number, radius: number):
  * Compute the rotation period for a ring of given radius to simulate a given gravity.
  * @param radius The radius of the ring in meters
  * @param gravity The gravity to simulate at the inner surface of the ring in m/s²
+ * @returns Rotation period in seconds.
  */
 export function getRotationPeriodForArtificialGravity(radius: number, gravity: number): number {
     // g = v² / r and T = 2 * pi * r / v => v = sqrt(g * r) and T = 2 * pi * r / sqrt(g * r) = 2 * pi * sqrt(r / g)
@@ -125,6 +126,7 @@ export function getRotationPeriodForArtificialGravity(radius: number, gravity: n
  * @param pressure The pressure of the atmosphere in pascal
  * @param minTemperature The minimum temperature of the planet in Kelvin
  * @param maxTemperature The maximum temperature of the planet in Kelvin
+ * @returns Whether liquid water can exist within the planet's temperature range.
  */
 export function hasLiquidWater(pressure: number, minTemperature: number, maxTemperature: number): boolean {
     const waterBoilingPoint = waterBoilingTemperature(pressure);
@@ -159,6 +161,7 @@ export function hasLiquidWater(pressure: number, minTemperature: number, maxTemp
  * @param period The rotation period of the tether in seconds (typically the same as the parent object for a classic space elevator)
  * @param mass The mass of the parent object in kilograms
  * @param distance The distance to the center of the parent object in meters
+ * @returns Apparent gravitational acceleration in meters per second squared.
  * @see https://en.wikipedia.org/wiki/Space_elevator#Apparent_gravitational_field
  */
 export function getApparentGravityOnSpaceTether(period: number, mass: number, distance: number): number {
@@ -167,6 +170,7 @@ export function getApparentGravityOnSpaceTether(period: number, mass: number, di
 }
 
 /**
+ * Computes the distance beyond which stellar heating allows water ice to remain solid.
  * @param stellarTemperature The temperature of the star in Kelvin
  * @param stellarRadius The radius of the star in meters
  * @returns An estimation of the distance beyond which water ice can exist in solid form even in the presence of stellar radiation, in meters
@@ -178,6 +182,7 @@ export function getWaterIceFrostLine(stellarTemperature: number, stellarRadius: 
 }
 
 /**
+ * Computes the distance inside which silicate rock sublimates.
  * @param stellarTemperature The temperature of the star in Kelvin
  * @param stellarRadius The radius of the star in meters
  * @returns An estimation of the distance inside which silicate rock sublimates under stellar radiation, in meters
@@ -188,6 +193,7 @@ export function getSilicateRockSublimationLine(stellarTemperature: number, stell
 }
 
 /**
+ * Computes the distance at which irradiation reaches the requested temperature.
  * @param stellarTemperature The temperature of the star in Kelvin
  * @param stellarRadius The radius of the star in meters
  * @param targetTemperature The target temperature in Kelvin
@@ -207,6 +213,7 @@ export function getTemperatureLine(
  * @param planetMass The planet mass in kilograms
  * @param surfaceLiquidWaterMassRatio The fraction of planet mass made of surface liquid water
  * @param oceanCoverage The fraction of the surface covered by oceans, between 0 and 1
+ * @returns Ocean depth in meters.
  */
 export function getOceanDepth(
     planetRadius: number,

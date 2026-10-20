@@ -104,8 +104,8 @@ export type TargetOptions = {
 };
 
 /**
- * Returns the camera position as a uniform input block.
  * @param options - Optional target options.
+ * @returns Camera position as a shader uniform connection.
  */
 export function uniformCameraPosition(options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const cameraPosition = new InputBlock("cameraPosition");
@@ -116,8 +116,8 @@ export function uniformCameraPosition(options?: Partial<TargetOptions>): NodeMat
 }
 
 /**
- * Returns the view matrix as a uniform input block.
  * @param options - Optional target options.
+ * @returns View matrix as a shader uniform connection.
  */
 export function uniformView(options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const view = new InputBlock("view");
@@ -128,8 +128,8 @@ export function uniformView(options?: Partial<TargetOptions>): NodeMaterialConne
 }
 
 /**
- * Returns the view projection matrix as a uniform input block.
  * @param options - Optional target options.
+ * @returns View-projection matrix as a shader uniform connection.
  */
 export function uniformViewProjection(options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const ViewProjection = new InputBlock("ViewProjection");
@@ -140,8 +140,8 @@ export function uniformViewProjection(options?: Partial<TargetOptions>): NodeMat
 }
 
 /**
- * Returns the world matrix as a uniform input block.
  * @param options - Optional target options.
+ * @returns World matrix as a shader uniform connection.
  */
 export function uniformWorld(options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const world = new InputBlock("world");
@@ -152,7 +152,7 @@ export function uniformWorld(options?: Partial<TargetOptions>): NodeMaterialConn
 }
 
 /**
- * Returns an animated time uniform in seconds.
+ * @returns Elapsed time in seconds as a shader uniform.
  */
 export function uniformElapsedSeconds(): NodeMaterialConnectionPoint {
     const elapsedSecondsBlock = new InputBlock("Time");
@@ -176,6 +176,7 @@ export type AttributeType =
  * @param name - The name of the attribute in the mesh's vertex buffers.
  * @param type - The explicit scalar, vector, or color type of the attribute.
  * @param options - Optional target options (vertex by default).
+ * @returns The named vertex attribute as a shader connection.
  */
 export function attribute(
     name: string,
@@ -209,6 +210,7 @@ export type BuiltinAttributeName =
  * The associated vertex buffer determines whether values are per vertex or per instance.
  * @param name - The name of the built-in attribute.
  * @param options - Optional target options.
+ * @returns The built-in vertex attribute as a shader connection.
  */
 export function builtinAttribute(
     name: BuiltinAttributeName,
@@ -222,9 +224,9 @@ export function builtinAttribute(
 }
 
 /**
- * Returns a float input block with the given value.
  * @param value - The float value.
  * @param options - Optional target options.
+ * @returns The value as a constant shader input.
  */
 export function float(value: number, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const inputBlock = new InputBlock("float");
@@ -237,16 +239,19 @@ export function float(value: number, options?: Partial<TargetOptions>): NodeMate
 
 /**
  * Shorthand alias for {@link float}.
+ * @param value - Float value to wrap in a constant input block.
+ * @param options - Optional target selection for the input block.
+ * @returns The same constant float connection as {@link float}.
  */
 export function f(value: number, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return float(value, options);
 }
 
 /**
- * Returns a constant float input block with the given name and value.
  * @param name - The name of the input block.
  * @param value - The float value.
  * @param options - Optional target options.
+ * @returns The named value as a constant shader input.
  */
 export function constFloat(name: string, value: number, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const inputBlock = new InputBlock(name);
@@ -262,10 +267,9 @@ export type UniformFloatOptions = TargetOptions & {
 };
 
 /**
- * Returns a uniform float input block with the given name.
  * @param name - The name of the input block.
  * @param options - Optional input block options, including `defaultValue` and `target`.
- * @returns The uniform float input block.
+ * @returns A uniform float input block initialized from `defaultValue` or zero.
  */
 export function uniformFloat(name: string, options?: Partial<UniformFloatOptions>): InputBlock {
     const inputBlock = new InputBlock(name);
@@ -277,10 +281,10 @@ export function uniformFloat(name: string, options?: Partial<UniformFloatOptions
 }
 
 /**
- * Returns the view direction from world position to camera position.
  * @param worldPosition - The world position.
  * @param cameraPosition - The camera position.
  * @param options - Optional target options.
+ * @returns Direction from the world position toward the camera.
  */
 export function getViewDirection(
     worldPosition: NodeMaterialConnectionPoint,
@@ -307,6 +311,7 @@ export type TextureBlockOptions = TargetOptions & {
  * @param texture - The texture to sample.
  * @param uv - The UV coordinates.
  * @param options - Optional properties for the texture block.
+ * @returns The configured texture sampling block.
  */
 export function textureSample(
     texture: NodeMaterialConnectionPoint,
@@ -334,6 +339,7 @@ export type UniformTexture2d = {
  * Returns a texture uniform with an ImageSourceBlock.
  * @param texture - The texture to expose.
  * @param options - Optional target options.
+ * @returns Image source connection points for the texture and its dimensions.
  */
 export function uniformTexture2d(texture: Texture, options?: Partial<TargetOptions>): UniformTexture2d {
     const imageSourceBlock = new ImageSourceBlock(`${texture.name}SourceBlock`);
@@ -355,6 +361,7 @@ export type TriPlanarSampleOptions = TargetOptions & {
  * @param position - The world position.
  * @param normal - The world normal.
  * @param options - Optional properties for the triplanar sampling.
+ * @returns The configured triplanar sampling block.
  */
 export function textureTriPlanarSample(
     texture: NodeMaterialConnectionPoint,
@@ -383,6 +390,7 @@ export function textureTriPlanarSample(
  * @param position - The world position.
  * @param normal - The world normal.
  * @param options - Optional triplanar sampling options.
+ * @returns The configured triplanar sampling block.
  */
 export function triPlanarMapping(
     textures: [NodeMaterialConnectionPoint?, NodeMaterialConnectionPoint?, NodeMaterialConnectionPoint?],
@@ -410,6 +418,7 @@ export function triPlanarMapping(
 }
 
 /**
+ * Creates a shader connection point for the current draw instance index.
  * @returns the instance index within the current draw as a float computed in the vertex shader.
  */
 export function instanceIndex(): NodeMaterialConnectionPoint {
@@ -429,6 +438,7 @@ export type InstanceData = {
  * @param world3 - The fourth world matrix row.
  * @param world - The base world matrix.
  * @param options - Optional target options.
+ * @returns The instance transform and instance ID connection points.
  */
 export function getInstanceData(
     world0: NodeMaterialConnectionPoint,
@@ -451,10 +461,10 @@ export function getInstanceData(
 }
 
 /**
- * Transforms a position vector using the given transformation matrix.
  * @param transformMat4 - The transformation matrix.
  * @param positionVec3 - The position vector.
  * @param options - Optional target options.
+ * @returns The transformed position as a shader expression.
  */
 export function transformPosition(
     transformMat4: NodeMaterialConnectionPoint,
@@ -473,10 +483,10 @@ export function transformPosition(
 }
 
 /**
- * Transforms a direction vector using the given transformation matrix.
  * @param transformMat4 - The transformation matrix.
  * @param directionVec3 - The direction vector.
  * @param options - Optional target options.
+ * @returns The transformed direction as a shader expression.
  */
 export function transformDirection(
     transformMat4: NodeMaterialConnectionPoint,
@@ -495,10 +505,10 @@ export function transformDirection(
 }
 
 /**
- * Returns a trigonometry operation on the input value.
  * @param input - The input value.
  * @param operation - The trigonometry operation to perform.
  * @param options - Optional target options.
+ * @returns Result of `operation` as a shader expression.
  */
 export function trig(
     input: NodeMaterialConnectionPoint,
@@ -515,10 +525,10 @@ export function trig(
 }
 
 /**
- * Returns the arctangent of y/x using the signs of the arguments to determine the quadrant.
  * @param x - The x coordinate.
  * @param y - The y coordinate.
  * @param options - Optional target options.
+ * @returns The angle of `(x, y)` in radians, preserving its quadrant.
  */
 export function atan2(
     x: NodeMaterialConnectionPoint,
@@ -535,54 +545,54 @@ export function atan2(
 }
 
 /**
- * Returns the sine of the input.
- * @param x - The input value.
+ * @param x - Angle in radians.
  * @param options - Optional target options.
+ * @returns Sine of `x` as a shader expression.
  */
 export function sin(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return trig(x, TrigonometryBlockOperations.Sin, options);
 }
 
 /**
- * Returns the cosine of the input.
- * @param x - The input value.
+ * @param x - Angle in radians.
  * @param options - Optional target options.
+ * @returns Cosine of `x` as a shader expression.
  */
 export function cos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return trig(x, TrigonometryBlockOperations.Cos, options);
 }
 
 /**
- * Returns the arc cosine of the input.
- * @param x - The input value.
+ * @param x - Input value.
  * @param options - Optional target options.
+ * @returns Arc cosine of `x` in radians as a shader expression.
  */
 export function acos(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return trig(x, TrigonometryBlockOperations.ArcCos, options);
 }
 
 /**
- * Returns the square root of the input.
- * @param x - The input value.
+ * @param x - Input value.
  * @param options - Optional target options.
+ * @returns Square root of `x` as a shader expression.
  */
 export function sqrt(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return trig(x, TrigonometryBlockOperations.Sqrt, options);
 }
 
 /**
- * Returns the sign of the input.
- * @param x - The input value.
+ * @param x - Input value.
  * @param options - Optional target options.
+ * @returns Sign of `x` as a shader expression.
  */
 export function sign(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return trig(x, TrigonometryBlockOperations.Sign, options);
 }
 
 /**
- * Returns the negated value of the input.
- * @param x - The input value.
+ * @param x - Value to negate.
  * @param options - Optional target options.
+ * @returns Negative of `x` as a shader expression.
  */
 export function negate(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const negateBlock = new NegateBlock("negate");
@@ -593,9 +603,9 @@ export function negate(x: NodeMaterialConnectionPoint, options?: Partial<TargetO
 }
 
 /**
- * Returns the length (magnitude) of a vector.
- * @param input - The input vector.
+ * @param input - Vector to measure.
  * @param options - Optional target options.
+ * @returns Vector magnitude as a shader expression.
  */
 export function length(
     input: NodeMaterialConnectionPoint,
@@ -610,10 +620,10 @@ export function length(
 }
 
 /**
- * Returns the distance between two points.
- * @param left - The first point.
- * @param right - The second point.
+ * @param left - First point.
+ * @param right - Second point.
  * @param options - Optional target options.
+ * @returns Distance between the points as a shader expression.
  */
 export function distance(
     left: NodeMaterialConnectionPoint,
@@ -629,11 +639,11 @@ export function distance(
 }
 
 /**
- * Remaps a value from one range to another.
  * @param input - The input value to remap.
  * @param sourceRange - The input range tuple as `[min, max]`.
  * @param targetRange - The output range tuple as `[min, max]`.
  * @param options - Optional target options.
+ * @returns Value remapped to `targetRange` as a shader expression.
  */
 export function remap(
     input: NodeMaterialConnectionPoint,
@@ -653,9 +663,9 @@ export function remap(
 }
 
 /**
- * Returns the fractional part of the input value.
- * @param input - The input value.
+ * @param input - Value whose fractional part is requested.
  * @param options - Optional target options.
+ * @returns Fractional part of `input` as a shader expression.
  */
 export function fract(
     input: NodeMaterialConnectionPoint,
@@ -671,10 +681,10 @@ export function fract(
 }
 
 /**
- * Multiplies two values (vector / vector or float / float or any other combination).
  * @param left - The left vector.
  * @param right - The right vector.
  * @param options - Optional target options.
+ * @returns Product of `left` and `right` as a shader expression.
  */
 export function mul(
     left: NodeMaterialConnectionPoint,
@@ -691,11 +701,10 @@ export function mul(
 }
 
 /**
- * Divides the left value by the right value.
  * @param left - The dividend value.
  * @param right - The divisor value.
  * @param options - Optional target options.
- * @returns The division result as a connection point.
+ * @returns Quotient of `left` and `right` as a shader expression.
  */
 export function div(
     left: NodeMaterialConnectionPoint,
@@ -712,10 +721,10 @@ export function div(
 }
 
 /**
- * Raises a value to the given power.
  * @param value - The base value.
  * @param power - The exponent.
  * @param options - Optional target options.
+ * @returns `value` raised to `power` as a shader expression.
  */
 export function pow(
     value: NodeMaterialConnectionPoint,
@@ -732,9 +741,9 @@ export function pow(
 }
 
 /**
- * Returns the normalized version of the input vector.
- * @param input - The input vector.
+ * @param input - Vector to normalize.
  * @param options - Optional target options.
+ * @returns Unit-length vector as a shader expression.
  */
 export function normalize(
     input: NodeMaterialConnectionPoint,
@@ -749,7 +758,7 @@ export function normalize(
 }
 
 /**
- * Returns whether the current fragment is front-facing.
+ * @returns Front-facing state of the current fragment.
  */
 export function getFrontFacing(): NodeMaterialConnectionPoint {
     const frontFacingBlock = new FrontFacingBlock("frontFacing");
@@ -779,6 +788,7 @@ type MergeOutput = {
  * Merges the given components into a vector.
  * @param inputs - The components to merge (x, y, z, w or xy, zw or xyz, xyzw).
  * @param options - Optional target options.
+ * @returns The merged vector component outputs.
  */
 export function merge(inputs: MergeInput, options?: Partial<TargetOptions>): MergeOutput {
     const merger = new VectorMergerBlock("Merge");
@@ -804,10 +814,10 @@ type SwizzleString =
     | `${SwizzleComponent}${SwizzleComponent}${SwizzleComponent}${SwizzleComponent}`;
 
 /**
- * Rearranges vector components according to the given swizzle string.
  * @param input - The input vector.
  * @param swizzleStr - The component order to produce.
  * @param options - Optional target options.
+ * @returns Components reordered by `swizzleStr` as a shader expression.
  */
 export function swizzle(
     input: NodeMaterialConnectionPoint,
@@ -853,9 +863,9 @@ export function swizzle(
 }
 
 /**
- * Returns a constant color input block.
  * @param value - The color value.
  * @param options - Optional target options.
+ * @returns The color as a constant shader input.
  */
 export function color(value: Color3 | Color4, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const colorBlock = new InputBlock("color");
@@ -867,10 +877,10 @@ export function color(value: Color3 | Color4, options?: Partial<TargetOptions>):
 }
 
 /**
- * Samples a gradient based on the given steps and t value.
  * @param gradientSteps - Pairs of position and color.
  * @param t - The gradient input.
  * @param options - Optional target options.
+ * @returns Color interpolated at `t` as a shader expression.
  */
 export function sampleGradient(
     gradientSteps: ReadonlyArray<[number, Color3]>,
@@ -887,9 +897,9 @@ export function sampleGradient(
 }
 
 /**
- * Converts RGB to HSL.
- * @param rgb - The RGB input.
+ * @param rgb - RGB color components.
  * @param options - Optional target options.
+ * @returns HSL components as a shader expression.
  */
 export function rgbToHsl(
     rgb: NodeMaterialConnectionPoint,
@@ -904,9 +914,9 @@ export function rgbToHsl(
 }
 
 /**
- * Converts HSL to RGB.
- * @param hsl - The HSL input.
+ * @param hsl - HSL color components.
  * @param options - Optional target options.
+ * @returns RGB components as a shader expression.
  */
 export function hslToRgb(
     hsl: NodeMaterialConnectionPoint,
@@ -921,9 +931,9 @@ export function hslToRgb(
 }
 
 /**
- * Converts a Babylon.js vector to a node material input block.
- * @param inputVector - The Babylon.js vector.
+ * @param inputVector - Babylon.js vector value.
  * @param options - Optional target options.
+ * @returns The vector value as a shader input connection.
  */
 export function vec(
     inputVector: Vector2 | Vector3 | Vector4,
@@ -938,10 +948,10 @@ export function vec(
 }
 
 /**
- * Creates a vec2 from the given components.
  * @param x - The x component.
  * @param y - The y component.
  * @param options - Optional target options.
+ * @returns The composed vec2 as a shader expression.
  */
 export function vec2(
     x: NodeMaterialConnectionPoint,
@@ -960,18 +970,18 @@ type Vec3Input = Partial<{
 }>;
 
 /**
- * Creates a vec3 from the given components.
  * @param inputs - The components to merge into a vec3 (x, y, z or xy, z or xyz).
  * @param options - Optional target options.
+ * @returns The composed vec3 as a shader expression.
  */
 export function vec3(inputs: Vec3Input, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return merge(inputs, options).xyzOut;
 }
 
 /**
- * Creates a vec4 from the given components.
  * @param inputs - The components to merge into a vec4 (x, y, z, w or xy, z, w or xyz, w or xyzw).
  * @param options - Optional target options.
+ * @returns The composed vec4 as a shader expression.
  */
 export function vec4(inputs: MergeInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return merge(inputs, options).xyzw;
@@ -981,6 +991,7 @@ export function vec4(inputs: MergeInput, options?: Partial<TargetOptions>): Node
  * Splits a vec2/3/4 into its components.
  * @param inputVec - The input vec.
  * @param options - Optional target options.
+ * @returns The block exposing the vector components.
  */
 export function splitVec(inputVec: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): VectorSplitterBlock {
     const splitBlock = new VectorSplitterBlock("split");
@@ -1017,6 +1028,7 @@ export function splitVec(inputVec: NodeMaterialConnectionPoint, options?: Partia
  * Splits an RGBA color into its individual channels.
  * @param inputColor - The input color.
  * @param options - Optional target options.
+ * @returns The block exposing the color channels.
  */
 export function splitRgba(
     inputColor: NodeMaterialConnectionPoint,
@@ -1042,9 +1054,9 @@ export type MatrixSplitterOutput = {
 };
 
 /**
- * Splits a matrix into its row and column vectors.
  * @param input - The input matrix.
  * @param options - Optional target options.
+ * @returns Row and column vectors exposed as shader connection points.
  */
 export function splitMatrix(
     input: NodeMaterialConnectionPoint,
@@ -1058,10 +1070,10 @@ export function splitMatrix(
 }
 
 /**
- * Returns the step function: 0 if x < edge, 1 if x >= edge
  * @param edge - The edge value.
  * @param x - The input value.
  * @param options - Optional target options.
+ * @returns Zero below `edge`, otherwise one, as a shader expression.
  */
 export function step(
     edge: NodeMaterialConnectionPoint,
@@ -1104,9 +1116,9 @@ export function smoothstep(
 }
 
 /**
- * Returns the absolute value of the input.
- * @param input - The input value.
+ * @param input - Value whose absolute value is requested.
  * @param options - Optional target options.
+ * @returns Absolute value as a shader expression.
  */
 export function abs(input: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const absBlock = new TrigonometryBlock("abs");
@@ -1124,6 +1136,7 @@ export function abs(input: NodeMaterialConnectionPoint, options?: Partial<Target
  * @param y - The second value.
  * @param a - The gradient factor (0-1).
  * @param options - Optional target options.
+ * @returns Interpolated value as a shader expression.
  */
 export function mix(
     x: NodeMaterialConnectionPoint,
@@ -1142,11 +1155,10 @@ export function mix(
 }
 
 /**
- * Adds two values together.
  * @param left - The first value to add.
  * @param right - The second value to add.
  * @param options - Optional target options.
- * @returns The sum as a connection point.
+ * @returns Sum of `left` and `right` as a shader expression.
  */
 export function add(
     left: NodeMaterialConnectionPoint,
@@ -1163,10 +1175,10 @@ export function add(
 }
 
 /**
- * Subtracts the right value from the left value.
  * @param left - The left value.
  * @param right - The right value to subtract.
  * @param options - Optional target options.
+ * @returns `left` minus `right` as a shader expression.
  */
 export function sub(
     left: NodeMaterialConnectionPoint,
@@ -1183,10 +1195,10 @@ export function sub(
 }
 
 /**
- * Returns the remainder of dividing the left value by the right value.
  * @param left - The dividend value.
  * @param right - The divisor value.
  * @param options - Optional target options.
+ * @returns Remainder of `left` divided by `right` as a shader expression.
  */
 export function mod(
     left: NodeMaterialConnectionPoint,
@@ -1203,9 +1215,9 @@ export function mod(
 }
 
 /**
- * Returns one minus the input value.
- * @param input - The input value.
+ * @param input - Value to subtract from one.
  * @param options - Optional target options.
+ * @returns One minus `input` as a shader expression.
  */
 export function oneMinus(
     input: NodeMaterialConnectionPoint,
@@ -1219,10 +1231,10 @@ export function oneMinus(
 }
 
 /**
- * Returns the cross product of two vectors.
  * @param left - The left vector.
  * @param right - The right vector.
  * @param options - Optional target options.
+ * @returns Cross product of `left` and `right` as a shader expression.
  */
 export function cross(
     left: NodeMaterialConnectionPoint,
@@ -1239,10 +1251,10 @@ export function cross(
 }
 
 /**
- * Returns the dot product of two vectors.
  * @param left - The left vector.
  * @param right - The right vector.
  * @param options - Optional target options.
+ * @returns Dot product of `left` and `right` as a shader expression.
  */
 export function dot(
     left: NodeMaterialConnectionPoint,
@@ -1363,6 +1375,7 @@ export type PerturbNormalOutput = {
  * @param normalTexture - The normal texture.
  * @param bumpStrengthFloat - The bump strength.
  * @param options - Optional target options.
+ * @returns The perturbed normal and adjusted UV coordinates.
  */
 export function perturbNormal(
     uv: NodeMaterialConnectionPoint,
@@ -1395,6 +1408,12 @@ export type SubSurfaceScatteringOptions = {
     dispersion: SubSurfaceBlock["dispersion"];
 };
 
+/**
+ * Creates a fragment shader block for subsurface scattering.
+ * @param thickness - Scattering thickness value connected to the subsurface block.
+ * @param options - Optional target and subsurface scattering settings.
+ * @returns Subsurface scattering connection for the shader graph.
+ */
 export function subSurfaceScatter(
     thickness: NodeMaterialConnectionPoint,
     options?: Partial<SubSurfaceScatteringOptions>,
@@ -1454,6 +1473,7 @@ export type PBROutput = {
  * @param cameraPositionVec3 - The camera position vector.
  * @param positionWorldVec3 - The world position vector.
  * @param options - Optional properties for the PBR material.
+ * @returns Lighting, alpha, and shadow connections from the material block.
  */
 export function pbr(
     metallicFloat: NodeMaterialConnectionPoint,
@@ -1492,6 +1512,7 @@ export function pbr(
  * Discards fragments where value is below cutoff.
  * @param value - The test value.
  * @param cutoff - The cutoff threshold.
+ * @returns The configured fragment discard block.
  */
 export function discardTest(value: NodeMaterialConnectionPoint, cutoff: NodeMaterialConnectionPoint): DiscardBlock {
     const discardBlock = new DiscardBlock("discard");
@@ -1514,6 +1535,7 @@ export type OutputFragColorOptions = {
  * Outputs the fragment color using the given parameters.
  * @param colorRgb - The color.
  * @param options - Optional properties for the fragment output block.
+ * @returns The fragment output block connected to the color.
  */
 export function outputFragColor(
     colorRgb: NodeMaterialConnectionPoint,
@@ -1535,6 +1557,7 @@ export function outputFragColor(
  * Outputs the vertex position using the given parameters.
  * @param positionVec4 - The position vector.
  * @param options - Optional target options.
+ * @returns The vertex output block connected to the position.
  */
 export function outputVertexPosition(
     positionVec4: NodeMaterialConnectionPoint,

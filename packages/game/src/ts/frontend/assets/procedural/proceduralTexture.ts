@@ -20,6 +20,11 @@ import { RawTexture } from "@babylonjs/core/Materials/Textures/rawTexture";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Scene } from "@babylonjs/core/scene";
 
+/**
+ * Creates a transparent 1×1 RGBA texture for materials without a map.
+ * @param scene Scene that owns the texture.
+ * @returns A nearest-sampled, transparent texel.
+ */
 export function createEmptyTexture(scene: Scene): RawTexture {
     const emptyTextureData = new Uint8Array([0, 0, 0, 0]); // RGBA
     return new RawTexture(

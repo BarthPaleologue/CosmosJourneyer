@@ -26,6 +26,10 @@ export const FlyByState = {
 
 export type FlyByState = (typeof FlyByState)[keyof typeof FlyByState];
 
+/**
+ * @param state - Legacy numeric value or already-string mission state.
+ * @returns Mapped state for values 0–2; other values pass through for schema validation.
+ */
 function preprocessLegacyFlyByState(state: unknown): unknown {
     if (typeof state !== "number") {
         return state;

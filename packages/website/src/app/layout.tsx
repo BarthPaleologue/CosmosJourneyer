@@ -91,6 +91,12 @@ interface RootLayoutProps {
     children: ReactNode;
 }
 
+/**
+ * Renders page content inside the site's English-language HTML document.
+ * @param props - Layout properties.
+ * @param props.children - Page content to render in the document body.
+ * @returns The root HTML document.
+ */
 export default function RootLayout({ children }: RootLayoutProps): ReactElement {
     return (
         <html lang="en">

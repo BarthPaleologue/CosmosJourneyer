@@ -18,6 +18,11 @@
 import { getRngFromSeed } from "@cosmos-journeyer/random";
 import type { CylinderHabitatModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param seed Seed for reproducible procedural choices.
+ * @param surface Surface geometry on which to place the habitat.
+ * @returns A cylindrical habitat section fitted to the surface.
+ */
 export function generateCylinderHabitatModel(
     seed: number,
     surface: Readonly<CylinderHabitatModel["surface"]>,

@@ -24,6 +24,13 @@ import { getRngFromSeed, normalRandom, randRange } from "@cosmos-journeyer/rando
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { JuliaSetModel, OrbitalObjectModel, Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param id Identifier assigned to the generated object.
+ * @param seed Seed for reproducible procedural choices.
+ * @param name Display name assigned to the generated object.
+ * @param parentBodies Orbital ancestors that define the generated object's parent path.
+ * @returns A Julia set model with seeded properties and orbital data.
+ */
 export function generateJuliaSetModel(
     id: string,
     seed: number,

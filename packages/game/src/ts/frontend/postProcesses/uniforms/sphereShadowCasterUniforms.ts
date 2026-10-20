@@ -33,6 +33,12 @@ export const SphereShadowCasterUniformNames = {
 const shadowCastingSpheres = new Float32Array(maxShadowCastingSpheres * 4);
 const tempPosition = new Vector3();
 
+/**
+ * Binds nearby spherical shadow casters, capped at the shader's supported count.
+ * @param effect Effect receiving the shadow caster array.
+ * @param shadowCasters Candidate spherical objects that cast shadows.
+ * @param floatingOriginOffset Offset subtracted from each world position.
+ */
 export function setSphereShadowCasterUniforms(
     effect: Effect,
     shadowCasters: ReadonlyArray<SphereShadowCaster>,

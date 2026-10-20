@@ -52,6 +52,11 @@ import { getTriPlanarBlending, getTriPlanarUVs, unpackNormal, whiteoutBlend } fr
 
 import normalMapPath from "@assets/testNormal.webp";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting tri-planar normal blending under adjustable lighting.
+ */
 export async function createTriPlanarNormalScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
@@ -131,6 +136,11 @@ export async function createTriPlanarNormalScene(
     return scene;
 }
 
+/**
+ * @param light - Light to orient.
+ * @param azimuthDegrees - Horizontal angle in degrees.
+ * @param elevationDegrees - Angle above the horizon in degrees.
+ */
 function updateLightDirection(light: DirectionalLight, azimuthDegrees: number, elevationDegrees: number): void {
     const azimuth = degreesToRadians(azimuthDegrees);
     const elevation = degreesToRadians(elevationDegrees);
@@ -143,6 +153,14 @@ function updateLightDirection(light: DirectionalLight, azimuthDegrees: number, e
     ).normalize();
 }
 
+/**
+ * @param label - Control label.
+ * @param minimum - Lower bound in degrees.
+ * @param maximum - Upper bound in degrees.
+ * @param value - Initial angle in degrees.
+ * @param onValueChanged - Receives changes in degrees.
+ * @returns Slider with a live angle label.
+ */
 function createAngleSlider(
     label: string,
     minimum: number,
@@ -170,6 +188,11 @@ function createAngleSlider(
     return { labelBlock, slider };
 }
 
+/**
+ * Adds azimuth and elevation controls for comparing lighting directions.
+ * @param scene - Owning scene.
+ * @param light - Controlled light.
+ */
 function createLightControlUi(scene: Scene, light: DirectionalLight): void {
     const ui = AdvancedDynamicTexture.CreateFullscreenUI("triPlanarNormalUi", true, scene);
 

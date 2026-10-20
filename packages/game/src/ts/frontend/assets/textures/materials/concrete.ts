@@ -26,6 +26,11 @@ import concreteAmbientOcclusion from "@assets/degraded-concrete-ue/degraded-conc
 import concreteMetallicRoughness from "@assets/degraded-concrete-ue/degraded-concrete_metallic_roughness.webp";
 import concreteNormal from "@assets/degraded-concrete-ue/degraded-concrete_normal-dx.webp";
 
+/**
+ * @param engine Engine used to create the textures.
+ * @param progressMonitor Progress monitor notified as each image loads.
+ * @returns Concrete albedo, normal, metallic-roughness, and ambient-occlusion maps.
+ */
 export async function loadConcreteTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

@@ -27,6 +27,16 @@ export type OutputPayload = DeepReadonly<{
     };
     cubes: Record<CubeId, SpatialCube>;
 }>;
+/**
+ * Builds the output payload with selection settings and retrieval statistics.
+ * @param cubes Populated spatial cubes to serialize.
+ * @param grid Spatial grid dimensions used for the query.
+ * @param query Gaia query filters used to select rows.
+ * @param retrieved Number of rows returned by Gaia.
+ * @param retained Number of stars retained after processing.
+ * @param now Clock used to stamp the payload generation time.
+ * @returns The complete dataset payload.
+ */
 export function buildOutput(
     cubes: DeepReadonly<Map<CubeId, SpatialCube>>,
     grid: GridConfig,
@@ -56,6 +66,12 @@ export function buildOutput(
         cubes: Object.fromEntries(cubes),
     };
 }
+/**
+ * Writes the dataset as JSON and gzip-compressed JSON.
+ * @param payload Dataset payload to write.
+ * @param jsonPath Destination path for the JSON file.
+ * @param gzipPath Destination path for the gzip file.
+ */
 export async function dumpOutputs(payload: OutputPayload, jsonPath: string, gzipPath: string): Promise<void> {
     const text = JSON.stringify(payload);
     await Promise.all([

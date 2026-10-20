@@ -45,6 +45,12 @@ const pngSignature = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0
 const iendChunkType = "IEND";
 const internationalTextChunkType = "iTXt";
 
+/**
+ * Snapshots the capture time, game version, and relative universe location.
+ * @param location - Universe location stored with the capture.
+ * @param capturedAt - Capture timestamp, defaulting to the current time.
+ * @returns Versioned screenshot metadata.
+ */
 export function createScreenshotMetadata(location: RelativeCoordinates, capturedAt = new Date()): ScreenshotMetadata {
     return {
         schemaVersion: 1,
@@ -54,6 +60,12 @@ export function createScreenshotMetadata(location: RelativeCoordinates, captured
     };
 }
 
+/**
+ * @param engine - Rendering engine used for the capture.
+ * @param camera - Camera whose view is captured.
+ * @param options - Optional location metadata and screenshot dimensions.
+ * @returns PNG bytes with metadata when a location was supplied.
+ */
 export async function makeScreenshotPng(
     engine: AbstractEngine,
     camera: Camera,
@@ -72,10 +84,20 @@ export async function makeScreenshotPng(
     return addScreenshotMetadata(png, createScreenshotMetadata(options.location));
 }
 
+/**
+ * Stores metadata as UTF-8 text in an uncompressed PNG `iTXt` chunk.
+ * @param png - Encoded PNG bytes.
+ * @param metadata - Validated game screenshot metadata.
+ * @returns New PNG bytes containing the metadata chunk.
+ */
 export function addScreenshotMetadata(png: Uint8Array, metadata: ScreenshotMetadata): Uint8Array {
     return addPngInternationalTextChunk(png, ScreenshotMetadataKeyword, JSON.stringify(metadata));
 }
 
+/**
+ * @param png - Encoded PNG bytes.
+ * @returns Metadata, `null` when absent, or a PNG, JSON, or schema error.
+ */
 export function readScreenshotMetadata(
     png: Uint8Array,
 ): Result<ScreenshotMetadata | null, ScreenshotMetadataReadError> {
@@ -105,6 +127,13 @@ export function readScreenshotMetadata(
     return ok(metadataResult.data);
 }
 
+/**
+ * Inserts a UTF-8 international-text chunk immediately before the PNG end marker.
+ * @param png - Encoded PNG bytes.
+ * @param keyword - PNG international-text keyword.
+ * @param text - Text to encode.
+ * @returns New PNG bytes containing the inserted chunk.
+ */
 function addPngInternationalTextChunk(png: Uint8Array, keyword: string, text: string): Uint8Array {
     assertPngSignature(png);
     validatePngTextKeyword(keyword);
@@ -120,6 +149,11 @@ function addPngInternationalTextChunk(png: Uint8Array, keyword: string, text: st
     return result;
 }
 
+/**
+ * @param png - Encoded PNG bytes.
+ * @param keyword - PNG international-text keyword.
+ * @returns The matching text, or null if absent or unsupported.
+ */
 function readPngInternationalTextChunk(png: Uint8Array, keyword: string): string | null {
     assertPngSignature(png);
 
@@ -147,6 +181,11 @@ function readPngInternationalTextChunk(png: Uint8Array, keyword: string): string
     return null;
 }
 
+/**
+ * Throws if the URL does not contain the Base64 marker.
+ * @param dataUrl - Base64 data URL to decode.
+ * @returns Decoded bytes.
+ */
 export function dataUrlToBytes(dataUrl: string): Uint8Array {
     const base64SeparatorIndex = dataUrl.indexOf(";base64,");
     if (base64SeparatorIndex === -1) {
@@ -164,6 +203,11 @@ export function dataUrlToBytes(dataUrl: string): Uint8Array {
     return bytes;
 }
 
+/**
+ * @param bytes - Raw byte data.
+ * @param mimeType - Media type embedded in the data URL.
+ * @returns The Base64 data URL.
+ */
 export function bytesToDataUrl(bytes: Uint8Array, mimeType: string): string {
     let binary = "";
     for (const byte of bytes) {
@@ -174,6 +218,11 @@ export function bytesToDataUrl(bytes: Uint8Array, mimeType: string): string {
     return `data:${mimeType};base64,${base64}`;
 }
 
+/**
+ * Starts a PNG download and revokes its temporary object URL.
+ * @param png - Encoded PNG bytes.
+ * @param filename - PNG download filename.
+ */
 export function downloadPng(png: Uint8Array, filename: string): void {
     const bytes = new ArrayBuffer(png.byteLength);
     new Uint8Array(bytes).set(png);
@@ -189,6 +238,12 @@ export function downloadPng(png: Uint8Array, filename: string): void {
     URL.revokeObjectURL(url);
 }
 
+/**
+ * Builds an uncompressed UTF-8 international-text payload without language metadata.
+ * @param keyword - PNG international-text keyword.
+ * @param text - Text to encode.
+ * @returns The encoded international-text payload.
+ */
 function createInternationalTextChunkData(keyword: string, text: string): Uint8Array {
     const keywordBytes = asciiToBytes(keyword);
     const textBytes = new TextEncoder().encode(text);
@@ -205,6 +260,12 @@ function createInternationalTextChunkData(keyword: string, text: string): Uint8A
     return data;
 }
 
+/**
+ * Reads UTF-8 text only from an uncompressed payload with the expected keyword.
+ * @param data - PNG chunk payload bytes.
+ * @param expectedKeyword - Keyword whose text should be returned.
+ * @returns The matching text, or null for a different keyword or unsupported payload.
+ */
 function readInternationalTextChunkData(data: Uint8Array, expectedKeyword: string): string | null {
     const keywordEnd = data.indexOf(0);
     if (keywordEnd === -1) {
@@ -234,6 +295,12 @@ function readInternationalTextChunkData(data: Uint8Array, expectedKeyword: strin
     return new TextDecoder().decode(data.subarray(translatedKeywordEnd + 1));
 }
 
+/**
+ * Frames PNG chunk data with its length, ASCII type, and CRC-32 checksum.
+ * @param type - Four-character PNG chunk type.
+ * @param data - PNG chunk payload bytes.
+ * @returns The complete encoded PNG chunk.
+ */
 function createChunk(type: string, data: Uint8Array): Uint8Array {
     const typeBytes = asciiToBytes(type);
     const chunk = new Uint8Array(12 + data.length);
@@ -246,6 +313,12 @@ function createChunk(type: string, data: Uint8Array): Uint8Array {
     return chunk;
 }
 
+/**
+ * Locates a PNG chunk by type, rejecting truncated data or a missing chunk.
+ * @param png - Encoded PNG bytes.
+ * @param chunkType - Four-character PNG chunk type to locate.
+ * @returns Byte offset of the matching chunk length field.
+ */
 function findChunkOffset(png: Uint8Array, chunkType: string): number {
     let offset = pngSignature.length;
     while (offset < png.length) {
@@ -267,6 +340,10 @@ function findChunkOffset(png: Uint8Array, chunkType: string): number {
     throw new Error(`Invalid PNG: ${chunkType} chunk not found`);
 }
 
+/**
+ * Rejects input that does not begin with the complete PNG signature.
+ * @param png - Encoded PNG bytes.
+ */
 function assertPngSignature(png: Uint8Array): void {
     if (png.length < pngSignature.length) {
         throw new Error("Invalid PNG: file is too short");
@@ -279,6 +356,10 @@ function assertPngSignature(png: Uint8Array): void {
     }
 }
 
+/**
+ * Requires a PNG text keyword of one to 79 printable ASCII characters.
+ * @param keyword - PNG international-text keyword.
+ */
 function validatePngTextKeyword(keyword: string): void {
     if (keyword.length === 0 || keyword.length > 79) {
         throw new Error("PNG text keyword must contain between 1 and 79 characters");
@@ -292,6 +373,10 @@ function validatePngTextKeyword(keyword: string): void {
     }
 }
 
+/**
+ * @param text - Text to encode.
+ * @returns The character-code bytes.
+ */
 function asciiToBytes(text: string): Uint8Array {
     const bytes = new Uint8Array(text.length);
     for (let i = 0; i < text.length; i++) {
@@ -300,6 +385,10 @@ function asciiToBytes(text: string): Uint8Array {
     return bytes;
 }
 
+/**
+ * @param bytes - Raw byte data.
+ * @returns The single-byte character string.
+ */
 function bytesToAscii(bytes: Uint8Array): string {
     let text = "";
     for (const byte of bytes) {
@@ -308,6 +397,12 @@ function bytesToAscii(bytes: Uint8Array): string {
     return text;
 }
 
+/**
+ * Throws if the four-byte field at `offset` is truncated.
+ * @param bytes - Raw byte data.
+ * @param offset - Byte offset of the four-byte integer field.
+ * @returns The unsigned 32-bit value.
+ */
 function readUint32(bytes: Uint8Array, offset: number): number {
     const byte0 = bytes[offset];
     const byte1 = bytes[offset + 1];
@@ -321,6 +416,12 @@ function readUint32(bytes: Uint8Array, offset: number): number {
     return ((byte0 << 24) | (byte1 << 16) | (byte2 << 8) | byte3) >>> 0;
 }
 
+/**
+ * Writes an unsigned integer as four big-endian bytes.
+ * @param bytes - Raw byte data.
+ * @param offset - Byte offset of the four-byte integer field.
+ * @param value - Unsigned integer to encode.
+ */
 function writeUint32(bytes: Uint8Array, offset: number, value: number): void {
     bytes[offset] = (value >>> 24) & 0xff;
     bytes[offset + 1] = (value >>> 16) & 0xff;
@@ -328,6 +429,11 @@ function writeUint32(bytes: Uint8Array, offset: number, value: number): void {
     bytes[offset + 3] = value & 0xff;
 }
 
+/**
+ * Computes the PNG CRC-32 checksum over chunk type and payload bytes.
+ * @param bytes - Raw byte data.
+ * @returns The unsigned CRC-32 checksum.
+ */
 function crc32(bytes: Uint8Array): number {
     let crc = 0xffffffff;
 

@@ -25,6 +25,11 @@ import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 
+/**
+ * Formats a vector's components as a comma-separated sector key.
+ * @param v Sector coordinates.
+ * @returns The coordinates joined as `x,y,z`.
+ */
 export function vector3ToString(v: Vector3): string {
     return `${v.x},${v.y},${v.z}`;
 }

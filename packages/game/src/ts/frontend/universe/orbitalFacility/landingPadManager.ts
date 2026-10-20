@@ -87,7 +87,7 @@ export class LandingPadManager {
     }
 
     /**
-     * Cancels a landing request, making the pad available again
+     * Releases a reserved landing pad after a landing request is cancelled.
      * @param pad The landing pad to make available
      */
     public cancelLandingRequest(pad: ILandingPad): void {
@@ -95,14 +95,16 @@ export class LandingPadManager {
     }
 
     /**
-     * Returns all landing pads, including those that are currently in use
+     * Returns every landing pad managed by this facility, including occupied pads.
+     * @returns All managed landing pads.
      */
     public getLandingPads(): ReadonlyArray<ILandingPad> {
         return this.landingPads;
     }
 
     /**
-     * Returns all landing pads that are currently available for landing
+     * Returns only landing pads that are not currently reserved.
+     * @returns Landing pads that are currently free.
      */
     public getAvailableLandingPads(): ReadonlyArray<ILandingPad> {
         return this.getLandingPads().filter((landingPad) => {

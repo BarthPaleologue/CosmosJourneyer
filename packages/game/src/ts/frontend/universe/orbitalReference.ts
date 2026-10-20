@@ -19,7 +19,12 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 import type { KeplerianObject, RelativeTransformFrame } from "./keplerianOrbitalSimulation";
 
-/** Navigation heuristic: proximity outweighs mass enough to approach small orbiting facilities. */
+/**
+ * Selects the orbital object that should anchor navigation, balancing proximity with mass.
+ * @param objects - The bodies that can serve as the navigation reference.
+ * @param position - World-space position from which to compare the candidate bodies.
+ * @returns The navigation reference object, or undefined when no candidates exist.
+ */
 export function getMostInfluentialObject(
     objects: Iterable<KeplerianObject>,
     position: Vector3,
@@ -40,7 +45,11 @@ export function getMostInfluentialObject(
     return bestObject;
 }
 
-/** Avoid compensating rapid spins. A zero period denotes an object without rotation. */
+/**
+ * Chooses whether navigation should compensate for the body’s rotation based on its sidereal period.
+ * @param siderealPeriod - The body’s rotation period in seconds; zero means it does not rotate.
+ * @returns The reference-frame policy for the body’s sidereal period.
+ */
 export function getNavigationReferenceFrame(siderealPeriod: number): RelativeTransformFrame {
     const period = Math.abs(siderealPeriod);
     return period > 0 && period < 10 * 60 ? "inertial" : "reference";

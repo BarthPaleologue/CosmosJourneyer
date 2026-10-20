@@ -14,6 +14,14 @@ import { parseDistance } from "@/utils/strings/parseToStrings";
 
 import type { MissionContext } from "./missionContext";
 
+/**
+ * @param missionContext - Current player and mission context.
+ * @param targetSystemCoordinates - Destination system coordinates.
+ * @param keyboardLayout - Keyboard code-to-label map.
+ * @param universeBackend - Universe lookup for target objects.
+ * @param t - Translation function for player-facing text.
+ * @returns Localized instructions for the next travel step.
+ */
 export function getGoToSystemInstructions(
     missionContext: MissionContext,
     targetSystemCoordinates: StarSystemCoordinates,

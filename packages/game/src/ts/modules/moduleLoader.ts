@@ -26,14 +26,15 @@ import { MonolithModule } from "./monolith";
 import { SpaceTelescopesModule } from "./spaceTelescopes";
 import { VestaModule } from "./vesta";
 
+/** @returns Modules loaded at startup. */
 export function getBuiltinModules(): Array<GameModule> {
     return [DarkKnightModule, MonolithModule, SpaceTelescopesModule, VestaModule, ChronosModule];
 }
 
 /**
- *
- * @param gameModules
- * @param api
+ * @param gameModules - Modules in setup order.
+ * @param api - Content registration API.
+ * @returns Success, or the first setup error.
  */
 export function setupModules(gameModules: Iterable<GameModule>, api: GameModuleApi): Result<void, Error> {
     for (const gameModule of gameModules) {

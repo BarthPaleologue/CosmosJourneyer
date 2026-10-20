@@ -54,6 +54,12 @@ export type Musics = {
     readonly soaring: AbstractSound;
 };
 
+/**
+ * Loads the game's looping music tracks.
+ * @param audioEngine Audio engine that decodes and plays the music.
+ * @param progressMonitor Tracks completion of individual music-loading tasks.
+ * @returns Named tracks for the game's menus and environments.
+ */
 export async function loadMusics(
     audioEngine: AudioEngineV2,
     progressMonitor: ILoadingProgressMonitor,

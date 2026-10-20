@@ -29,6 +29,13 @@ export type Assets = {
     readonly rendering: Readonly<RenderingAssets>;
 };
 
+/**
+ * Loads audio and rendering resources needed to run the game.
+ * @param scene Scene that owns the loaded and created rendering resources.
+ * @param audioEngine Audio engine that decodes and plays the game's sounds.
+ * @param progressMonitor Tracks completion of individual asset-loading tasks.
+ * @returns The audio and rendering resource bundles.
+ */
 export async function loadAssets(
     scene: Scene,
     audioEngine: AudioEngineV2,

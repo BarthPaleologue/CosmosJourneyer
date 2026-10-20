@@ -26,6 +26,10 @@ import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 
 import { enablePhysics } from "./utils";
 
+/**
+ * @param value - Texture or plain-object tree.
+ * @yields {BaseTexture} Nested textures; other object types are not traversed.
+ */
 function* findTextures(value: unknown): Generator<BaseTexture> {
     if (value instanceof BaseTexture) {
         yield value;
@@ -40,6 +44,11 @@ function* findTextures(value: unknown): Generator<BaseTexture> {
     }
 }
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting loaded textures under preview lighting.
+ */
 export async function createDebugAssetsScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
@@ -59,6 +68,11 @@ export async function createDebugAssetsScene(
     const hemi = new HemisphericLight("hemisphericLight", new Vector3(0, 1, 0), scene);
     hemi.intensity = 0.5;
 
+    /**
+     * Displays a texture without lighting so its pixels can be inspected.
+     * @param texture - Preview image.
+     * @param position - Preview position.
+     */
     function showTexture(texture: BaseTexture, position: Vector3): void {
         const plane = MeshBuilder.CreateGround("plane", { width: 0.9, height: 0.9 }, scene);
         const material = new StandardMaterial("material", scene);

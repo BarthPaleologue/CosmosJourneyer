@@ -1,6 +1,9 @@
 import { degreesToRadians, durationToSeconds } from "@cosmos-journeyer/physics";
 import type { StarModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @returns Star model for Sol's central star.
+ */
 export function getSunModel(): StarModel {
     return {
         id: "sun",

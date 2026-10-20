@@ -37,6 +37,10 @@ import type { ScatteredInstanceBuffers } from "./scatteringSystem";
 
 const SKIRT_GENERATION_VERTEX_SPACING_THRESHOLD = 512;
 
+/**
+ * @param faceIndex - The cube-sphere face index in the range 0 through 5.
+ * @returns A normalized direction vector pointing away from the selected cube face.
+ */
 function faceIndexToDirection(faceIndex: FaceIndex): Direction {
     switch (faceIndex) {
         case 0:
@@ -56,6 +60,11 @@ function faceIndexToDirection(faceIndex: FaceIndex): Direction {
     }
 }
 
+/**
+ * Builds indexed terrain geometry from the worker task’s height samples.
+ * @param task - The terrain task containing the inputs for this computation.
+ * @returns The generated vertex and index buffers for the chunk.
+ */
 export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffers {
     const nbVerticesPerSide = task.nbVerticesPerSide;
     const nbSubdivisions = nbVerticesPerSide - 1;

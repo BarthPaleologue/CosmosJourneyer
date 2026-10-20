@@ -29,36 +29,22 @@ import { deserializeMissionNode } from "./nodes/deserializeNode";
 import type { MissionNode } from "./nodes/missionNode";
 
 /**
- * General mission abstraction. The mission can have any arbitrary task tree and reward.
- * If you want to create new mission archetypes, you should register a new enum variant in MissionType
+ * Mission with a task tree, reward, issuing station, and display category.
  */
 export class Mission {
-    /**
-     * The task tree that the player has to complete to finish the mission
-     */
     readonly tree: MissionNode;
 
-    /**
-     * The reward that the player gets for completing the mission
-     */
     readonly reward: number;
 
-    /**
-     * The space station that gave the mission
-     */
     readonly missionGiver: UniverseObjectId;
 
-    /**
-     * The type of the mission (useful for displaying localized strings)
-     */
     readonly missionType: MissionType;
 
     /**
-     * Creates a new mission
-     * @param tree The task tree that the player has to complete to finish the mission
-     * @param reward The reward that the player gets for completing the mission
-     * @param missionGiver The space station that gave the mission
-     * @param missionType The type of the mission (useful for displaying localized strings)
+     * @param tree - Tasks required to complete the mission.
+     * @param reward - Completion reward.
+     * @param missionGiver - Station offering the mission.
+     * @param missionType - Category used for localized display.
      */
     constructor(tree: MissionNode, reward: number, missionGiver: UniverseObjectId, missionType: MissionType) {
         this.tree = tree;
@@ -68,9 +54,11 @@ export class Mission {
     }
 
     /**
-     * Describes the next task that the player has to complete given the current mission context
-     * @param context The current mission context
-     * @param keyboardLayout The keyboard layout map to localize the keys
+     * @param context - Current mission state and player location.
+     * @param keyboardLayout - Keyboard code-to-label map.
+     * @param universeBackend - Universe lookup for target objects.
+     * @param t - Translation function for player-facing text.
+     * @returns The localized next task instruction.
      */
     describeNextTask(
         context: MissionContext,
@@ -82,36 +70,37 @@ export class Mission {
     }
 
     /**
-     * Returns true if the two missions have the same task tree
-     * @param other The other mission to compare to
+     * @param other - Mission whose task tree is compared.
+     * @returns Whether both missions have the same task tree.
      */
     equals(other: Mission): boolean {
         return this.tree.equals(other.tree);
     }
 
     /**
-     * Returns the reward that the player gets for completing the mission
+     * @returns The mission completion reward.
      */
     getReward(): number {
         return this.reward;
     }
 
     /**
-     * Returns all the current target systems that the player has to visit to complete the mission
+     * @returns Systems the player still needs to visit.
      */
     getTargetSystems(): StarSystemCoordinates[] {
         return this.tree.getTargetSystems();
     }
 
     /**
-     * Returns mission targets that should guide the player in the current system.
+     * @returns Objects that should guide the player in the current system.
      */
     getGuidanceTargetObjectIds(): UniverseObjectId[] {
         return this.tree.getGuidanceTargetObjectIds();
     }
 
     /**
-     * Returns the localized string for the mission type
+     * @param t - Translation function for player-facing text.
+     * @returns The localized mission category.
      */
     getTypeString(t: TFunction): string {
         switch (this.missionType) {
@@ -127,21 +116,24 @@ export class Mission {
     }
 
     /**
-     * Returns a string describing the mission using the mission tree and the origin seed
+     * Localizes the task tree relative to the system that issued the mission.
+     * @param universeBackend - Universe lookup for target objects.
+     * @param t - Translation function for player-facing text.
+     * @returns The localized mission description.
      */
     describe(universeBackend: UniverseBackend, t: TFunction): string {
         return this.tree.describe(this.missionGiver.systemCoordinates, universeBackend, t);
     }
 
     /**
-     * Returns true if the mission is completed, false otherwise
+     * @returns Whether the task tree has been completed.
      */
     isCompleted(): boolean {
         return this.tree.isCompleted();
     }
 
     /**
-     * Serializes the mission to a JSON object for storage in save files
+     * @returns Serialized mission data for save files.
      */
     serialize(): MissionSerialized {
         return {
@@ -153,8 +145,8 @@ export class Mission {
     }
 
     /**
-     * Updates the mission state recursively given the current mission context
-     * @param context The current mission context
+     * Updates unfinished tasks from the current mission context.
+     * @param context - Current mission state and player location.
      */
     update(context: MissionContext): void {
         if (this.isCompleted()) {

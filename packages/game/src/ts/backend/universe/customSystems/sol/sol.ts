@@ -33,6 +33,9 @@ import { getJupiterModel } from "./jupiter";
 import { getSaturnModel } from "./saturn";
 import { getSunModel } from "./sun";
 
+/**
+ * @returns Sol system model with fixed coordinates and orbital-object hierarchy.
+ */
 export function getSolSystemModel(): StarSystemModel {
     const sun = getSunModel();
 

@@ -19,6 +19,14 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 
+/**
+ * Scatters randomly scaled and rotated instances across a square grid on the XZ plane.
+ * @param position - Patch center projected onto the XZ plane.
+ * @param size - Width of the square patch.
+ * @param resolution - Number of grid cells along each side.
+ * @param rng - Random source used to sample placements.
+ * @returns Packed instance matrices with 16 floats per grid cell.
+ */
 export function createSquareMatrixBuffer(
     position: Vector3,
     size: number,
@@ -50,6 +58,12 @@ export function createSquareMatrixBuffer(
     return matrixBuffer;
 }
 
+/**
+ * Places equally spaced instances on an XZ circle facing its center.
+ * @param radius - Radius in the coordinate units used by the input geometry.
+ * @param nbPoints - Number of instances distributed around the circle.
+ * @returns Packed matrices for the circular arrangement.
+ */
 export function createCircleInstanceBuffer(radius: number, nbPoints: number): Float32Array<ArrayBuffer> {
     const buffer = new Float32Array(16 * nbPoints);
 
@@ -92,9 +106,9 @@ type ScatteringLayersBuffers<TLayers extends ReadonlyArray<ScatteringLayer>> = {
 export const MaxScatterDensity = 16;
 
 /**
- * @param pointBuffer Buffer of points (stride is 6: 3 for position, 3 for surface normal)
- * @param layers The scattering layers to generate the matrices for. Each layer has a density function that determines the probability of scattering an object at a given position with a given normal. The density function should return a value between 0 and MaxScatterDensity, where 0 means no chance of scattering and MaxScatterDensity means 100% chance of scattering.
- * @returns One Float32Array for each layer, containing the transformation matrices of the scattered objects (16 floats per matrix)
+ * @param pointBuffer - Packed points with three position and three normal values each.
+ * @param layers - Placement rules returning density from 0 (never) to `MaxScatterDensity` (always).
+ * @returns Per-layer transforms, positions, rotations, scales, and instance counts.
  */
 export function filterPoints<const TLayers extends ReadonlyArray<ScatteringLayer>>(
     pointBuffer: Float32Array,
@@ -167,6 +181,13 @@ export function filterPoints<const TLayers extends ReadonlyArray<ScatteringLayer
     ) as ScatteringLayersBuffers<TLayers>;
 }
 
+/**
+ * Creates a thin-instance patch with geometry independent of its source mesh.
+ * @param name - Name assigned to the created mesh.
+ * @param baseMesh - Source mesh to clone.
+ * @param matrixBuffer - Packed transforms with 16 floats per instance.
+ * @returns The cloned mesh with attached instance transforms.
+ */
 export function createInstancePatch(name: string, baseMesh: Mesh, matrixBuffer: Float32Array): Mesh {
     const mesh = baseMesh.clone(name);
     mesh.makeGeometryUnique();
