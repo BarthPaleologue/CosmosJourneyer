@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Encodes Unicode text as Base64.
+ * Uses URI percent-encoding to preserve Unicode inside Base64.
  * @param str - Unicode text to encode.
  * @returns Base64 text, or `null` if encoding fails.
  */
@@ -29,9 +29,8 @@ export function encodeBase64(str: string): string | null {
 }
 
 /**
- * Decodes Base64-encoded UTF-8 text.
- * @param str - Base64-encoded text.
- * @returns Decoded text; malformed Base64 or UTF-8 data throws.
+ * @param str - Base64 containing URI percent-encoded text, as produced by {@link encodeBase64}.
+ * @returns Decoded Unicode text; malformed Base64 or URI encoding throws.
  */
 export function decodeBase64(str: string): string {
     const base64Decoded = window.atob(str);
