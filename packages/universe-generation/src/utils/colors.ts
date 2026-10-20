@@ -1,4 +1,4 @@
-import type { RGBColor } from "@cosmos-journeyer/universe-model";
+import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 type HSVColor = {
     readonly h: number;
@@ -6,7 +6,7 @@ type HSVColor = {
     readonly v: number;
 };
 
-export function hsvToRgb(hsv: HSVColor): RGBColor {
+export function hsvToRgb(hsv: HSVColor): LinearSrgbColor {
     const { h, s, v } = hsv;
     const normalizedHue = ((h % 360) + 360) % 360;
 

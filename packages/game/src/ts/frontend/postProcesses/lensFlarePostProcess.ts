@@ -24,8 +24,7 @@ import { Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
 import type { Scene } from "@babylonjs/core/scene";
-
-import type { RGBColor } from "@/utils/colors";
+import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
 import { OffsetViewProjectionToRef } from "../helpers/floatingOrigin";
@@ -48,12 +47,12 @@ export class LensFlarePostProcess extends PostProcess {
 
     private readonly cameraToStellarObject = Vector3.Zero();
 
-    private readonly color: RGBColor;
+    private readonly color: LinearSrgbColor;
 
     constructor(
         stellarTransform: TransformNode,
         boundingRadius: number,
-        color: RGBColor,
+        color: LinearSrgbColor,
         depthRendererManager: DepthRendererManager,
         scene: Scene,
     ) {

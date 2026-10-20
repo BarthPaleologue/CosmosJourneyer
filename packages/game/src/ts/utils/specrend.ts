@@ -1,4 +1,4 @@
-import type { RGBColor } from "./colors";
+import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 /*
                 Colour Rendering of Spectra
@@ -555,7 +555,7 @@ export function demonstrate(): void {
     }
 }
 
-export function getRgbFromTemperature(temperature: number): RGBColor {
+export function getRgbFromTemperature(temperature: number): LinearSrgbColor {
     const cs = HDTVsystem;
 
     bbTemp = temperature;
