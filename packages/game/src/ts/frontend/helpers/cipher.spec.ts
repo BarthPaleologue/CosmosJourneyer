@@ -59,6 +59,10 @@ describe("cipher", () => {
     });
 });
 
+/**
+ * @param base64 - Base64-encoded byte data.
+ * @returns Base64 text with its first character replaced.
+ */
 function tamperBase64(base64: string): string {
     const firstCharacter = base64.charAt(0);
     const replacementCharacter = firstCharacter === "A" ? "B" : "A";

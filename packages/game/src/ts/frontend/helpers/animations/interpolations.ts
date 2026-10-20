@@ -17,22 +17,29 @@
 
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 
+/**
+ * @param t - Normalized interpolation progress.
+ * @returns Quadratically eased progress.
+ */
 export function easeInOutQuadratic(t: number): number {
     return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 }
 
+/**
+ * @param t - Normalized interpolation progress.
+ * @returns Cubically eased progress.
+ */
 export function easeInOutCubic(t: number): number {
     return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 }
 
 /**
- * Frame-rate independent slerp based on frame-rate independent lerp.
- * @param a The start quaternion
- * @param b The target quaternion
- * @param halfLifeSeconds The half-life of the slerp (in seconds)
- * @param deltaSeconds The time delta (in seconds)
- * @param ref The quaternion to store the result in
- * @returns The interpolated quaternion
+ * @param a - First quaternion.
+ * @param b - Second quaternion.
+ * @param halfLifeSeconds - Exponential weight half-life in seconds.
+ * @param deltaSeconds - Elapsed time in seconds.
+ * @param ref - Destination quaternion.
+ * @returns Interpolated quaternion written to ref.
  */
 export function slerpSmoothToRef(
     a: Quaternion,

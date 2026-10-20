@@ -22,6 +22,13 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
 
+/**
+ * Creates a massless environment collider that collides with dynamic objects.
+ * @param mesh - Mesh whose geometry or physics is being updated.
+ * @param physicsShapeType - Collision shape used for the environment mesh.
+ * @param scene - Scene that owns the created resources.
+ * @returns The configured aggregate, owned by the caller.
+ */
 export function createEnvironmentAggregate(
     mesh: AbstractMesh,
     physicsShapeType: PhysicsShapeType,
@@ -35,6 +42,11 @@ export function createEnvironmentAggregate(
     return aggregate;
 }
 
+/**
+ * Switches an aggregate’s collision filter between every category and none.
+ * @param aggregate - Physics aggregate whose collision mask is updated.
+ * @param enabled - Whether collisions should be enabled.
+ */
 export function setCollisionsEnabled(aggregate: PhysicsAggregate, enabled: boolean): void {
     aggregate.shape.filterCollideMask = enabled ? CollisionMask.EVERYTHING : CollisionMask.NONE;
 }

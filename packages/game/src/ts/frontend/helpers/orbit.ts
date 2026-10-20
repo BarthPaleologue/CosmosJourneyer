@@ -9,11 +9,11 @@ import { findMinimumNewtonRaphson } from "@/utils/math";
 type OrbitalPlane = DeepReadonly<Pick<Orbit, "inclination" | "longitudeOfAscendingNode">>;
 
 /**
- *
- * @param orbit
- * @param t
- * @returns
- * @see https://medium.com/@barth_29567/crazy-orbits-lets-make-squares-c91a427c6b26
+ * Evaluates an Lp-shaped Keplerian orbit in its parent-centered frame at the given time.
+ * @param orbit - Orbit parameters in the parent-centered frame.
+ * @param parentMass - Combined parent mass in kilograms.
+ * @param t - Elapsed simulation time in seconds.
+ * @returns Parent-relative position in meters.
  */
 export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: number, t: number): Vector3 {
     const orbitalPeriod = getOrbitalPeriod(orbit.semiMajorAxis, parentMass);
@@ -50,6 +50,13 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
     return point;
 }
 
+/**
+ * Combines the orbital plane and tilted spin axis with the elapsed sidereal rotation.
+ * @param orbitalPlane - Inclination and ascending-node longitude in radians.
+ * @param spin - Axial tilt, axis azimuth, and sidereal rotation parameters.
+ * @param elapsedSeconds - Elapsed simulation time in seconds.
+ * @returns The absolute body orientation quaternion.
+ */
 export function computeAbsoluteOrientation(
     orbitalPlane: OrbitalPlane,
     spin: DeepReadonly<SpinModel>,
@@ -65,6 +72,12 @@ export function computeAbsoluteOrientation(
     return spinAxisOrientation.multiply(Quaternion.RotationAxis(Axis.Y, rotationAngle));
 }
 
+/**
+ * Computes the tilted spin axis relative to the orbital plane without the sidereal phase.
+ * @param orbitalPlane - Inclination and ascending-node longitude in radians.
+ * @param spin - Axial tilt, axis azimuth, and sidereal rotation parameters.
+ * @returns The absolute spin-axis orientation quaternion.
+ */
 export function computeSpinAxisOrientation(orbitalPlane: OrbitalPlane, spin: DeepReadonly<SpinModel>): Quaternion {
     const orbitOrientation = Quaternion.RotationAxis(Axis.Y, orbitalPlane.longitudeOfAscendingNode).multiply(
         Quaternion.RotationAxis(Axis.Z, orbitalPlane.inclination),

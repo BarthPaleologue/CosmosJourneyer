@@ -19,6 +19,13 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { arc, interpolateViridis, pie, scaleSequential } from "d3";
 import type { PieArcDatum } from "d3";
 
+/**
+ * Builds SVG pie slices and legends using a Viridis color scale.
+ * @param data - Data records represented by the pie slices.
+ * @param extractProportion - Extracts the numeric weight of each pie slice.
+ * @param extractLegend - Extracts the text label for each pie slice.
+ * @returns SVG markup for the chart and legend.
+ */
 export function makeD3PieChart<T>(
     data: DeepReadonly<Array<T>>,
     extractProportion: (d: DeepReadonly<T>) => number,

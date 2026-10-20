@@ -21,6 +21,13 @@ import jsQR from "jsqr";
 import { toCanvas } from "qrcode";
 import type { QRCodeRenderersOptions } from "qrcode";
 
+/**
+ * Renders a QR code into a dynamic texture with corrected UV orientation.
+ * @param content - Text encoded in the QR code.
+ * @param scene - Scene that owns the created resources.
+ * @param options - QR code rendering settings; width defaults to 512 pixels.
+ * @returns The dynamic texture, owned by the caller.
+ */
 export async function makeQrCodeTexture(content: string, scene: Scene, options?: QRCodeRenderersOptions) {
     const size = options?.width ?? 512;
     const texture = new DynamicTexture(
@@ -43,6 +50,11 @@ export async function makeQrCodeTexture(content: string, scene: Scene, options?:
     return texture;
 }
 
+/**
+ * @param engine - Rendering engine used for the capture.
+ * @param camera - Camera whose view is searched for a QR code.
+ * @returns Decoded text, or null when no QR code is found or pixels are unavailable.
+ */
 export async function decodeQrCodeFromScreenshot(engine: AbstractEngine, camera: Camera): Promise<string | null> {
     const screenshot = await CreateScreenshotAsync(engine, camera, { precision: 1 });
     const image = await loadImage(screenshot);
@@ -60,6 +72,11 @@ export async function decodeQrCodeFromScreenshot(engine: AbstractEngine, camera:
     return jsQR(pixels.data, pixels.width, pixels.height)?.data ?? null;
 }
 
+/**
+ * Rejects if the browser cannot decode the screenshot image.
+ * @param source - Screenshot data URL to decode.
+ * @returns The fully loaded image element.
+ */
 async function loadImage(source: string): Promise<HTMLImageElement> {
     const image = new Image();
     image.src = source;

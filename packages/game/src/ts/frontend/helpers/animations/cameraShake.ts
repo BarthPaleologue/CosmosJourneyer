@@ -20,6 +20,12 @@ import { Vector2 } from "@babylonjs/core/Maths/math.vector";
 
 import { CustomAnimation } from "./customAnimation";
 
+/**
+ * @param elapsedSeconds - Time coordinate supplied to the sine signal.
+ * @param baseFrequency - Frequency of the lowest sine octave.
+ * @param phase - Phase offset in radians.
+ * @returns The normalized sum of the four sine octaves.
+ */
 function sumOfSines(elapsedSeconds: number, baseFrequency: number, phase: number): number {
     let sum = 0;
     let normalization = 0;
@@ -36,10 +42,20 @@ function sumOfSines(elapsedSeconds: number, baseFrequency: number, phase: number
     return sum / normalization;
 }
 
+/**
+ * @param progress - Normalized animation progress from zero to one.
+ * @returns The sine envelope intensity.
+ */
 function burstEnvelope(progress: number): number {
     return Math.sin(Math.PI * progress);
 }
 
+/**
+ * @param camera - Camera whose initial alpha and beta anchor the shake.
+ * @param baseIntensity - Peak angular shake intensity.
+ * @param durationSeconds - Animation duration in seconds.
+ * @returns Animation yielding camera alpha and beta angles.
+ */
 export function createCameraShakeAnimation(
     camera: ArcRotateCamera,
     baseIntensity: number,

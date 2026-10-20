@@ -18,12 +18,10 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
 /**
- * Bevel a closed 3D polygon.
- *
- * - points are ordered around the polygon
- * - polygon is closed, but the first point is NOT repeated at the end
- * - each original vertex is replaced by `pointsPerCorner` points
- * - `borderRadius` is a fraction of each adjacent edge length used as cut distance
+ * @param points - Ordered polygon vertices; do not repeat the first point at the end.
+ * @param pointsPerCorner - Samples per corner, clamped to at least two.
+ * @param borderRadius - Fraction of each adjacent edge cut off at the corner.
+ * @returns Beveled vertices, or a copy of `points` when fewer than three are provided.
  */
 export function bevelPolygon(
     points: ReadonlyArray<Vector3>,

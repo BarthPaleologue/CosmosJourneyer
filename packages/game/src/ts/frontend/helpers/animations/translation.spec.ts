@@ -25,6 +25,10 @@ import { afterAll, describe, expect, it } from "vitest";
 import { FloatingOriginSystem } from "../floatingOriginSystem";
 import { TransformTranslationAnimation } from "./translation";
 
+/**
+ * @param actual - Observed vector.
+ * @param expected - Expected vector.
+ */
 function expectVectorCloseTo(actual: Vector3, expected: Vector3): void {
     expect(actual.x).toBeCloseTo(expected.x);
     expect(actual.y).toBeCloseTo(expected.y);

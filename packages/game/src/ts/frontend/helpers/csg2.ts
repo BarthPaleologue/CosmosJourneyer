@@ -18,6 +18,9 @@
 import { InitializeCSG2Async, IsCSG2Ready } from "@babylonjs/core/Meshes/csg2";
 import createManifoldModule from "manifold-3d";
 
+/**
+ * Initializes Babylon CSG2 with Manifold unless CSG2 is already ready.
+ */
 export async function initializeCsg2(): Promise<void> {
     if (IsCSG2Ready()) {
         return;

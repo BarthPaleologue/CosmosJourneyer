@@ -25,6 +25,13 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 
 import { Settings } from "@/settings";
 
+/**
+ * Finds neighboring systems within the requested galactic radius, excluding the origin system.
+ * @param starSystemCoordinates - Origin system to exclude from the results.
+ * @param radius - Search radius in light-years.
+ * @param universeBackend - Universe data provider used to resolve systems and target objects.
+ * @returns Neighbor coordinates, galactic positions, and distances in light-years.
+ */
 export function getNeighborStarSystemCoordinates(
     starSystemCoordinates: StarSystemCoordinates,
     radius: number,

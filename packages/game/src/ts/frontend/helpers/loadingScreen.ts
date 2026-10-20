@@ -38,8 +38,8 @@ export class LoadingScreen implements ILoadingScreen {
     private readonly t: TFunction;
 
     /**
-     * Creates a new default loading screen
-     * @param canvas defines the canvas used to render the scene
+     * @param canvas - Canvas where the loading screen is displayed.
+     * @param t - Translation function for player-facing text.
      */
     constructor(canvas: HTMLCanvasElement, t: TFunction) {
         this.canvas = canvas;
@@ -47,7 +47,6 @@ export class LoadingScreen implements ILoadingScreen {
     }
 
     /**
-     * Function called to display the loading screen
      */
     public displayLoadingUI(): void {
         if (this.loadingDiv) {
@@ -115,7 +114,6 @@ export class LoadingScreen implements ILoadingScreen {
     }
 
     /**
-     * Function called to hide the loading screen
      */
     public hideLoadingUI(): void {
         if (!this.loadingDiv) {
@@ -150,7 +148,7 @@ export class LoadingScreen implements ILoadingScreen {
     }
 
     /**
-     * Gets or sets the text to display while loading
+     * @param text - Loading message to display.
      */
     public set loadingUIText(text: string) {
         this.loadingText = text;
@@ -165,7 +163,7 @@ export class LoadingScreen implements ILoadingScreen {
     }
 
     /**
-     * Gets or sets the color to use for the background
+     * @returns The loading screen background color.
      */
     public get loadingUIBackgroundColor(): string {
         return this.loadingDivBackgroundColor;

@@ -27,6 +27,11 @@ import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoun
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 import type { StarSystemController } from "@/frontend/universe/starSystemController";
 
+/**
+ * @param objectPosition - Absolute position from which distances are measured.
+ * @param bodies - Nonempty candidate list; empty input throws.
+ * @returns The candidate closest to `objectPosition`.
+ */
 export function nearestObject(objectPosition: Vector3, bodies: ReadonlyArray<Transformable>): Transformable {
     let distance = -1;
     let nearest = bodies[0];
@@ -43,6 +48,13 @@ export function nearestObject(objectPosition: Vector3, bodies: ReadonlyArray<Tra
     return nearest;
 }
 
+/**
+ * Applies a saved relative pose while keeping the transform at least two bounding radii away.
+ * @param orbitalObject - Rendered orbital object.
+ * @param localPosition - Saved position in the target object’s local frame.
+ * @param localRotation - Saved rotation in the target object’s local frame.
+ * @param transform - Transform to place at the adjusted world-space pose.
+ */
 export function positionNearObject(
     orbitalObject: Transformable & HasBoundingSphere,
     localPosition: Vector3,
@@ -67,6 +79,13 @@ export function positionNearObject(
     setRotationQuaternion(transform, worldRotation);
 }
 
+/**
+ * Places a transform toward the nearest star and orients it toward the target object.
+ * @param transformable - Object or controls to reposition.
+ * @param object - Target object with a bounding sphere.
+ * @param starSystem - Current rendered star system.
+ * @param nRadius - Target-radius multiplier; defaults to 3.
+ */
 export function positionNearObjectBrightSide(
     transformable: Transformable,
     object: Transformable & HasBoundingSphere,
@@ -106,6 +125,13 @@ export function positionNearObjectBrightSide(
     );
 }
 
+/**
+ * Places and rolls the active controls for a view containing the target and its nearest star.
+ * @param transformable - Object or controls to reposition.
+ * @param object - Target object with a bounding sphere.
+ * @param starSystem - Current rendered star system.
+ * @param nRadius - Target-radius multiplier; defaults to 3.
+ */
 export function positionNearObjectWithStarVisible(
     transformable: Controls,
     object: Transformable & HasBoundingSphere,
@@ -170,6 +196,13 @@ export function positionNearObjectWithStarVisible(
     transformable.getActiveCamera().getProjectionMatrix(true);
 }
 
+/**
+ * Chooses a position along a planet’s asteroid ring on the side perpendicular to its nearest star.
+ * @param body - Ring-bearing body to approach.
+ * @param starSystem - Current rendered star system.
+ * @param t - Fraction between the inner and outer ring radii.
+ * @returns A world-space position above the asteroid ring.
+ */
 export function positionNearObjectAsteroidField(
     body: Transformable & CanHaveRings & HasBoundingSphere,
     starSystem: StarSystemController,

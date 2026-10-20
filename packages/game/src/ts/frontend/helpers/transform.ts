@@ -20,6 +20,12 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
+/**
+ * Orients a transform toward a world-space target with the scene’s handedness correction.
+ * @param transformNode - Transform whose pose is read or updated.
+ * @param target - World-space point to face.
+ * @param useRightHandedSystem - Whether the scene uses right-handed coordinates.
+ */
 export function lookAt(transformNode: TransformNode, target: Vector3, useRightHandedSystem: boolean): void {
     transformNode.lookAt(target);
     if (useRightHandedSystem) {
@@ -27,20 +33,42 @@ export function lookAt(transformNode: TransformNode, target: Vector3, useRightHa
     }
 }
 
+/**
+ * Applies a world-space displacement and refreshes the transform matrix.
+ * @param transformNode - Transform whose pose is read or updated.
+ * @param displacement - World-space translation.
+ */
 export function translate(transformNode: TransformNode, displacement: Vector3): void {
     transformNode.setAbsolutePosition(transformNode.getAbsolutePosition().add(displacement));
     transformNode.computeWorldMatrix(true);
 }
 
+/**
+ * Refreshes the world matrix after rotation around a pivot.
+ * @param transformNode - Transform whose pose is read or updated.
+ * @param pivot - World-space rotation center.
+ * @param axis - World-space rotation axis.
+ * @param amount - Rotation angle in radians.
+ */
 export function rotateAround(transformNode: TransformNode, pivot: Vector3, axis: Vector3, amount: number): void {
     transformNode.rotateAround(pivot, axis, amount);
     transformNode.computeWorldMatrix(true);
 }
 
+/**
+ * @param transformNode - Transform whose pose is read or updated.
+ * @param axis - World-space rotation axis.
+ * @param amount - Rotation angle in radians.
+ */
 export function rotate(transformNode: TransformNode, axis: Vector3, amount: number): void {
     transformNode.rotate(axis, amount, Space.WORLD);
 }
 
+/**
+ * Throws if the transform has no rotation quaternion.
+ * @param transformNode - Transform whose pose is read or updated.
+ * @returns The transform’s existing rotation quaternion.
+ */
 export function getRotationQuaternion(transformNode: TransformNode): Quaternion {
     if (transformNode.rotationQuaternion === null) {
         throw new Error(`Null quaternion for ${transformNode.name}`);
@@ -48,11 +76,21 @@ export function getRotationQuaternion(transformNode: TransformNode): Quaternion 
     return transformNode.rotationQuaternion;
 }
 
+/**
+ * Assigns a rotation quaternion and refreshes the world matrix.
+ * @param transformNode - Transform whose pose is read or updated.
+ * @param newRotation - Rotation quaternion assigned to the transform.
+ */
 export function setRotationQuaternion(transformNode: TransformNode, newRotation: Quaternion): void {
     transformNode.rotationQuaternion = newRotation;
     transformNode.computeWorldMatrix(true);
 }
 
+/**
+ * Rotates a transform to align its up direction with the requested vector.
+ * @param transformNode - Transform whose pose is read or updated.
+ * @param newUp - Desired normalized up direction.
+ */
 export function setUpVector(transformNode: TransformNode, newUp: Vector3): void {
     if (newUp.equalsWithEpsilon(transformNode.up, 1e-7)) {
         return;
@@ -66,27 +104,24 @@ export function setUpVector(transformNode: TransformNode, newUp: Vector3): void 
 /* #region directions */
 
 /**
- *
- * @param transformNode
- * @param amount
+ * @param transformNode - Transform whose pose is read or updated.
+ * @param amount - Rotation angle in radians.
  */
 export function roll(transformNode: TransformNode, amount: number): void {
     rotate(transformNode, transformNode.forward, amount);
 }
 
 /**
- *
- * @param transformNode
- * @param amount
+ * @param transformNode - Transform whose pose is read or updated.
+ * @param amount - Rotation angle in radians.
  */
 export function pitch(transformNode: TransformNode, amount: number): void {
     rotate(transformNode, transformNode.right, amount);
 }
 
 /**
- *
- * @param transformNode
- * @param amount
+ * @param transformNode - Transform whose pose is read or updated.
+ * @param amount - Rotation angle in radians.
  */
 export function yaw(transformNode: TransformNode, amount: number): void {
     rotate(transformNode, transformNode.up, amount);
