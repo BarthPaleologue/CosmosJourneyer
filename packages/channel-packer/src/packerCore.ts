@@ -84,6 +84,12 @@ export interface PackerEngine<TInput, TEncodedPng> {
     synchronizeCache(request: PackRequest, cache: ImageCache): void;
 }
 
+/**
+ * Creates a channel-packing engine with platform-specific input and image adapters.
+ * @param fileAdapter - Reads signatures and decodes platform inputs.
+ * @param imageAdapter - Builds previews and encodes the output format.
+ * @returns Engine exposing preview, save, and cache synchronization operations.
+ */
 export function createPackerEngine<TInput, TEncodedPng>(
     fileAdapter: PackerFileAdapter<TInput>,
     imageAdapter: PackerImageAdapter<TEncodedPng>,
@@ -131,6 +137,11 @@ export function createPackerEngine<TInput, TEncodedPng>(
     };
 }
 
+/**
+ * Retains cached images referenced by the current packing request.
+ * @param request - Current channel assignments.
+ * @param cache - Decoded image cache to prune.
+ */
 function synchronizeCache(request: PackRequest, cache: ImageCache): void {
     const retainedKeys = new Set<string>();
 
@@ -143,6 +154,14 @@ function synchronizeCache(request: PackRequest, cache: ImageCache): void {
     cache.synchronize(retainedKeys);
 }
 
+/**
+ * Combines routed source channels and constant fills into a full-resolution RGBA texture.
+ * @param request - Channel assignments and constant fills.
+ * @param inputsByKey - Source inputs indexed by their routing keys.
+ * @param cache - Decoded image cache used for assigned inputs.
+ * @param fileAdapter - Platform-specific file signature and decoding operations.
+ * @returns The packed texture with its active input count.
+ */
 async function packTexture<TInput>(
     request: PackRequest,
     inputsByKey: ReadonlyMap<string, TInput>,
@@ -195,6 +214,14 @@ async function packTexture<TInput>(
     };
 }
 
+/**
+ * Loads assigned textures, reuses repeated inputs, and rejects mismatched dimensions.
+ * @param request - Channel assignments and constant fills.
+ * @param inputsByKey - Source inputs indexed by their routing keys.
+ * @param cache - Decoded image cache retained between operations.
+ * @param fileAdapter - Platform-specific file signature and decoding operations.
+ * @returns Decoded images associated with each assigned row.
+ */
 async function loadImages<TInput>(
     request: PackRequest,
     inputsByKey: ReadonlyMap<string, TInput>,
@@ -244,6 +271,14 @@ async function loadImages<TInput>(
     return loadedImages;
 }
 
+/**
+ * Reuses decoded pixels by input identity or signature, decoding and caching changed inputs.
+ * @param key - Input cache key.
+ * @param input - Source input to decode or reuse.
+ * @param cache - Decoded image cache retained between operations.
+ * @param fileAdapter - Platform-specific file signature and decoding operations.
+ * @returns Validated cached or freshly decoded image pixels.
+ */
 async function loadCachedImage<TInput>(
     key: string,
     input: TInput,
@@ -277,6 +312,12 @@ async function loadCachedImage<TInput>(
     return decoded;
 }
 
+/**
+ * Compares all file signature fields used to validate decoded image cache entries.
+ * @param left - First file signature.
+ * @param right - Second file signature.
+ * @returns Whether all signature fields match.
+ */
 function areSignaturesEqual(left: FileSignature, right: FileSignature): boolean {
     return (
         left.byteLength === right.byteLength &&
@@ -285,6 +326,11 @@ function areSignaturesEqual(left: FileSignature, right: FileSignature): boolean 
     );
 }
 
+/**
+ * Maps an RGBA channel to its byte offset within an interleaved pixel.
+ * @param channel - RGBA channel being handled.
+ * @returns The byte offset from zero to three.
+ */
 function channelByteOffset(channel: ChannelAssignment["outputChannel"]): number {
     if (channel === "r") {
         return 0;

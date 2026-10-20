@@ -159,6 +159,12 @@ export class DesktopAutoUpdateService {
     }
 }
 
+/**
+ * Creates the desktop update service with an optional updater implementation.
+ * @param onStateChanged - Callback receiving each update state transition.
+ * @param updater - Optional update client; defaults to the production updater.
+ * @returns The configured update service.
+ */
 export function createDesktopAutoUpdateService(
     onStateChanged: (state: DesktopUpdateState) => void,
     updater?: AutoUpdaterClient,

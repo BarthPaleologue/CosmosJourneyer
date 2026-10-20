@@ -40,6 +40,12 @@ export interface UiHandlers {
     onFileInputChange(file: File | null): void;
 }
 
+/**
+ * Builds the channel-packing interface and connects its controls to the supplied handlers.
+ * @param state - Initial session state used to render the controls.
+ * @param handlers - Callbacks for user actions.
+ * @returns References to the mounted controls.
+ */
 export function createUi(state: AppState, handlers: UiHandlers): UiRefs {
     const app = getAppRoot();
     app.innerHTML = createAppShellMarkup(state);
@@ -112,6 +118,11 @@ export function createUi(state: AppState, handlers: UiHandlers): UiRefs {
     return ui;
 }
 
+/**
+ * Updates control states, status text, and preview dimensions from the current session.
+ * @param state - Session values to display.
+ * @param ui - References to the mounted interface.
+ */
 export function syncUi(state: AppState, ui: UiRefs): void {
     ui.appShell.classList.toggle("app-shell-busy", state.isBusy);
     ui.statusMessage.textContent = state.statusMessage;
@@ -151,6 +162,12 @@ export function syncUi(state: AppState, ui: UiRefs): void {
     }
 }
 
+/**
+ * Moves the active drop highlight and records the corresponding output channel.
+ * @param ui - References to the mounted interface.
+ * @param state - Session whose hovered target is updated.
+ * @param nextTarget - Highlighted output channel, or null to clear it.
+ */
 export function setHoveredDropTarget(ui: UiRefs, state: AppState, nextTarget: ColorChannel | null): void {
     if (state.hoveredDropTarget === nextTarget) {
         return;
@@ -168,6 +185,12 @@ export function setHoveredDropTarget(ui: UiRefs, state: AppState, nextTarget: Co
     }
 }
 
+/**
+ * Updates a channel row from its routing state and the session busy state.
+ * @param rowElements - Controls for the output row.
+ * @param state - Session values for this row.
+ * @param channel - RGBA channel being handled.
+ */
 function syncRow(rowElements: RowElements, state: AppState, channel: ColorChannel): void {
     const rowState = state.rows[channel];
 
@@ -179,6 +202,11 @@ function syncRow(rowElements: RowElements, state: AppState, channel: ColorChanne
     rowElements.sourceSelect.value = rowState.sourceChannel;
 }
 
+/**
+ * Builds the initial application markup with escaped status and file text.
+ * @param state - Session state to render.
+ * @returns The initial application HTML.
+ */
 function createAppShellMarkup(state: AppState): string {
     return `
         <div class="app-shell">
@@ -237,6 +265,11 @@ function createAppShellMarkup(state: AppState): string {
     `;
 }
 
+/**
+ * Builds the controls and preview markup for one output channel.
+ * @param row - Routing state for the output row.
+ * @returns The output row HTML.
+ */
 function createRowMarkup(row: ChannelRowState): string {
     return `
         <section class="channel-row" data-row="${row.outputChannel}">
@@ -266,6 +299,10 @@ function createRowMarkup(row: ChannelRowState): string {
     `;
 }
 
+/**
+ * Finds the application mount point, throwing if it is absent.
+ * @returns The required application root.
+ */
 function getAppRoot(): HTMLDivElement {
     const app = document.querySelector<HTMLDivElement>("#app");
     if (app === null) {
@@ -275,6 +312,13 @@ function getAppRoot(): HTMLDivElement {
     return app;
 }
 
+/**
+ * Finds a descendant of the expected element class, throwing if it is absent or mismatched.
+ * @param parent - Root in which to find the descendant.
+ * @param selector - CSS selector for the required element.
+ * @param constructor - Expected DOM element class.
+ * @returns The matching element with the expected DOM class.
+ */
 function requireElement<T extends Element>(
     parent: ParentNode,
     selector: string,
@@ -288,6 +332,11 @@ function requireElement<T extends Element>(
     return element;
 }
 
+/**
+ * Collects the controls and preview canvas belonging to one output channel.
+ * @param channel - RGBA channel being handled.
+ * @returns The channel’s interface references.
+ */
 function collectRowElements(channel: ColorChannel): RowElements {
     const row = requireElement(document, `[data-row="${channel}"]`, HTMLElement);
 
@@ -306,6 +355,11 @@ function collectRowElements(channel: ColorChannel): RowElements {
     };
 }
 
+/**
+ * Accepts an RGBA channel identifier and rejects other values with null.
+ * @param value - Text or identifier to interpret.
+ * @returns The valid channel, or null.
+ */
 function parseColorChannel(value: string | undefined): ColorChannel | null {
     if (value === "r" || value === "g" || value === "b" || value === "a") {
         return value;

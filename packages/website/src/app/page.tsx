@@ -7,6 +7,10 @@ import { ViewFeatures } from "./ViewFeatures";
 import { ViewHero } from "./ViewHero";
 import { ViewRoadmap } from "./ViewRoadmap";
 
+/**
+ * Renders the Cosmos Journeyer landing page.
+ * @returns The landing page content.
+ */
 export default function Home(): ReactElement {
     return (
         <>

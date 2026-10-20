@@ -41,6 +41,13 @@ const BrowserPackerEngine = createPackerEngine<File, Blob>(
     },
 );
 
+/**
+ * @param request - Output channel assignments and constant fills.
+ * @param filesByKey - Selected browser files indexed by their routing keys.
+ * @param cache - Decoded image cache retained between operations.
+ * @param maxPreviewEdge - Maximum preview width or height in pixels.
+ * @returns Packed pixels, original dimensions, and bounded preview dimensions.
+ */
 export async function generatePreview(
     request: PackRequest,
     filesByKey: ReadonlyMap<string, File>,
@@ -50,6 +57,13 @@ export async function generatePreview(
     return BrowserPackerEngine.generatePreview(request, filesByKey, cache, maxPreviewEdge);
 }
 
+/**
+ * @param request - Output channel assignments and constant fills.
+ * @param filesByKey - Selected browser files indexed by their routing keys.
+ * @param cache - Decoded image cache retained between operations.
+ * @param fileName - Download filename.
+ * @returns The encoded PNG and output metadata.
+ */
 export async function savePackedPng(
     request: PackRequest,
     filesByKey: ReadonlyMap<string, File>,
@@ -60,10 +74,23 @@ export async function savePackedPng(
     return mapSaveResponse(response);
 }
 
+/**
+ * Retains cached images referenced by the current packing request.
+ * @param request - Channel assignments and constant fills.
+ * @param cache - Decoded image cache retained between operations.
+ */
 export function synchronizeCache(request: PackRequest, cache: ImageCache): void {
     BrowserPackerEngine.synchronizeCache(request, cache);
 }
 
+/**
+ * @param response - Engine result containing the encoded payload and dimensions.
+ * @param response.width - Output width in pixels.
+ * @param response.height - Output height in pixels.
+ * @param response.payload - Encoded PNG blob.
+ * @param response.fileName - Download filename.
+ * @returns The public save response with the PNG blob.
+ */
 function mapSaveResponse(response: { width: number; height: number; payload: Blob; fileName: string }): SaveResponse {
     return {
         width: response.width,
@@ -73,6 +100,11 @@ function mapSaveResponse(response: { width: number; height: number; payload: Blo
     };
 }
 
+/**
+ * Computes a hexadecimal SHA-256 digest for cache validation.
+ * @param bytes - File contents to hash.
+ * @returns The lowercase hexadecimal content digest.
+ */
 async function hashFileContents(bytes: ArrayBuffer): Promise<string> {
     const digest = await crypto.subtle.digest("SHA-256", bytes);
     const hashBytes = new Uint8Array(digest);
@@ -81,6 +113,11 @@ async function hashFileContents(bytes: ArrayBuffer): Promise<string> {
         .join("");
 }
 
+/**
+ * Decodes a browser file into RGBA pixels and closes the temporary bitmap.
+ * @param file - Selected source file.
+ * @returns Decoded image dimensions and RGBA pixels.
+ */
 async function decodeImage(file: File): Promise<DecodedImage> {
     let bitmap: ImageBitmap | null = null;
 
@@ -115,6 +152,12 @@ async function decodeImage(file: File): Promise<DecodedImage> {
     }
 }
 
+/**
+ * Downscales packed pixels to fit the edge limit while preserving aspect ratio.
+ * @param packed - Full-resolution packed pixels and dimensions.
+ * @param maxEdge - Maximum preview width or height in pixels.
+ * @returns The original texture if it fits, otherwise a downscaled preview.
+ */
 function buildPreviewTexture(packed: PackedTexture, maxEdge: number): PackedTexture {
     if (packed.width <= maxEdge && packed.height <= maxEdge) {
         return packed;
@@ -156,6 +199,13 @@ function buildPreviewTexture(packed: PackedTexture, maxEdge: number): PackedText
     };
 }
 
+/**
+ * Encodes RGBA pixels through a browser canvas, rejecting if PNG encoding fails.
+ * @param width - Image width in pixels.
+ * @param height - Image height in pixels.
+ * @param pixels - Interleaved RGBA pixel bytes.
+ * @returns The encoded PNG blob.
+ */
 async function encodePng(width: number, height: number, pixels: Uint8ClampedArray): Promise<Blob> {
     const canvas = document.createElement("canvas");
     canvas.width = width;

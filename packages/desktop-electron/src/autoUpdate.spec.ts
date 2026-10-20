@@ -88,6 +88,10 @@ describe("DesktopAutoUpdateService", () => {
     });
 });
 
+/**
+ * Creates release metadata for the desktop updater tests.
+ * @returns The release metadata fixture.
+ */
 function createUpdateInfo(): UpdateInfo {
     return {
         version: "1.12.0",

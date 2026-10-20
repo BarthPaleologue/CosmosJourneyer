@@ -11,6 +11,11 @@ const HeaderContentLength = "content-length";
 const HeaderContentRange = "content-range";
 const HeaderContentType = "content-type";
 
+/**
+ * Selects the response media type from a renderer asset’s file extension.
+ * @param filePath - Resolved renderer asset path.
+ * @returns The media type, falling back to application/octet-stream.
+ */
 function getContentType(filePath: string): string {
     switch (extname(filePath).toLowerCase()) {
         case ".babylon":
@@ -54,6 +59,11 @@ function getContentType(filePath: string): string {
     }
 }
 
+/**
+ * Creates asset headers advertising byte ranges and the appropriate media type.
+ * @param filePath - Resolved renderer asset path.
+ * @returns The asset response headers.
+ */
 function getResponseHeaders(filePath: string): Headers {
     const headers = new Headers();
     headers.set(HeaderAcceptRanges, "bytes");
@@ -61,15 +71,32 @@ function getResponseHeaders(filePath: string): Headers {
     return headers;
 }
 
+/**
+ * Checks that a resolved asset path is below the renderer directory.
+ * @param filePath - Resolved renderer asset path.
+ * @param rootDir - Renderer root directory.
+ * @returns Whether the asset resolves below the renderer root.
+ */
 function isRendererPathInsideRoot(filePath: string, rootDir: string): boolean {
     const relativePath = relative(rootDir, filePath);
     return relativePath !== "" && !relativePath.startsWith("..");
 }
 
+/**
+ * Identifies root and extensionless paths eligible for the application HTML fallback.
+ * @param urlPath - Requested URL pathname.
+ * @returns Whether the path can use the HTML fallback.
+ */
 function shouldServeIndexHtml(urlPath: string): boolean {
     return urlPath === "/" || extname(urlPath) === "";
 }
 
+/**
+ * Parses one bounded, open-ended, or suffix byte range, returning null for invalid ranges.
+ * @param rangeHeader - HTTP Range header value.
+ * @param fileSize - Resource length in bytes.
+ * @returns Inclusive byte bounds, or null for an invalid range.
+ */
 function parseRangeHeader(rangeHeader: string, fileSize: number): { start: number; end: number } | null {
     const match = /^bytes=(\d*)-(\d*)$/u.exec(rangeHeader);
     if (match === null) {
@@ -106,6 +133,12 @@ function parseRangeHeader(rangeHeader: string, fileSize: number): { start: numbe
     return { start, end };
 }
 
+/**
+ * Collects local asset references from the generated renderer HTML.
+ * @param indexHtml - Generated renderer HTML.
+ * @param rendererDir - Directory containing the built game renderer.
+ * @returns Unique resolved asset paths.
+ */
 function getLocalAssetPaths(indexHtml: string, rendererDir: string): Array<string> {
     const assetPaths = new Set<string>();
     const pattern = /\b(?:src|href)="([^"]+)"/gu;
@@ -122,6 +155,12 @@ function getLocalAssetPaths(indexHtml: string, rendererDir: string): Array<strin
     return [...assetPaths];
 }
 
+/**
+ * Streams a renderer file with HEAD and single byte-range response support.
+ * @param filePath - Resolved renderer asset path.
+ * @param request - HTTP request containing the method and optional byte range.
+ * @returns The file response, or a 416 response for an invalid range.
+ */
 async function createFileResponse(filePath: string, request: Request): Promise<Response> {
     const fileStats = await stat(filePath);
     const rangeHeader = request.headers.get("range");
@@ -159,6 +198,12 @@ async function createFileResponse(filePath: string, request: Request): Promise<R
     });
 }
 
+/**
+ * Serves renderer assets for the application host with an HTML fallback for extensionless routes.
+ * @param rendererDir - Directory containing the built game renderer.
+ * @param request - HTTP request containing the method and optional byte range.
+ * @returns The asset response or an appropriate HTTP error response.
+ */
 async function handleAppProtocol(rendererDir: string, request: Request): Promise<Response> {
     if (request.method !== "GET" && request.method !== "HEAD") {
         return new Response("Method not allowed", { status: 405 });
@@ -193,10 +238,20 @@ async function handleAppProtocol(rendererDir: string, request: Request): Promise
     }
 }
 
+/**
+ * Binds the renderer directory to an application protocol request handler.
+ * @param rendererDir - Directory containing the built game renderer.
+ * @returns A handler for requests to the bound renderer bundle.
+ */
 export function createHandleAppProtocol(rendererDir: string): (request: Request) => Promise<Response> {
     return async (request: Request) => handleAppProtocol(rendererDir, request);
 }
 
+/**
+ * Checks that the renderer HTML and each referenced local asset are readable.
+ * @param rendererDir - Directory containing the built game renderer.
+ * @returns Whether all required bundle files can be read.
+ */
 export async function rendererBuildIsReady(rendererDir: string): Promise<boolean> {
     const indexPath = join(rendererDir, "index.html");
 
@@ -210,6 +265,12 @@ export async function rendererBuildIsReady(rendererDir: string): Promise<boolean
     }
 }
 
+/**
+ * Polls for a complete renderer bundle until the readiness timeout expires.
+ * @param rendererDir - Directory containing the built game renderer.
+ * @param timeoutMs - Maximum readiness wait in milliseconds.
+ * @returns Whether the bundle became ready before timeout.
+ */
 export async function waitForRendererBuild(rendererDir: string, timeoutMs = 5_000): Promise<boolean> {
     const pollIntervalMs = 100;
     const startTime = Date.now();

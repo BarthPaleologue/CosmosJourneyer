@@ -36,6 +36,10 @@ protocol.registerSchemesAsPrivileged([
     },
 ]);
 
+/**
+ * Creates the fullscreen game window and attaches development reload watching.
+ * @returns The game window.
+ */
 function createMainWindow(): ElectronModule.BrowserWindow {
     const window = new BrowserWindow({
         width: 1280,
@@ -75,6 +79,10 @@ void app.whenReady().then(() => {
     });
 });
 
+/**
+ * Sends the current update state to every open desktop window.
+ * @param state - Desktop update state to broadcast.
+ */
 function broadcastUpdateState(state: ReturnType<DesktopAutoUpdateService["getState"]>): void {
     for (const window of BrowserWindow.getAllWindows()) {
         window.webContents.send(updateIpcChannels.stateChanged, state);
@@ -86,6 +94,9 @@ app.on("before-quit", () => {
     devWatcher = null;
 });
 
+/**
+ * Registers renderer requests for update state, download, installation, and release notes.
+ */
 function registerAutoUpdateIpc(): void {
     ipcMain.handle(updateIpcChannels.getState, () => autoUpdateService?.getState() ?? { type: "idle" });
     ipcMain.handle(updateIpcChannels.download, async () => autoUpdateService?.downloadUpdate());
