@@ -23,6 +23,11 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { ProceduralSpotLightInstances } from "@/frontend/assets/procedural/spotLight";
 import type { ProceduralSpotLightInstanceData } from "@/frontend/assets/procedural/spotLight";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting spotlight rendering.
+ */
 export async function createSpotLightsScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

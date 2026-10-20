@@ -34,6 +34,11 @@ import { ItemPool } from "@/utils/itemPool";
 
 import { enablePhysics } from "../utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting Saturn and its rings.
+ */
 export async function createSaturnScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

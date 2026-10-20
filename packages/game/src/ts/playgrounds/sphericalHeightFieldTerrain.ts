@@ -39,6 +39,11 @@ import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing spherical height-field terrain.
+ */
 export async function createSphericalHeightFieldTerrainScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

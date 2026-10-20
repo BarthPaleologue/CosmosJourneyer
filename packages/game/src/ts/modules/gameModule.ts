@@ -21,9 +21,8 @@ export interface GameModule {
     readonly id: string;
 
     /**
-     *
-     * @param api
-     * @throws if anything goes wrong, the extension should throw
+     * Registers this module's game features and resources.
+     * @param api - Services the module can use while registering its features.
      */
     setup(api: GameModuleApi): void;
 }

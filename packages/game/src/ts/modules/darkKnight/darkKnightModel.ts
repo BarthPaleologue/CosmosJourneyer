@@ -22,6 +22,10 @@ import type { InOrbitPlacementModel, SystemContentModel } from "@/backend/system
 
 export type DarkKnightModel = SystemContentModel<"darkKnight">;
 
+/**
+ * @param parentIds - Orbital parent identifiers.
+ * @returns Placement with a semi-major axis of 100 AU.
+ */
 export function createDarkKnightOrbitalPlacementModel(parentIds: Iterable<OrbitalObjectId>): InOrbitPlacementModel {
     return {
         type: "inOrbit",

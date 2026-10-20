@@ -35,6 +35,11 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 
 import { enablePhysics } from "../utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting neutron-star rendering.
+ */
 export async function createNeutronStarScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

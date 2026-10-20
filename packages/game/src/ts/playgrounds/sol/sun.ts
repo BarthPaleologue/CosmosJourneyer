@@ -32,6 +32,11 @@ import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { enablePhysics } from "../utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting solar rendering.
+ */
 export async function createSunScene(engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;

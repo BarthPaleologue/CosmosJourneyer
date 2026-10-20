@@ -64,6 +64,11 @@ import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing character controls on foot.
+ */
 export async function createOnFootScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

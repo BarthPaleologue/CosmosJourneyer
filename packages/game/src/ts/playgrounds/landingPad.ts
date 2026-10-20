@@ -31,6 +31,11 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadMa
 
 import { enablePhysics } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting landing-pad geometry.
+ */
 export async function createLandingPadScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

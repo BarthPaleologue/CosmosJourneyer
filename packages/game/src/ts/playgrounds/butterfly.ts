@@ -28,6 +28,11 @@ import { createInstancePatch, createSquareMatrixBuffer } from "@/frontend/helper
 
 import { createSky } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting butterfly animation.
+ */
 export async function createButterflyScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

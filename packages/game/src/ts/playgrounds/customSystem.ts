@@ -46,6 +46,11 @@ import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for exploring the authored system selected by the URL.
+ */
 export async function createCustomSystemScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

@@ -41,6 +41,11 @@ import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing the star-system view.
+ */
 export async function createStarSystemViewScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

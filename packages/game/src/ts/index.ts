@@ -43,10 +43,19 @@ try {
     await crashReporter.reportCrash({ type: "startup", value: error });
 }
 
+/**
+ * Starts in new-game mode.
+ * @param engine - Game instance.
+ */
 async function simpleInit(engine: CosmosJourneyer): Promise<void> {
     await engine.init(false);
 }
 
+/**
+ * Invalid shared saves fall back to a new game.
+ * @param engine - Game instance.
+ * @param saveString - Base64-encoded JSON save.
+ */
 async function initWithSaveString(engine: CosmosJourneyer, saveString: string): Promise<void> {
     const jsonString = decodeBase64(saveString);
     const json = jsonSafeParse(jsonString);
@@ -68,6 +77,7 @@ async function initWithSaveString(engine: CosmosJourneyer, saveString: string): 
     engine.starSystemView.setUIEnabled(true);
 }
 
+/** Prefers a URL save, then the latest saved game when requested, otherwise starts a new game. */
 async function startCosmosJourneyer(): Promise<void> {
     const engineResult = await CosmosJourneyer.New(t);
     if (!engineResult.success) {

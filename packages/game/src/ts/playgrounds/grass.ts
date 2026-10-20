@@ -36,6 +36,11 @@ import { createInstancePatch, createSquareMatrixBuffer } from "@/frontend/helper
 
 import { createSky } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting procedural grass rendering.
+ */
 export async function createGrassScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

@@ -41,6 +41,11 @@ import { Settings } from "@/settings";
 
 import { enablePhysics } from "../utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for exploring the authored Solar System.
+ */
 export async function createSolScene(engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;

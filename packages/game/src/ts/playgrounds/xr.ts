@@ -38,6 +38,11 @@ import { EmptyCelestialBody } from "@/frontend/universe/emptyCelestialBody";
 
 import { ItemPool } from "@/utils/itemPool";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting procedural anomalies in XR.
+ */
 export async function createXrScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -59,6 +64,11 @@ export async function createXrScene(
     const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
     const ringsReadyPromises: Promise<void>[] = [];
 
+    /**
+     * @param transform - Anomaly transform, including its visual scale.
+     * @param boundingRadius - Unscaled anomaly radius.
+     * @returns Ring uniforms scaled to the visible anomaly.
+     */
     function createAnomalyRings(transform: TransformNode, boundingRadius: number): RingsUniforms {
         const visualRadius = boundingRadius * transform.scalingDeterminant;
         const frequencyScale = 1e6 / visualRadius;
@@ -89,6 +99,7 @@ export async function createXrScene(
         return ringsUniforms;
     }
 
+    /** @returns Transform of the XR-scale Mandelbulb. */
     function createMandelbulb(): TransformNode {
         const mandelBulbModel = generateMandelbulbModel("mandelbulb", Math.random() * 100_000, "XR Anomaly", []);
         const mandelbulb = new EmptyCelestialBody(mandelBulbModel, scene);
@@ -112,6 +123,7 @@ export async function createXrScene(
         return mandelbulb.getTransform();
     }
 
+    /** @returns Transform of the XR-scale Julia set. */
     function createJulia(): TransformNode {
         const juliaModel = generateJuliaSetModel("julia", Math.random() * 100_000, "XR Anomaly", []);
         const julia = new EmptyCelestialBody(juliaModel, scene);
@@ -135,6 +147,7 @@ export async function createXrScene(
         return julia.getTransform();
     }
 
+    /** @returns Transform of the XR-scale Mandelbox. */
     function createMandelbox(): TransformNode {
         const mandelboxModel = generateMandelboxModel("mandelbox", Math.random() * 100_000, "XR Anomaly", []);
         const mandelbox = new EmptyCelestialBody(mandelboxModel, scene);
@@ -158,6 +171,7 @@ export async function createXrScene(
         return mandelbox.getTransform();
     }
 
+    /** @returns Transform of the XR-scale Sierpinski pyramid. */
     function createSierpinskiPyramid(): TransformNode {
         const sierpinskiPyramidModel = generateSierpinskiPyramidModel(
             "sierpinski",
@@ -189,6 +203,7 @@ export async function createXrScene(
         return sierpinskiPyramid.getTransform();
     }
 
+    /** @returns Transform of the XR-scale Menger sponge. */
     function createMengerSponge(): TransformNode {
         const mengerSpongeModel = generateMengerSpongeModel("menger", Math.random() * 100_000, "XR Anomaly", []);
         const mengerSponge = new EmptyCelestialBody(mengerSpongeModel, scene);
@@ -212,6 +227,10 @@ export async function createXrScene(
         return mengerSponge.getTransform();
     }
 
+    /**
+     * Keeps the effect attached to existing and newly added XR cameras.
+     * @param pp - Post-process to attach and update.
+     */
     function setupPP(pp: CelestialBodyUberShaderPass): void {
         scene.cameras.forEach((cam) => cam.attachPostProcess(pp));
         scene.onNewCameraAddedObservable.add((cam) => {

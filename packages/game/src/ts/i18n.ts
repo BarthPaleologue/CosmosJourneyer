@@ -22,8 +22,8 @@ import { z } from "zod";
 import { renderMarkdownInline } from "./utils/markdown";
 
 /**
- * Load all the resources from the locales folder and return them in the i18next format.
- * This takes place at build time, so the resources are bundled with the application.
+ * Locales are bundled eagerly so translations need no runtime fetch.
+ * @returns Translation namespaces grouped by language.
  */
 function loadResources(): Resource {
     const localeModules = import.meta.glob("../locales/**/*.json", {
@@ -72,6 +72,10 @@ function loadResources(): Resource {
     return resources;
 }
 
+/**
+ * Uses the URL language override, falling back to the browser language.
+ * @returns Translator after applying static page translations.
+ */
 export async function initI18n(): Promise<TFunction> {
     // init language to url parameter if defined, otherwise use the browser language
     const urlParams = new URLSearchParams(window.location.search);

@@ -44,7 +44,12 @@ export class SpaceTelescope implements SystemContent {
     private physics: { aggregate: PhysicsAggregate; shapes: ReadonlyArray<PhysicsShape> } | null = null;
     readonly radius: number;
 
-    /** Models are validated by the content factory before allocating Babylon resources. */
+    /**
+     * Requires a model validated by the content factory.
+     * @param model - Telescope geometry.
+     * @param insulation - Foil material.
+     * @param scene - Scene owning the representation.
+     */
     constructor(model: DeepReadonly<SpaceTelescopeModel>, insulation: FoilMaterial, scene: Scene) {
         this.transform = new TransformNode("spaceTelescope", scene);
         const gold = new PBRMaterial("telescopeGold", scene);
@@ -134,6 +139,14 @@ export class SpaceTelescope implements SystemContent {
     }
 }
 
+/**
+ * @param mirror - Optical dimensions.
+ * @param primaryMirror - Primary mirror to attach.
+ * @param gold - Secondary mirror material.
+ * @param structure - Support and receptor material.
+ * @param scene - Owning scene.
+ * @returns Root transform for the telescope optics.
+ */
 function createOpticalAssembly(
     mirror: DeepReadonly<PrimaryMirrorModel>,
     primaryMirror: TelescopePrimaryMirror,
@@ -202,6 +215,13 @@ function createOpticalAssembly(
     return optics;
 }
 
+/**
+ * @param model - Sheet layout.
+ * @param insulation - Foil material.
+ * @param structure - Support material.
+ * @param scene - Owning scene.
+ * @returns Insulation rig below the optical assembly.
+ */
 function createInsulationSheets(
     model: DeepReadonly<SpaceTelescopeModel["insulationSheets"]>,
     insulation: FoilMaterial,

@@ -35,6 +35,11 @@ import { AsteroidPatch } from "@/frontend/universe/asteroidFields/asteroidPatch"
 
 import { enablePhysics } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing asteroid-field rendering and collisions.
+ */
 export async function createAsteroidFieldScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

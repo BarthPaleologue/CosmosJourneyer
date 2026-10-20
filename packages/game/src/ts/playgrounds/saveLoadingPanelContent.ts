@@ -33,6 +33,11 @@ import { SaveLoadingPanelContent } from "@/frontend/ui/saveLoadingPanelContent";
 
 import { initI18n } from "@/i18n";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting the save-loading interface.
+ */
 export async function createSaveLoadingPanelContentScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

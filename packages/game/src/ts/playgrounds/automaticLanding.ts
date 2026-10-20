@@ -45,6 +45,11 @@ import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for testing automatic landing guidance.
+ */
 export async function createAutomaticLandingScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

@@ -31,6 +31,11 @@ import { RingsUniforms } from "@/frontend/postProcesses/rings/ringsUniform";
 
 import { ItemPool } from "@/utils/itemPool";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting planetary-ring rendering.
+ */
 export async function createRingsScene(
     engine: AbstractEngine,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

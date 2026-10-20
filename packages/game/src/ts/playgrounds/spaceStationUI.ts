@@ -40,6 +40,11 @@ import { initI18n } from "@/i18n";
 
 import { addToWindow, enablePhysics } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting the station interface.
+ */
 export async function createSpaceStationUIScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

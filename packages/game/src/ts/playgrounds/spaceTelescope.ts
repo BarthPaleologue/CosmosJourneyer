@@ -36,6 +36,11 @@ import { createSpaceTelescopeModel } from "@/modules/spaceTelescopes/spaceTelesc
 
 import { enablePhysics, enableShadows } from "./utils";
 
+/**
+ * @param engine - Rendering engine.
+ * @param progressMonitor - Asset-loading progress.
+ * @returns Scene for inspecting telescope optics and insulation.
+ */
 export async function createSpaceTelescopeScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
