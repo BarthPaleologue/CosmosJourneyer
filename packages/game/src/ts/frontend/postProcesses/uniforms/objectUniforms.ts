@@ -28,6 +28,13 @@ export const ObjectUniformNames = {
 
 const tempVector = new Vector3();
 
+/**
+ * Binds an object's position, radius, rotation axis, and scale to an effect.
+ * @param effect Effect receiving the object uniforms.
+ * @param transform Transform that positions and scales the object.
+ * @param boundingRadius Object radius used by the shader.
+ * @param floatingOriginOffset World-space offset subtracted from object position.
+ */
 export function setObjectUniforms(
     effect: Effect,
     transform: TransformNode,

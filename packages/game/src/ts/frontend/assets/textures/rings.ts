@@ -29,6 +29,11 @@ export type RingsTextures = {
     uranus: Texture;
 };
 
+/**
+ * @param engine Engine used to create the textures.
+ * @param progressMonitor Progress monitor notified as each image loads.
+ * @returns Separate ring textures for the two planets.
+ */
 export async function loadRingsTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

@@ -33,6 +33,11 @@ export type GasPlanetTextures = {
     neptune: Texture;
 };
 
+/**
+ * @param engine Engine used to create the textures.
+ * @param progressMonitor Progress monitor notified as each image loads.
+ * @returns Planet textures keyed by Jupiter, Saturn, Uranus, and Neptune.
+ */
 export async function loadGasPlanetTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

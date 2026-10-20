@@ -90,6 +90,7 @@ export class AsteroidField implements IDisposable {
      * Updates the asteroid field. The position of the camera is used to determine which chunks to load and unload.
      * The delta seconds are used to fade in and out the chunks
      * @param cameraWorldPosition The position of the camera in world space
+     * @param asteroids - The asteroid instances currently assigned to nearby patches.
      * @param deltaSeconds The seconds elapsed since last frame
      */
     public update(cameraWorldPosition: Vector3, asteroids: ReadonlyArray<Asteroid>, deltaSeconds: number): void {
@@ -182,13 +183,14 @@ export class AsteroidField implements IDisposable {
     }
 
     /**
-     * Creates a matrix buffer for an asteroid patch. The patch has a given square size, subdivided in cells by the resolution parameter. Each cell contains one instance. The min and max radius ensure the asteroid don't spread to far
+     * Builds a matrix buffer for a square asteroid patch, distributing one instance per grid cell.
      * @param position The position of the patch in the local space of the parent transform of any field
      * @param resolution The subdivision of the chunk, each cell contains a single instance
      * @param patchSize The overall planar size of the patch
      * @param patchThickness The vertical spread of the patch
      * @param minRadius The minimum radius at which the field starts
      * @param maxRadius The maximum radius at which the field ends
+     * @param maxTypeIndex - The highest asteroid model index available to the patch generator.
      * @param rng A random number generator
      * @returns A new matrix 4x4 buffer
      */

@@ -42,6 +42,11 @@ export type AllTerrainTextures = {
     sand: TerrainTextures;
 };
 
+/**
+ * @param engine Engine used to create the textures.
+ * @param progressMonitor Progress monitor notified as each image loads.
+ * @returns Surface maps grouped for rock, grass, snow, and sand.
+ */
 export async function loadTerrainTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

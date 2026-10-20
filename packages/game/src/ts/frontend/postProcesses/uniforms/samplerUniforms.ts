@@ -25,6 +25,12 @@ export const SamplerUniformNames = {
     DEPTH_SAMPLER: "depthSampler",
 };
 
+/**
+ * Binds the depth map rendered for the active camera.
+ * @param effect Effect receiving the depth sampler.
+ * @param camera Camera whose depth map is selected.
+ * @param depthRendererManager Provides per-camera depth renderers.
+ */
 export function setSamplerUniforms(effect: Effect, camera: Camera, depthRendererManager: DepthRendererManager): void {
     effect.setTexture(SamplerUniformNames.DEPTH_SAMPLER, depthRendererManager.getDepthRenderer(camera).getDepthMap());
 }

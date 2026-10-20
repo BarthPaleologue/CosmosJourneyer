@@ -50,6 +50,13 @@ describe("orbital reference selection", () => {
         engine.dispose();
     });
 
+    /**
+     * Creates a zero-orbit test body with the requested mass and world-space position.
+     * @param id - Identifier of the orbital object.
+     * @param mass - Mass of the orbital object in kilograms.
+     * @param position - World-space position of the orbital object.
+     * @returns An orbital test object with the requested mass and transform.
+     */
     function object(id: string, mass: number, position: Vector3): KeplerianObject {
         const transform = new TransformNode(id, scene);
         transform.position.copyFrom(position);
@@ -71,6 +78,12 @@ describe("orbital reference selection", () => {
         };
     }
 
+    /**
+     * Advances the supplied orbital bodies to a time and copies their simulated positions into transforms.
+     * @param models - The orbital body models whose positions should be simulated.
+     * @param time - Simulation time in seconds.
+     * @returns A simulation updated to the requested time.
+     */
     function placeModels(
         models: ReadonlyArray<Pick<KeplerianObject, "id" | "mass" | "orbit" | "spin">>,
         time = 0,

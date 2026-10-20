@@ -27,6 +27,11 @@ export const StellarObjectUniformNames = {
 let starDirections = new Float32Array(0);
 let starColors = new Float32Array(0);
 
+/**
+ * Binds directional light vectors and colors used to shade stellar bodies.
+ * @param effect Effect receiving the stellar light uniforms.
+ * @param stellarObjects Directional lights representing visible stars.
+ */
 export function setStellarObjectUniforms(effect: Effect, stellarObjects: ReadonlyArray<DirectionalLight>): void {
     effect.setInt(StellarObjectUniformNames.NB_STARS, stellarObjects.length);
 

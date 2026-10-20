@@ -60,9 +60,10 @@ export class NeutronStar implements CelestialBodyBase<"neutronStar">, Cullable, 
     readonly asteroidField: AsteroidField | null;
 
     /**
-     * New Star
+     * Creates a neutron-star presentation from its model and shared textures.
      * @param model The seed of the star in [-1, 1]
-     * @param scene
+     * @param textures - The textures used for the neutron star’s surface and glow.
+     * @param scene - The Babylon.js scene that owns the rendered meshes.
      */
     constructor(model: DeepReadonly<NeutronStarModel>, textures: Textures, scene: Scene) {
         this.model = model;

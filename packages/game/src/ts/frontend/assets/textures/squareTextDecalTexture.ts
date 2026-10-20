@@ -20,6 +20,14 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import { Settings } from "@/settings";
 
+/**
+ * Renders text into a scene-owned decal texture using the landing-pad aspect ratio.
+ * @param name Texture name.
+ * @param text Text rendered into the decal texture.
+ * @param scene Scene that owns the texture.
+ * @param options Optional resolution, font size, and text color.
+ * @returns A dynamic texture containing the rendered text.
+ */
 export function createSquareTextDecalTexture(
     name: string,
     text: string,

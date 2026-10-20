@@ -37,6 +37,12 @@ const tempMatrix3 = new Matrix();
 
 const tempVector1 = new Vector3();
 
+/**
+ * Binds camera matrices and clipping values to a shader effect.
+ * @param effect Effect receiving the camera uniforms.
+ * @param camera Camera providing the view and projection matrices.
+ * @param floatingOriginEnabled Whether the view matrix uses the floating origin.
+ */
 export function setCameraUniforms(effect: Effect, camera: Camera, floatingOriginEnabled: boolean): void {
     const view = floatingOriginEnabled ? OffsetViewToRef(camera.getViewMatrix(), tempMatrix1) : camera.getViewMatrix();
     const cameraPosition = floatingOriginEnabled

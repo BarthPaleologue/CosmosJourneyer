@@ -23,6 +23,12 @@ export type ChunkIndices = {
     readonly y: number;
 };
 
+/**
+ * Computes the four Morton child indices directly below a terrain chunk.
+ * @param parent - The parent chunk whose four child indices are requested.
+ * @param childIndex - The child’s index within the parent’s four quadrants (0 through 3).
+ * @returns The four child indices, ordered by their quadrant.
+ */
 export function getChunkChildIndices(parent: ChunkIndices, childIndex: 0 | 1 | 2 | 3): ChunkIndices {
     /*
         3   2

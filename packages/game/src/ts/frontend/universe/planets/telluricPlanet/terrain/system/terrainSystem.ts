@@ -24,10 +24,20 @@ export type TaskId = Brand<string, "TaskId">;
 
 export type ChunkId = Brand<string, "ChunkId">;
 
+/**
+ * Prefixes a terrain task identifier so it cannot collide with chunk identifiers.
+ * @param taskId - Identifier assigned to the terrain task.
+ * @returns A registry key for the task.
+ */
 export function makeTaskId(taskId: string): TaskId {
     return taskId as TaskId;
 }
 
+/**
+ * Prefixes a terrain chunk identifier so it cannot collide with task identifiers.
+ * @param chunkId - Identifier assigned to the terrain chunk.
+ * @returns A registry key for the chunk.
+ */
 export function makeChunkId(chunkId: string): ChunkId {
     return chunkId as ChunkId;
 }

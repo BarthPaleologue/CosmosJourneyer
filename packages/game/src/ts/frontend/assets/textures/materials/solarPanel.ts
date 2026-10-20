@@ -35,6 +35,11 @@ export type SolarPanelTextures = {
     ambientOcclusion: Texture;
 };
 
+/**
+ * @param engine Engine used to create the textures.
+ * @param progressMonitor Progress monitor notified as each image loads.
+ * @returns Solar-panel albedo, normal, metallic, roughness, and ambient-occlusion maps.
+ */
 export async function loadSolarPanelTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

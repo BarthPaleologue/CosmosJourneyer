@@ -19,6 +19,11 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import type { Scene } from "@babylonjs/core/scene";
 
+/**
+ * Builds a flat, two-winged mesh used as a butterfly sprite.
+ * @param scene Scene that owns the butterfly mesh.
+ * @returns A four-triangle butterfly mesh with UV coordinates.
+ */
 export function createButterfly(scene: Scene): Mesh {
     const positions = new Float32Array(6 * 3);
     const indices = new Uint32Array(4 * 3);

@@ -49,6 +49,12 @@ export type Materials = {
     readonly glass: PBRMaterial;
 };
 
+/**
+ * Builds the game's material set from its loaded texture resources.
+ * @param textures Loaded texture maps used by the materials.
+ * @param scene Scene that owns the created materials.
+ * @returns Materials for game objects, terrain, vegetation, and effects.
+ */
 export function initMaterials(textures: Textures, scene: Scene): Materials {
     const crateMaterial = new CrateMaterial(textures.materials.crate, scene);
 
@@ -97,6 +103,14 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     };
 }
 
+/**
+ * Creates a flat debug material with optional wireframe rendering.
+ * @param name Name assigned to the material.
+ * @param diffuse Whether the material receives a diffuse color.
+ * @param wireframe Whether to display polygon edges instead of filled faces.
+ * @param scene Scene that owns the material.
+ * @returns A standard material configured for visual debugging.
+ */
 export function createDebugMaterial(
     name: string,
     diffuse: boolean,

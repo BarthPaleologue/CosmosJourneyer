@@ -67,7 +67,6 @@ export class RingsUniforms {
 
     /**
      * Creates a new `RingsUniforms` instance for procedural ring models.
-     *
      * @param model - The procedural ring model to use for generating the uniforms.
      * @param texturePool - A pool of reusable procedural pattern LUTs.
      * @param fadeOutDistance - The distance at which the ring fades out.

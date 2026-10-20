@@ -115,6 +115,10 @@ export class StarSystemController {
      * Creates a new star system controller from a given model and scene
      * Note that the star system is not loaded until the load method is called
      * @param model The data model of the star system
+     * @param orbitalObjects - The ordered orbital models to add, with each parent before its children.
+     * @param systemEntities - The loaded entity instances owned by this star system.
+     * @param orbitalSimulation - The simulation that supplies current orbital transforms.
+     * @param assets - The loaded assets used to create the star system’s visual objects.
      * @param scene The scene in which the star system will be rendered
      */
     private constructor(
@@ -212,8 +216,9 @@ export class StarSystemController {
     }
 
     /**
-     * Returns the nearest orbital object to the given position
+     * Returns the orbital object nearest to the supplied world-space position.
      * @param position The position from which we want to find the nearest orbital object
+     * @returns The nearest orbital object, or undefined when the system is empty.
      */
     public getNearestOrbitalObject(position: Vector3): OrbitalObject {
         const orbitalObjects = this.getOrbitalObjects();
@@ -233,35 +238,40 @@ export class StarSystemController {
     }
 
     /**
-     * Returns all the space stations in the star system
+     * Returns all stations and other facilities in the current star system.
+     * @returns The orbital facilities in the current system.
      */
     public getOrbitalFacilities(): ReadonlyArray<OrbitalFacility> {
         return this.orbitalFacilities;
     }
 
     /**
-     * Returns all the celestial bodies in the star system
+     * Returns all planets, moons, and other solid bodies in the current star system.
+     * @returns The celestial bodies in the current system.
      */
     public getCelestialBodies(): ReadonlyArray<CelestialBody> {
         return [...this.getStellarObjects(), ...this.getPlanetaryMassObjects(), ...this.getAnomalies()];
     }
 
     /**
-     * Returns all the stellar objects in the star system
+     * Returns all stars and compact stellar remnants in the current star system.
+     * @returns The stellar objects in the current system.
      */
     public getStellarObjects(): Readonly<NonEmptyArray<StellarObject>> {
         return this.stellarObjects;
     }
 
     /**
-     * Returns all the orbital objects in the star system
+     * Returns every object advanced by the orbital simulation.
+     * @returns The orbital objects in the current system.
      */
     public getOrbitalObjects(): ReadonlyArray<OrbitalObject> {
         return [...this.getCelestialBodies(), ...this.getOrbitalFacilities()];
     }
 
     /**
-     * Returns all the planets in the star system
+     * Returns the planets in the system, excluding their satellites.
+     * @returns The planets in the current system.
      */
     public getPlanets(): ReadonlyArray<Planet> {
         return this.planets;
@@ -276,14 +286,16 @@ export class StarSystemController {
     }
 
     /**
-     * Returns all the planetary mass objects in the star system. (Planets first, then satellites)
+     * Returns planets first, followed by their satellites.
+     * @returns Planets followed by their satellites.
      */
     public getPlanetaryMassObjects(): ReadonlyArray<Planet> {
         return [...this.getPlanets(), ...this.satellites];
     }
 
     /**
-     * Returns all the anomalies in the star system
+     * Returns all anomalies registered in the current star system.
+     * @returns The anomalies in the current system.
      */
     public getAnomalies(): ReadonlyArray<Anomaly> {
         return this.anomalies;
@@ -294,7 +306,9 @@ export class StarSystemController {
     }
 
     /**
-     * Returns the nearest body to the given position
+     * Returns the celestial body nearest to the supplied world-space position.
+     * @param position - World-space position of the orbital object.
+     * @returns The nearest celestial body, or undefined when the system has none.
      */
     public getNearestCelestialBody(position: Vector3): CelestialBody {
         const celestialBodies = this.getCelestialBodies();
@@ -397,6 +411,7 @@ export class StarSystemController {
      * The nearest object is kept in place and the other objects are updated accordingly.
      * @param deltaSeconds The time elapsed since the last update
      * @param terrainSystem The system used to update the LOD of the telluric planets
+     * @param systemEntityProcessors - Systems that update entity instances during each tick.
      */
     public update(
         deltaSeconds: number,

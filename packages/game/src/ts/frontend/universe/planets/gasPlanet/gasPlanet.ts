@@ -57,9 +57,11 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
     readonly asteroidField: AsteroidField | null;
 
     /**
-     * New Gas Planet
+     * Creates a gas-planet presentation with its atmosphere, surface, and rings.
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
-     * @param scene
+     * @param textures - The textures used by the planet’s atmosphere and surface materials.
+     * @param ringsLutPool - The shared pool of lookup textures used to render rings.
+     * @param scene - The Babylon.js scene that owns the rendered meshes.
      */
     constructor(
         model: DeepReadonly<GasPlanetModel>,

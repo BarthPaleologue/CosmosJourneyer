@@ -61,6 +61,12 @@ export type AllMaterialTextures = {
     tree: Pick<PBRTextures, "albedo">;
 };
 
+/**
+ * Loads the texture maps required by the game's material definitions.
+ * @param engine Engine that creates the texture resources.
+ * @param progressMonitor Tracks completion of the individual image loads.
+ * @returns Texture sets for foil, solar panels, stations, crates, tires, and other materials.
+ */
 export async function loadMaterialTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

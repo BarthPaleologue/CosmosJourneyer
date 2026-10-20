@@ -31,6 +31,12 @@ export type RenderingAssets = {
     readonly objects: Objects;
 };
 
+/**
+ * Loads the textures, materials, and meshes used by the renderer.
+ * @param scene Scene that owns the loaded and created rendering resources.
+ * @param progressMonitor Tracks completion of individual asset-loading tasks.
+ * @returns The texture, material, and object bundles required for rendering.
+ */
 export async function loadRenderingAssets(
     scene: Scene,
     progressMonitor: ILoadingProgressMonitor,

@@ -81,6 +81,11 @@ const astronautArmClearanceAdjustments = {
 
 const astronautLocomotionArmClearance = 0.65;
 
+/**
+ * Reads a string name from an animation target when one is available.
+ * @param target Babylon animation target whose name is inspected.
+ * @returns The target name, or undefined when it has no string name.
+ */
 function getAnimationTargetName(target: unknown): string | undefined {
     if (typeof target !== "object" || target === null || !("name" in target)) {
         return undefined;
@@ -90,10 +95,22 @@ function getAnimationTargetName(target: unknown): string | undefined {
     return typeof name === "string" ? name : undefined;
 }
 
+/**
+ * Interpolates from no rotation toward the given rotation by the requested fraction.
+ * @param rotation Rotation whose angle is being reduced.
+ * @param scale Fraction of the rotation to retain.
+ * @returns The slerped rotation between identity and the input quaternion.
+ */
 function scaleQuaternionAngle(rotation: Quaternion, scale: number): Quaternion {
     return Quaternion.Slerp(Quaternion.Identity(), rotation, scale);
 }
 
+/**
+ * Multiplies quaternion keys for the named skeleton node by a local rotation offset.
+ * @param animationGroup Animation group containing the named animation.
+ * @param nodeName Name of the skeleton node to locate.
+ * @param rotationOffset Additional rotation applied to the node.
+ */
 function applyLocalRotationOffset(animationGroup: AnimationGroup, nodeName: string, rotationOffset: Quaternion): void {
     for (const targetedAnimation of animationGroup.targetedAnimations) {
         const targetName = getAnimationTargetName(targetedAnimation.target);
@@ -125,6 +142,11 @@ function applyLocalRotationOffset(animationGroup: AnimationGroup, nodeName: stri
     }
 }
 
+/**
+ * Adds the astronaut's shoulder and arm offsets to an animation group.
+ * @param animationGroup Animation group containing the named animation.
+ * @param strength Weight applied to this animation contribution.
+ */
 function applyArmClearanceAdjustment(animationGroup: AnimationGroup, strength: number): void {
     applyLocalRotationOffset(
         animationGroup,
@@ -148,6 +170,10 @@ function applyArmClearanceAdjustment(animationGroup: AnimationGroup, strength: n
     );
 }
 
+/**
+ * Adjusts astronaut shoulder and arm poses across locomotion and idle animations.
+ * @param animations Animation groups available for the humanoid model.
+ */
 function applyAstronautAnimationPostProcessing(animations: HumanoidAnimations): void {
     applyArmClearanceAdjustment(animations.idle, 1);
     applyArmClearanceAdjustment(animations.walk, astronautLocomotionArmClearance);
@@ -156,6 +182,12 @@ function applyAstronautAnimationPostProcessing(animations: HumanoidAnimations): 
     applyArmClearanceAdjustment(animations.sittingOnGroundIdle, astronautLocomotionArmClearance * 0.5);
 }
 
+/**
+ * Loads the default and astronaut models and exposes them as spawnable prefabs.
+ * @param scene Scene that owns the loaded humanoid models.
+ * @param progressMonitor Progress monitor whose task is completed after loading.
+ * @returns Prefabs that create humanoid instances with their skeletons and animation groups.
+ */
 export async function loadHumanoidPrefabs(
     scene: Scene,
     progressMonitor: ILoadingProgressMonitor,

@@ -69,12 +69,12 @@ export class TerrainFaceQuadTree implements Cullable {
     private readonly maxGpuUploadsPerFrame = 1;
 
     /**
-     *
-     * @param faceIndex
-     * @param planetModel
-     * @param parentTransform
-     * @param material
-     * @param scene
+     * Creates the root terrain quad tree for one cube-sphere face and retains its render dependencies.
+     * @param faceIndex - The cube-sphere face index in the range 0 through 5.
+     * @param planetModel - The planet model that supplies radius and terrain parameters.
+     * @param parentTransform - The transform that positions this terrain face on the planet.
+     * @param material - The terrain material shared by chunks on this face.
+     * @param scene - The Babylon.js scene that owns the rendered meshes.
      */
     constructor(
         faceIndex: FaceIndex,
@@ -107,9 +107,10 @@ export class TerrainFaceQuadTree implements Cullable {
     }
 
     /**
-     * Update tree to create matching LOD relative to the observer's position
+     * Splits or merges this face’s terrain quad tree to match the observer’s level of detail.
      * @param lodContext Shared LOD state computed once for the terrain update
-     * @param terrainSystem
+     * @param terrainSystem - The terrain worker system that creates and retires terrain chunks.
+     * @param scatteringSystem - The atmosphere-scattering system used to update terrain shading.
      */
     public updateLOD(
         lodContext: LodUpdateContext,
@@ -168,9 +169,10 @@ export class TerrainFaceQuadTree implements Cullable {
     }
 
     /**
-     * Recursive function used internally to update LOD
+     * Updates a terrain node and its descendants against the shared level-of-detail context.
      * @param lodContext Shared LOD state computed once for the terrain update
-     * @param terrainSystem
+     * @param terrainSystem - The terrain worker system that creates and retires terrain chunks.
+     * @param scatteringSystem - The atmosphere-scattering system used to update terrain shading.
      * @param node The node to update recursively
      */
     private updateLODRecursively(
@@ -280,6 +282,12 @@ export class TerrainFaceQuadTree implements Cullable {
     }
 }
 
+/**
+ * Orders terrain levels by increasing subdivision depth.
+ * @param a - First terrain detail level to compare.
+ * @param b - Second terrain detail level to compare.
+ * @returns A negative value, zero, or positive value according to ascending LOD order.
+ */
 function sortLodAscending(a: TerrainChunkMesh, b: TerrainChunkMesh): number {
     return a.indices.lod - b.indices.lod;
 }

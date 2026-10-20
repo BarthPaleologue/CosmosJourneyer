@@ -35,6 +35,11 @@ export type ParticleTextures = {
     blackHoleSprite: Texture;
 };
 
+/**
+ * @param engine Engine used to create the textures.
+ * @param progressMonitor Progress monitor notified as each image loads.
+ * @returns Sprite textures used by particle and billboard effects.
+ */
 export async function loadParticleTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

@@ -22,6 +22,11 @@ export type MatterJetsSettings = {
 export const matterJetsScalingFactor = 10000;
 export const matterJetsConeHeight = 100;
 
+/**
+ * Computes the distance beyond which a neutron star's matter jets are hidden.
+ * @param bodyRadius Neutron star radius in world units.
+ * @returns Visibility radius in world units.
+ */
 export function getMatterJetsVisibilityRadius(bodyRadius: number): number {
     return bodyRadius * matterJetsScalingFactor * matterJetsConeHeight;
 }

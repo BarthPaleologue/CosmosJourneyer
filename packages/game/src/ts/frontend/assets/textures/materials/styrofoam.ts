@@ -33,6 +33,11 @@ export type StyroFoamTextures = {
     ambientOcclusion: Texture;
 };
 
+/**
+ * @param engine Engine used to create the textures.
+ * @param progressMonitor Progress monitor notified as each image loads.
+ * @returns Styrofoam albedo, normal, roughness, and ambient-occlusion maps.
+ */
 export async function loadStyroFoamTextures(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,

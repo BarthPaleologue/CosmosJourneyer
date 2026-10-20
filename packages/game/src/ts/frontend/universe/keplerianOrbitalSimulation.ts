@@ -59,8 +59,8 @@ export class KeplerianOrbitalSimulation {
     }
 
     /**
-     * Adds new objects to the simulation. The parents must come before the children in the array.
-     * @param orbitalObjects
+     * Adds orbital models to the simulation in parent-before-child order.
+     * @param orbitalObjects - The ordered orbital models to add, with each parent before its children.
      */
     public addObjects(orbitalObjects: ReadonlyArray<KeplerianObject>) {
         for (const object of orbitalObjects) {
@@ -118,10 +118,11 @@ export class KeplerianOrbitalSimulation {
     }
 
     /**
-     * Computes the transform of an object relative to another object.
+     * Returns an object transform expressed relative to a chosen orbital reference frame.
      * @param objectId The object whose transform is returned.
      * @param referenceObjectId The object used as the local origin.
      * @param frame "reference" expresses the result in the reference object's rotating frame; "inertial" only subtracts the reference position.
+     * @returns The transform from the reference object to the requested object in the selected frame.
      */
     public getRelativeTransform(
         objectId: string,

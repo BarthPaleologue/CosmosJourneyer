@@ -36,7 +36,7 @@ export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implement
 
     /**
      * @param model The model to create the planet from or a seed for the planet in [-1, 1]
-     * @param scene
+     * @param scene - The Babylon.js scene that owns the rendered meshes.
      */
     constructor(model: Extract<DeepReadonly<CelestialBodyModel>, { type: TObjectType }>, scene: Scene) {
         this.model = model;

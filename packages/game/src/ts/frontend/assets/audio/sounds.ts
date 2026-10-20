@@ -55,6 +55,12 @@ export type Sounds = {
     readonly error: StaticSound;
 };
 
+/**
+ * Loads one-shot sound effects used for game actions and interface feedback.
+ * @param audioEngine Audio engine that decodes and plays the effects.
+ * @param progressMonitor Tracks completion of individual sound-loading tasks.
+ * @returns Effects indexed by their in-game purpose.
+ */
 export async function loadSounds(
     audioEngine: AudioEngineV2,
     progressMonitor: ILoadingProgressMonitor,

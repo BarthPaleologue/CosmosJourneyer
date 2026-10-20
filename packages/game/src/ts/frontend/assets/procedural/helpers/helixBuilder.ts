@@ -11,6 +11,7 @@ import type { Scene } from "@babylonjs/core/scene";
  * @param turnCount The number of spires of the spiral.
  * @param pitch The distance between two spires.
  * @param tessellation The number of sides of the spiral.
+ * @returns The generated mesh vertex data.
  */
 export function createHelixVertexData(
     radius: number,
@@ -130,6 +131,18 @@ export function createHelixVertexData(
     return vertexData;
 }
 
+/**
+ * Builds a flat-shaded helical mesh from the generated ring geometry.
+ * @param name Name assigned to the mesh.
+ * @param radius Distance from the helix axis to the tube center.
+ * @param thickness Radius of the tube around the helix path.
+ * @param height Total vertical extent of the helix.
+ * @param tessellation Number of subdivisions around the geometry.
+ * @param turnCount Number of turns in the helix.
+ * @param pitch Vertical distance between consecutive turns.
+ * @param scene Scene that owns the mesh.
+ * @returns A flat-shaded helix mesh attached to the scene.
+ */
 export function createHelix(
     name: string,
     radius: number,

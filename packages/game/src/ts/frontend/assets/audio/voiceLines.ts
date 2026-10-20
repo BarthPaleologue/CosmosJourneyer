@@ -57,6 +57,12 @@ export type SpeakerVoiceLines = {
     readonly charlotte: VoiceLines;
 };
 
+/**
+ * Loads the voice lines available for each speaker.
+ * @param audioEngine Audio engine that decodes and plays the voice lines.
+ * @param progressMonitor Tracks completion of individual voice-line loading tasks.
+ * @returns Voice-line groups keyed by speaker.
+ */
 export async function loadVoiceLines(
     audioEngine: AudioEngineV2,
     progressMonitor: ILoadingProgressMonitor,

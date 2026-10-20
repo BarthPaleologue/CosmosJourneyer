@@ -57,7 +57,9 @@ export class TerrainQuadTreeNode {
     }
 
     /**
+     * Traverses this quad-tree node and yields each terrain chunk it owns.
      * @returns An iterator of all chunks in the subtree of this node, including its own chunk
+     * @yields {TerrainChunkMesh} Each terrain chunk in this node’s subtree.
      */
     public *getChunks(): Generator<TerrainChunkMesh, void, unknown> {
         yield this.chunk;

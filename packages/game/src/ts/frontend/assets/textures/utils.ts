@@ -22,6 +22,14 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
+/**
+ * Loads a 2D texture and completes its loading task.
+ * @param name Name assigned to the texture.
+ * @param url URL of the image to load.
+ * @param engine Engine that creates the texture resource.
+ * @param progressMonitor Tracks completion of this texture-loading task.
+ * @returns A texture that resolves after the image loads.
+ */
 export async function loadTextureAsync(
     name: string,
     url: string,
@@ -40,6 +48,14 @@ export async function loadTextureAsync(
     return texture;
 }
 
+/**
+ * Loads a cube texture and completes its loading task.
+ * @param name Name assigned to the cube texture.
+ * @param url Base URL used to load the cube-map faces.
+ * @param scene Scene that owns the cube texture.
+ * @param progressMonitor Tracks completion of this texture-loading task.
+ * @returns The loaded prefiltered cube texture.
+ */
 export async function loadCubeTextureAsync(
     name: string,
     url: string,

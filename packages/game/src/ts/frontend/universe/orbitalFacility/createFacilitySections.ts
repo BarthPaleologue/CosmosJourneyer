@@ -33,6 +33,16 @@ import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilit
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
 
+/**
+ * Instantiates the ordered station sections and attaches each one to the facility hierarchy.
+ * @param root - The facility root transform that will own the generated sections.
+ * @param models - The ordered section models that define the facility layout.
+ * @param displayName - The localized name used for this facility section.
+ * @param assets - The loaded models and textures needed by the facility sections.
+ * @param scene - The Babylon.js scene that owns the rendered meshes.
+ * @param initialSupport - The initial landing-pad support section to build.
+ * @returns The facility sections attached to the root transform.
+ */
 export function createFacilitySections(
     root: TransformNode,
     models: DeepReadonly<Array<StationSectionModel>>,
@@ -56,6 +66,11 @@ export function createFacilitySections(
     return sections;
 }
 
+/**
+ * Moves a station section so its lower bound rests on top of its parent section.
+ * @param node - The facility section transform to place on top of its parent.
+ * @param parent - The facility transform that supports the new section.
+ */
 function placeNode(node: TransformNode, parent: TransformNode): void {
     // Make sure bounds are current
     parent.computeWorldMatrix(true);
@@ -69,6 +84,14 @@ function placeNode(node: TransformNode, parent: TransformNode): void {
     node.translate(Axis.Y, deltaY, Space.WORLD);
 }
 
+/**
+ * Creates the station-section implementation selected by the model variant.
+ * @param sectionModel - The model describing this facility section.
+ * @param displayName - The localized name used for this facility section.
+ * @param assets - The loaded models and textures needed by the facility sections.
+ * @param scene - The Babylon.js scene that owns the rendered meshes.
+ * @returns The instantiated section node.
+ */
 function getSectionFromModel(
     sectionModel: DeepReadonly<StationSectionModel>,
     displayName: string,

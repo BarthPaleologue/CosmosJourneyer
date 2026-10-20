@@ -21,6 +21,11 @@ import { makeChunkId, makeTaskId } from "./terrainSystem";
 import type { TerrainBuffers } from "./terrainSystem";
 import { TerrainTaskRegistry } from "./terrainTaskRegistry";
 
+/**
+ * Wraps a value in the worker-buffer shape used by registry tests.
+ * @param value - The value to wrap in a terrain-buffer result.
+ * @returns The buffer result containing the supplied test value.
+ */
 function makeBuffers(value: number): TerrainBuffers {
     return {
         positions: new Float32Array([value]),

@@ -22,6 +22,13 @@ import type { GasPlanetTextureId } from "@cosmos-journeyer/universe-model";
 
 import type { GasPlanetTextures } from "@/frontend/assets/textures/gasPlanet";
 
+/**
+ * Creates a gas-planet material and assigns the texture for the selected planet.
+ * @param textureId - Identifier of the gas-planet surface texture.
+ * @param textures - The gas-planet surface textures indexed by planet name.
+ * @param scene - The Babylon.js scene that owns the rendered meshes.
+ * @returns The material configured for the selected gas-planet texture.
+ */
 export function createGasPlanetTextureMaterial(
     textureId: GasPlanetTextureId,
     textures: GasPlanetTextures,

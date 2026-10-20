@@ -65,9 +65,10 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
     readonly cloudsUniforms: CloudsUniforms | null;
 
     /**
-     * New Telluric Planet
+     * Creates a solid planet presentation with generated terrain and atmosphere.
      * @param model The model to build the planet or a seed for the planet in [-1, 1]
-     * @param scene
+     * @param assets - The loaded terrain, vegetation, and surface assets used by the planet.
+     * @param scene - The Babylon.js scene that owns the planet meshes and terrain.
      */
     constructor(
         model: DeepReadonly<TelluricPlanetModel | TelluricSatelliteModel>,
@@ -153,9 +154,10 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
     }
 
     /**
-     * Update terrain of the sphere relative to the observer position
-     * @param camera
-     * @param terrainSystem
+     * Splits or merges this face’s terrain quad tree to match the observer’s level of detail.
+     * @param camera - The active camera whose position determines terrain detail.
+     * @param terrainSystem - The terrain worker system that creates and retires terrain chunks.
+     * @param scatteringSystem - The atmosphere-scattering system used to update terrain shading.
      */
     public updateLOD(camera: Camera, terrainSystem: ITerrainSystem, scatteringSystem: ScatteringSystem): void {
         this.terrain.updateLOD(camera, terrainSystem, scatteringSystem);

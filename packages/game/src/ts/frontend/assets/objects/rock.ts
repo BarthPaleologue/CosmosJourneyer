@@ -29,6 +29,13 @@ import { loadAssetInContainerAsync } from "./utils";
 
 import rockPath from "@assets/rock.glb";
 
+/**
+ * Loads the rock mesh and builds collision shapes for every supported rock size.
+ * @param material Material assigned to the created mesh.
+ * @param scene Scene that owns the rock mesh and collision shapes.
+ * @param progressMonitor Progress monitor whose task is completed after loading.
+ * @returns The hidden display mesh and a size-indexed map of physics shapes.
+ */
 export async function loadRock(
     material: Material,
     scene: Scene,

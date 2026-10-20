@@ -22,6 +22,15 @@ import type { IStreamingSoundOptions, StreamingSound } from "@babylonjs/core/Aud
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 
+/**
+ * Creates a streamed sound from a URL and marks its loading task complete.
+ * @param name Label shown for the sound in the audio engine.
+ * @param url Source URL for the audio stream.
+ * @param engine Audio engine that owns the new sound.
+ * @param progressMonitor Tracks completion of this sound-loading task.
+ * @param options Playback and streaming settings passed to Babylon's audio engine.
+ * @returns A sound that streams audio instead of loading the full clip up front.
+ */
 export async function loadStreamingSoundAsync(
     name: string,
     url: string,
@@ -35,6 +44,15 @@ export async function loadStreamingSoundAsync(
     return sound;
 }
 
+/**
+ * Decodes a sound clip from a URL and marks its loading task complete.
+ * @param name Label shown for the sound in the audio engine.
+ * @param url Source URL for the audio clip.
+ * @param engine Audio engine that owns the new sound.
+ * @param progressMonitor Tracks completion of this sound-loading task.
+ * @param options Playback settings passed to Babylon's audio engine.
+ * @returns A decoded clip ready for playback without streaming.
+ */
 export async function loadStaticSoundAsync(
     name: string,
     url: string,

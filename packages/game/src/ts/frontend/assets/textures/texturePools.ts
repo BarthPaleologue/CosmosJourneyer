@@ -32,6 +32,11 @@ export type TexturePools = {
     landingPad: LandingPadTexturePool;
 };
 
+/**
+ * Creates pools for reusable procedural textures associated with a scene.
+ * @param scene Scene used to create pooled GPU textures.
+ * @returns Pools for cloud, ring, star, and landing-pad textures.
+ */
 export function createTexturePools(scene: Scene): TexturePools {
     return {
         cloudsLut: new ItemPool<CloudsLut>(() => new CloudsLut(scene)),

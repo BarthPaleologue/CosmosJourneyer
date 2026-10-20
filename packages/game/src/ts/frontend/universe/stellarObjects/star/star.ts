@@ -60,9 +60,10 @@ export class Star implements CelestialBodyBase<"star">, Cullable, LightEmitter {
     readonly type = "star";
 
     /**
-     * New Star
+     * Creates a star presentation from its model and shared textures.
      * @param model The seed of the star in [-1, 1]
-     * @param scene
+     * @param textures - The textures used for the star’s surface and glow.
+     * @param scene - The Babylon.js scene that owns the rendered meshes.
      */
     constructor(model: DeepReadonly<StarModel>, textures: Textures, scene: Scene) {
         this.model = model;

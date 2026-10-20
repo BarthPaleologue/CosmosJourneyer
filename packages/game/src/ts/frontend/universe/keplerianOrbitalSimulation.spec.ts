@@ -24,6 +24,17 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { KeplerianObject } from "./keplerianOrbitalSimulation";
 import { KeplerianOrbitalSimulation } from "./keplerianOrbitalSimulation";
 
+/**
+ * Builds an orbital body fixture with a transform, orbit, and spin for simulation tests.
+ * @param scene - The Babylon.js scene that owns the rendered meshes.
+ * @param root0 - Orbital, position, and spin values for the test body.
+ * @param root0.id - Identifier for the root orbital object.
+ * @param root0.parentIds - Identifiers of the root object’s parent bodies.
+ * @param root0.semiMajorAxis - The root object’s semi-major axis in meters.
+ * @param root0.position - The initial root-object position in world coordinates.
+ * @param root0.siderealPeriod - The root object’s rotation period in seconds.
+ * @returns An orbital body with the requested orbit and a scene transform.
+ */
 function createTestOrbitalObject(
     scene: Scene,
     {
