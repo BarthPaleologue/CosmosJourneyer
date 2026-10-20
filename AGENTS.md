@@ -20,15 +20,15 @@ Make sure you read and understand the root level `.md` files. Other `.md` files 
 
 ## Engineering Principles
 
-- **Composition over inheritance**: prefer interface-based composition (see `Transformable`) or discriminated unions. Inheritance hierarchies are discouraged (Rationale: inheritance is a trap that makes code harder to refactor when requirements inevitably change).
+The principles below cover rules that cannot be checked automatically by the linter. They complement the rules already enforced by the linter.
 
-- **No circular dependencies**: dependency cycles are forbidden per ESLint `import/no-cycle` rule. (Rationale: cycles creates coupling between components that should be independently testable and maintainable.)
+- **Composition over inheritance**: prefer interface-based composition (see `Transformable`) or discriminated unions. Inheritance hierarchies are discouraged (Rationale: inheritance is a trap that makes code harder to refactor when requirements inevitably change).
 
 - **Explicit dependencies**: avoid hidden dependencies such as global mutable state (like singletons), prefer dependency injection instead. (Rationale: global mutable state makes code harder to test and reason about.)
 
 - **Memory ownership**: always consider who owns what (think like Rust borrow checker), especially for GPU resources. Avoid leaking GPU resources (e.g., textures, buffers) by ensuring proper disposal patterns. (Rationale: GPU resources are limited and leaking them can lead to crashes or degraded performance.)
 
-- **Read-only access**: prefer `const` bindings and express consumers' non-mutation contracts in function signatures with `Readonly<T>` or `ReadonlyArray<T>`. Use `DeepReadonly<T>` from `@cosmos-journeyer/typescript` when the contract also covers nested data. Keep shared data records mutable unless immutability is a domain invariant; newly created results belong to their recipient.
+- **Read-only access**: express consumers' non-mutation contracts in function signatures with `Readonly<T>` or `ReadonlyArray<T>`. Use `DeepReadonly<T>` from `@cosmos-journeyer/typescript` when the contract also covers nested data. Keep shared data records mutable unless immutability is a domain invariant; newly created results belong to their recipient.
 
 - **I18n aware**: Player-facing strings should be translated using i18next. (Rationale: hardcoded strings make localization difficult and error-prone.)
 
