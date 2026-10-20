@@ -28,11 +28,13 @@ Make sure you read and understand the root level `.md` files. Other `.md` files 
 
 - **Memory ownership**: always consider who owns what (think like Rust borrow checker), especially for GPU resources. Avoid leaking GPU resources (e.g., textures, buffers) by ensuring proper disposal patterns. (Rationale: GPU resources are limited and leaking them can lead to crashes or degraded performance.)
 
-- **Immutability**: prefer `const`, `readonly` and `ReadonlyArray<T>` where possible. (Rationale: immutability makes code easier to reason about and reduces side effects.)
+- **Read-only access**: prefer `const` bindings and express consumers' non-mutation contracts in function signatures with `Readonly<T>` or `ReadonlyArray<T>`. Use `DeepReadonly<T>` from `@cosmos-journeyer/typescript` when the contract also covers nested data. Keep shared data records mutable unless immutability is a domain invariant; newly created results belong to their recipient.
 
 - **I18n aware**: Player-facing strings should be translated using i18next. (Rationale: hardcoded strings make localization difficult and error-prone.)
 
-- **Type safety**: always prefer strong typing over `any` or `unknown`. Use TypeScript features like union types, intersection types, and generics to model complex data structures. (Rationale: strong typing helps catch errors at compile time and improves code readability.)
+- **Type safety**: model known data with precise domain types; use `unknown` for unvalidated external data and narrow it at the boundary. Use `type` for data records and `interface` for contracts implemented by classes. Name types after their semantics and keep one canonical definition per contract.
+
+- **SI units**: internal physical calculations use SI units. Do not add unit suffixes to parameter or local variable names; document units in JSDoc instead. Convert to and from other units at input/output boundaries.
 
 - **Git LFS for large assets**: use Git LFS for large binary assets (e.g., textures, models). (Rationale: Git LFS helps keep the repo size manageable and improves performance.)
 

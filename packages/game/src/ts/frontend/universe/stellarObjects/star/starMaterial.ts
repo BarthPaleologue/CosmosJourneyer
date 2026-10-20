@@ -18,10 +18,10 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import type { Scene } from "@babylonjs/core/scene";
+import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
 
-import type { RGBColor } from "@/utils/colors";
 import type { ItemPool } from "@/utils/itemPool";
 import { getRgbFromTemperature } from "@/utils/specrend";
 
@@ -45,7 +45,7 @@ const StarMaterialSamplerNames = {
 export class StarMaterial extends ShaderMaterial {
     private readonly starSeed: number;
 
-    private readonly starColor: RGBColor;
+    private readonly starColor: LinearSrgbColor;
 
     private elapsedSeconds = 0;
 

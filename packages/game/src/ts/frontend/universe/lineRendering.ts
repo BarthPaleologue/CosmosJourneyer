@@ -22,20 +22,19 @@ import { CreateGreasedLine } from "@babylonjs/core/Meshes/Builders/greasedLineBu
 import { CreateLines } from "@babylonjs/core/Meshes/Builders/linesBuilder";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { Scene } from "@babylonjs/core/scene";
-
-import type { RGBColor } from "@/utils/colors";
+import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 export type CreateLinesMeshFunction = (
     name: string,
     points: ReadonlyArray<Vector3>,
-    color: RGBColor,
+    color: LinearSrgbColor,
     scene: Scene,
 ) => Mesh;
 
 export const CreateGreasedLineHelper: CreateLinesMeshFunction = (
     name: string,
     points: ReadonlyArray<Vector3>,
-    color: RGBColor,
+    color: LinearSrgbColor,
     scene: Scene,
 ) => {
     return CreateGreasedLine(
@@ -57,7 +56,7 @@ export const CreateGreasedLineHelper: CreateLinesMeshFunction = (
 export const CreateLinesHelper: CreateLinesMeshFunction = (
     name: string,
     points: ReadonlyArray<Vector3>,
-    color: RGBColor,
+    color: LinearSrgbColor,
     scene: Scene,
 ) => {
     const color4 = new Color4(color.r, color.g, color.b, 1.0);

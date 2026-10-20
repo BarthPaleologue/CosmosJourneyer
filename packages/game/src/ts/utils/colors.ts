@@ -15,52 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Represents a color in the RGB color space.
- */
-export type RGBColor = {
-    /**
-     * The red component value (0-1).
-     */
-    r: number;
-
-    /**
-     * The green component value (0-1).
-     */
-    g: number;
-
-    /**
-     * The blue component value (0-1).
-     */
-    b: number;
-};
-
-/**
- * Represents a color in the HSV (Hue, Saturation, Value) color space.
- */
-export type HSVColor = {
-    /**
-     * The hue component value in degrees (0-360).
-     */
-    h: number;
-
-    /**
-     * The saturation component value (0-1).
-     */
-    s: number;
-
-    /**
-     * The value (brightness) component value (0-1).
-     */
-    v: number;
-};
+import type { HSVColor, LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 /**
  * Converts an HSV color to RGB color space.
  * @param hsv - The HSV color to convert
  * @returns The equivalent RGB color
  */
-export function hsvToRgb(hsv: HSVColor): RGBColor {
+export function hsvToRgb(hsv: Readonly<HSVColor>): LinearSrgbColor {
     const { h, s, v } = hsv;
 
     // Normalize hue to 0-360 range

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { RGBColor } from "../common";
+import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 type RingsModelBase = {
     /**
@@ -45,12 +45,12 @@ export type ProceduralRingsModel = RingsModelBase & {
     /**
      * The ice-rich end-member color of the rings in RGB color space
      */
-    iceAlbedo: RGBColor;
+    iceAlbedo: LinearSrgbColor;
 
     /**
      * The dust-rich end-member color of the rings in RGB color space
      */
-    dustAlbedo: RGBColor;
+    dustAlbedo: LinearSrgbColor;
 };
 
 export type TexturedRingsModel = RingsModelBase & {

@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { RGBColor } from "../../common";
+import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
+
 import type { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
 
 export type MandelbulbModel = OrbitalObjectModelBase<"mandelbulb"> & {
     radius: number;
     readonly power: number;
-    readonly accentColor: RGBColor;
+    readonly accentColor: LinearSrgbColor;
 };

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { RGBColor } from "../common";
+import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 export type CloudsModel = {
     layerRadius: number;
@@ -25,7 +25,7 @@ export type CloudsModel = {
     detailFrequency: number;
     coverage: number;
     sharpness: number;
-    color: RGBColor;
+    color: LinearSrgbColor;
     worleySpeed: number;
     detailSpeed: number;
 };
