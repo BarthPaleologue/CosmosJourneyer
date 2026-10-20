@@ -1,12 +1,6 @@
-import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
+import type { HSVColor, LinearSrgbColor } from "@cosmos-journeyer/physics";
 
-type HSVColor = {
-    readonly h: number;
-    readonly s: number;
-    readonly v: number;
-};
-
-export function hsvToRgb(hsv: HSVColor): LinearSrgbColor {
+export function hsvToRgb(hsv: Readonly<HSVColor>): LinearSrgbColor {
     const { h, s, v } = hsv;
     const normalizedHue = ((h % 360) + 360) % 360;
 

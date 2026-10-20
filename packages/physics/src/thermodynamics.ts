@@ -16,6 +16,20 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { StefanBoltzmannConstant } from "./constants/derived";
+import { BoltzmannConstant, C, PlanckConstant } from "./constants/fundamental";
+
+/**
+ * Applies Planck's law to calculate black body spectral exitance Mλ = 2πhc² / (λ⁵ expm1(hc/(λkT))).
+ * @param temperature The black body temperature in kelvin.
+ * @param wavelength The wavelength in metres.
+ * @returns The hemispherically integrated spectral exitance per unit wavelength in W/m²/m.
+ */
+export function getBlackBodySpectralExitance(temperature: number, wavelength: number): number {
+    return (
+        (2 * Math.PI * PlanckConstant * C ** 2) /
+        (wavelength ** 5 * Math.expm1((PlanckConstant * C) / (wavelength * BoltzmannConstant * temperature)))
+    );
+}
 
 /**
  * Applies Stefan-Boltzmann law to calculate the radiative flux of a black body.

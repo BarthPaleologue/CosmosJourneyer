@@ -3,10 +3,28 @@ import { describe, expect, it } from "vitest";
 import {
     getBlackBodyLuminosity,
     getBlackBodyRadiatedFlux,
+    getBlackBodySpectralExitance,
     getRadiatedFlux,
     getRadiatorAreaForHeat,
     getSphereIrradianceAtDistance,
 } from "./thermodynamics";
+
+describe("Planck's law", () => {
+    it.each([300, 5778])("integrates to the Stefan-Boltzmann flux at %s K", (temperature) => {
+        const intervals = 4096;
+        const minimum = Math.log(1e-9);
+        const maximum = Math.log(0.1);
+        const step = (maximum - minimum) / intervals;
+        let flux = 0;
+        for (let i = 0; i < intervals; i++) {
+            const lower = Math.exp(minimum + i * step);
+            const upper = Math.exp(minimum + (i + 1) * step);
+            const midpoint = (lower + upper) / 2;
+            flux += getBlackBodySpectralExitance(temperature, midpoint) * (upper - lower);
+        }
+        expect(Math.abs(flux / getBlackBodyRadiatedFlux(temperature) - 1)).toBeLessThan(1e-5);
+    });
+});
 
 describe("Stefan-Boltzmann Law Functions", () => {
     const expectedStefanBoltzmannConstant = 5.670374419e-8;
