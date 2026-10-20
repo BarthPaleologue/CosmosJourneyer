@@ -26,6 +26,13 @@ import type { GasPlanetModel, Orbit, SpinModel, StellarObjectModel } from "@cosm
 
 import { getGasPlanetOrbitRadius, sampleGasPlanetMass } from "./gasPlanetModelHelpers";
 
+/**
+ * @param id Identifier assigned to the generated object.
+ * @param seed Seed for reproducible procedural choices.
+ * @param name Display name assigned to the generated object.
+ * @param parentBodies Orbital ancestors that define the object's parent path.
+ * @returns A gas planet model with seeded physical and orbital properties.
+ */
 export function generateGasPlanetModel(
     id: string,
     seed: number,

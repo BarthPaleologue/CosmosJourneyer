@@ -24,6 +24,13 @@ import { getRngFromSeed, normalRandom, randRange } from "@cosmos-journeyer/rando
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { SierpinskiPyramidModel, OrbitalObjectModel, Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param id Identifier assigned to the generated object.
+ * @param seed Seed for reproducible procedural choices.
+ * @param name Display name assigned to the generated object.
+ * @param parentBodies Orbital ancestors that define the object's parent path.
+ * @returns A seeded Sierpinski pyramid model with orbital data.
+ */
 export function generateSierpinskiPyramidModel(
     id: string,
     seed: number,

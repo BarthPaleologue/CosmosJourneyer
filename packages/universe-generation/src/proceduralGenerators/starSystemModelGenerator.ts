@@ -319,6 +319,7 @@ export function generateStarSystemModel(
  * @param rng Random number generator
  * @param index Index of the stellar object
  * @see https://physics.stackexchange.com/questions/442154/how-common-are-neutron-stars
+ * @returns The stellar object type sampled for this index.
  */
 function getBodyTypeOfStellarObject(
     rng: (index: number) => number,

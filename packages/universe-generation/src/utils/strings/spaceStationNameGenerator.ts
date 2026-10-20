@@ -106,6 +106,7 @@ export const SpaceElevatorDesignators = [
  * Generate a space station name using a noise based rng and a given sample index
  * @param rng The noise based rng with a range of [0, 1]
  * @param sampleIndex The index of the sample to generate
+ * @returns A generated space station name.
  */
 export function generateSpaceStationName(rng: (index: number) => number, sampleIndex: number): string {
     const designator = SpaceStationDesignators[Math.floor(rng(sampleIndex) * SpaceStationDesignators.length)];
@@ -113,6 +114,11 @@ export function generateSpaceStationName(rng: (index: number) => number, sampleI
     return `${name}${uniformRandBool(0.5, rng, sampleIndex + 2) ? "'s" : ""} ${designator}`;
 }
 
+/**
+ * @param rng Indexed random source for deterministic name selection.
+ * @param sampleIndex Index used to select name components.
+ * @returns A generated space elevator name.
+ */
 export function generateSpaceElevatorName(rng: (index: number) => number, sampleIndex: number): string {
     const designator = SpaceElevatorDesignators[Math.floor(rng(sampleIndex) * SpaceElevatorDesignators.length)];
     const name = IllustriousFigures[Math.floor(rng(sampleIndex + 1) * IllustriousFigures.length)]?.lastName;

@@ -18,6 +18,11 @@
 import { normalRandom, randRange } from "@cosmos-journeyer/random";
 import type { RingsModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param celestialBodyRadius Radius of the ringed body in meters.
+ * @param rng Indexed random source for reproducible procedural choices.
+ * @returns Ring geometry scaled to the body's radius.
+ */
 export function generateSeededRingsModel(celestialBodyRadius: number, rng: (step: number) => number): RingsModel {
     const innerRadius = celestialBodyRadius * randRange(1.8, 2.2, rng, 1400);
     const ringWidth = celestialBodyRadius * Math.max(0.2, normalRandom(1.0, 0.5, rng, 1405));

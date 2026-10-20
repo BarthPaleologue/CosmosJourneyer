@@ -49,6 +49,13 @@ import { generateLandingBayModel } from "./sections/landingBay";
 import { generateSolarSectionModel } from "./sections/solar";
 import { generateUtilitySectionModel } from "./sections/utility";
 
+/**
+ * @param id Identifier assigned to the generated facility.
+ * @param seed Seed for reproducible procedural choices.
+ * @param parentBody Body orbited by the facility.
+ * @param systemModel Containing star system used to resolve placement.
+ * @returns A space elevator model with generated sections and orbital data.
+ */
 export function generateSpaceElevatorModel(
     id: string,
     seed: number,

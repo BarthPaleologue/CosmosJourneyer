@@ -10,6 +10,11 @@ import type { GaiaRow } from "./schemas";
 export const GaiaTapAsyncEndpoint = "https://gea.esac.esa.int/tap-server/tap/async";
 export type GaiaClientOptions = AsyncTapClientOptions & Readonly<{ endpoint?: string }>;
 const numeric = (value: string): number | null => (value.trim() === "" ? null : Number(value));
+/**
+ * Validates and converts raw Gaia TAP rows into typed Gaia records.
+ * @param rows Rows returned by the TAP CSV parser.
+ * @returns Parsed Gaia records, or the first schema validation error.
+ */
 function parseGaiaRows(rows: DeepReadonly<Array<Record<string, string>>>): Result<ReadonlyArray<GaiaRow>, string> {
     const parsedRows: GaiaRow[] = [];
     for (const raw of rows) {
@@ -55,6 +60,11 @@ export class GaiaClient {
         return parsed;
     }
 }
+/**
+ * Creates a Gaia client backed by the asynchronous TAP service.
+ * @param options TAP transport settings and an optional service endpoint.
+ * @returns A client that queries and validates Gaia records.
+ */
 export function createGaiaClient(options: GaiaClientOptions = {}): GaiaClient {
     const { endpoint = GaiaTapAsyncEndpoint, ...tapOptions } = options;
     return new GaiaClient(createAsyncTapClient(endpoint, tapOptions));

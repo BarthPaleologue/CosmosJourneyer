@@ -18,6 +18,14 @@
 import { getWaterSaturationPressure } from "@cosmos-journeyer/physics";
 import type { CloudsModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param planetRadius Planet radius in meters.
+ * @param cloudLayerHeight Cloud layer height above the surface in meters.
+ * @param oceanCoverage Fraction of the surface covered by liquid water.
+ * @param averageTemperature Average surface temperature in kelvins.
+ * @param pressure Atmospheric pressure in pascals.
+ * @returns A cloud layer model sized and colored for the planet conditions.
+ */
 export function generateCloudsModel(
     planetRadius: number,
     cloudLayerHeight: number,

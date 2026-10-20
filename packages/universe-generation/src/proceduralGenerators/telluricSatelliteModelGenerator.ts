@@ -45,6 +45,14 @@ import type {
 import { generateCloudsModel } from "./cloudsModelGenerator";
 import { getTemperatureRange } from "./temperatureRange";
 
+/**
+ * @param id Identifier assigned to the generated object.
+ * @param seed Seed for reproducible procedural choices.
+ * @param name Display name assigned to the generated object.
+ * @param parentBodies Orbital ancestors that define the object's parent path.
+ * @param stellarObjects Stellar objects in the containing system.
+ * @returns A rocky satellite model with seeded physical and orbital properties.
+ */
 export function generateTelluricSatelliteModel(
     id: string,
     seed: number,

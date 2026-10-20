@@ -1,5 +1,10 @@
 import type { SimbadMetadata } from "./metadata";
 export type StarNature = "main-sequence" | "white-dwarf" | "neutron-star" | "black-hole";
+/**
+ * Classifies a star from its SIMBAD object and spectral types.
+ * @param metadata SIMBAD metadata for the star, when available.
+ * @returns The inferred stellar nature, defaulting to main sequence when unknown.
+ */
 export function classifyStar(metadata: SimbadMetadata | undefined): StarNature {
     if (metadata === undefined) {
         return "main-sequence";

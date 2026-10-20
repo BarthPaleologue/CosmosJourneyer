@@ -21,6 +21,10 @@ import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
 import type { CelestialBodyModel } from "./index";
 
+/**
+ * @param body Celestial body whose radius is requested.
+ * @returns The body's radius in the model's configured distance unit.
+ */
 export function getCelestialBodyRadius(body: DeepReadonly<CelestialBodyModel>): number {
     switch (body.type) {
         case "blackHole":

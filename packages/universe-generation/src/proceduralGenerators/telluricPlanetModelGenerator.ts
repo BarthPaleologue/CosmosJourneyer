@@ -45,6 +45,15 @@ import { generateSeededRingsModel } from "./ringsModelGenerator";
 import { getTelluricPlanetOrbitRadius } from "./telluricPlanetOrbitGenerator";
 import { getTemperatureRange } from "./temperatureRange";
 
+/**
+ * Generates a telluric planet model with seeded properties and parent-relative orbital data.
+ * @param id Identifier assigned to the generated planet.
+ * @param seed Seed used to make procedural choices reproducible.
+ * @param name Display name assigned to the planet.
+ * @param parentBodies Stellar objects that parent the planet's orbit.
+ * @param overrides Optional values that replace generated defaults.
+ * @returns The generated telluric planet model.
+ */
 export function generateTelluricPlanetModel(
     id: string,
     seed: number,

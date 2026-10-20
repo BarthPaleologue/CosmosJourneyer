@@ -17,14 +17,31 @@
 
 import { G } from "./constants";
 
+/**
+ * @param periapsis Distance from the primary at periapsis.
+ * @param apoapsis Distance from the primary at apoapsis.
+ * @returns The semi-major axis in the same distance unit as the apsides.
+ */
 export function getSemiMajorAxis(periapsis: number, apoapsis: number): number {
     return (periapsis + apoapsis) / 2;
 }
 
+/**
+ * @param periapsis Distance from the primary at periapsis.
+ * @param apoapsis Distance from the primary at apoapsis.
+ * @returns The orbit's eccentricity.
+ */
 export function getEccentricity(periapsis: number, apoapsis: number): number {
     return (apoapsis - periapsis) / (apoapsis + periapsis);
 }
 
+/**
+ * Evaluates the angular residual of Kepler's equation.
+ * @param trueAnomaly Orbital anomaly angle in radians.
+ * @param meanAnomaly Mean anomaly in radians.
+ * @param eccentricity Orbital eccentricity.
+ * @returns The equation residual, which is zero at a solution.
+ */
 export function keplerEquation(trueAnomaly: number, meanAnomaly: number, eccentricity: number): number {
     return meanAnomaly - trueAnomaly + eccentricity * Math.sin(trueAnomaly); // = 0
 }
@@ -34,16 +51,18 @@ export function keplerEquation(trueAnomaly: number, meanAnomaly: number, eccentr
  * @param x The x-coordinate of the point along the orbit.
  * @param y The y-coordinate of the point along the orbit.
  * @param p The p-norm shaping the orbit.
+ * @returns The radial scale factor that produces the requested p-norm orbit.
  */
 export function computeLpFactor(x: number, y: number, p: number): number {
     return 1 / (Math.abs(x) ** p + Math.abs(y) ** p) ** (1 / p);
 }
 
 /**
+ * Computes the orbital period from semi-major axis and primary mass.
  * @see https://fr.wikipedia.org/wiki/Lois_de_Kepler
- * @param semiMajorAxis
- * @param parentMass
- * @return The orbital period in seconds or 0 if the parent mass is 0
+ * @param semiMajorAxis Semi-major axis in meters.
+ * @param parentMass Mass of the orbit's primary body in kilograms.
+ * @returns The orbital period in seconds or 0 if the parent mass is 0
  */
 export function getOrbitalPeriod(semiMajorAxis: number, parentMass: number): number {
     if (parentMass === 0) {
@@ -54,6 +73,11 @@ export function getOrbitalPeriod(semiMajorAxis: number, parentMass: number): num
     return 2 * Math.PI * Math.sqrt(a ** 3 / (G * M));
 }
 
+/**
+ * @param period Orbital period in seconds.
+ * @param parentMass Mass of the orbit's primary body in kilograms.
+ * @returns Semi-major axis in meters, or zero when the primary has no mass.
+ */
 export function getSemiMajorAxisFromPeriod(period: number, parentMass: number): number {
     if (parentMass === 0) {
         return 0;

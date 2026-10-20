@@ -23,7 +23,7 @@ import type { IndexedRng } from "./indexedRng";
  * @param options An array of tuples, each tuple being an option of type T and its weight. (The weights don't have to add up to 1.0, they are normalized internally.)
  * @param randomValue A random value between 0.0 and 1.0 that you can provide with any random number generator of your choice.
  * @returns The chosen option.
- * @throws An error if the wheel of fortune failed. (This should never happen.)
+ * @throws {Error} If accumulated weights do not cover the supplied random value.
  */
 export function wheelOfFortune<T>(options: ReadonlyArray<readonly [T, number]>, randomValue: number): T {
     const total = options.reduce((acc, [, weight]) => acc + weight, 0);
@@ -44,6 +44,7 @@ export function wheelOfFortune<T>(options: ReadonlyArray<readonly [T, number]>, 
  * @param rng The noise based random number generator used
  * @param baseIndex The first index to use in the rng
  * @see https://stackoverflow.com/questions/53279807/how-to-get-random-number-list-with-fixed-sum-and-size
+ * @returns Random non-negative components normalized to sum to one.
  */
 export function randomPieChart(nbSlices: number, rng: IndexedRng, baseIndex: number): number[] {
     const results = [];

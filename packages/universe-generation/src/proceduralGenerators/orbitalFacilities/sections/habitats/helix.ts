@@ -18,6 +18,11 @@
 import { getRngFromSeed, randRangeInt } from "@cosmos-journeyer/random";
 import type { HelixHabitatModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param seed Seed for reproducible procedural choices.
+ * @param surface Surface geometry on which to place the habitat.
+ * @returns A helical habitat section fitted to the surface.
+ */
 export function generateHelixHabitatModel(
     seed: number,
     surface: Readonly<HelixHabitatModel["surface"]>,

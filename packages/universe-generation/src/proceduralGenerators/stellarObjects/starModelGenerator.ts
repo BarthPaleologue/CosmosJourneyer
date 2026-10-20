@@ -24,6 +24,13 @@ import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectModel, Orbit, StarModel, SpinModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param id Identifier assigned to the generated object.
+ * @param seed Seed for reproducible procedural choices.
+ * @param name Display name assigned to the generated object.
+ * @param parentBodies Orbital ancestors that define the object's parent path.
+ * @returns A star model with seeded physical and orbital properties.
+ */
 export function generateStarModel(
     id: string,
     seed: number,
@@ -81,6 +88,10 @@ export function generateStarModel(
     };
 }
 
+/**
+ * @param rng Indexed random source for reproducible selection.
+ * @returns A stellar spectral type sampled from the configured distribution.
+ */
 export function getRandomStellarType(rng: (step: number) => number): StellarType {
     return wheelOfFortune(
         [
@@ -96,6 +107,11 @@ export function getRandomStellarType(rng: (step: number) => number): StellarType
     );
 }
 
+/**
+ * @param stellarType Spectral class used to select the temperature range.
+ * @param rng Indexed random source for reproducible sampling.
+ * @returns A sampled temperature in kelvins.
+ */
 export function getRandomTemperatureFromStellarType(stellarType: StellarType, rng: (step: number) => number): number {
     switch (stellarType) {
         case "M":
@@ -117,6 +133,11 @@ export function getRandomTemperatureFromStellarType(stellarType: StellarType, rn
     }
 }
 
+/**
+ * @param stellarType Spectral class used to select the radius range.
+ * @param rng Indexed random source for reproducible sampling.
+ * @returns A sampled stellar radius in meters.
+ */
 export function getRandomRadiusFromStellarType(stellarType: StellarType, rng: (step: number) => number): number {
     switch (stellarType) {
         case "M":

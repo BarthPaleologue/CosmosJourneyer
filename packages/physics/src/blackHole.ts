@@ -37,6 +37,7 @@ export function getMassFromSchwarzschildRadius(radius: number): number {
 }
 
 /**
+ * Computes the radius of a black hole shadow from its Schwarzschild radius.
  * @param mass The mass of the black hole in kilograms
  * @returns The radius of the shadow of the black hole in meters
  * @see https://arxiv.org/pdf/2105.07101
@@ -49,6 +50,9 @@ export function getShadowRadius(mass: number): number {
  * As the angular momentum is conserved, the black hole retains the original star's angular momentum.
  * As the original star's radius is only known approximately, the black hole's angular momentum can only be estimated.
  * The angular momentum is important in the Kerr metric to compute frame dragging.
+ * @param mass Mass of the progenitor star in kilograms.
+ * @param rotationPeriod Progenitor star rotation period in seconds.
+ * @returns Estimated angular momentum in kilogram square meters per second.
  */
 export function estimateBlackHoleAngularMomentum(mass: number, rotationPeriod: number): number {
     if (rotationPeriod === 0) {
@@ -67,6 +71,8 @@ export function estimateBlackHoleAngularMomentum(mass: number, rotationPeriod: n
 
 /**
  * This corresponds to a=J/Mc in the Kerr metric. Physical values are between 0 and the mass of the black hole. Exceeding that range will create naked singularities. (J > M²)
+ * @param mass Black hole mass in kilograms.
+ * @param rotationPeriod Rotation period in seconds.
  * @returns J/Mc for this black hole
  * @see https://en.wikipedia.org/wiki/Kerr_metric#Overextreme_Kerr_solutions
  */
@@ -74,11 +80,23 @@ export function getKerrMetricA(mass: number, rotationPeriod: number): number {
     return estimateBlackHoleAngularMomentum(mass, rotationPeriod) / (mass * C);
 }
 
+/**
+ * Computes the dimensionless Kerr spin parameter from the black hole mass and rotation period.
+ * @param mass Black hole mass in kilograms.
+ * @param rotationPeriod Rotation period in seconds.
+ * @returns The dimensionless Kerr spin parameter.
+ */
 export function getDimensionlessSpin(mass: number, rotationPeriod: number): number {
     const a = getKerrMetricA(mass, rotationPeriod);
     return (a * C ** 2) / (G * mass);
 }
 
+/**
+ * Checks whether the black hole spin exceeds the Kerr limit.
+ * @param mass Black hole mass in kilograms.
+ * @param rotationPeriod Rotation period in seconds.
+ * @returns Whether the spin exceeds the Kerr black hole limit.
+ */
 export function hasNakedSingularity(mass: number, rotationPeriod: number): boolean {
     return Math.abs(getDimensionlessSpin(mass, rotationPeriod)) > 1;
 }
@@ -88,7 +106,8 @@ export function hasNakedSingularity(mass: number, rotationPeriod: number): boole
  * @param mass The mass of the black hole in kilograms
  * @param rotationPeriod The rotation period of the black hole in seconds
  * @param theta The angle in radians to the black hole's rotation axis. (equator => theta = pi / 2)
- * @throws This function throws an error when the black hole is a naked singularity
+ * @throws {Error} When the angular momentum exceeds the Kerr black hole limit.
+ * @returns The ergosphere radius in meters at the specified polar angle.
  */
 export function getErgosphereRadius(mass: number, rotationPeriod: number, theta: number): number {
     const m = (G * mass) / C ** 2;

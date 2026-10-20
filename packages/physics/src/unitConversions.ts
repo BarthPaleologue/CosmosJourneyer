@@ -24,26 +24,41 @@ export type Duration = Partial<{
     seconds: number;
 }>;
 
+/**
+ * @param meters Distance in meters.
+ * @returns Distance in light years.
+ */
 export function metersToLightYears(meters: number): number {
     return meters / LightYearInMeters;
 }
 
+/**
+ * @param lightYears Distance in light years.
+ * @returns Distance in meters.
+ */
 export function lightYearsToMeters(lightYears: number): number {
     return lightYears * LightYearInMeters;
 }
 
+/**
+ * @param meters Distance in meters.
+ * @returns Distance in light seconds.
+ */
 export function metersToLightSeconds(meters: number): number {
     return meters / C;
 }
 
+/**
+ * @param meters Distance in meters.
+ * @returns Distance in light minutes.
+ */
 export function metersToLightMinutes(meters: number): number {
     return meters / (C * 60);
 }
 
 /**
- * Converts a duration to seconds.
- * @param duration The duration expressed in days, hours, minutes, and/or seconds.
- * @returns The duration in seconds.
+ * @param duration Duration expressed in days, hours, minutes, and/or seconds.
+ * @returns Duration in seconds.
  */
 export function durationToSeconds(duration: Readonly<Duration>): number {
     const days = duration.days ?? 0;
@@ -55,42 +70,40 @@ export function durationToSeconds(duration: Readonly<Duration>): number {
 }
 
 /**
- * Converts a temperature in Celsius to Kelvin
- * @param celsius The temperature in Celsius
- * @returns The temperature in Kelvin
+ * @param celsius Temperature in degrees Celsius.
+ * @returns Temperature in kelvins.
  */
 export function celsiusToKelvin(celsius: number): number {
     return celsius + 273.15;
 }
 
 /**
- * Converts a temperature in Kelvin to Celsius
- * @param kelvin The temperature in Kelvin
- * @returns The temperature in Celsius
+ * @param kelvin Temperature in kelvins.
+ * @returns Temperature in degrees Celsius.
  */
 export function kelvinToCelsius(kelvin: number): number {
     return kelvin - 273.15;
 }
 
 /**
- * @param distanceAU The distance in astronomical units (AU)
- * @returns The distance in meters
+ * @param distanceAU Distance in astronomical units (AU).
+ * @returns Distance in meters.
  */
 export function astronomicalUnitToMeters(distanceAU: number): number {
     return distanceAU * AU;
 }
 
 /**
- * @param solarMasses The mass in solar masses.
- * @returns The mass in kilograms.
+ * @param solarMasses Mass in solar masses.
+ * @returns Mass in kilograms.
  */
 export function solarMassToKg(solarMasses: number): number {
     return solarMasses * SolarMass;
 }
 
 /**
- * @param bar The pressure in bar
- * @returns The pressure in pascals (Pa)
+ * @param bar Pressure in bar.
+ * @returns Pressure in pascals (Pa).
  * @see https://en.wikipedia.org/wiki/Bar_(unit) for the conversion factor
  */
 export function barToPascal(bar: number): number {

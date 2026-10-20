@@ -13,6 +13,13 @@ export type StarRecord = Readonly<{
     sourceId: GaiaSourceId | null;
     nature: StarNature | null;
 }>;
+/**
+ * Converts right ascension and declination into Cartesian light-year coordinates.
+ * @param raDegrees Right ascension in degrees.
+ * @param decDegrees Declination in degrees.
+ * @param distanceLy Distance from the origin in light years.
+ * @returns The x, y, and z coordinates in light years.
+ */
 export function toCartesian(
     raDegrees: number,
     decDegrees: number,
@@ -23,6 +30,14 @@ export function toCartesian(
     const cosDec = Math.cos(dec);
     return [distanceLy * cosDec * Math.cos(ra), distanceLy * cosDec * Math.sin(ra), distanceLy * Math.sin(dec)];
 }
+/**
+ * Converts a Gaia row into a positioned star when its parallax is positive.
+ * @param row Validated Gaia source row.
+ * @param names Optional SIMBAD names keyed by Gaia source identifier.
+ * @param temperatures Optional fallback temperatures keyed by Gaia source identifier.
+ * @param natures Optional stellar classifications keyed by Gaia source identifier.
+ * @returns The star record, or undefined when distance cannot be derived.
+ */
 export function rowToStar(
     row: DeepReadonly<GaiaRow>,
     names: DeepReadonly<Map<GaiaSourceId, string>> = new Map(),
@@ -44,6 +59,14 @@ export function rowToStar(
         nature: natures.get(row.source_id) ?? null,
     };
 }
+/**
+ * Converts Gaia rows to star records, omitting rows without a usable parallax.
+ * @param rows Validated Gaia source rows.
+ * @param names Optional SIMBAD names keyed by Gaia source identifier.
+ * @param temperatures Optional fallback temperatures keyed by Gaia source identifier.
+ * @param natures Optional stellar classifications keyed by Gaia source identifier.
+ * @returns The available star records.
+ */
 export function rowsToStars(
     rows: DeepReadonly<Array<GaiaRow>>,
     names?: DeepReadonly<Map<GaiaSourceId, string>>,

@@ -22,9 +22,9 @@ import type { IndexedRng } from "./indexedRng";
 const defaultRand = (): number => Math.random();
 
 /**
- * Returns a random value between -1 and 1
- * @param rand the rng (should return numbers between 0 and 1) defaults to Math.random
- * @param step the step to use for the rng
+ * @param rand Indexed source returning values in [0, 1); defaults to `Math.random`.
+ * @param step Index passed to the source.
+ * @returns A value in [-1, 1).
  */
 export function centeredRand(rand: IndexedRng = defaultRand, step = 0): number {
     return (rand(step) - 0.5) * 2;
@@ -34,8 +34,9 @@ export function centeredRand(rand: IndexedRng = defaultRand, step = 0): number {
  * Returns a random integer between min and max (both included for a source in [0, 1))
  * @param min the minimum value
  * @param max the maximum value
- * @param rand the rng (should return numbers between 0 and 1) defaults to Math.random
- * @param step the step to use for the rng
+ * @param rand Indexed source returning values in [0, 1); defaults to `Math.random`.
+ * @param step Index passed to the source.
+ * @returns A random integer between min and max, inclusive.
  */
 export function randRangeInt(min: number, max: number, rand: IndexedRng = defaultRand, step = 0): number {
     return Math.floor(rand(step) * (max - min + 1)) + min;
@@ -45,19 +46,20 @@ export function randRangeInt(min: number, max: number, rand: IndexedRng = defaul
  * Returns a random number between min and max (excluded)
  * @param min the minimum value
  * @param max the maximum value
- * @param rand the rng (should return numbers between 0 and 1) defaults to Math.random
- * @param step the step to use for the rng
+ * @param rand Indexed source returning values in [0, 1); defaults to `Math.random`.
+ * @param step Index passed to the source.
+ * @returns A random value in the interval [min, max).
  */
 export function randRange(min = 0, max = 1, rand: IndexedRng = defaultRand, step = 0): number {
     return rand(step) * (max - min) + min;
 }
 
 /**
- * Returns a random number using the normal distribution of the given mean and std using the Box-Mueller transform
- * @param mean The mean value of the distribution
- * @param std The standard deviation to the mean value
- * @param rand the rng (should return numbers between 0 and 1) defaults to Math.random
- * @param step the step to use for the rng (will also use step + 1 !!!)
+ * @param mean Distribution mean.
+ * @param std Distribution standard deviation.
+ * @param rand Indexed source; `rand(step)` must be greater than zero. Defaults to `Math.random`.
+ * @param step First index used; the next index is also sampled.
+ * @returns A normally distributed random value with the requested mean and standard deviation.
  * @see https://www.baeldung.com/cs/uniform-to-normal-distribution
  */
 export function normalRandom(mean: number, std: number, rand: IndexedRng = defaultRand, step = 0): number {
@@ -65,16 +67,20 @@ export function normalRandom(mean: number, std: number, rand: IndexedRng = defau
 }
 
 /**
- * Returns whereas a random number from the uniform distribution between 0 and 1 is lesser than p
- * @param p The probability of the function returning true
- * @param rand the rng (should return numbers between 0 and 1) defaults to Math.random
- * @param step the step to use for the rng
+ * @param p Probability threshold.
+ * @param rand Indexed source returning values in [0, 1); defaults to `Math.random`.
+ * @param step Index passed to the source.
+ * @returns Whether the indexed random value is less than p.
  */
 export function uniformRandBool(p: number, rand: IndexedRng = defaultRand, step = 0): boolean {
     return rand(step) < p;
 }
 
-/** Converts a uniformly drawn value using the existing inverse exponential transform. */
+/**
+ * @param uniformValue Uniformly distributed sample in the interval (0, 1].
+ * @param lambda Exponential rate parameter, in inverse sample units.
+ * @returns Exponential sample in the reciprocal units of lambda.
+ */
 export function uniformToExponential(uniformValue: number, lambda: number): number {
     return -Math.log(uniformValue) / lambda;
 }

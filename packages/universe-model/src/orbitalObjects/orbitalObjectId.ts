@@ -26,6 +26,13 @@ export const OrbitalObjectIdSchema = z.string();
  */
 export type OrbitalObjectId = z.infer<typeof OrbitalObjectIdSchema>;
 
+/**
+ * Creates a stable identifier from the parent path, object type, and sibling index.
+ * @param parentIds Identifier path of the object's parent bodies.
+ * @param type Type of orbital object being identified.
+ * @param index Zero-based index among siblings of the same type.
+ * @returns The serialized orbital object identifier.
+ */
 export function createOrbitalObjectId(
     parentIds: ReadonlyArray<OrbitalObjectId>,
     type: OrbitalObjectType,
@@ -34,6 +41,11 @@ export function createOrbitalObjectId(
     return `[${parentIds.join("|")}]->${type}${index}`;
 }
 
+/**
+ * @param a First identifier to compare.
+ * @param b Second identifier to compare.
+ * @returns Whether the identifiers match.
+ */
 export function orbitalObjectIdEquals(a: OrbitalObjectId, b: OrbitalObjectId): boolean {
     return a === b;
 }

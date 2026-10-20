@@ -17,6 +17,10 @@
 
 import type { FusionSectionModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param netPowerOutput Net electrical power available to the fusion section, in watts.
+ * @returns A fusion section model sized for the available power.
+ */
 export function generateFusionSectionModel(netPowerOutput: number): FusionSectionModel {
     return {
         type: "fusion",

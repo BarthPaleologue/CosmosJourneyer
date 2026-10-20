@@ -20,6 +20,10 @@ import { expect, it } from "vitest";
 import { makeNoise3D, getRngFromSeed } from "./index";
 
 // fast-simplex-noise consumes a sequential source while building its permutation table.
+/**
+ * Creates a deterministic sequential source for the simplex noise fixture.
+ * @returns A random source that advances one seeded index per call.
+ */
 function sequentialSource(): () => number {
     const rng = getRngFromSeed(42);
     let index = 0;

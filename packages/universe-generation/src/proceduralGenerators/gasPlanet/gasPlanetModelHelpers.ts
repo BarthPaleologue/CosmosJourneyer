@@ -67,6 +67,10 @@ export function getGasPlanetOrbitRadius(
     return sqrtA * sqrtA;
 }
 
+/**
+ * @param rng Indexed random source used for reproducible sampling.
+ * @returns A sampled gas planet mass in the model's mass units.
+ */
 export function sampleGasPlanetMass(rng: (step: number) => number): number {
     const minMass = 0.08 * JupiterMass;
     const maxMass = 8.0 * JupiterMass;

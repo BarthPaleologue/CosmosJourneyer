@@ -17,6 +17,11 @@
 
 export type StellarType = "O" | "B" | "A" | "F" | "G" | "K" | "M";
 
+/**
+ * Classifies a star by its effective temperature using spectral classes O through M.
+ * @param temperature Effective stellar temperature in kelvins.
+ * @returns The corresponding coarse stellar spectral class.
+ */
 export function getStellarTypeFromTemperature(temperature: number): StellarType {
     if (temperature < 3500) {
         return "M";
