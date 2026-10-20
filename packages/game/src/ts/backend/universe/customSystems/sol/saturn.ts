@@ -18,6 +18,10 @@
 import { degreesToRadians, durationToSeconds, EarthSeaLevelPressure } from "@cosmos-journeyer/physics";
 import type { GasPlanetModel, OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @param parentIds - IDs of the containing system and orbital parent used to construct its model ID.
+ * @returns Saturn model with its configured physical properties and orbit.
+ */
 export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPlanetModel {
     return {
         id: "saturn",

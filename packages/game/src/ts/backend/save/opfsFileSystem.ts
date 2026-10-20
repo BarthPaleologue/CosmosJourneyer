@@ -35,8 +35,7 @@ export class OPFSFileSystem implements IFileSystem {
 
     /**
      * Creates a new OPFSFileSystem instance.
-     * @param rootHandle - The root directory handle for OPFS
-     * @private
+     * @param rootHandle - OPFS directory handle used as the root for all save paths.
      */
     private constructor(rootHandle: FileSystemDirectoryHandle) {
         this.rootHandle = rootHandle;
@@ -44,7 +43,7 @@ export class OPFSFileSystem implements IFileSystem {
 
     /**
      * Factory method to create an OPFSFileSystem instance.
-     * @returns The created OPFSFileSystem instance
+     * @returns The created OPFSFileSystem instance.
      */
     public static async CreateAsync(): Promise<Result<OPFSFileSystem, unknown>> {
         if (!OPFSFileSystem.IsSupported()) {
@@ -64,7 +63,7 @@ export class OPFSFileSystem implements IFileSystem {
      * Gets or creates a directory handle for the given path.
      * @param path - The directory path
      * @param create - Whether to create the directory if it doesn't exist
-     * @returns The directory handle or null if it doesn't exist and create is false
+     * @returns The directory handle or null if it doesn't exist and create is false.
      */
     private async getDirectoryHandle(path: string, create = false): Promise<FileSystemDirectoryHandle | null> {
         try {
@@ -88,7 +87,7 @@ export class OPFSFileSystem implements IFileSystem {
      * Gets a file handle for the given path.
      * @param path - The file path
      * @param create - Whether to create the file if it doesn't exist
-     * @returns The file handle or null if it doesn't exist and create is false
+     * @returns The file handle or null if it doesn't exist and create is false.
      */
     private async getFileHandle(path: string, create = false): Promise<FileSystemFileHandle | null> {
         try {
@@ -228,7 +227,7 @@ export class OPFSFileSystem implements IFileSystem {
 
     /**
      * Checks if OPFS is supported in the current browser.
-     * @returns Boolean indicating OPFS support
+     * @returns Boolean indicating OPFS support.
      */
     public static IsSupported(): boolean {
         return "storage" in navigator && "getDirectory" in navigator.storage;

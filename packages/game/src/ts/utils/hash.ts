@@ -15,6 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * @param x - The X coordinate.
+ * @param y - The Y coordinate.
+ * @param z - The Z coordinate.
+ * @returns Coordinate hash reduced modulo one billion; negative values are possible.
+ */
 export function hashVec3(x: number, y: number, z: number): number {
     const hash = (x * 73856093) ^ (y * 19349663) ^ (z * 83492791);
 
@@ -22,6 +28,10 @@ export function hashVec3(x: number, y: number, z: number): number {
     return hash % n;
 }
 
+/**
+ * @param arr - Ordered numeric values to mix into the hash.
+ * @returns A deterministic value in the inclusive range from zero to one.
+ */
 export function hashArray(arr: ReadonlyArray<number>): number {
     // FNV-1a 32-bit parameters
     let hash = 0x811c9dc5; // FNV offset basis

@@ -20,6 +20,13 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { abs, add, f, mod, mul, normalize, remap, splitVec, sub, vec, vec3 } from "babylonjs-shading-language";
 import type { TargetOptions } from "babylonjs-shading-language";
 
+/**
+ * Builds a repeating triangular waveform from a shader value.
+ * @param input - Scalar or vector shader input to fold into the wave period.
+ * @param phase - Per-axis offset added before folding the input.
+ * @param period - Positive period of the repeating wave.
+ * @returns Shader connection point containing the folded absolute-value waveform.
+ */
 export function triangleWave3d(
     input: NodeMaterialConnectionPoint,
     phase: Vector3,
@@ -28,6 +35,12 @@ export function triangleWave3d(
     return abs(sub(mod(add(input, vec(phase)), f(period)), f(period * 0.5)));
 }
 
+/**
+ * Remaps an encoded tangent-space normal sample from [0, 1] to [-1, 1].
+ * @param normalMapSample - RGB normal sample encoded in the [0, 1] range.
+ * @param options - Optional Y inversion and tangent-plane strength settings.
+ * @returns Decoded tangent-space normal shader value, with optional strength adjustment.
+ */
 export function unpackNormal(
     normalMapSample: NodeMaterialConnectionPoint,
     options?: Partial<{ normalStrength: NodeMaterialConnectionPoint; invertY: boolean }>,
@@ -50,6 +63,12 @@ type ConnectionPointList = readonly [
     ...NodeMaterialConnectionPoint[],
 ];
 
+/**
+ * Adds two or more shader values from left to right.
+ * @param inputs - At least two shader connection points to sum.
+ * @param options - Babylon shading-language options forwarded to each addition.
+ * @returns Shader connection point containing the sum; undefined later entries are skipped.
+ */
 export function addN(inputs: ConnectionPointList, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     let result = add(inputs[0], inputs[1], options);
 
@@ -65,6 +84,12 @@ export function addN(inputs: ConnectionPointList, options?: Partial<TargetOption
     return result;
 }
 
+/**
+ * Multiplies two or more shader values from left to right.
+ * @param inputs - At least two shader connection points to multiply.
+ * @param options - Babylon shading-language options forwarded to each multiplication.
+ * @returns Shader connection point containing the product; undefined later entries are skipped.
+ */
 export function mulN(inputs: ConnectionPointList, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     let result = mul(inputs[0], inputs[1], options);
 
@@ -80,6 +105,12 @@ export function mulN(inputs: ConnectionPointList, options?: Partial<TargetOption
     return result;
 }
 
+/**
+ * Scales tangent-space normal XY while retaining Z, then renormalizes the vector.
+ * @param tangentNormal - Decoded tangent-space normal shader value.
+ * @param normalStrength - Shader scalar applied to the normal's XY components.
+ * @returns Renormalized tangent-space normal shader value.
+ */
 export function scaleTangentNormal(
     tangentNormal: NodeMaterialConnectionPoint,
     normalStrength: NodeMaterialConnectionPoint,

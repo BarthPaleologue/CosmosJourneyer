@@ -26,6 +26,10 @@ export const LandMissionState = {
 
 export type LandMissionState = (typeof LandMissionState)[keyof typeof LandMissionState];
 
+/**
+ * @param state - Legacy numeric value or already-string landing mission state.
+ * @returns Mapped state for values 0–2; other values pass through for schema validation.
+ */
 function preprocessLegacyLandMissionState(state: unknown): unknown {
     if (typeof state !== "number") {
         return state;

@@ -28,10 +28,14 @@ import { UniverseCoordinatesSchema } from "./universeCoordinates";
 export const SaveSchema = z.object({
     uuid: z.string().default(() => crypto.randomUUID()),
 
-    /** The timestamp when the save file was created. */
+    /**
+     * The timestamp when the save file was created.
+     */
     timestamp: z.number().default(() => Date.now()),
 
-    /** The player data. */
+    /**
+     * The player data.
+     */
     player: SerializedPlayerSchema,
 
     playerLocation: UniverseCoordinatesSchema,
@@ -46,6 +50,11 @@ export const SaveSchema = z.object({
  */
 export type Save = z.infer<typeof SaveSchema>;
 
+/**
+ * Validates an untrusted save object against the current save schema.
+ * @param json - Parsed JSON object read from a save source.
+ * @returns Validated save data, or an `INVALID_SAVE` error containing schema issues.
+ */
 export function safeParseSave(json: Record<string, unknown>): Result<Save, SaveLoadingError> {
     const result = SaveSchema.safeParse(json);
     if (result.success) {
@@ -55,6 +64,12 @@ export function safeParseSave(json: Record<string, unknown>): Result<Save, SaveL
     return err({ type: "INVALID_SAVE", content: result.error });
 }
 
+/**
+ * Encodes a save into the current page URL for sharing or restoring a session.
+ * The thumbnail is omitted to keep the URL payload smaller.
+ * @param save - Save state to serialize, excluding any mutation by this function.
+ * @returns URL with a base64 `save` query parameter, or `null` if encoding fails.
+ */
 export function createUrlFromSave(save: DeepReadonly<Save>): URL | null {
     const urlRoot = window.location.href.split("?")[0];
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -67,6 +82,11 @@ export function createUrlFromSave(save: DeepReadonly<Save>): URL | null {
     return new URL(`${urlRoot}?save=${saveString}`);
 }
 
+/**
+ * Separates imported save records into schema-valid saves and records with load errors.
+ * @param rawSaves - Parsed values from the imported save collection.
+ * @returns Valid saves and invalid original values paired with their validation errors.
+ */
 export function parseSaveArray(rawSaves: Record<string, unknown>[]): {
     validSaves: Save[];
     invalidSaves: { save: unknown; error: SaveLoadingError }[];
@@ -87,18 +107,26 @@ export function parseSaveArray(rawSaves: Record<string, unknown>[]): {
 }
 
 export const CmdrSavesShallowSchema = z.object({
-    /** The manual saves of the cmdr. */
+    /**
+     * The manual saves of the cmdr.
+     */
     manual: z.array(z.record(z.string(), z.unknown())),
 
-    /** The auto saves of the cmdr. */
+    /**
+     * The auto saves of the cmdr.
+     */
     auto: z.array(z.record(z.string(), z.unknown())),
 });
 
 export const CmdrSavesDeepSchema = CmdrSavesShallowSchema.extend({
-    /** The manual saves of the cmdr. */
+    /**
+     * The manual saves of the cmdr.
+     */
     manual: z.array(SaveSchema),
 
-    /** The auto saves of the cmdr. */
+    /**
+     * The auto saves of the cmdr.
+     */
     auto: z.array(SaveSchema),
 });
 

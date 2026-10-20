@@ -35,6 +35,12 @@ export type SaveLoadingError =
           content: z.ZodError;
       };
 
+/**
+ * Converts a save-loading failure into its localized notification message.
+ * @param error - Discriminated save-loading error and any attached validation details.
+ * @param t - The translation function used to localize player-facing text.
+ * @returns Localized user-facing explanation of why the save could not be loaded.
+ */
 export function saveLoadingErrorToI18nString(error: SaveLoadingError, t: TFunction): string {
     switch (error.type) {
         case "INVALID_JSON":

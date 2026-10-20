@@ -41,6 +41,13 @@ export interface CommanderArchive {
     readonly saves: CmdrSaves;
 }
 
+/**
+ * Packages a commander's save collections and manifest into a compressed archive.
+ * @param cmdrUuid - Stable UUID identifying the commander in the archive manifest.
+ * @param cmdrName - Display name recorded in the archive manifest.
+ * @param saves - Manual and automatic saves to include in the archive.
+ * @returns Compressed archive bytes suitable for writing to a file.
+ */
 export function createCommanderArchive(cmdrUuid: string, cmdrName: string, saves: DeepReadonly<CmdrSaves>): Uint8Array {
     const archiveEntries: Record<string, Uint8Array> = {
         [MANIFEST_FILE_NAME]: strToU8(
@@ -62,6 +69,12 @@ export function createCommanderArchive(cmdrUuid: string, cmdrName: string, saves
     return zipSync(archiveEntries, { level: 6 });
 }
 
+/**
+ * Builds a filesystem-safe filename for a commander's exported archive.
+ * @param cmdrUuid - Stable commander identifier used to avoid filename collisions.
+ * @param cmdrName - Human-readable commander name, sanitized for use in a filename.
+ * @returns Archive filename with the commander identity and supported archive extension.
+ */
 export function createCommanderArchiveFileName(cmdrUuid: string, cmdrName: string): string {
     const safeCmdrName = cmdrName
         .trim()
@@ -70,6 +83,11 @@ export function createCommanderArchiveFileName(cmdrUuid: string, cmdrName: strin
     return `CosmosJourneyer_${safeCmdrName || "Commander"}_${cmdrUuid}.zip`;
 }
 
+/**
+ * Decompresses a commander archive, validates its manifest, and validates contained saves.
+ * @param archiveData - Raw ZIP bytes produced by a commander archive export.
+ * @returns Commander identity and saves, or a specific error for malformed ZIP, manifest, or save data.
+ */
 export function parseCommanderArchive(archiveData: Uint8Array): Result<CommanderArchive, CommanderArchiveError> {
     let entries: Record<string, Uint8Array>;
     try {

@@ -19,6 +19,10 @@ import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import type { SerializedComponent } from "./component";
 
+/**
+ * @param serializedComponent - Component type, size, and quality to price.
+ * @returns Component value in the game's currency units.
+ */
 export function getComponentValue(serializedComponent: SerializedComponent): number {
     switch (serializedComponent.type) {
         case "warpDrive":

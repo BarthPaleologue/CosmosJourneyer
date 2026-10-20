@@ -148,6 +148,11 @@ export class CrashReporter {
     }
 }
 
+/**
+ * Converts arbitrary thrown or rejected values into the crash-report error shape.
+ * @param value - Value supplied as an error, rejection reason, or startup failure.
+ * @returns Serialized message and any available Error name, stack, and cause.
+ */
 function serializeUnknownError(value: unknown): SerializedError {
     if (value instanceof Error) {
         return {
@@ -165,6 +170,11 @@ function serializeUnknownError(value: unknown): SerializedError {
     return { message: stringifyUnknown(value) };
 }
 
+/**
+ * Serializes an error cause while preserving nested Error details when available.
+ * @param value - The value stored in an Error's `cause` property.
+ * @returns Nested serialized error for Error causes, otherwise a string representation.
+ */
 function serializeCause(value: unknown): SerializedError | string {
     if (value instanceof Error) {
         return serializeUnknownError(value);
@@ -173,6 +183,11 @@ function serializeCause(value: unknown): SerializedError | string {
     return stringifyUnknown(value);
 }
 
+/**
+ * Converts an arbitrary value to text, falling back when JSON serialization fails.
+ * @param value - Value to represent in a crash report.
+ * @returns JSON text when serializable, or `String(value)` for cyclic and unsupported values.
+ */
 function stringifyUnknown(value: unknown): string {
     try {
         return JSON.stringify(value);

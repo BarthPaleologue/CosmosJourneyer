@@ -30,6 +30,10 @@ export const MissionType = {
 } as const;
 
 export type MissionType = (typeof MissionType)[keyof typeof MissionType];
+/**
+ * @param type - Legacy numeric identifier or current mission type string.
+ * @returns Mapped type for identifiers 0–2; unknown values pass through for schema validation.
+ */
 function preprocessLegacyMissionType(type: unknown): unknown {
     if (typeof type !== "number") {
         return type;

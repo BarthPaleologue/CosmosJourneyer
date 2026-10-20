@@ -30,6 +30,9 @@ import {
 } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @returns Alpha Testis system definition with its fixed coordinates and orbital objects.
+ */
 export function getAlphaTestisSystemModel(): StarSystemModel {
     const systemName = "Alpha Testis";
     const systemCoordinates: StarSystemCoordinates = {

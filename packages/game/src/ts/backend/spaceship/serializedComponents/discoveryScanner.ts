@@ -25,6 +25,10 @@ export const SerializedDiscoveryScannerSchema = z.object({
 
 export type SerializedDiscoveryScanner = z.infer<typeof SerializedDiscoveryScannerSchema>;
 
+/**
+ * @param serializedDiscoveryScanner - Serialized scanner size and quality values.
+ * @returns Range relative to the scanner's baseline range.
+ */
 export function getDiscoveryScannerSpec(serializedDiscoveryScanner: SerializedDiscoveryScanner): {
     relativeRange: number;
 } {

@@ -15,6 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Encodes Unicode text as Base64.
+ * @param str - Unicode text to encode.
+ * @returns Base64 text, or `null` if encoding fails.
+ */
 export function encodeBase64(str: string): string | null {
     try {
         return window.btoa(encodeURIComponent(str));
@@ -23,6 +28,11 @@ export function encodeBase64(str: string): string | null {
     }
 }
 
+/**
+ * Decodes Base64-encoded UTF-8 text.
+ * @param str - Base64-encoded text.
+ * @returns Decoded text; malformed Base64 or UTF-8 data throws.
+ */
 export function decodeBase64(str: string): string {
     const base64Decoded = window.atob(str);
     return decodeURIComponent(base64Decoded);

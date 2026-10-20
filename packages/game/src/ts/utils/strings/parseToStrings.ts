@@ -24,6 +24,11 @@ import {
 } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
+/**
+ * Formats a speed in metres per second using a scale suited to its magnitude.
+ * @param speed - Speed in metres per second.
+ * @returns Rounded speed with units of m/s, km/s, Mm/s, or a fraction of light speed.
+ */
 export function parseSpeed(speed: number): string {
     if (speed < 1_000) {
         return `${speed.toFixed(0)} m/s`;
@@ -37,8 +42,10 @@ export function parseSpeed(speed: number): string {
 }
 
 /**
- * @param distance Distance in meters.
- * @returns A string representing the distance in a human-readable format.
+ * Formats a distance using the most readable supported astronomical unit.
+ * @param distance - Distance in metres.
+ * @param t - The translation function used to localize player-facing text.
+ * @returns Localized distance with units from metres through light-years.
  */
 export function parseDistance(distance: number, t: TFunction): string {
     if (distance < 1_000) {
@@ -58,6 +65,12 @@ export function parseDistance(distance: number, t: TFunction): string {
     }
 }
 
+/**
+ * Formats a duration as one rounded, localized unit.
+ * @param seconds - Duration in seconds.
+ * @param t - The translation function used to localize player-facing text.
+ * @returns Rounded seconds, minutes, hours, days, or years; durations of ten years or more display as infinity.
+ */
 export function parseSecondsRough(seconds: number, t: TFunction): string {
     if (seconds < 60) {
         return t("units:shortSeconds", { count: Number(seconds.toFixed(0)) });
@@ -76,6 +89,12 @@ export function parseSecondsRough(seconds: number, t: TFunction): string {
     }
 }
 
+/**
+ * Formats a duration as a sequence of non-zero calendar-sized units.
+ * @param seconds - Non-negative duration in seconds.
+ * @param t - The translation function used to localize player-facing text.
+ * @returns Localized years, days, hours, minutes, and seconds, omitting zero-valued units.
+ */
 export function parseSecondsPrecise(seconds: number, t: TFunction): string {
     let secondsLeft = seconds;
     const nbYears = Math.floor(secondsLeft / (60 * 60 * 24 * 365.25));
@@ -109,9 +128,7 @@ export function parseSecondsPrecise(seconds: number, t: TFunction): string {
 }
 
 /**
- * Parse a number between 0 and 1 to a percentage string.
- * Example: 0.5 -> "50%"
- * @param percentage01 A number between 0 and 1 representing a percentage.
+ * @param percentage01 - A number between 0 and 1 representing a percentage.
  * @returns A string representing the percentage.
  */
 export function parsePercentageFrom01(percentage01: number): string {

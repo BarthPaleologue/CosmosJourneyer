@@ -63,6 +63,10 @@ export const SerializedSpaceshipSchema = z.discriminatedUnion("type", [WandererS
 
 export type SerializedSpaceship = z.infer<typeof SerializedSpaceshipSchema>;
 
+/**
+ * Creates the initial Wanderer ship with baseline propulsion, fuel, and optional equipment.
+ * @returns Validated serialized ship with a newly generated UUID and full fuel tank.
+ */
 export function getDefaultSerializedSpaceship(): SerializedSpaceship {
     return WandererSchema.parse({
         type: "WANDERER",

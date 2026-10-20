@@ -19,6 +19,9 @@ import { SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
 import { generateSpaceStationModel } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
+/**
+ * @returns Lone Star system model at its fixed coordinates.
+ */
 export function getLoneStarSystem(): StarSystemModel {
     const systemModel: StarSystemModel = {
         name: "Lone Star",

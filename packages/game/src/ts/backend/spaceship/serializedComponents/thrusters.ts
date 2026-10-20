@@ -25,6 +25,10 @@ export const SerializedThrustersSchema = z.object({
 
 export type SerializedThrusters = z.infer<typeof SerializedThrustersSchema>;
 
+/**
+ * @param serializedThrusters - Serialized thruster size and quality values.
+ * @returns Maximum speed in metres per second.
+ */
 export function getThrustersSpec(serializedThrusters: SerializedThrusters): { maxSpeed: number } {
     return {
         maxSpeed: 1e3 * (1.0 + serializedThrusters.size / 7.0 + serializedThrusters.quality / 20.0),

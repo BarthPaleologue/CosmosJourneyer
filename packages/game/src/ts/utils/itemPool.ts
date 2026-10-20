@@ -24,12 +24,15 @@ export class ItemPool<TItem> {
         this.makeItem = makeItem;
     }
 
-    /** Grab one from the pool, or make a fresh one with `new ctor(...args)` */
+    /** @returns A released item, or a newly created item when the pool is empty. */
     get(): TItem {
         return this.pool.pop() ?? this.makeItem();
     }
 
-    /** Return an instance to the pool */
+    /**
+     * Returns an item to the pool for reuse.
+     * @param item Item to retain until the next call to `get`.
+     */
     release(item: TItem): void {
         this.pool.push(item);
     }

@@ -32,6 +32,10 @@ export type CropType = (typeof CropType)[keyof typeof CropType];
 
 export const CropTypes = Object.values(CropType);
 
+/**
+ * @param cropType - Crop species whose English display name is requested.
+ * @returns Capitalized crop name.
+ */
 export function cropTypeToString(cropType: CropType): string {
     switch (cropType) {
         case CropType.POTATO:
@@ -57,7 +61,8 @@ export function cropTypeToString(cropType: CropType): string {
 
 /**
  * Edible energy in kcal/m²/day for different plant species
- * @see https://www.fao.org/4/t0207e/T0207E04.htm#4.%20Nutritive%20value
+ * @param cropType - Crop species whose edible yield is being estimated.
+ * @returns Edible energy yield in kilocalories per square metre per day.
  */
 export function getEdibleEnergyPerAreaPerDay(cropType: CropType): number {
     switch (cropType) {
