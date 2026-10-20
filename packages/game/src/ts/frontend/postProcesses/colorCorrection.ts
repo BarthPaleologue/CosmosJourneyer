@@ -27,17 +27,15 @@ const shaderName = "colorCorrection";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = colorCorrectionFragment;
 
 export class ColorCorrection extends PostProcess {
-    brightness = 0;
     contrast = 1;
     exposure = 1;
-    gamma = 1;
     saturation = 1;
 
     constructor(name: string, scene: Scene) {
         super(
             name,
             shaderName,
-            ["brightness", "contrast", "exposure", "gamma", "saturation"],
+            ["contrast", "exposure", "saturation"],
             ["textureSampler"],
             1,
             null,
@@ -48,14 +46,16 @@ export class ColorCorrection extends PostProcess {
             Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
+        // Preserve linear HDR until ColorCorrection applies exposure and ACES.
+        scene.imageProcessingConfiguration.applyByPostProcess = true;
+        scene.imageProcessingConfiguration.skipFinalColorClamp = true;
+
         // This is necessary because BabylonJS post process sets the scene using the camera. However, I don't pass a camera to the constructor as I use a PostProcessRenderPipeline.
         this._scene = scene;
 
         this.onApplyObservable.add((effect: Effect) => {
-            effect.setFloat("brightness", this.brightness);
             effect.setFloat("contrast", this.contrast);
             effect.setFloat("exposure", this.exposure);
-            effect.setFloat("gamma", this.gamma);
             effect.setFloat("saturation", this.saturation);
         });
     }
