@@ -1,6 +1,7 @@
 import eslint from "@eslint/js";
 import nextPlugin from "@next/eslint-plugin-next";
 import { importX } from "eslint-plugin-import-x";
+import jsdoc from "eslint-plugin-jsdoc";
 import { defineConfig, globalIgnores } from "eslint/config";
 import tseslint from "typescript-eslint";
 
@@ -249,6 +250,7 @@ export default defineConfig([
     },
     eslint.configs.recommended,
     ...strictTypeChecked,
+    jsdoc.configs["flat/recommended-typescript-error"],
     importX.flatConfigs.recommended,
     importX.flatConfigs.typescript,
     nextCoreWebVitals,
