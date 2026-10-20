@@ -124,7 +124,7 @@ export class PostProcessManager {
     private readonly celestialBodyToPostProcesses: Map<Transformable, PostProcess[]> = new Map();
 
     /**
-     * The color correction post process responsible for tone mapping, saturation, contrast, brightness and gamma.
+     * The color correction post process responsible for tone mapping, display encoding, saturation, contrast and brightness.
      */
     readonly colorCorrection: ColorCorrection;
 
@@ -163,9 +163,12 @@ export class PostProcessManager {
 
         this.renderingPipelineManager = scene.postProcessRenderPipelineManager;
 
+        // Preserve linear HDR until ColorCorrection applies exposure and ACES.
+        scene.imageProcessingConfiguration.applyByPostProcess = true;
+        scene.imageProcessingConfiguration.skipFinalColorClamp = true;
+
         this.colorCorrection = new ColorCorrection("colorCorrection", scene);
         this.colorCorrection.exposure = 1.5;
-        this.colorCorrection.gamma = 1.0;
         this.colorCorrection.saturation = 1.2;
 
         this.fxaa = new FxaaPostProcess(
