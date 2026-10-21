@@ -8,6 +8,16 @@
 
 [![Presentation Video](./coverImages/video.png)](https://youtu.be/AZM6psivIBE)
 
+## Contributor video overview
+
+[![Watch the Cosmos Journeyer developer overview](.github/media/repo-overview.jpg)](https://www.ngram.com/embed/cosmos-journeyer-play-it-understand-it-build-it-1d9bfe43a0ac42a18c0c339a09f9f84d)
+
+A short guide to playing or running the game, the workspace packages, and a path into the code. [Watch the video](https://www.ngram.com/embed/cosmos-journeyer-play-it-understand-it-build-it-1d9bfe43a0ac42a18c0c339a09f9f84d).
+
+[![Create a video like this for your repo](https://img.shields.io/badge/Create_a_video_like_this_for_your_repo-ngram-0D0D0D)](https://github.com/apps/ngram-ai/)
+
+<sub>Video created with ngram.</sub>
+
 - [What is Cosmos Journeyer?](#what-is-cosmos-journeyer)
 - [How to play](#how-to-play)
     - [Official website](#official-website)
