@@ -170,6 +170,7 @@ export class PostProcessManager {
         this.colorCorrection = new ColorCorrection("colorCorrection", scene);
         this.colorCorrection.exposure = 1.5;
         this.colorCorrection.saturation = 1.2;
+        this.colorCorrection.contrast = 1.1;
 
         this.fxaa = new FxaaPostProcess(
             "fxaa",
