@@ -196,7 +196,7 @@ export class PostProcessManager {
         this.renderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "renderingPipeline");
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
 
-        this.bloomRenderEffect = new BloomEffect(scene, 1.0, 0.3, 32, Constants.TEXTURETYPE_HALF_FLOAT);
+        this.bloomRenderEffect = new BloomEffect(scene, 1.0, 0.05, 32, Constants.TEXTURETYPE_HALF_FLOAT);
         this.bloomRenderEffect.threshold = 0.0;
 
         this.sphereShadows = new SphereShadowsPostProcess(depthRendererManager, scene);
