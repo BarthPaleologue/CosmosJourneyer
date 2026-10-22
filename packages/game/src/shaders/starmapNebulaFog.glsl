@@ -27,16 +27,11 @@ uniform vec3 nebula_cell_id;
 uniform vec3 nebula_cell_offset;
 
 #include "./utils/camera.glsl";
+#include "./utils/hash12.glsl";
 #include "./utils/noise.glsl";
 #include "./utils/worldFromUV.glsl";
 
 const float maxFogDistance = 6000.0;
-
-float hash12(vec2 p) {
-    vec3 p3 = fract(vec3(p.xyx) * 0.1031);
-    p3 += dot(p3, p3.yzx + 33.33);
-    return fract((p3.x + p3.y) * p3.z);
-}
 
 float hash13(vec3 p) {
     p = fract(p * 0.1031);
