@@ -25,6 +25,7 @@ import { loadEnvironmentTextures } from "@/frontend/assets/textures/environment"
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
+import { ColorCorrection } from "@/frontend/postProcesses/colorCorrection";
 import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 import { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/blackHole";
 import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHole/blackHolePostProcess";
@@ -68,6 +69,11 @@ export async function createBlackHoleScene(
         scene,
     );
     camera.attachPostProcess(blackHolePostProcess);
+
+    const colorCorrection = new ColorCorrection("colorCorrection", scene);
+    colorCorrection.exposure = 1.5;
+    colorCorrection.saturation = 1.2;
+    camera.attachPostProcess(colorCorrection);
 
     camera.maxZ = 1e12;
     lookAt(defaultControls.getTransform(), blackHole.getTransform().position, scene.useRightHandedSystem);

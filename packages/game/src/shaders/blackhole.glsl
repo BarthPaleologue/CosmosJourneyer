@@ -15,6 +15,8 @@ uniform float elapsedSeconds;
 #include "./utils/object.glsl";
 
 uniform float accretionDiskRadius;
+uniform vec3 innerDiskColor;
+uniform vec3 outerDiskColor;
 uniform float warpingMinkowskiFactor;
 uniform float standardGravitationalParameter;
 
@@ -158,7 +160,6 @@ vec4 raymarchDisk(vec3 rayDir, vec3 entryPoint, vec3 exitPoint) {
     vec3 samplePoint = entryPoint;
     float distanceToCenter = length(samplePoint);// distance to the center of the disk
     float relativeDistance = distanceToCenter / schwarzschildRadius;
-    float relativeDiskRadius = accretionDiskRadius / schwarzschildRadius;
 
     vec3 projectedRayDir = vec3(rayDir.x, 0.0, rayDir.z);
     vec3 projectedEntryPoint = vec3(entryPoint.x, 0.0, entryPoint.z);
@@ -172,12 +173,10 @@ vec4 raymarchDisk(vec3 rayDir, vec3 entryPoint, vec3 exitPoint) {
 
     float redShift = (1.0 + parallel) / 2.0;
 
-    float diskMix = smoothstep(0.3, 0.9, relativeDistance / relativeDiskRadius); // transition between inner and outer color
-    vec3 innerDiskColor = vec3(1.0, 0.8, 0.1);
-    vec3 outerDiskColor = vec3(0.5, 0.13, 0.02) * 0.2;
+    float diskMix = smoothstep(0.3, 0.9, distanceToCenter / accretionDiskRadius); // transition between inner and outer color
     vec3 insideCol =  mix(innerDiskColor, outerDiskColor, diskMix) * 1.25;
 
-    vec3 redShiftMult = mix(vec3(1.6, 1.0, 2.0) * 4.0, vec3(0.8, 0.2, 0.1) * 0.5, redShift);
+    vec3 redShiftMult = mix(vec3(1.6, 1.0, 2.0) * 2.0, vec3(0.5, 0.2, 0.1) * 0.2, redShift);
     insideCol *= redShiftMult;
 
     vec4 diskColor = vec4(0.0);
@@ -194,7 +193,7 @@ vec4 raymarchDisk(vec3 rayDir, vec3 entryPoint, vec3 exitPoint) {
         float diskMask = 1.0;
         float photonSphereRelativeRadius = 1.5;
         diskMask *= smoothstep(photonSphereRelativeRadius, 2.5, relativeDistance); // Fade the disk when inside the photon sphere.
-        diskMask *= clamp(1.0 - relativeDistance / relativeDiskRadius, 0.0, 1.0); //smoothstep(0.0, 1.0, relativeDiskRadius - relativeDistance);// The 2.0 is only for aesthetics
+        diskMask *= 1.0 - smoothstep(0.0, 1.0, distanceToCenter / accretionDiskRadius); //smoothstep(0.0, 1.0, relativeDiskRadius - relativeDistance);// The 2.0 is only for aesthetics
 
         // Inner disk material moves faster than outer material, but the sheared noise is recycled before it degenerates into radial high frequency noise.
         float noise = sampleDiskNoiseWithBoundedShear(projectedSamplePoint, relativeDistance, intensity);
@@ -298,7 +297,7 @@ void main() {
                     float glowOuterRadius = maxBendDistance / schwarzschildRadius;
                     float glowOuterMask = 1.0 - smoothstep(glowOuterRadius * 0.65, glowOuterRadius * 0.95, relativeDistance);
                     float glowMask = glowInnerMask * glowOuterMask;
-                    accumulatedGlow += 0.2 * vec3(1.0, 0.9, 0.6) * (stepSize / schwarzschildRadius) * glowMask / (relativeDistance * relativeDistance);
+                    accumulatedGlow += 0.04 * vec3(1.0, 0.8, 0.6) * (stepSize / schwarzschildRadius) * glowMask / (relativeDistance * relativeDistance);
                 }
             }
 
@@ -349,6 +348,7 @@ void main() {
         rayDirWorld = vec3(starfieldRotation * vec4(rayDirWorld, 1.0));
         rayDirWorld.z *= -1.0;
         bg = texture(starfieldTexture, rayDirWorld);
+        bg.rgb = pow(bg.rgb, vec3(2.2));
     }
 
     vec4 finalColor = vec4(1.0, 0.0, 0.0, 1.0);
