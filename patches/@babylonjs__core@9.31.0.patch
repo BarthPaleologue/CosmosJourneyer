@@ -1,0 +1,68 @@
+diff --git a/PostProcesses/volumetricLightScatteringPostProcess.pure.d.ts b/PostProcesses/volumetricLightScatteringPostProcess.pure.d.ts
+index 910e02b91e5aa877494aa674ae603605dfcfc022..ac6c82fa56d2204bf00e3aac50b38f26b3a1ae81 100644
+--- a/PostProcesses/volumetricLightScatteringPostProcess.pure.d.ts
++++ b/PostProcesses/volumetricLightScatteringPostProcess.pure.d.ts
+@@ -79,8 +79,9 @@ export declare class VolumetricLightScatteringPostProcess extends PostProcess {
+      * @param engine The babylon engine
+      * @param reusable If the post-process is reusable
+      * @param scene The constructor needs a scene reference to initialize internal components. If "camera" is null a "scene" must be provided
++     * @param textureType Texture type for the post-process input and internal scattering pass. Defaults to unsigned byte.
+      */
+-    constructor(name: string, ratio: any, camera: Nullable<Camera>, mesh?: Mesh, samples?: number, samplingMode?: number, engine?: AbstractEngine, reusable?: boolean, scene?: Scene);
++    constructor(name: string, ratio: any, camera: Nullable<Camera>, mesh?: Mesh, samples?: number, samplingMode?: number, engine?: AbstractEngine, reusable?: boolean, scene?: Scene, textureType?: number);
+     protected _gatherImports(useWebGPU: boolean, list: Promise<any>[]): void;
+     /**
+      * Returns the string "VolumetricLightScatteringPostProcess"
+diff --git a/PostProcesses/volumetricLightScatteringPostProcess.pure.js b/PostProcesses/volumetricLightScatteringPostProcess.pure.js
+index 8f66f3403ea3f20a4bc3d73eb10eae2eff945518..a31fb8c4cd3cf25e487a8d3d8ae85dbc3e213e86 100644
+--- a/PostProcesses/volumetricLightScatteringPostProcess.pure.js
++++ b/PostProcesses/volumetricLightScatteringPostProcess.pure.js
+@@ -76,11 +76,12 @@ let VolumetricLightScatteringPostProcess = (() => {
+              * @param engine The babylon engine
+              * @param reusable If the post-process is reusable
+              * @param scene The constructor needs a scene reference to initialize internal components. If "camera" is null a "scene" must be provided
++             * @param textureType Texture type for the post-process input and internal scattering pass. Defaults to unsigned byte.
+              */
+-            constructor(name, ratio, camera, mesh, samples = 100, samplingMode = Texture.BILINEAR_SAMPLINGMODE, engine, reusable, scene) {
++            constructor(name, ratio, camera, mesh, samples = 100, samplingMode = Texture.BILINEAR_SAMPLINGMODE, engine, reusable, scene, textureType = 0) {
+                 const selectedEngine = engine ?? camera?.getScene().getEngine() ?? scene?.getEngine();
+                 const shaderLanguage = selectedEngine?.isWebGPU && !PostProcess.ForceGLSL ? 1 /* ShaderLanguage.WGSL */ : 0 /* ShaderLanguage.GLSL */;
+-                super(name, "volumetricLightScattering", ["decay", "exposure", "weight", "meshPositionOnScreen", "density"], ["lightScatteringSampler"], ratio.postProcessRatio || ratio, camera, samplingMode, selectedEngine, reusable, "#define NUM_SAMPLES " + samples, undefined, undefined, undefined, undefined, undefined, shaderLanguage);
++                super(name, "volumetricLightScattering", ["decay", "exposure", "weight", "meshPositionOnScreen", "density"], ["lightScatteringSampler"], ratio.postProcessRatio || ratio, camera, samplingMode, selectedEngine, reusable, "#define NUM_SAMPLES " + samples, textureType, undefined, undefined, undefined, undefined, shaderLanguage);
+                 this._screenCoordinates = Vector2.Zero();
+                 /**
+                  * Custom position of the mesh. Used if "useCustomMeshPosition" is set to "true"
+@@ -130,7 +131,7 @@ let VolumetricLightScatteringPostProcess = (() => {
+                 // Configure mesh
+                 this.mesh = mesh ?? _a.CreateDefaultMesh("VolumetricLightScatteringMesh", scene);
+                 // Configure
+-                this._createPass(scene, ratio.passRatio || ratio);
++                this._createPass(scene, ratio.passRatio || ratio, textureType);
+                 this.onActivate = (camera) => {
+                     if (!this.isSupported) {
+                         this.dispose(camera);
+@@ -332,9 +333,9 @@ let VolumetricLightScatteringPostProcess = (() => {
+                 }
+                 return false;
+             }
+-            _createPass(scene, ratio) {
++            _createPass(scene, ratio, textureType) {
+                 const engine = scene.getEngine();
+-                this._volumetricLightScatteringRTT = new RenderTargetTexture("volumetricLightScatteringMap", { width: engine.getRenderWidth() * ratio, height: engine.getRenderHeight() * ratio }, scene, false, true, 0);
++                this._volumetricLightScatteringRTT = new RenderTargetTexture("volumetricLightScatteringMap", { width: engine.getRenderWidth() * ratio, height: engine.getRenderHeight() * ratio }, scene, false, true, textureType);
+                 this._volumetricLightScatteringRTT.wrapU = Texture.CLAMP_ADDRESSMODE;
+                 this._volumetricLightScatteringRTT.wrapV = Texture.CLAMP_ADDRESSMODE;
+                 this._volumetricLightScatteringRTT.renderList = null;
+diff --git a/Shaders/volumetricLightScattering.fragment.js b/Shaders/volumetricLightScattering.fragment.js
+index 01eec1050949aaf7c29f244bb9160ca875e609c6..e656dd01e8867f61c0eb4373bd77bb42294cedaf 100644
+--- a/Shaders/volumetricLightScattering.fragment.js
++++ b/Shaders/volumetricLightScattering.fragment.js
+@@ -1,7 +1,7 @@
+ // Do not edit.
+ import { ShaderStore } from "../Engines/shaderStore.js";
+ const name = "volumetricLightScatteringPixelShader";
+-const shader = `uniform sampler2D textureSampler;uniform sampler2D lightScatteringSampler;uniform float decay;uniform float exposure;uniform float weight;uniform float density;uniform vec2 meshPositionOnScreen;varying vec2 vUV;
++const shader = `uniform highp sampler2D textureSampler;uniform highp sampler2D lightScatteringSampler;uniform float decay;uniform float exposure;uniform float weight;uniform float density;uniform vec2 meshPositionOnScreen;varying vec2 vUV;
+ #define CUSTOM_FRAGMENT_DEFINITIONS
+ void main(void) {
+ #define CUSTOM_FRAGMENT_MAIN_BEGIN

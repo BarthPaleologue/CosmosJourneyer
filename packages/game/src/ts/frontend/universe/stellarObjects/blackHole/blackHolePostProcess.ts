@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import "@babylonjs/core/Shaders/ShadersInclude/helperFunctions";
+
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Effect } from "@babylonjs/core/Materials/effect";

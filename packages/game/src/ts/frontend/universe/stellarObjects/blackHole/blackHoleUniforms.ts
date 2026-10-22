@@ -27,6 +27,9 @@ import { computeSpinAxisOrientation } from "@/frontend/helpers/orbit";
 
 export const BlackHoleUniformNames = {
     STARFIELD_ROTATION: "starfieldRotation",
+    STARFIELD_GAMMA_SPACE: "starfieldGammaSpace",
+    STARFIELD_IS_RGBD: "starfieldIsRGBD",
+    STARFIELD_LEVEL: "starfieldLevel",
     ELAPSED_SECONDS: "elapsedSeconds",
     SCHWARZSCHILD_RADIUS: "schwarzschildRadius",
     FRAME_DRAGGING_FACTOR: "frameDraggingFactor",
@@ -70,6 +73,9 @@ export class BlackHoleUniforms {
 
     public setUniforms(effect: Effect, blackHoleTransform: TransformNode, floatingOriginOffset: Vector3): void {
         effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, this.backgroundTexture.getReflectionTextureMatrix());
+        effect.setBool(BlackHoleUniformNames.STARFIELD_GAMMA_SPACE, this.backgroundTexture.gammaSpace);
+        effect.setBool(BlackHoleUniformNames.STARFIELD_IS_RGBD, this.backgroundTexture.isRGBD);
+        effect.setFloat(BlackHoleUniformNames.STARFIELD_LEVEL, this.backgroundTexture.level);
         effect.setFloat(BlackHoleUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
         effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, this.schwarzschildRadius);
         effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, this.frameDraggingFactor);

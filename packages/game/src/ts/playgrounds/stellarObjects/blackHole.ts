@@ -16,7 +16,9 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Constants } from "@babylonjs/core/Engines/constants";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { ImageProcessingPostProcess } from "@babylonjs/core/PostProcesses/imageProcessingPostProcess";
 import { Scene } from "@babylonjs/core/scene";
 import { generateBlackHoleModel } from "@cosmos-journeyer/universe-generation";
 
@@ -68,6 +70,11 @@ export async function createBlackHoleScene(
         scene,
     );
     camera.attachPostProcess(blackHolePostProcess);
+    new ImageProcessingPostProcess(
+        "imageProcessing",
+        { engine, textureType: Constants.TEXTURETYPE_HALF_FLOAT },
+        camera,
+    );
 
     camera.maxZ = 1e12;
     lookAt(defaultControls.getTransform(), blackHole.getTransform().position, scene.useRightHandedSystem);

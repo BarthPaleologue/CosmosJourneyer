@@ -33,8 +33,13 @@ uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
 uniform samplerCube starfieldTexture;
+uniform bool starfieldGammaSpace;
+uniform bool starfieldIsRGBD;
+uniform float starfieldLevel;
 
 uniform mat4 starfieldRotation;
+
+#include<helperFunctions>
 
 #include "./utils/camera.glsl";
 
@@ -349,6 +354,13 @@ void main() {
         rayDirWorld = vec3(starfieldRotation * vec4(rayDirWorld, 1.0));
         rayDirWorld.z *= -1.0;
         bg = texture(starfieldTexture, rayDirWorld);
+        if (starfieldIsRGBD) {
+            bg = vec4(fromRGBD(bg), 1.0);
+        }
+        if (starfieldGammaSpace) {
+            bg.rgb = toLinearSpace(bg.rgb);
+        }
+        bg.rgb *= starfieldLevel;
     }
 
     vec4 finalColor = vec4(1.0, 0.0, 0.0, 1.0);
