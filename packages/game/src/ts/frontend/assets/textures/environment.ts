@@ -31,7 +31,7 @@ export type EnvironmentTextures = {
  * Loads the Milky Way cube map used for the skybox.
  * @param scene Scene that owns the environment texture.
  * @param progressMonitor Tracks completion of the cube-map load.
- * @returns The skybox texture with gamma-space sampling enabled.
+ * @returns The skybox texture decoded into linear space.
  */
 export async function loadEnvironmentTextures(
     scene: Scene,
@@ -39,7 +39,7 @@ export async function loadEnvironmentTextures(
 ): Promise<EnvironmentTextures> {
     const milkyWayPromise = loadCubeTextureAsync("SkyBox", milkyWay, scene, progressMonitor);
     const milkyWayTexture = await milkyWayPromise;
-    milkyWayTexture.gammaSpace = true;
+    milkyWayTexture.gammaSpace = true; // exr is already linear, but I prefer the darker look the power-law gives it
 
     return {
         milkyWay: milkyWayTexture,
