@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
+import { Constants } from "@babylonjs/core/Engines/constants";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -44,6 +45,7 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess {
             scene.getEngine(),
             false,
             scene,
+            Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
         // This is necessary because BabylonJS post process sets the scene using the camera. However, I don't pass a camera to the constructor as I use a PostProcessRenderPipeline.
