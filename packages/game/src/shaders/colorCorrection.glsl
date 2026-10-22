@@ -26,6 +26,7 @@ uniform highp sampler2D textureSampler;
 varying vec2 vUV;
 
 #include "./utils/tonemapping/acesTonemap.glsl";
+#include "./utils/hash12.glsl";
 
 vec3 linearToSRGB(vec3 color) {
     color = clamp(color, 0.0, 1.0);
@@ -58,6 +59,9 @@ void main() {
     color = acesTonemap(color);
 
     color = linearToSRGB(color);
+
+    float dither = (hash12(gl_FragCoord.xy) - 0.5) / 255.0;
+    color = clamp(color + vec3(dither), 0.0, 1.0);
 
     gl_FragColor = vec4(color, texel.a);
 }
