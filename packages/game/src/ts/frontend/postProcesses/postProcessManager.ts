@@ -563,8 +563,8 @@ export class PostProcessManager {
         this.renderingPipeline.addEffect(this.bodyRenderEffect);
         this.renderingPipeline.addEffect(this.bloomRenderEffect);
         this.renderingPipeline.addEffect(this.lensFlareRenderEffect);
-        this.renderingPipeline.addEffect(this.fxaaRenderEffect);
         this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
+        this.renderingPipeline.addEffect(this.fxaaRenderEffect);
 
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
         this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
