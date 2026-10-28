@@ -15,6 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Scene } from "@babylonjs/core/scene";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
@@ -128,5 +133,50 @@ describe("StarSystemView", () => {
         expect(player.serializedSpaceships).toEqual([currentSpaceshipSerialized]);
         expect(player.instancedSpaceships).toEqual([]);
         expect(nextPlayer.serializedSpaceships).toEqual([nextSpaceshipSerialized]);
+    });
+});
+
+describe("character gravity alignment", () => {
+    it.each([
+        { gravity: null, expectedUp: Vector3.Up() },
+        { gravity: Vector3.Zero(), expectedUp: Vector3.Up() },
+        { gravity: new Vector3(3, -4, 0), expectedUp: new Vector3(-0.6, 0.8, 0) },
+    ])("preserves finite transforms and cached gravity for $gravity", ({ gravity, expectedUp }) => {
+        const engine = new NullEngine();
+        const scene = new Scene(engine);
+        const transform = new TransformNode("character", scene);
+        transform.rotationQuaternion = Quaternion.RotationAxis(Vector3.Up(), 0.7);
+        transform.computeWorldMatrix(true);
+        const previousRotation = transform.rotationQuaternion.clone();
+        const previousGravity = gravity?.clone();
+        const camera = new FreeCamera("character camera", new Vector3(0, 1.5, 0), scene);
+        camera.parent = transform;
+        const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+        const context = {
+            _isLoadingSystem: false,
+            activeControls: null,
+            characterControls: { avatar: { aggregate: { body: {} }, getTransform: () => transform } },
+            getStarSystem: () => ({ gravitySystem: { getLastComputedForce: () => gravity } }),
+            spaceshipControls: {},
+        } as unknown as StarSystemView;
+        const prototype = StarSystemView.prototype as unknown as {
+            updateBeforeRender(this: StarSystemView, deltaSeconds: number): void;
+        };
+        try {
+            prototype.updateBeforeRender.call(context, 0);
+            transform.computeWorldMatrix(true);
+            camera.getViewMatrix(true);
+            expect(transform.up.equalsWithEpsilon(expectedUp, 1e-6)).toBe(true);
+            expect(Array.from(transform.getWorldMatrix().m).every(Number.isFinite)).toBe(true);
+            expect(camera.globalPosition.asArray().every(Number.isFinite)).toBe(true);
+            expect(gravity).toEqual(previousGravity ?? null);
+            if (gravity === null || gravity.lengthSquared() === 0) {
+                expect(transform.rotationQuaternion.equals(previousRotation)).toBe(true);
+            }
+        } finally {
+            warning.mockRestore();
+            scene.dispose();
+            engine.dispose();
+        }
     });
 });

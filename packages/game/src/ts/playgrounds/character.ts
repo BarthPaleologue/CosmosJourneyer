@@ -36,7 +36,8 @@ import { CharacterControls } from "@/frontend/controls/characterControls/charact
 import { CharacterInputs } from "@/frontend/controls/characterControls/characterControlsInputs";
 import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
-import { setUpVector } from "@/frontend/helpers/transform";
+import { alignRotationToRef } from "@/frontend/helpers/rotation";
+import { getRotationQuaternion } from "@/frontend/helpers/transform";
 import { GravitySystem } from "@/frontend/universe/gravitySystem";
 
 import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";
@@ -128,6 +129,7 @@ export async function createCharacterDemoScene(
     character3.dance();
 
     const headTrackingTarget = Vector3.Zero();
+    const upDirection = Vector3.Zero();
 
     const characters = [character, character2, character3];
 
@@ -154,9 +156,11 @@ export async function createCharacterDemoScene(
         character3.update(deltaSeconds);
 
         for (const character of characters) {
-            const gravity = gravitySystem.getLastComputedForce(character.aggregate.body) ?? Vector3.Up();
-            const upDirection = gravity.normalize().negateInPlace();
-            setUpVector(character.getTransform(), upDirection);
+            const gravity = gravitySystem.getLastComputedForce(character.aggregate.body);
+            if (gravity === null || gravity.lengthSquared() === 0) continue;
+            gravity.negateToRef(upDirection);
+            const rotation = getRotationQuaternion(character.getTransform());
+            alignRotationToRef(rotation, Vector3.UpReadOnly, upDirection, rotation);
         }
 
         character.getHeadPositionToRef(headTrackingTarget);

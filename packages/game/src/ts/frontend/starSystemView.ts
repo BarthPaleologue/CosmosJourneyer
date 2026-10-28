@@ -54,7 +54,8 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
-import { getRotationQuaternion, lookAt, setRotationQuaternion, setUpVector } from "@/frontend/helpers/transform";
+import { alignRotationToRef } from "@/frontend/helpers/rotation";
+import { getRotationQuaternion, lookAt, setRotationQuaternion } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import { type Mission } from "@/frontend/missions/mission";
 import { type MissionContext } from "@/frontend/missions/missionContext";
@@ -937,9 +938,14 @@ export class StarSystemView implements View {
             this.setActiveCamera(this.activeControls.getActiveCamera());
         }
 
-        const lastCharacterGravity =
-            starSystem.gravitySystem.getLastComputedForce(this.characterControls.avatar.aggregate.body) ?? Vector3.Up();
-        setUpVector(this.characterControls.avatar.getTransform(), lastCharacterGravity.normalize().negateInPlace());
+        const lastCharacterGravity = starSystem.gravitySystem.getLastComputedForce(
+            this.characterControls.avatar.aggregate.body,
+        );
+        if (lastCharacterGravity !== null && lastCharacterGravity.lengthSquared() > 0) {
+            const characterUp = lastCharacterGravity.negate();
+            const rotation = getRotationQuaternion(this.characterControls.avatar.getTransform());
+            alignRotationToRef(rotation, Vector3.UpReadOnly, characterUp, rotation);
+        }
 
         const activeControls = this.activeControls;
         if (activeControls === null) {
