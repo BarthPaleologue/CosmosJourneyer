@@ -3,9 +3,9 @@ name: Deploy Game Release
 on:
     workflow_dispatch:
         inputs:
-            version:
-                description: "Release version, e.g. 1.11.1"
-                required: true
+            sha:
+                description: "Full commit SHA to release; leave empty to use main without repeating full CI"
+                required: false
                 type: string
             dry_run:
                 description: "Run deployment rsync commands without changing the VPS"
@@ -18,9 +18,67 @@ concurrency:
     cancel-in-progress: false
 
 jobs:
+    prepare-release:
+        name: Prepare release
+        if: github.ref == 'refs/heads/main'
+        permissions:
+            contents: read
+        timeout-minutes: 5
+        runs-on: ubuntu-latest
+        outputs:
+            source_sha: ${{ steps.source.outputs.commit }}
+            version: ${{ steps.version.outputs.version }}
+        steps:
+            - name: Checkout release source
+              id: source
+              uses: actions/checkout@v7
+              with:
+                  ref: ${{ inputs.sha || github.sha }}
+                  lfs: false
+
+            - name: Read and validate release version
+              id: version
+              env:
+                  SOURCE_SHA: ${{ steps.source.outputs.commit }}
+                  INPUT_SHA: ${{ inputs.sha }}
+              run: |
+                  if [[ -n "$INPUT_SHA" && "${INPUT_SHA,,}" != "$SOURCE_SHA" ]]; then
+                      echo "sha must be the full commit SHA" >&2
+                      exit 1
+                  fi
+                  VERSION=$(jq -er .version packages/game/package.json)
+                  if ! jq -es --arg version "$VERSION" 'all(.[]; .version == $version)' package.json packages/desktop-electron/package.json >/dev/null; then
+                      echo "Root, game and Electron versions must match" >&2
+                      exit 1
+                  fi
+                  TAG_REF="refs/tags/v$VERSION"
+                  git check-ref-format "$TAG_REF"
+                  EXISTING_TAG=$(git ls-remote --tags origin "$TAG_REF")
+                  if [[ -n "$EXISTING_TAG" ]]; then
+                      git fetch --quiet --no-tags origin "$TAG_REF"
+                      if [[ "$(git rev-parse 'FETCH_HEAD^{commit}')" != "$SOURCE_SHA" ]]; then
+                          echo "Tag v$VERSION already identifies another commit; bump the version" >&2
+                          exit 1
+                      fi
+                  fi
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+                  printf 'Release **v%s** — `%s`\n' "$VERSION" "$SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+
+    validate-source:
+        name: Validate release source
+        needs: prepare-release
+        if: inputs.sha != ''
+        permissions:
+            contents: read
+            pull-requests: read
+        uses: ./.github/workflows/ci-checks.yml
+        with:
+            source_sha: ${{ needs.prepare-release.outputs.source_sha }}
+
     build-game:
         name: Build game artifact
-        if: github.ref == 'refs/heads/main'
+        needs: [prepare-release, validate-source]
+        if: ${{ !cancelled() && needs.prepare-release.result == 'success' && (inputs.sha == '' || needs.validate-source.result == 'success') }}
         permissions:
             contents: read
         timeout-minutes: 20
@@ -29,11 +87,19 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v7
               with:
-                  ref: ${{ github.sha }}
+                  ref: ${{ needs.prepare-release.outputs.source_sha }}
                   lfs: false
 
+            - name: Checkout release tooling
+              uses: actions/checkout@v7
+              with:
+                  ref: ${{ github.sha }}
+                  lfs: false
+                  path: .workflow-tools
+                  sparse-checkout: .github/actions/setup-lfs
+
             - name: Setup Git LFS assets
-              uses: ./.github/actions/setup-lfs
+              uses: ./.workflow-tools/.github/actions/setup-lfs
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v6
@@ -57,26 +123,6 @@ jobs:
               with:
                   tool: wasm-pack
 
-            - name: Validate release version
-              env:
-                  INPUT_VERSION: ${{ inputs.version }}
-              run: |
-                  if [[ ! "$INPUT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
-                      echo "Invalid release version: $INPUT_VERSION" >&2
-                      exit 1
-                  fi
-                  GAME_VERSION=$(node -p "require('./packages/game/package.json').version")
-                  ELECTRON_VERSION=$(node -p "require('./packages/desktop-electron/package.json').version")
-                  if [ "$GAME_VERSION" != "$INPUT_VERSION" ]; then
-                      echo "Game package.json version ($GAME_VERSION) does not match release version ($INPUT_VERSION)" >&2
-                      exit 1
-                  fi
-                  if [ "$ELECTRON_VERSION" != "$INPUT_VERSION" ]; then
-                      echo "Electron package.json version ($ELECTRON_VERSION) does not match release version ($INPUT_VERSION)" >&2
-                      exit 1
-                  fi
-                  echo "Version validation passed: $INPUT_VERSION"
-
             - name: Build game artifact
               run: pnpm --filter @cosmos-journeyer/game... build
 
@@ -88,7 +134,8 @@ jobs:
 
     build-electron:
         name: Build Electron (${{ matrix.os }})
-        if: github.ref == 'refs/heads/main'
+        needs: [prepare-release, validate-source]
+        if: ${{ !cancelled() && needs.prepare-release.result == 'success' && (inputs.sha == '' || needs.validate-source.result == 'success') }}
         permissions:
             contents: read
         timeout-minutes: 30
@@ -105,11 +152,19 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v7
               with:
-                  ref: ${{ github.sha }}
+                  ref: ${{ needs.prepare-release.outputs.source_sha }}
                   lfs: false
 
+            - name: Checkout release tooling
+              uses: actions/checkout@v7
+              with:
+                  ref: ${{ github.sha }}
+                  lfs: false
+                  path: .workflow-tools
+                  sparse-checkout: .github/actions/setup-lfs
+
             - name: Setup Git LFS assets
-              uses: ./.github/actions/setup-lfs
+              uses: ./.workflow-tools/.github/actions/setup-lfs
 
             - name: Setup pnpm
               uses: pnpm/action-setup@v6
@@ -138,8 +193,9 @@ jobs:
 
     deploy-game:
         name: Deploy game to VPS
-        if: github.ref == 'refs/heads/main'
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' && needs.prepare-release.result == 'success' && needs.build-game.result == 'success' && needs.build-electron.result == 'success' }}
         needs:
+            - prepare-release
             - build-game
             - build-electron
         permissions:
@@ -176,7 +232,7 @@ jobs:
             - name: Deploy game artifact to VPS
               env:
                   DEPLOY_DRY_RUN: ${{ inputs.dry_run }}
-                  GITHUB_SHA: ${{ github.sha }}
+                  RELEASE_SHA: ${{ needs.prepare-release.outputs.source_sha }}
                   VPS_HOST: ${{ secrets.VPS_HOST }}
                   VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
                   VPS_SSH_PORT: ${{ secrets.VPS_SSH_PORT || 22 }}
@@ -185,8 +241,9 @@ jobs:
 
     publish-electron:
         name: Create draft GitHub release
-        if: ${{ !inputs.dry_run }}
+        if: ${{ !cancelled() && !inputs.dry_run && needs.build-electron.result == 'success' && needs.deploy-game.result == 'success' }}
         needs:
+            - prepare-release
             - build-electron
             - deploy-game
         permissions:
@@ -204,13 +261,13 @@ jobs:
               uses: softprops/action-gh-release@v3
               with:
                   draft: true
-                  tag_name: v${{ inputs.version }}
-                  target_commitish: ${{ github.sha }}
-                  name: Cosmos Journeyer v${{ inputs.version }}
+                  tag_name: v${{ needs.prepare-release.outputs.version }}
+                  target_commitish: ${{ needs.prepare-release.outputs.source_sha }}
+                  name: Cosmos Journeyer v${{ needs.prepare-release.outputs.version }}
                   body: |
                       The new version of Cosmos Journeyer is online at https://cosmosjourneyer.com/
                       This draft release contains Electron desktop builds.
 
-                      **Deployed commit:** ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}
+                      **Deployed commit:** ${{ github.server_url }}/${{ github.repository }}/commit/${{ needs.prepare-release.outputs.source_sha }}
                   files: release-assets/*
                   fail_on_unmatched_files: true

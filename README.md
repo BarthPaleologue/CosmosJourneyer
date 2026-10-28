@@ -209,6 +209,10 @@ Channel Packer is web-only and can be started with `pnpm dev:channel-packer`.
 
 The packaged desktop artifacts will appear in `packages/desktop-electron/release`.
 
+### Releases
+
+See [RELEASING.md](RELEASING.md) for publishing the game from `main` or a hotfix commit through GitHub Actions.
+
 ### Testing
 
 Cosmos Journeyer has unit tests and end-to-end tests.
