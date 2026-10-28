@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { Vector3, type Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Vector3, Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { type TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 export function lookAt(transformNode: TransformNode, target: Vector3, useRightHandedSystem: boolean): void {
@@ -41,7 +41,7 @@ export function rotate(transformNode: TransformNode, axis: Vector3, amount: numb
 }
 
 export function getRotationQuaternion(transformNode: TransformNode): Quaternion {
-    if (transformNode.rotationQuaternion === null) throw new Error(`Null quaternion for ${transformNode.name}`);
+    transformNode.rotationQuaternion ??= Quaternion.FromEulerVector(transformNode.rotation);
     return transformNode.rotationQuaternion;
 }
 

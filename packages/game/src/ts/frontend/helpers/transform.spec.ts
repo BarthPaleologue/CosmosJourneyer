@@ -18,10 +18,12 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
-import { Vector3 } from "@babylonjs/core/Maths/math";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
 import { afterAll, describe, expect, it } from "vitest";
+
+import { getRotationQuaternion } from "./transform";
 
 describe("BasicTransform", () => {
     const engine = new NullEngine();
@@ -37,5 +39,37 @@ describe("BasicTransform", () => {
         transform.setAbsolutePosition(new Vector3(1, 0, 0));
         transform.rotateAround(new Vector3(0, 0, 0), new Vector3(0, 1, 0), Math.PI / 2);
         expect(transform.getAbsolutePosition().equals(new Vector3(0, 0, -1))).to.be.true;
+    });
+
+    it("initializes an unrotated transform with the identity quaternion", () => {
+        const node = new TransformNode("unrotated", scene);
+
+        const rotation = getRotationQuaternion(node);
+
+        expect(rotation.equals(Quaternion.Identity())).toBe(true);
+        expect(node.rotationQuaternion).toBe(rotation);
+        expect(getRotationQuaternion(node)).toBe(rotation);
+    });
+
+    it("preserves an Euler orientation when initializing its quaternion", () => {
+        const node = new TransformNode("Euler rotation", scene);
+        node.rotation.set(0.4, 0.7, -0.3);
+        node.computeWorldMatrix(true);
+        const previousWorldMatrix = node.getWorldMatrix().clone();
+
+        getRotationQuaternion(node);
+        node.computeWorldMatrix(true);
+
+        expect(Array.from(node.getWorldMatrix().m)).toEqual(Array.from(previousWorldMatrix.m));
+    });
+
+    it("returns an existing quaternion without replacing it", () => {
+        const node = new TransformNode("quaternion rotation", scene);
+        const rotation = Quaternion.RotationYawPitchRoll(0.4, 0.7, -0.3);
+        node.rotationQuaternion = rotation;
+        const previousRotation = rotation.clone();
+
+        expect(getRotationQuaternion(node)).toBe(rotation);
+        expect(rotation.equals(previousRotation)).toBe(true);
     });
 });
