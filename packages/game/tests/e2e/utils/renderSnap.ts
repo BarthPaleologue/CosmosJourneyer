@@ -1,5 +1,7 @@
 import { expect } from "@playwright/test";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
+
+type ScreenshotOptions = Parameters<ReturnType<typeof expect<Locator>>["toHaveScreenshot"]>[0];
 
 /**
  * Waits for scene readiness before comparing the canvas to its baseline.
@@ -10,6 +12,7 @@ import type { Page } from "@playwright/test";
  * @param opts.urlParams - Extra URL parameters.
  * @param opts.urlParams.freeze - Simulation freeze time.
  * @param opts.flagToWait - Canvas data attribute set to 1 when ready.
+ * @param opts.screenshotOptions - Options forwarded to Playwright's screenshot assertion.
  */
 export async function renderAndSnap(
     page: Page,
@@ -21,6 +24,7 @@ export async function renderAndSnap(
             [key: string]: string | number;
         };
         flagToWait: string;
+        screenshotOptions?: ScreenshotOptions;
     },
 ): Promise<void> {
     const urlParams = new URLSearchParams();
@@ -37,5 +41,8 @@ export async function renderAndSnap(
 
     await page.locator(`canvas[data-${opts.flagToWait}="1"]`).waitFor({ timeout: 60_000 });
 
-    await expect(page.locator("canvas")).toHaveScreenshot(`${opts.shotName}.png`, { timeout: 60_000 });
+    await expect(page.locator("canvas")).toHaveScreenshot(`${opts.shotName}.png`, {
+        timeout: 60_000,
+        ...opts.screenshotOptions,
+    });
 }
