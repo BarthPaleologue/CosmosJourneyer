@@ -102,7 +102,10 @@ fn chunk_skirt_triangles_face_toward_chunk_interior_on_all_edges() {
             let quad_centroid = (&(&(&top_a + &top_b) + &bottom_a) + &bottom_b) / 4.0;
             let outward_reference = &quad_centroid - &inner_vertex;
 
-            for triangle in indices[next_index_offset..next_index_offset + 6].chunks_exact(3) {
+            for triangle in indices[next_index_offset..next_index_offset + 6]
+                .as_chunks::<3>()
+                .0
+            {
                 let p1 = get_vertex(&positions, triangle[0] as usize);
                 let p2 = get_vertex(&positions, triangle[1] as usize);
                 let p3 = get_vertex(&positions, triangle[2] as usize);
