@@ -1,0 +1,115 @@
+name: CI Checks
+
+on:
+    workflow_call:
+        inputs:
+            source_sha:
+                description: Commit to validate
+                required: true
+                type: string
+        outputs:
+            desktop-packaging-changed:
+                description: Whether desktop packaging files changed
+                value: ${{ jobs.checks.outputs.desktop-packaging-changed }}
+
+permissions:
+    contents: read
+    pull-requests: read
+
+jobs:
+    checks:
+        name: Checks
+        runs-on: ubuntu-latest
+        timeout-minutes: 40
+        outputs:
+            desktop-packaging-changed: ${{ steps.desktop-packaging-changes.outputs.desktop-packaging }}
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v7
+              with:
+                  ref: ${{ inputs.source_sha }}
+                  lfs: false
+
+            - name: Detect desktop packaging changes
+              id: desktop-packaging-changes
+              uses: dorny/paths-filter@v4
+              with:
+                  filters: |
+                      desktop-packaging:
+                          - ".github/actions/setup-lfs/**"
+                          - ".github/workflows/ci.yml"
+                          - ".github/workflows/ci-checks.yml"
+                          - "package.json"
+                          - "pnpm-lock.yaml"
+                          - "pnpm-workspace.yaml"
+                          - "packages/desktop-electron/**"
+
+            - name: Checkout CI tooling
+              uses: actions/checkout@v7
+              with:
+                  ref: ${{ github.sha }}
+                  lfs: false
+                  path: .workflow-tools
+                  sparse-checkout: .github/actions/setup-lfs
+
+            - name: Setup Git LFS assets
+              uses: ./.workflow-tools/.github/actions/setup-lfs
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6
+
+            - name: Use Node.js 24
+              uses: actions/setup-node@v7
+              with:
+                  node-version: "24"
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Setup Rust toolchain
+              uses: dtolnay/rust-toolchain@stable
+              with:
+                  targets: wasm32-unknown-unknown
+
+            - name: Setup wasm-pack
+              uses: taiki-e/install-action@v2.87.29
+              with:
+                  tool: wasm-pack
+
+            - name: Format check
+              run: pnpm format:check
+
+            - name: Typecheck
+              run: pnpm typecheck
+
+            - name: Lint
+              run: pnpm lint
+
+            - name: Unit tests
+              run: pnpm test:unit
+
+            - name: Build documentation
+              run: pnpm doc
+
+            - name: Build packages
+              run: pnpm build
+
+            - name: Install Playwright Chromium
+              run: pnpm --filter @cosmos-journeyer/game exec playwright install --with-deps chromium
+
+            - name: Run Playwright suite
+              run: |
+                  mkdir -p packages/game/artifacts
+                  pnpm --filter @cosmos-journeyer/game exec playwright test \
+                    --output=artifacts/test-results \
+                    --reporter=line,html
+
+            - name: Upload Playwright artifacts
+              if: failure()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: test-results
+                  path: |
+                      packages/game/artifacts
+                      packages/game/playwright-report

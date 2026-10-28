@@ -21,7 +21,7 @@ ssh_target="${VPS_USERNAME}@${VPS_HOST}"
 ssh_args=(-p "${ssh_port}")
 rsync_ssh_command="ssh -p ${ssh_port}"
 
-release_id="${GITHUB_SHA:-$(date -u +%Y%m%d-%H%M%S)}"
+release_id="${RELEASE_SHA:-$(date -u +%Y%m%d-%H%M%S)}"
 base_path="${VPS_GAME_PATH}"
 release_dir="${base_path}/releases/${release_id}"
 
