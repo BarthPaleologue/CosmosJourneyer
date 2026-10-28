@@ -15,12 +15,43 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, TmpVectors, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { describe, expect, it } from "vitest";
 
 import { alignRotationToRef } from "./rotation";
 
 describe("alignRotationToRef", () => {
+    it("accepts Babylon temporary storage as inputs without overwriting it", () => {
+        const rotation = TmpVectors.Quaternion[0];
+        const localAxis = TmpVectors.Vector3[1];
+        const target = TmpVectors.Vector3[2];
+        const savedRotation = rotation.clone();
+        const savedAxis = localAxis.clone();
+        const savedTarget = target.clone();
+        try {
+            rotation.copyFrom(Quaternion.RotationYawPitchRoll(0.4, 0.7, -0.3));
+            localAxis.set(1, 2, 3).normalize();
+            target.set(1, -2, 3);
+            const previousRotation = rotation.clone();
+            const previousAxis = localAxis.clone();
+            const previousTarget = target.clone();
+            const result = Quaternion.Identity();
+
+            alignRotationToRef(rotation, localAxis, target, result);
+
+            expect(rotation.equals(previousRotation)).toBe(true);
+            expect(localAxis.equals(previousAxis)).toBe(true);
+            expect(target.equals(previousTarget)).toBe(true);
+            expect(localAxis.applyRotationQuaternion(result).equalsWithEpsilon(target.normalizeToNew(), 1e-6)).toBe(
+                true,
+            );
+        } finally {
+            rotation.copyFrom(savedRotation);
+            localAxis.copyFrom(savedAxis);
+            target.copyFrom(savedTarget);
+        }
+    });
+
     it.each([
         Vector3.Up(),
         Vector3.Down(),

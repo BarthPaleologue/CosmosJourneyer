@@ -15,8 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Quaternion, TmpVectors } from "@babylonjs/core/Maths/math.vector";
-import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+
+const currentDirection = Vector3.Zero();
+const targetUnitDirection = Vector3.Zero();
+const correction = Quaternion.Identity();
 
 /**
  * Aligns a local axis with a target direction by applying the shortest correction to a unit quaternion.
@@ -31,9 +34,6 @@ export function alignRotationToRef(
     targetDirection: Readonly<Vector3>,
     result: Quaternion,
 ): void {
-    const currentDirection = TmpVectors.Vector3[1];
-    const targetUnitDirection = TmpVectors.Vector3[2];
-    const correction = TmpVectors.Quaternion[0];
     localAxis.applyRotationQuaternionToRef(rotation, currentDirection).normalize();
     targetDirection.normalizeToRef(targetUnitDirection);
     // Allow rounding in rotated unit vectors without Babylon's coarse antiparallel threshold.
