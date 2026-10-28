@@ -16,8 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import type { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 /**
@@ -65,14 +64,12 @@ export function rotate(transformNode: TransformNode, axis: Vector3, amount: numb
 }
 
 /**
- * Throws if the transform has no rotation quaternion.
+ * Returns the transform's quaternion, initializing it from its Euler rotation when absent.
  * @param transformNode - Transform whose pose is read or updated.
- * @returns The transform’s existing rotation quaternion.
+ * @returns The quaternion stored on the transform.
  */
 export function getRotationQuaternion(transformNode: TransformNode): Quaternion {
-    if (transformNode.rotationQuaternion === null) {
-        throw new Error(`Null quaternion for ${transformNode.name}`);
-    }
+    transformNode.rotationQuaternion ??= Quaternion.FromEulerVector(transformNode.rotation);
     return transformNode.rotationQuaternion;
 }
 
