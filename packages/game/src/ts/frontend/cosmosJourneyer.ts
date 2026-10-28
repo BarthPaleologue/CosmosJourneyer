@@ -58,6 +58,7 @@ import { Tts } from "@/frontend/audio/tts";
 import { initializeCsg2 } from "@/frontend/helpers/csg2";
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 import { positionNearObject } from "@/frontend/helpers/positionNearObject";
+import { alignRotationToRef } from "@/frontend/helpers/rotation";
 import { bytesToDataUrl, downloadPng, makeScreenshotPng } from "@/frontend/helpers/screenshot";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
@@ -953,7 +954,7 @@ export class CosmosJourneyer {
             .absoluteRotationQuaternion.clone()
             .invert();
 
-        let currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
+        const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
         if (isTooCloseToNearestObject) {
             const recoveryWorldPosition = Vector3.TransformCoordinates(
                 currentLocalPosition,
@@ -964,14 +965,9 @@ export class CosmosJourneyer {
                 .getAbsolutePosition()
                 .subtract(recoveryWorldPosition)
                 .normalize();
-            const deltaRotation = Quaternion.FromUnitVectorsToRef(
-                transform.forward,
-                targetForward,
-                Quaternion.Identity(),
-            );
-            currentLocalRotation = deltaRotation
-                .multiply(currentWorldRotation)
-                .multiply(nearestOrbitalObjectInverseRotation);
+            const localForward = Vector3.Forward(transform.getScene().useRightHandedSystem);
+            alignRotationToRef(currentWorldRotation, localForward, targetForward, currentLocalRotation);
+            currentLocalRotation.multiplyInPlace(nearestOrbitalObjectInverseRotation);
         }
 
         return {

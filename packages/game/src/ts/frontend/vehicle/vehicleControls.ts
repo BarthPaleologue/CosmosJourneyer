@@ -28,6 +28,8 @@ import { lerp, lerpAngle, lerpSmooth, smoothstep } from "@/utils/math";
 import type { Controls } from "../controls";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
 import { easeInOutCubic } from "../helpers/animations/interpolations";
+import { alignRotationToRef } from "../helpers/rotation";
+import { getRotationQuaternion } from "../helpers/transform";
 import { toggleDoor } from "./door";
 import { thirdPersonCameraPresets } from "./thirdPersonCameraPresets";
 import type { ThirdPersonCameraPreset, ThirdPersonCameraPresetNames } from "./thirdPersonCameraPresets";
@@ -40,6 +42,7 @@ export class VehicleControls implements Controls {
     private vehicle: Vehicle | null = null;
 
     private readonly thirdPersonTransform: TransformNode;
+    private readonly thirdPersonTargetRotation = Quaternion.Identity();
     private readonly thirdPersonCameraYOffset = 2;
 
     readonly thirdPersonCamera: ArcRotateCamera;
@@ -178,12 +181,9 @@ export class VehicleControls implements Controls {
         this.firstPersonCamera.parent = vehicleTransform;
     }
 
-    setUpDirection(up: Vector3): void {
-        const deltaRotation = Quaternion.FromUnitVectorsToRef(this.thirdPersonTransform.up, up, Quaternion.Identity());
-
-        this.thirdPersonTransform.rotationQuaternion = deltaRotation.multiply(
-            this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
-        );
+    setUpDirection(up: Readonly<Vector3>): void {
+        const rotation = getRotationQuaternion(this.thirdPersonTransform);
+        alignRotationToRef(rotation, Vector3.UpReadOnly, up, rotation);
     }
 
     getVehicle(): Vehicle | null {
@@ -225,21 +225,14 @@ export class VehicleControls implements Controls {
         if (horizontalSpeed > 0.1) {
             const horizontalDirection = horizontalVelocity.normalizeToNew();
 
-            const deltaRotation = Quaternion.FromUnitVectorsToRef(
-                this.thirdPersonTransform.forward,
-                horizontalDirection,
-                Quaternion.Identity(),
-            );
-            const targetRotation = deltaRotation.multiply(
-                this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
-            );
+            const rotation = getRotationQuaternion(this.thirdPersonTransform);
+            const localForward = this.thirdPersonTransform.getScene().useRightHandedSystem
+                ? Vector3.RightHandedForwardReadOnly
+                : Vector3.LeftHandedForwardReadOnly;
+            alignRotationToRef(rotation, localForward, horizontalDirection, this.thirdPersonTargetRotation);
             const rotationHalfLife = 0.1;
             const rotationT = lerpSmooth(0, 1, rotationHalfLife, deltaSeconds) * smoothstep(2, 4, horizontalSpeed);
-            this.thirdPersonTransform.rotationQuaternion = Quaternion.Slerp(
-                this.thirdPersonTransform.rotationQuaternion ?? Quaternion.Identity(),
-                targetRotation,
-                rotationT,
-            );
+            Quaternion.SlerpToRef(rotation, this.thirdPersonTargetRotation, rotationT, rotation);
         }
 
         this.thirdPersonTransform.computeWorldMatrix(true);

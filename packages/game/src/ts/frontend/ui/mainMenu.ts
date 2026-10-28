@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
 import { ok } from "@cosmos-journeyer/typescript";
@@ -34,6 +34,7 @@ import {
     positionNearObjectAsteroidField,
     positionNearObjectWithStarVisible,
 } from "@/frontend/helpers/positionNearObject";
+import { alignRotationToRef } from "@/frontend/helpers/rotation";
 import type { StarSystemView } from "@/frontend/starSystemView";
 
 import { getVestaModel } from "@/modules/vesta/vesta";
@@ -348,8 +349,6 @@ export class MainMenu {
 
         const starSystemController = this.starSystemView.getStarSystem();
 
-        const currentForward = this.controls.getTransform().forward;
-
         const orbitalObject = starSystemController.getOrbitalObjectById(this.universeObjectId.idInSystem);
         const celestialBody = starSystemController.getCelestialBodies().find((body) => body === orbitalObject);
         if (celestialBody === undefined) {
@@ -362,8 +361,9 @@ export class MainMenu {
             .normalize();
 
         const initialRotation = this.controls.getTransform().rotationQuaternion?.clone() ?? Quaternion.Identity();
-        const deltaRotation = Quaternion.FromUnitVectorsToRef(currentForward, newForward, Quaternion.Identity());
-        const finalRotation = deltaRotation.multiply(initialRotation);
+        const localForward = Vector3.Forward(this.scene.useRightHandedSystem);
+        const finalRotation = Quaternion.Identity();
+        alignRotationToRef(initialRotation, localForward, newForward, finalRotation);
 
         const targetPosition = positionNearObjectAsteroidField(celestialBody, starSystemController, 0.9);
 

@@ -23,6 +23,7 @@ import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import { EarthG } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
+import { alignRotationToRef } from "@/frontend/helpers/rotation";
 import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
 import { CollisionMask } from "@/settings";
@@ -254,8 +255,9 @@ export class LandingComputer {
             Matrix.RotationAxis(currentRight, -Math.PI / 4),
         );
 
-        const deltaRotation = Quaternion.FromUnitVectorsToRef(currentForward, targetForward, Quaternion.Identity());
-        const targetRotation = deltaRotation.multiply(currentRotation);
+        const localForward = Vector3.Forward(this.transform.getScene().useRightHandedSystem);
+        const targetRotation = Quaternion.Identity();
+        alignRotationToRef(currentRotation, localForward, targetForward, targetRotation);
 
         return [
             {
@@ -305,24 +307,17 @@ export class LandingComputer {
                         landingSpotNormal.scale(this.boundingExtent.y / 2),
                     );
 
-                    const currentUp = this.transform.up;
-                    const targetUp = landingSpotNormal;
-
-                    if (currentUp.equalsWithEpsilon(targetUp)) {
-                        return {
-                            position: landingSpotPosition,
-                            rotation: this.transform.absoluteRotationQuaternion,
-                        };
-                    }
-
-                    const axis = Vector3.Cross(currentUp, targetUp);
-                    const theta = Math.acos(Vector3.Dot(currentUp, targetUp));
+                    const targetRotation = Quaternion.Identity();
+                    alignRotationToRef(
+                        this.transform.absoluteRotationQuaternion,
+                        Vector3.UpReadOnly,
+                        landingSpotNormal,
+                        targetRotation,
+                    );
 
                     return {
                         position: landingSpotPosition,
-                        rotation: Quaternion.RotationAxis(axis, theta).multiplyInPlace(
-                            this.transform.absoluteRotationQuaternion,
-                        ),
+                        rotation: targetRotation,
                     };
                 },
                 maxVelocityAtTarget: {

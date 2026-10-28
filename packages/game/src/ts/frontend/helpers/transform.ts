@@ -16,7 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 /**
@@ -81,21 +82,6 @@ export function getRotationQuaternion(transformNode: TransformNode): Quaternion 
 export function setRotationQuaternion(transformNode: TransformNode, newRotation: Quaternion): void {
     transformNode.rotationQuaternion = newRotation;
     transformNode.computeWorldMatrix(true);
-}
-
-/**
- * Rotates a transform to align its up direction with the requested vector.
- * @param transformNode - Transform whose pose is read or updated.
- * @param newUp - Desired normalized up direction.
- */
-export function setUpVector(transformNode: TransformNode, newUp: Vector3): void {
-    if (newUp.equalsWithEpsilon(transformNode.up, 1e-7)) {
-        return;
-    }
-    const currentUp = transformNode.up;
-    const rotationAxis = Vector3.Cross(newUp, currentUp);
-    const angle = -Math.acos(Vector3.Dot(newUp, currentUp));
-    rotate(transformNode, rotationAxis, angle);
 }
 
 /* #region directions */

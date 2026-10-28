@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
 
+import { AttitudePDController } from "./attitudePdController";
 import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
 
 // Mock BabylonJS classes
@@ -39,6 +40,7 @@ describe("LandingComputer", () => {
             right: Vector3.Right(),
             forward: Vector3.Forward(),
             position: new Vector3(0, 0, 0),
+            getScene: () => ({ useRightHandedSystem: false }),
         } as unknown as TransformNode;
 
         mockPhysicsBody = {
@@ -153,6 +155,31 @@ describe("LandingComputer", () => {
 
         const status = landingComputer.update(0.016);
         expect(status).toBe(LandingComputerStatusBit.PROGRESS);
+    });
+
+    it("plans a finite surface landing when the ship is upside down", () => {
+        mockTransform.absoluteRotationQuaternion.copyFrom(Quaternion.RotationAxis(Vector3.RightReadOnly, Math.PI));
+        mockTransform.up.copyFrom(Vector3.DownReadOnly);
+        mockTransform.position.set(0, 100, 0);
+        const computeTorque = vi.spyOn(AttitudePDController.prototype, "computeTorqueToRef");
+
+        try {
+            landingComputer.setTarget({
+                kind: "celestial_body",
+                celestialBody: { position: new Vector3(0, -100, 0) } as TransformNode,
+            });
+            const status = landingComputer.update(0.016);
+            const targetRotation = computeTorque.mock.lastCall?.[1].orientation;
+            if (targetRotation === undefined) {
+                throw new Error("Expected a target rotation for the surface landing");
+            }
+
+            expect(status).toBe(LandingComputerStatusBit.PROGRESS);
+            expect(targetRotation.asArray().every(Number.isFinite)).toBe(true);
+            expect(Vector3.Up().applyRotationQuaternion(targetRotation).y).toBeCloseTo(1);
+        } finally {
+            computeTorque.mockRestore();
+        }
     });
 
     it("should timeout liftoff without a landing target", () => {

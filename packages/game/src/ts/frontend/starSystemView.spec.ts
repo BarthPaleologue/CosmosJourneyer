@@ -15,7 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Scene } from "@babylonjs/core/scene";
 import { ok } from "@cosmos-journeyer/typescript";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -186,11 +190,23 @@ describe("StarSystemView", () => {
         );
     });
 
-    it("updates clustered lighting after star system positions", () => {
-        const camera = {};
+    it.each([
+        { label: "missing", gravity: null, expectedUp: Vector3.Up() },
+        { label: "zero", gravity: Vector3.Zero(), expectedUp: Vector3.Up() },
+        { label: "nonzero", gravity: new Vector3(3, -4, 0), expectedUp: new Vector3(-0.6, 0.8, 0) },
+    ])("updates the character and lighting with $label gravity", ({ gravity, expectedUp }) => {
+        const engine = new NullEngine();
+        const scene = new Scene(engine);
+        const transform = new TransformNode("character", scene);
+        transform.rotationQuaternion = Quaternion.RotationAxis(Vector3.Up(), 0.7);
+        transform.computeWorldMatrix(true);
+        const previousForward = transform.forward.clone();
+        const previousGravity = gravity?.clone();
+        const camera = new FreeCamera("character camera", new Vector3(0, 1.5, 0), scene);
+        camera.parent = transform;
         const expectedError = new Error("Stop after clustered lighting update");
         const starSystem = {
-            gravitySystem: { getLastComputedForce: (): Vector3 => Vector3.Down() },
+            gravitySystem: { getLastComputedForce: (): Vector3 | null => gravity },
             update: vi.fn(),
         };
         const clusteredLightingSystem = {
@@ -200,7 +216,7 @@ describe("StarSystemView", () => {
         };
         const activeControls = {
             getActiveCamera: (): object => camera,
-            update: vi.fn(),
+            update: vi.fn(() => camera.getViewMatrix(true)),
         };
         const context = {
             _isLoadingSystem: false,
@@ -208,7 +224,7 @@ describe("StarSystemView", () => {
             characterControls: {
                 avatar: {
                     aggregate: { body: {} },
-                    getTransform: () => ({ up: Vector3.Up() }),
+                    getTransform: () => transform,
                 },
             },
             clusteredLightingSystem,
@@ -222,12 +238,26 @@ describe("StarSystemView", () => {
             updateBeforeRender(this: StarSystemView, deltaSeconds: number): void;
         };
 
-        expect(() => {
-            starSystemViewPrototype.updateBeforeRender.call(context, 1);
-        }).toThrow(expectedError);
-        expect(clusteredLightingSystem.update).toHaveBeenCalledWith(camera);
-        expect(starSystem.update.mock.invocationCallOrder[0]).toBeLessThan(
-            clusteredLightingSystem.update.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
-        );
+        try {
+            expect(() => {
+                starSystemViewPrototype.updateBeforeRender.call(context, 1);
+            }).toThrow(expectedError);
+            transform.computeWorldMatrix(true);
+
+            expect(transform.up.equalsWithEpsilon(expectedUp, 1e-6)).toBe(true);
+            expect(Array.from(transform.getWorldMatrix().m).every(Number.isFinite)).toBe(true);
+            expect(camera.globalPosition.asArray().every(Number.isFinite)).toBe(true);
+            expect(gravity).toEqual(previousGravity ?? null);
+            if (gravity === null || gravity.lengthSquared() === 0) {
+                expect(transform.forward.equalsWithEpsilon(previousForward, 1e-6)).toBe(true);
+            }
+            expect(clusteredLightingSystem.update).toHaveBeenCalledWith(camera);
+            expect(starSystem.update.mock.invocationCallOrder[0]).toBeLessThan(
+                clusteredLightingSystem.update.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
+            );
+        } finally {
+            scene.dispose();
+            engine.dispose();
+        }
     });
 });

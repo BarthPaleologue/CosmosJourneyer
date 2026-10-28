@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 import { afterAll, describe, expect, it, vi } from "vitest";
@@ -69,5 +70,24 @@ describe("VehicleControls", () => {
 
         expect(vehicleControls.firstPersonCamera.parent).toBeNull();
         vehicleTransform.dispose();
+    });
+
+    it("aligns the camera to successive up directions without refreshing matrices", () => {
+        const controls = new VehicleControls(scene);
+        const transform = controls.thirdPersonCamera.parent;
+        if (!(transform instanceof TransformNode)) {
+            throw new Error("Expected a camera transform");
+        }
+        transform.rotationQuaternion = Quaternion.RotationAxis(Vector3.UpReadOnly, 0.7);
+        const rotation = transform.rotationQuaternion;
+        transform.computeWorldMatrix(true);
+
+        controls.setUpDirection(Vector3.RightReadOnly);
+        controls.setUpDirection(Vector3.DownReadOnly);
+        transform.computeWorldMatrix(true);
+
+        expect(transform.rotationQuaternion).toBe(rotation);
+        expect(transform.up.equalsWithEpsilon(Vector3.DownReadOnly, 1e-6)).toBe(true);
+        expect(rotation.asArray().every(Number.isFinite)).toBe(true);
     });
 });
