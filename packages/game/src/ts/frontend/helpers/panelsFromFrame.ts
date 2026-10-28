@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Matrix, Quaternion, Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Matrix, Vector2, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PolygonMeshBuilder } from "@babylonjs/core/Meshes/polygonMesh";
 import type { Scene } from "@babylonjs/core/scene";
@@ -266,10 +266,11 @@ export function createPanelsFromFrame(
         const pmb = new PolygonMeshBuilder("poly", shape2D, scene, earcut);
         const panel = pmb.build(false, thickness);
 
-        // Compose transform to map local 2D back to 3D plane at faceCentroid.
-        // Using a quaternion that looks along axisV with up=normal gives a stable frame.
-        const rotation = Quaternion.FromLookDirectionRH(axisV, normal.negate());
-        const panelTransform = Matrix.Compose(new Vector3(1, 1, 1), rotation, faceCentroid);
+        // PolygonMeshBuilder embeds its 2D polygon in local X/Z.
+        const axisY = Vector3.Cross(axisV, axisU);
+        const panelTransform = Matrix.Identity();
+        Matrix.FromXYZAxesToRef(axisU, axisY, axisV, panelTransform);
+        panelTransform.setTranslation(faceCentroid);
 
         panel.bakeTransformIntoVertices(panelTransform);
         panels.push(panel);
