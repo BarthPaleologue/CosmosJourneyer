@@ -29,6 +29,7 @@ import {
     Vector3,
 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core";
+import { getRngFromSeed } from "@cosmos-journeyer/random";
 
 import { loadSounds } from "@/frontend/assets/audio/sounds";
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -149,7 +150,7 @@ export async function createRoverScene(
     const roverResult = createWolfMk2(
         assets,
         scene,
-        new Vector3(0, 5, 0),
+        new Vector3(0, -0.5, 0),
         Quaternion.RotationAxis(Vector3.UpReadOnly, Math.PI / 4),
     );
     if (!roverResult.success) {
@@ -161,6 +162,23 @@ export async function createRoverScene(
     const roverControls = new VehicleControls(scene);
     roverControls.setVehicle(rover);
     roverControls.switchToThirdPersonCamera();
+    roverControls.thirdPersonCamera.alpha = -Math.PI / 2;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    for (const [property, parameter] of [
+        ["alpha", "cameraAlpha"],
+        ["beta", "cameraBeta"],
+        ["radius", "cameraRadius"],
+    ] as const) {
+        const value = urlParams.get(parameter);
+        if (value === null) {
+            continue;
+        }
+        const parsed = Number(value);
+        if (Number.isFinite(parsed)) {
+            roverControls.thirdPersonCamera[property] = parsed;
+        }
+    }
 
     let activeControls: Controls = roverControls;
 
@@ -206,14 +224,16 @@ export async function createRoverScene(
         }
     });
 
-    //spawn a bunch of boxes
+    const rng = getRngFromSeed(2);
+    const random = (index: number): number => Math.abs(rng(index));
     for (let i = 0; i < 200; i++) {
-        const box = MeshBuilder.CreateBox(`box${i}`, { size: 0.2 + Math.random() }, scene);
-        box.position = new Vector3((Math.random() - 0.5) * 200, 0, (Math.random() - 0.5) * 200);
-        box.rotation = new Vector3(Math.random(), Math.random(), Math.random());
+        const step = i * 9;
+        const box = MeshBuilder.CreateBox(`box${i}`, { size: 0.2 + random(step) }, scene);
+        box.position = new Vector3((random(step + 1) - 0.5) * 200, 0, (random(step + 2) - 0.5) * 200);
+        box.rotation = new Vector3(random(step + 3), random(step + 4), random(step + 5));
 
         const boxMaterial = new PBRMaterial("boxMaterial", scene);
-        boxMaterial.albedoColor = Color3.Random();
+        boxMaterial.albedoColor = new Color3(random(step + 6), random(step + 7), random(step + 8));
         boxMaterial.metallic = 0;
         boxMaterial.roughness = 0.7;
         box.material = boxMaterial;
