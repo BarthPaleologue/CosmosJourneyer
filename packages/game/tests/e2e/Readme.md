@@ -8,6 +8,8 @@ You can write end-to-end tests in `packages/game/tests/e2e` using Playwright's A
 
 Screenshots are stored in folders next to the test files. The screenshots are versioned using git-lfs, so you need to have git-lfs installed and configured to use them.
 
+The rover playground starts with the camera behind the rover. It accepts `cameraAlpha` and `cameraBeta` (radians) and `cameraRadius` (meters) to reproduce other views. For example: `/playground.html?scene=rover&freeze=5&cameraAlpha=2.356194490192345&cameraBeta=1.4&cameraRadius=12`. Its obstacle layout is deterministic, and the rover starts just above the ground so frozen captures also show the wheels near the surface.
+
 ## Git LFS
 
 You need to have [git-lfs](https://git-lfs.github.com/) installed and configured to use the screenshots. You can install it using the following command:
