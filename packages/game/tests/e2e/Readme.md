@@ -55,3 +55,9 @@ To update the screenshots, run the update command. This also rebuilds the produc
 ```bash
 pnpm test:e2e:update
 ```
+
+## Terrain heightmaps
+
+`/playground.html?scene=terrainHeightmap&seed=261` samples the game's Slang terrain compute shader on a 512×256 equirectangular grid. North is at the top, longitudes run from −180° to +180°, and grayscale maps a fixed −10 km to +10 km elevation relative to sea level. Change `seed` to inspect another generated planet. Raw elevations in metres above the planet's reference radius are available in `window.terrainHeightmap`.
+
+`terrainHeightmap.spec.ts` compares maps for two seeds and checks finite heights, relief, the longitude seam, and both poles. Update only these baselines with `pnpm --filter @cosmos-journeyer/game exec playwright test terrainHeightmap.spec.ts --update-snapshots` after rebuilding the game.
