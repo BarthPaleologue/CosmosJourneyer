@@ -119,3 +119,34 @@ Apply or inspect this scope independently with:
 ansible-playbook site.yml --tags journald --check --diff
 ansible-playbook site.yml --tags journald --diff
 ```
+
+## Automatic security updates
+
+Ansible installs `unattended-upgrades`, manages `/etc/apt/apt.conf.d/60-cosmos-security-updates` and enables the
+`apt-daily.timer` and `apt-daily-upgrade.timer` timers. The drop-in enables daily package-list refreshes and unattended
+upgrades while retaining Ubuntu's default allowed origins. It does not enable the general `-updates` pocket or activate
+Ubuntu Pro/ESM subscriptions.
+
+When an unattended upgrade requires a reboot, it is scheduled for **04:30 in the VPS's local timezone**, including when
+users are logged in. The production VPS currently uses UTC. Package upgrades can also restart affected services before
+a reboot. The playbook configures the scheduled updates; it does not run a bulk package upgrade itself.
+
+Inspect or apply this scope independently with:
+
+```sh
+ansible-playbook site.yml --tags unattended-upgrades --check --diff
+ansible-playbook site.yml --tags unattended-upgrades --diff
+```
+
+To inspect the effective configuration and recent scheduled runs on the VPS:
+
+```sh
+dpkg-query -W unattended-upgrades
+apt-config dump | grep -E '^(APT::Periodic|Unattended-Upgrade::)'
+systemctl list-timers --all apt-daily.timer apt-daily-upgrade.timer --no-pager
+sudo journalctl -u apt-daily-upgrade.service -n 40 --no-pager
+```
+
+`/usr/lib/update-notifier/apt-check` reports `total;security` upgrade counts using the current package lists, when
+`update-notifier-common` is installed. Pending non-security updates can remain even when unattended security upgrades
+are working. Detailed upgrade logs are in `/var/log/unattended-upgrades/`.

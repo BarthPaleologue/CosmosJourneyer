@@ -16,3 +16,6 @@
 
 - name: Configure production journal retention
   ansible.builtin.import_playbook: journald.yml
+
+- name: Configure production automatic security updates
+  ansible.builtin.import_playbook: unattended-upgrades.yml
