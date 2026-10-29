@@ -16,14 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import "@babylonjs/core/Engines/Extensions/";
-import "@babylonjs/core/Engines/WebGPU/Extensions/";
 import "@babylonjs/core/Physics/physicsEngineComponent";
 
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 import { CreateAudioEngineAsync } from "@babylonjs/core/AudioV2/webAudio/webAudioEngine";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Engine } from "@babylonjs/core/Engines/engine";
-import { EngineFactory } from "@babylonjs/core/Engines/engineFactory";
 import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -451,21 +449,12 @@ export class CosmosJourneyer {
 
         const backend = backendResult.value;
 
-        // Init BabylonJS engine (use webgpu if ?webgpu is in the url)
-        const engine = window.location.search.includes("webgpu")
-            ? await EngineFactory.CreateAsync(canvas, {
-                  useHighPrecisionMatrix: true,
-                  twgslOptions: {
-                      wasmPath: new URL("@/utils/TWGSL/twgsl.wasm", import.meta.url).href,
-                      jsPath: new URL("@/utils/TWGSL/twgsl.js", import.meta.url).href,
-                  },
-              })
-            : new Engine(canvas, true, {
-                  // the preserveDrawingBuffer option is required for the screenshot feature to work
-                  preserveDrawingBuffer: true,
-                  useHighPrecisionMatrix: true,
-                  doNotHandleContextLost: true,
-              });
+        const engine = new Engine(canvas, true, {
+            // the preserveDrawingBuffer option is required for the screenshot feature to work
+            preserveDrawingBuffer: true,
+            useHighPrecisionMatrix: true,
+            doNotHandleContextLost: true,
+        });
 
         engine.useReverseDepthBuffer = true;
         engine.loadingScreen = loadingScreen;
@@ -484,7 +473,7 @@ export class CosmosJourneyer {
         const audioEngine = audioEngineResult.value;
 
         // Log informations about the gpu and the api used
-        console.log(`API: ${engine.isWebGPU ? "WebGPU" : "WebGL"}`);
+        console.log(`API: ${engine.name}`);
         console.log(`GPU detected: ${engine.extractDriverInfo()}`);
 
         // Init geometry and physics engines
