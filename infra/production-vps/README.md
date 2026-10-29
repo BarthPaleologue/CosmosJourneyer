@@ -9,6 +9,26 @@ The `Production infrastructure` GitHub workflow runs syntax validation and the `
 pull requests that change this directory. Tooling and collection versions are pinned. The workflow has read-only
 repository permissions, receives no production secret and never connects to the VPS.
 
+## Check or apply from GitHub Actions
+
+Open **Actions → Manage Production Infrastructure → Run workflow** and select `main`. The workflow connects to the
+inventory's administrative account and runs `site.yml`:
+
+- `dry_run=true` (default): `ansible-playbook site.yml --check --diff` previews changes.
+- `dry_run=false`: `ansible-playbook site.yml --diff` applies them.
+
+Inspect the normal Ansible logs for the diff and recap. A successful dry-run can report changes; it is a preview, not
+an automatic conformity verdict. Several SSH, firewall, HTTP and TLS runtime checks are skipped in check mode.
+
+Create a GitHub environment named `production-infrastructure`, allow deployments only from the `main` branch, require
+reviewer approval before jobs can access its secrets, and set:
+
+- `VPS_ANSIBLE_SSH_KEY`: a dedicated private SSH key authorized for the inventory's `ubuntu` account, with
+  non-interactive sudo access. Keep it separate from the application deployment key, whose account has no sudo access.
+- `VPS_SSH_KNOWN_HOSTS`: the verified SSH host-key entry for the inventory's VPS.
+
+Only one infrastructure run executes at a time; a new run never automatically cancels an apply in progress.
+
 ## SSH hardening
 
 The production inventory uses the `ubuntu` administrative account and the SSH host key already recorded by the
