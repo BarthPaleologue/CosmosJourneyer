@@ -22,23 +22,26 @@ test("The main menu renders after loading the game", async ({ page }, testInfo) 
     await expect(page.locator(".mainMenu").getByText("New Journey", { exact: true })).toBeVisible();
     expect(errors).toEqual([]);
 
-    const activeMeshCount = await Promise.race([
+    const hasVisiblePixels = await Promise.race([
         page.waitForEvent("pageerror").then((error) => {
             throw error;
         }),
         page.evaluate(async () => {
             const { engine, starSystemView } = window.CosmosJourneyer;
             const scene = starSystemView.getMainScene();
-            return await new Promise<number>((resolve) => {
+            await new Promise<void>((resolve) => {
                 scene.onAfterRenderObservable.addOnce(() => {
                     engine.onEndFrameObservable.addOnce(() => {
-                        resolve(scene.getActiveMeshes().length);
+                        resolve();
                     });
                 });
             });
+            const pixels = await engine.readPixels(0, 0, engine.getRenderWidth(), engine.getRenderHeight());
+            const channels = new Uint8Array(pixels.buffer, pixels.byteOffset, pixels.byteLength);
+            return channels.some((value, index) => index % 4 !== 3 && value > 0);
         }),
     ]);
-    expect(activeMeshCount).toBeGreaterThan(0);
+    expect(hasVisiblePixels).toBe(true);
 
     await testInfo.attach("main-menu-first-frame", {
         body: await page.screenshot({ path: testInfo.outputPath("main-menu-first-frame.png") }),

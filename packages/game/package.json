@@ -67,7 +67,6 @@
         "manifold-3d": "3.5.4",
         "markdown-it": "15.0.3",
         "qrcode": "1.5.4",
-        "terrain-generation": "workspace:^",
         "zod": "catalog:"
     },
     "devDependencies": {
@@ -86,7 +85,7 @@
         "typescript": "catalog:",
         "vite": "catalog:",
         "vite-plugin-glsl": "1.6.2",
-        "vite-plugin-wasm": "3.6.0",
+        "vite-slang": "0.7.0",
         "vitest": "catalog:"
     }
 }

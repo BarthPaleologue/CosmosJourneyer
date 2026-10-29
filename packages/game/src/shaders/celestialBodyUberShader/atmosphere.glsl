@@ -21,7 +21,7 @@
 #include "../utils/atmosphere.glsl";
 
 vec3 celestialBodyUberShaderAtmosphereDensityAtPoint(vec3 densitySamplePoint) {
-    float heightAboveSurface = length(densitySamplePoint - object_position) - object_radius;
+    float heightAboveSurface = max(0.0, length(densitySamplePoint - object_position) - object_radius);
 
     vec3 density = vec3(exp(-heightAboveSurface / vec2(atmosphere_rayleighHeight, atmosphere_mieHeight)), 0.0);
 
@@ -32,7 +32,7 @@ vec3 celestialBodyUberShaderAtmosphereDensityAtPoint(vec3 densitySamplePoint) {
 }
 
 vec3 celestialBodyUberShaderAtmosphereOpticalDepth(vec3 rayOrigin, vec3 rayDir, float rayLength) {
-    float stepSize = rayLength / (float(ATMOSPHERE_OPTICAL_DEPTH_POINTS) - 1.0);
+    float stepSize = rayLength / float(ATMOSPHERE_OPTICAL_DEPTH_POINTS);
 
     vec3 densitySamplePoint = rayOrigin;
     vec3 accumulatedOpticalDepth = vec3(0.0);
@@ -54,7 +54,7 @@ vec3 celestialBodyUberShaderAtmosphereCalculateLight(
     vec3 originalColor
 ) {
     vec3 samplePoint = rayOrigin;
-    float stepSize = rayLength / (float(ATMOSPHERE_POINTS_FROM_CAMERA) - 1.0);
+    float stepSize = rayLength / float(ATMOSPHERE_POINTS_FROM_CAMERA);
 
     vec3 inScatteredRayleigh = vec3(0.0);
     vec3 inScatteredMie = vec3(0.0);
@@ -92,10 +92,10 @@ vec3 celestialBodyUberShaderAtmosphereCalculateLight(
 
     float phaseRayleigh = 3.0 / (16.0 * PI) * (1.0 + costheta2);
 
-    float g = atmosphere_mieAsymmetry;
-    float g2 = g * g;
-    float phaseMie = (3.0 * (1.0 - g2) / (8.0 * PI * (2.0 + g2))) * (1.0 + costheta2)
-        / pow(1.0 + g2 - 2.0 * g * costheta, 1.5);
+    vec3 g = atmosphere_mieAsymmetry;
+    vec3 g2 = g * g;
+    vec3 phaseMie = (3.0 * (1.0 - g2) / (8.0 * PI * (2.0 + g2))) * (1.0 + costheta2)
+        / pow(1.0 + g2 - 2.0 * g * costheta, vec3(1.5));
 
     inScatteredRayleigh *= phaseRayleigh * atmosphere_rayleighCoeffs;
     inScatteredMie *= phaseMie * atmosphere_mieCoeffs;
