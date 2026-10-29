@@ -1,0 +1,73 @@
+name: Manage Production Infrastructure
+
+on:
+    workflow_dispatch:
+        inputs:
+            dry_run:
+                description: "Preview infrastructure changes without applying them"
+                required: true
+                type: boolean
+                default: true
+
+permissions:
+    contents: read
+
+concurrency:
+    group: production-infrastructure-operations
+    cancel-in-progress: false
+
+jobs:
+    manage:
+        name: ${{ inputs.dry_run && 'Check VPS configuration' || 'Apply VPS configuration' }}
+        if: github.ref == 'refs/heads/main'
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        environment: production-infrastructure
+        defaults:
+            run:
+                working-directory: infra/production-vps
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+              with:
+                  ref: ${{ github.sha }}
+                  persist-credentials: false
+
+            - name: Use Python 3.13
+              uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+              with:
+                  python-version: "3.13"
+
+            - name: Install pinned Ansible tooling
+              run: python -m pip install ansible-core==2.19.12
+
+            - name: Install pinned Ansible collections
+              run: ansible-galaxy collection install --requirements-file requirements.yml
+
+            - name: Configure known hosts
+              env:
+                  VPS_SSH_KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+              run: |
+                  if [[ -z "$VPS_SSH_KNOWN_HOSTS" ]]; then
+                      echo "::error::VPS_SSH_KNOWN_HOSTS must contain the verified VPS host key"
+                      exit 1
+                  fi
+                  install -d -m 700 ~/.ssh
+                  printf '%s\n' "$VPS_SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
+                  chmod 600 ~/.ssh/known_hosts
+
+            - name: Configure infrastructure SSH agent
+              uses: webfactory/ssh-agent@e83874834305fe9a4a2997156cb26c5de65a8555 # v0.10.0
+              with:
+                  ssh-private-key: ${{ secrets.VPS_ANSIBLE_SSH_KEY }}
+
+            - name: Run production playbook
+              env:
+                  DRY_RUN: ${{ inputs.dry_run }}
+                  ANSIBLE_SSH_ARGS: -o StrictHostKeyChecking=yes -o BatchMode=yes
+              run: |
+                  args=(site.yml --diff)
+                  if [[ "$DRY_RUN" == true ]]; then
+                      args+=(--check)
+                  fi
+                  ansible-playbook "${args[@]}"
