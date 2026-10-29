@@ -1,0 +1,30 @@
+---
+- name: Configure production automatic security updates
+  hosts: production
+  become: true
+  gather_facts: false
+  tags: unattended-upgrades
+
+  tasks:
+      - name: Install unattended upgrades
+        ansible.builtin.apt:
+            name: unattended-upgrades
+            state: present
+
+      - name: Install the automatic security update policy
+        ansible.builtin.copy:
+            src: apt/60-cosmos-security-updates
+            dest: /etc/apt/apt.conf.d/60-cosmos-security-updates
+            owner: root
+            group: root
+            mode: "0644"
+            validate: /usr/bin/apt-config -c %s dump
+
+      - name: Enable the daily APT timers
+        ansible.builtin.systemd_service:
+            name: "{{ item }}"
+            enabled: true
+            state: started
+        loop:
+            - apt-daily.timer
+            - apt-daily-upgrade.timer
