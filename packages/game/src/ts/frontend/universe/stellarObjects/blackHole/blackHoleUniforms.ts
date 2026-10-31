@@ -17,6 +17,7 @@
 
 import type { Effect } from "@babylonjs/core/Materials/effect";
 import type { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture";
+import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { G, getKerrMetricA, getSchwarzschildRadius } from "@cosmos-journeyer/physics";
@@ -31,6 +32,8 @@ export const BlackHoleUniformNames = {
     SCHWARZSCHILD_RADIUS: "schwarzschildRadius",
     FRAME_DRAGGING_FACTOR: "frameDraggingFactor",
     ACCRETION_DISK_RADIUS: "accretionDiskRadius",
+    INNER_DISK_COLOR: "innerDiskColor",
+    OUTER_DISK_COLOR: "outerDiskColor",
     WARPING_MINKOWSKI_FACTOR: "warpingMinkowskiFactor",
     STANDARD_GRAVITATIONAL_PARAMETER: "standardGravitationalParameter",
     WORLD_POSITION: "worldPosition",
@@ -43,13 +46,15 @@ export const BlackHoleSamplerNames = {
 };
 
 export class BlackHoleUniforms {
-    accretionDiskRadius: number;
-    warpingMinkowskiFactor: number;
-    schwarzschildRadius: number;
-    frameDraggingFactor: number;
-    standardGravitationalParameter: number;
+    readonly accretionDiskRadius: number;
+    readonly innerDiskColor: Color3;
+    readonly outerDiskColor: Color3;
+    readonly warpingMinkowskiFactor: number;
+    readonly schwarzschildRadius: number;
+    readonly frameDraggingFactor: number;
+    readonly standardGravitationalParameter: number;
     elapsedSeconds = 0;
-    backgroundTexture: CubeTexture;
+    readonly backgroundTexture: CubeTexture;
 
     private readonly worldPosition = new Vector3();
     private readonly diskRotation = new Matrix();
@@ -63,6 +68,8 @@ export class BlackHoleUniforms {
         this.frameDraggingFactor = kerrMetricA / blackHoleModel.mass;
         this.standardGravitationalParameter = G * blackHoleModel.mass;
         this.backgroundTexture = backgroundTexture;
+        this.innerDiskColor = new Color3(2.0, 1.2, 0.6);
+        this.outerDiskColor = this.innerDiskColor.scale(0.7);
 
         computeSpinAxisOrientation(blackHoleModel.orbit, blackHoleModel.spin).toRotationMatrix(this.diskRotation);
         this.diskRotation.transposeToRef(this.inverseDiskRotation);
@@ -74,6 +81,8 @@ export class BlackHoleUniforms {
         effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, this.schwarzschildRadius);
         effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, this.frameDraggingFactor);
         effect.setFloat(BlackHoleUniformNames.ACCRETION_DISK_RADIUS, this.accretionDiskRadius);
+        effect.setColor3(BlackHoleUniformNames.INNER_DISK_COLOR, this.innerDiskColor.toLinearSpace());
+        effect.setColor3(BlackHoleUniformNames.OUTER_DISK_COLOR, this.outerDiskColor.toLinearSpace());
         effect.setFloat(BlackHoleUniformNames.WARPING_MINKOWSKI_FACTOR, this.warpingMinkowskiFactor);
         effect.setFloat(BlackHoleUniformNames.STANDARD_GRAVITATIONAL_PARAMETER, this.standardGravitationalParameter);
 

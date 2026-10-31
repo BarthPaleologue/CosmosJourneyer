@@ -64,6 +64,8 @@ export class LandingBay {
 
     private readonly lights: Array<Light> = [];
 
+    private readonly lightIntensity = 10;
+
     constructor(model: LandingBayModel, displayName: string, assets: RenderingAssets, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
@@ -241,7 +243,7 @@ export class LandingBay {
                     lightInstanceData.push({
                         rootPosition: corner,
                         lookAtTarget: landingPadCenter,
-                        color: new Color3(1, 1, 0.8),
+                        color: new Color3(1, 1, 0.8).scaleInPlace(this.lightIntensity),
                         upDirection: landingPadUp,
                         range: 50 * landingPad.getPadSize(),
                         lampSize: landingPad.getPadSize(),
@@ -270,6 +272,7 @@ export class LandingBay {
             default:
                 assertUnreachable(status);
         }
+        statusColor.scaleInPlace(this.lightIntensity);
         this.landingPadLights.setColorAt(landingPadIndex * 4, statusColor);
         this.landingPadLights.setColorAt(landingPadIndex * 4 + 1, statusColor);
         this.landingPadLights.setColorAt(landingPadIndex * 4 + 2, statusColor);
