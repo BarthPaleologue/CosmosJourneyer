@@ -28,8 +28,8 @@ Effect.ShadersStore[`${shaderName}FragmentShader`] = colorCorrectionFragment;
 
 export class ColorCorrection extends PostProcess {
     contrast = 1;
-    exposure = 1;
-    saturation = 1;
+    exposure = 1.5;
+    saturation = 1.2;
 
     constructor(name: string, scene: Scene) {
         super(

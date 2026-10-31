@@ -71,8 +71,6 @@ export async function createBlackHoleScene(
     camera.attachPostProcess(blackHolePostProcess);
 
     const colorCorrection = new ColorCorrection("colorCorrection", scene);
-    colorCorrection.exposure = 1.5;
-    colorCorrection.saturation = 1.2;
     camera.attachPostProcess(colorCorrection);
 
     camera.maxZ = 1e12;
