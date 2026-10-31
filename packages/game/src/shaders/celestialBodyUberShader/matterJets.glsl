@@ -46,7 +46,8 @@ float matterJetsSpiralDensity(vec3 p, float coneTheta, float coneHeight) {
 
     float density = 1.0;
 
-    density *= exp(-0.02 * dist * dist);
+    float spiralFalloff = 0.02 / (1.0 + heightFraction * 5.0);
+    density *= exp(-spiralFalloff * dist * dist);
     density *= 1.0 - smoothstep(0.0, 1.0, heightFraction);
     density /= heightFraction;
 
