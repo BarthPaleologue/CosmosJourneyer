@@ -34,7 +34,7 @@ const float maxDiskNoiseShearRadians = 2.0 * TAU;
 uniform sampler2D textureSampler;
 uniform sampler2D depthSampler;
 
-uniform samplerCube starfieldTexture;
+uniform samplerCube backgroundLinear;
 
 uniform mat4 starfieldRotation;
 
@@ -347,8 +347,7 @@ void main() {
         rayDirWorld = normalize(directionToWorldSpace(rayDir));
         rayDirWorld = vec3(starfieldRotation * vec4(rayDirWorld, 1.0));
         rayDirWorld.z *= -1.0;
-        bg = texture(starfieldTexture, rayDirWorld);
-        bg.rgb = pow(bg.rgb, vec3(2.2));
+        bg = texture(backgroundLinear, rayDirWorld);
     }
 
     vec4 finalColor = vec4(1.0, 0.0, 0.0, 1.0);
