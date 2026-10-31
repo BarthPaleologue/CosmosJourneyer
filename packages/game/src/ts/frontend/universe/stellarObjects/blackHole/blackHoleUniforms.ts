@@ -42,7 +42,7 @@ export const BlackHoleUniformNames = {
 };
 
 export const BlackHoleSamplerNames = {
-    STARFIELD_TEXTURE: "starfieldTexture",
+    BACKGROUND_LINEAR: "backgroundLinear",
 };
 
 export class BlackHoleUniforms {
@@ -54,20 +54,20 @@ export class BlackHoleUniforms {
     readonly frameDraggingFactor: number;
     readonly standardGravitationalParameter: number;
     elapsedSeconds = 0;
-    readonly backgroundTexture: CubeTexture;
+    readonly backgroundLinear: CubeTexture;
 
     private readonly worldPosition = new Vector3();
     private readonly diskRotation = new Matrix();
     private readonly inverseDiskRotation = new Matrix();
 
-    constructor(blackHoleModel: DeepReadonly<BlackHoleModel>, backgroundTexture: CubeTexture) {
+    constructor(blackHoleModel: DeepReadonly<BlackHoleModel>, backgroundLinear: CubeTexture) {
         this.accretionDiskRadius = blackHoleModel.accretionDiskRadius;
         this.warpingMinkowskiFactor = 2.0;
         this.schwarzschildRadius = getSchwarzschildRadius(blackHoleModel.mass);
         const kerrMetricA = getKerrMetricA(blackHoleModel.mass, blackHoleModel.spin.siderealPeriod);
         this.frameDraggingFactor = kerrMetricA / blackHoleModel.mass;
         this.standardGravitationalParameter = G * blackHoleModel.mass;
-        this.backgroundTexture = backgroundTexture;
+        this.backgroundLinear = backgroundLinear;
         this.innerDiskColor = new Color3(2.0, 1.2, 0.6);
         this.outerDiskColor = this.innerDiskColor.scale(0.7);
 
@@ -76,7 +76,7 @@ export class BlackHoleUniforms {
     }
 
     public setUniforms(effect: Effect, blackHoleTransform: TransformNode, floatingOriginOffset: Vector3): void {
-        effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, this.backgroundTexture.getReflectionTextureMatrix());
+        effect.setMatrix(BlackHoleUniformNames.STARFIELD_ROTATION, this.backgroundLinear.getReflectionTextureMatrix());
         effect.setFloat(BlackHoleUniformNames.ELAPSED_SECONDS, this.elapsedSeconds);
         effect.setFloat(BlackHoleUniformNames.SCHWARZSCHILD_RADIUS, this.schwarzschildRadius);
         effect.setFloat(BlackHoleUniformNames.FRAME_DRAGGING_FACTOR, this.frameDraggingFactor);
@@ -94,6 +94,6 @@ export class BlackHoleUniforms {
     }
 
     public setSamplers(effect: Effect): void {
-        effect.setTexture(BlackHoleSamplerNames.STARFIELD_TEXTURE, this.backgroundTexture);
+        effect.setTexture(BlackHoleSamplerNames.BACKGROUND_LINEAR, this.backgroundLinear);
     }
 }

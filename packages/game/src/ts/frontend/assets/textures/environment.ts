@@ -39,7 +39,7 @@ export async function loadEnvironmentTextures(
 ): Promise<EnvironmentTextures> {
     const milkyWayPromise = loadCubeTextureAsync("SkyBox", milkyWay, scene, progressMonitor);
     const milkyWayTexture = await milkyWayPromise;
-    milkyWayTexture.gammaSpace = true; // exr is already linear, but I prefer the darker look the power-law gives it
+    milkyWayTexture.gammaSpace = false;
 
     return {
         milkyWay: milkyWayTexture,
