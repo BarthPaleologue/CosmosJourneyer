@@ -15,14 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-precision lowp float;
+precision highp float;
 
 #define DISABLE_UNIFORMITY_ANALYSIS
 
 varying vec2 vUV;// screen coordinates
 
-uniform sampler2D textureSampler;// the original screen texture
-uniform sampler2D depthSampler;// the depth map of the camera
+uniform highp sampler2D textureSampler;// the original screen texture
+uniform highp sampler2D depthSampler;// the depth map of the camera
 
 #include "./utils/stars.glsl";
 

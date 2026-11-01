@@ -58,7 +58,7 @@ void main() {
     float rays = pow(sin(vUV.x * 3.1415 * 4.0 + time), 4.0);
     rays *= 0.2 + sin(time * 2.0) * 0.1;
 
-    vec3 finalColor = noise * vec3(1.2, 1.2, 2.0) * 3.0;
+    vec3 finalColor = noise * vec3(1.2, 1.2, 2.0) * 2.0;
 
     finalColor += noise2 * vec3(0.9, 1.0, 0.9);
 

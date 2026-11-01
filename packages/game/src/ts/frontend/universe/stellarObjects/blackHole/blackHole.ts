@@ -44,7 +44,7 @@ export class BlackHole implements CelestialBodyBase<"blackHole"> {
 
     readonly accretionDisk: AccretionDisk | null;
 
-    constructor(model: DeepReadonly<BlackHoleModel>, backgroundTexture: CubeTexture, scene: Scene) {
+    constructor(model: DeepReadonly<BlackHoleModel>, backgroundLinear: CubeTexture, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;
@@ -55,7 +55,7 @@ export class BlackHole implements CelestialBodyBase<"blackHole"> {
         this.accretionDisk =
             this.model.accretionDiskRadius > 0 ? new AccretionDisk(this.model.blackBodyTemperature) : null;
 
-        this.blackHoleUniforms = new BlackHoleUniforms(this.model, backgroundTexture);
+        this.blackHoleUniforms = new BlackHoleUniforms(this.model, backgroundLinear);
     }
 
     getTransform(): TransformNode {

@@ -15,37 +15,53 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-precision lowp float;
+precision highp float;
 
 uniform float exposure;
-uniform float gamma;
 uniform float contrast;
 uniform float saturation;
-uniform float brightness;
 
-uniform sampler2D textureSampler;
+uniform highp sampler2D textureSampler;
 
 varying vec2 vUV;
 
 #include "./utils/tonemapping/acesTonemap.glsl";
+#include "./utils/hash12.glsl";
+
+vec3 linearToSRGB(vec3 color) {
+    color = clamp(color, 0.0, 1.0);
+
+    vec3 low = 12.92 * color;
+    vec3 high = 1.055 * pow(color, vec3(1.0 / 2.4)) - 0.055;
+
+    return mix(low, high, step(vec3(0.0031308), color));
+}
 
 void main() {
-    vec3 color = texture2D(textureSampler, vUV).rgb;
-
-    float alpha = texture2D(textureSampler, vUV).a;
+    vec4 texel = texture2D(textureSampler, vUV);
+    vec3 color = texel.rgb;
 
     color *= exposure;
 
+    const float pivot = 0.18;
+    color = pivot * pow(
+        color / pivot,
+        vec3(max(contrast, 0.001))
+    );
+
+    float luminance = dot(
+        color,
+        vec3(0.2126, 0.7152, 0.0722)
+    );
+    color = mix(vec3(luminance), color, saturation);
+    color = max(color, vec3(0.0));
+    
     color = acesTonemap(color);
 
-    color = (color - 0.5) * contrast + 0.5 + brightness;
-    color = clamp(color, 0.0, 1.0);
+    color = linearToSRGB(color);
 
-    vec3 grayscale = vec3(0.299, 0.587, 0.114) * color;
-    color = mix(grayscale, color, saturation);
-    color = clamp(color, 0.0, 1.0);
+    float dither = (hash12(gl_FragCoord.xy) - 0.5) / 255.0;
+    color = clamp(color + vec3(dither), 0.0, 1.0);
 
-    color = pow(color, vec3(gamma));
-
-    gl_FragColor = vec4(color, alpha);
+    gl_FragColor = vec4(color, texel.a);
 }

@@ -95,6 +95,7 @@ export class CreditsPanel {
         panel.appendChild(materialsHeader);
 
         const materialsCredits = [
+            'Milky Way background adapted from <a target="_blank" href="https://svs.gsfc.nasa.gov/4851/">Deep Star Maps 2020</a> by NASA/Goddard Space Flight Center Scientific Visualization Studio (Ernie Wright). Gaia DR2: ESA/Gaia/DPAC.',
             'Awesome PBR materials from <a target="_blank" href="https://freepbr.com">freepbr.com</a>',
             'Foil 003 insulation material from <a target="_blank" href="https://ambientcg.com/view?id=Foil003">ambientCG</a>, licensed under the Creative Commons CC0 1.0 Universal License.',
             'Solar panel material from <a target="_blank" href="https://www.texturecan.com/details/208/">texturecan.com</a>, licensed under the Creative Commons CC0 1.0 Universal License.',
