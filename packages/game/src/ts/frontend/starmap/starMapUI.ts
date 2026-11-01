@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
@@ -31,8 +30,6 @@ import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObject";
 
-import { getRgbFromTemperature } from "@/utils/specrend";
-
 import type { Player } from "../player/player";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
 import { SystemIcons } from "./systemIcons";
@@ -46,17 +43,6 @@ export class StarMapUI {
     readonly selectedSystemCursor: HTMLDivElement;
     readonly currentSystemCursorContainer: HTMLDivElement;
     readonly currentSystemCursor: HTMLDivElement;
-
-    readonly infoPanel: HTMLDivElement;
-    readonly infoPanelStarPreview: HTMLDivElement;
-    readonly infoPanelTitle: HTMLHeadingElement;
-    readonly starSector: HTMLParagraphElement;
-    readonly nbPlanets: HTMLParagraphElement;
-    readonly distanceToSol: HTMLParagraphElement;
-
-    readonly humanPresence: HTMLDivElement;
-    readonly nbSpaceStations: HTMLParagraphElement;
-    readonly factions: HTMLDivElement;
 
     readonly cursor: HTMLDivElement;
 
@@ -154,57 +140,6 @@ export class StarMapUI {
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("targetCursor");
-
-        this.infoPanel = document.createElement("div");
-        this.infoPanel.classList.add("starMapInfoPanel");
-        this.infoPanel.setAttribute("hidden", "true");
-        this.htmlRoot.appendChild(this.infoPanel);
-
-        this.infoPanelStarPreview = document.createElement("div");
-        this.infoPanelStarPreview.classList.add("starMapInfoPanelStarPreview");
-        this.infoPanel.appendChild(this.infoPanelStarPreview);
-
-        this.infoPanelTitle = document.createElement("h1");
-        this.infoPanelTitle.classList.add("starMapInfoPanelTitle");
-        this.infoPanel.appendChild(this.infoPanelTitle);
-
-        const hr = document.createElement("hr");
-        this.infoPanel.appendChild(hr);
-
-        this.starSector = document.createElement("p");
-        this.starSector.classList.add("starMapInfoPanelStarSector");
-        this.infoPanel.appendChild(this.starSector);
-
-        const hr2 = document.createElement("hr");
-        this.infoPanel.appendChild(hr2);
-
-        const generalInfoTitle = document.createElement("h2");
-        generalInfoTitle.textContent = this.t("starMap:generalInfo");
-        this.infoPanel.appendChild(generalInfoTitle);
-
-        this.nbPlanets = document.createElement("p");
-        this.nbPlanets.classList.add("starMapInfoPanelNbPlanets");
-        this.infoPanel.appendChild(this.nbPlanets);
-
-        this.distanceToSol = document.createElement("p");
-        this.distanceToSol.classList.add("starMapInfoPanelDistanceToSol");
-        this.infoPanel.appendChild(this.distanceToSol);
-
-        this.humanPresence = document.createElement("div");
-        this.humanPresence.classList.add("starMapInfoPanelHumanPresence");
-        this.infoPanel.appendChild(this.humanPresence);
-
-        const humanPresenceTitle = document.createElement("h2");
-        humanPresenceTitle.textContent = this.t("starMap:humanPresence");
-        this.humanPresence.appendChild(humanPresenceTitle);
-
-        this.nbSpaceStations = document.createElement("p");
-        this.nbSpaceStations.classList.add("starMapInfoPanelNbSpaceStations");
-        this.humanPresence.appendChild(this.nbSpaceStations);
-
-        this.factions = document.createElement("p");
-        this.factions.classList.add("starMapInfoPanelFactions");
-        this.humanPresence.appendChild(this.factions);
 
         this.cursor = document.createElement("div");
         this.cursor.classList.add("virtualCursor");
@@ -400,41 +335,20 @@ export class StarMapUI {
         this.shortHandUISystemType.textContent = getOrbitalObjectTypeToI18nString(starModel, this.t);
         this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
 
-        const objectColor = getRgbFromTemperature(starModel.blackBodyTemperature);
-        const objectColorHexString = new Color3(objectColor.r, objectColor.g, objectColor.b).toHexString();
-        this.infoPanelStarPreview.style.background = objectColorHexString;
-        this.infoPanelStarPreview.style.boxShadow = `0 0 20px ${objectColorHexString}`;
-
-        this.infoPanelTitle.textContent = targetSystemModel.name;
         this.shortHandUITitle.textContent = targetSystemModel.name;
-
-        this.starSector.innerText = `X:${targetSystemModel.coordinates.starSectorX} Y:${targetSystemModel.coordinates.starSectorY} Z:${targetSystemModel.coordinates.starSectorZ}
-            x:${targetSystemModel.coordinates.localX.toFixed(2)} y:${targetSystemModel.coordinates.localY.toFixed(2)} z:${targetSystemModel.coordinates.localZ.toFixed(2)}`;
-
-        this.nbPlanets.textContent = `${this.t("starMap:planets")}: ${targetSystemModel.planets.length}`;
-
-        this.distanceToSol.textContent = `${this.t("starMap:distanceToSol")}: ${this.t("units:shortLy", {
-            value: this.formatLyDistance(Vector3.Distance(targetPosition, Vector3.Zero())),
-        })}`;
 
         if (this.universeBackend.isSystemInHumanBubble(targetSystemModel.coordinates)) {
             const spaceStations = targetSystemModel.orbitalFacilities;
-
-            this.nbSpaceStations.textContent = `${this.t("starMap:spaceStations")}: ${spaceStations.length}`;
 
             const factionNames = spaceStations.map((station) => factionToString(station.faction));
             const uniqueFactions = Array.from(new Set(factionNames));
 
             if (uniqueFactions.length > 0) {
-                this.factions.textContent = `${this.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
                 this.shortHandUIFactions.textContent = `${this.t("starMap:factions")}: ${uniqueFactions.join(", ")}`;
             } else {
-                this.factions.textContent = `${this.t("starMap:factions")}: ${this.t("starMap:none")}`;
                 this.shortHandUIFactions.textContent = `${this.t("starMap:factions")}: ${this.t("starMap:none")}`;
             }
         } else {
-            this.nbSpaceStations.textContent = `${this.t("starMap:spaceStations")}: 0`;
-            this.factions.textContent = `${this.t("starMap:factions")}: ${this.t("starMap:none")}`;
             this.shortHandUIFactions.textContent = `${this.t("starMap:factions")}: ${this.t("starMap:none")}`;
         }
     }
