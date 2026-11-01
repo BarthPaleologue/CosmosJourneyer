@@ -1194,14 +1194,7 @@ export class StarSystemView implements View {
                 .getOrbitalFacilities()
                 .find((spaceStation) => {
                     if (spaceStation === facility) {
-                        this.spaceStationLayer.setStation(
-                            spaceStation.model,
-                            starSystem
-                                .getOrbitalObjects()
-                                .map((object) => object.model)
-                                .filter((object) => spaceStation.model.orbit.parentIds.includes(object.id)),
-                            this.player,
-                        );
+                        this.spaceStationLayer.setStation(spaceStation.model, this.player);
                         return true;
                     }
                     return false;

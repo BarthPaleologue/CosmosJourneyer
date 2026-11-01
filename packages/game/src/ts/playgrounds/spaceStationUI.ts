@@ -108,7 +108,7 @@ export async function createSpaceStationUIScene(
         throw new Error("No station found in system model");
     }
 
-    spaceStationUI.setStation(stationModel, [], player);
+    spaceStationUI.setStation(stationModel, player);
     spaceStationUI.setVisibility(true);
 
     clusteredLightingSystem.update(camera);
