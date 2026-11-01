@@ -138,68 +138,6 @@
         }
     }
 
-    .starMapInfoPanel {
-        position: absolute;
-        height: 100vh;
-        width: 25vw;
-
-        overflow-y: auto;
-
-        box-shadow: 0 0 20px black;
-        background: rgba(0, 0, 0, 0.8);
-
-        display: flex;
-        flex-direction: column;
-
-        padding: 0 0.7vw;
-
-        color: white;
-        font-family: Nasalization, sans-serif;
-
-        z-index: 10;
-
-        h1,
-        p {
-            margin-block: 0.5vh;
-        }
-
-        .starMapInfoPanelStarPreview {
-            width: 15vmin;
-            height: 15vmin;
-            background: white;
-            align-self: center;
-            border-radius: 50%;
-            box-shadow: 0 0 30px white;
-            margin: 3vh 0;
-        }
-
-        .starMapInfoPanelTitle {
-            text-align: center;
-            font-size: var(--h1-size);
-        }
-
-        .starMapInfoPanelStarSector {
-            padding: 0 1vw;
-            font-size: var(--h2-size);
-            text-align: center;
-        }
-
-        h2 {
-            font-size: var(--h2-size);
-        }
-
-        p {
-            font-size: var(--text-size);
-        }
-
-        hr {
-            width: 100%;
-            margin: 1vh auto;
-            border: 0;
-            border-top: 1px solid white;
-        }
-    }
-
     &.hidden {
         display: none;
     }

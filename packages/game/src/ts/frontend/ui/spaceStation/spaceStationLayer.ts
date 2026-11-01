@@ -18,7 +18,7 @@
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { OrbitalFacilityModel, OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
+import type { OrbitalFacilityModel } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
 import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
@@ -33,18 +33,15 @@ import { Settings } from "@/settings";
 import type { INotificationManager } from "../notificationManager";
 import { ExplorationCenterPanel } from "./explorationCenterPanel";
 import { SpaceshipDockUI } from "./spaceshipDock";
-import { generateInfoHTML } from "./spaceStationInfos";
 import { generateMissionsDom } from "./spaceStationMissions";
 
 import editIcon from "@assets/icons/edit.webp";
 import liftOffIcon from "@assets/icons/launch.webp";
 import missionsIcon from "@assets/icons/space-exploration.webp";
-import infoIcon from "@assets/icons/space-station.webp";
 import shipHangarIcon from "@assets/icons/spaceship_gear.webp";
 import explorationIcon from "@assets/icons/telescope.webp";
-import tradingIcon from "@assets/icons/trade.webp";
 
-type MainPanelState = "none" | "info" | "missions" | "spaceship" | "exploration_center";
+type MainPanelState = "none" | "missions" | "spaceship" | "exploration_center";
 
 export class SpaceStationLayer {
     readonly rootHtml: HTMLElement;
@@ -64,13 +61,10 @@ export class SpaceStationLayer {
     private readonly actionsContainer: HTMLElement;
     private readonly missionsButton: HTMLElement;
     private readonly spaceshipHangarButton: HTMLElement;
-    private readonly tradingButton: HTMLElement;
     private readonly explorationCenterButton: HTMLElement;
-    private readonly infoButton: HTMLElement;
     private readonly takeOffButton: HTMLElement;
 
     private currentStation: DeepReadonly<OrbitalFacilityModel> | null = null;
-    private currentStationParents: DeepReadonly<Array<OrbitalObjectModel>> = [];
 
     private mainPanelState: MainPanelState = "none";
 
@@ -226,40 +220,6 @@ export class SpaceStationLayer {
         explorationButtonDescription.textContent = this.t("spaceStation:explorationCenterDescription");
         this.explorationCenterButton.appendChild(explorationButtonDescription);
 
-        this.tradingButton = document.createElement("div");
-        this.tradingButton.setAttribute("class", "spaceStationAction tradingButton disabled");
-        this.actionsContainer.appendChild(this.tradingButton);
-
-        const tradingButtonIcon = document.createElement("img");
-        tradingButtonIcon.setAttribute("src", tradingIcon);
-        tradingButtonIcon.setAttribute("alt", "Market icon");
-        this.tradingButton.appendChild(tradingButtonIcon);
-
-        const tradingButtonTitle = document.createElement("h2");
-        tradingButtonTitle.textContent = this.t("spaceStation:market");
-        this.tradingButton.appendChild(tradingButtonTitle);
-
-        const tradingButtonDescription = document.createElement("p");
-        tradingButtonDescription.textContent = this.t("spaceStation:marketDescription");
-        this.tradingButton.appendChild(tradingButtonDescription);
-
-        this.infoButton = document.createElement("div");
-        this.infoButton.setAttribute("class", "spaceStationAction infoButton");
-        this.actionsContainer.appendChild(this.infoButton);
-
-        const infoButtonIcon = document.createElement("img");
-        infoButtonIcon.setAttribute("src", infoIcon);
-        infoButtonIcon.setAttribute("alt", "Info icon");
-        this.infoButton.appendChild(infoButtonIcon);
-
-        const infoButtonTitle = document.createElement("h2");
-        infoButtonTitle.textContent = this.t("spaceStation:stationInformation");
-        this.infoButton.appendChild(infoButtonTitle);
-
-        const infoButtonDescription = document.createElement("p");
-        infoButtonDescription.textContent = this.t("spaceStation:stationInformationDescription");
-        this.infoButton.appendChild(infoButtonDescription);
-
         const flexGrow = document.createElement("div");
         flexGrow.setAttribute("class", "flexGrow");
         this.actionsContainer.appendChild(flexGrow);
@@ -296,11 +256,6 @@ export class SpaceStationLayer {
             await this.setMainPanelState("exploration_center", player, universeBackend);
         });
 
-        this.infoButton.addEventListener("click", async () => {
-            this.soundPlayer.playNow("click");
-            await this.setMainPanelState("info", player, universeBackend);
-        });
-
         this.takeOffButton.addEventListener("click", () => {
             this.soundPlayer.playNow("click");
             this.onTakeOffObservable.notifyObservers();
@@ -326,10 +281,6 @@ export class SpaceStationLayer {
         }
 
         switch (this.mainPanelState) {
-            case "info":
-                this.mainPanel.classList.remove("hidden");
-                this.mainPanel.innerHTML = generateInfoHTML(this.currentStation, this.currentStationParents);
-                break;
             case "missions":
                 this.mainPanel.classList.remove("hidden");
                 this.mainPanel.innerHTML = "";
@@ -369,16 +320,11 @@ export class SpaceStationLayer {
         return this.rootHtml.style.visibility !== "hidden";
     }
 
-    public setStation(
-        station: DeepReadonly<OrbitalFacilityModel>,
-        stationParents: DeepReadonly<Array<OrbitalObjectModel>>,
-        player: Player,
-    ): void {
+    public setStation(station: DeepReadonly<OrbitalFacilityModel>, player: Player): void {
         if (this.currentStation === station) {
             return;
         }
         this.currentStation = station;
-        this.currentStationParents = stationParents;
         this.headerStationName.textContent = station.name;
 
         this.updatePlayerName(player.getName());
