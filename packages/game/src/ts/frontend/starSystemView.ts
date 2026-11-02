@@ -21,6 +21,7 @@ import "@babylonjs/core/Loading/loadingScreen";
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Quaternion, Space, Vector3 } from "@babylonjs/core/Maths/math";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
@@ -726,6 +727,84 @@ export class StarSystemView implements View {
         this.scene.getEngine().loadingScreen.hideLoadingUI();
 
         this._isLoadingSystem = false;
+    }
+
+    public getCurrentUniverseCoordinates(
+        transform: TransformNode,
+        minimumDistanceRadiusRatio: number | null = 1.1,
+    ): RelativeCoordinates {
+        const currentStarSystem = this.getStarSystem();
+
+        const currentWorldPosition = transform.getAbsolutePosition();
+        const currentWorldRotation = transform.absoluteRotationQuaternion;
+        let isTooCloseToNearestObject = false;
+
+        // Finding the index of the nearest orbital object
+        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(currentWorldPosition);
+
+        const universeObjectId: UniverseObjectId = {
+            systemCoordinates: currentStarSystem.model.coordinates,
+            idInSystem: nearestOrbitalObject.model.id,
+        };
+
+        // Finding the position of the player in the nearest orbital object's frame of reference
+        const nearestOrbitalObjectInverseWorld = nearestOrbitalObject
+            .getTransform()
+            .computeWorldMatrix(true)
+            .clone()
+            .invert();
+        const currentLocalPosition = Vector3.TransformCoordinates(
+            currentWorldPosition,
+            nearestOrbitalObjectInverseWorld,
+        );
+
+        if (minimumDistanceRadiusRatio !== null) {
+            const distanceToNearestOrbitalObject = currentLocalPosition.length();
+            const minimumDistanceToNearestOrbitalObject =
+                nearestOrbitalObject.getBoundingRadius() * minimumDistanceRadiusRatio;
+            if (distanceToNearestOrbitalObject < minimumDistanceToNearestOrbitalObject) {
+                currentLocalPosition.copyFromFloats(0, 0, nearestOrbitalObject.getBoundingRadius() * 5.0);
+                isTooCloseToNearestObject = true;
+            }
+        }
+
+        // Finding the rotation of the player in the nearest orbital object's frame of reference
+        const nearestOrbitalObjectInverseRotation = nearestOrbitalObject
+            .getTransform()
+            .absoluteRotationQuaternion.clone()
+            .invert();
+
+        const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
+        if (isTooCloseToNearestObject) {
+            const recoveryWorldPosition = Vector3.TransformCoordinates(
+                currentLocalPosition,
+                nearestOrbitalObject.getTransform().getWorldMatrix(),
+            );
+            const targetForward = nearestOrbitalObject
+                .getTransform()
+                .getAbsolutePosition()
+                .subtract(recoveryWorldPosition)
+                .normalize();
+            const localForward = Vector3.Forward(transform.getScene().useRightHandedSystem);
+            alignRotationToRef(currentWorldRotation, localForward, targetForward, currentLocalRotation);
+            currentLocalRotation.multiplyInPlace(nearestOrbitalObjectInverseRotation);
+        }
+
+        return {
+            type: "relative",
+            universeObjectId: universeObjectId,
+            position: {
+                x: currentLocalPosition.x,
+                y: currentLocalPosition.y,
+                z: currentLocalPosition.z,
+            },
+            rotation: {
+                x: currentLocalRotation.x,
+                y: currentLocalRotation.y,
+                z: currentLocalRotation.z,
+                w: currentLocalRotation.w,
+            },
+        };
     }
 
     public async loadLocation(location: UniverseCoordinates): Promise<void> {
