@@ -18,7 +18,7 @@
 import { Quaternion, TmpVectors, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { describe, expect, it } from "vitest";
 
-import { alignRotationToRef } from "./rotation";
+import { alignRotationToRef, quaternionFromForwardUpRH } from "./rotation";
 
 describe("alignRotationToRef", () => {
     it("accepts Babylon temporary storage as inputs without overwriting it", () => {
@@ -140,5 +140,81 @@ describe("alignRotationToRef", () => {
         expect(localAxis.equals(previousAxis)).toBe(true);
         expect(target.equals(previousTarget)).toBe(true);
         expect(firstResult.equals(previousResult)).toBe(true);
+    });
+});
+
+describe("quaternionFromForwardUpRH", () => {
+    it("returns the identity rotation for the local forward and up axes", () => {
+        const q = quaternionFromForwardUpRH(new Vector3(0, 0, -1), Vector3.UpReadOnly);
+        expect(Vector3.Right().applyRotationQuaternion(q).equalsWithEpsilon(Vector3.RightReadOnly, 1e-6)).toBe(true);
+        expect(Vector3.Up().applyRotationQuaternion(q).equalsWithEpsilon(Vector3.UpReadOnly, 1e-6)).toBe(true);
+    });
+
+    it("accepts Babylon temporaries without modifying them or earlier results", () => {
+        const forward = TmpVectors.Vector3[0];
+        const up = TmpVectors.Vector3[1];
+        const savedForward = forward.clone();
+        const savedUp = up.clone();
+        try {
+            forward.set(1, 2, -3);
+            up.set(0, 1, 0);
+            const q = quaternionFromForwardUpRH(forward, up);
+            const savedResult = q.clone();
+            quaternionFromForwardUpRH(Vector3.DownReadOnly, Vector3.RightReadOnly);
+            expect(forward.equals(new Vector3(1, 2, -3))).toBe(true);
+            expect(up.equals(Vector3.UpReadOnly)).toBe(true);
+            expect(q.equals(savedResult)).toBe(true);
+        } finally {
+            forward.copyFrom(savedForward);
+            up.copyFrom(savedUp);
+        }
+    });
+    it.each([
+        [new Vector3(0, 0, -1), Vector3.Up()],
+        [new Vector3(1, 2, 3), new Vector3(-2, 5, 1)],
+        [Vector3.Up(), Vector3.Right()],
+    ])("maps -Z to forward and +Y to projected up without changing inputs", (forward, up) => {
+        const savedForward = forward.clone();
+        const savedUp = up.clone();
+        const q = quaternionFromForwardUpRH(forward, up);
+        const f = forward.normalizeToNew();
+        const u = up.subtract(f.scale(Vector3.Dot(up, f))).normalize();
+        expect(new Vector3(0, 0, -1).applyRotationQuaternion(q).equalsWithEpsilon(f, 1e-6)).toBe(true);
+        expect(Vector3.Up().applyRotationQuaternion(q).equalsWithEpsilon(u, 1e-6)).toBe(true);
+        expect(forward.equals(savedForward)).toBe(true);
+        expect(up.equals(savedUp)).toBe(true);
+    });
+
+    it.each([
+        [Vector3.Zero(), Vector3.Up()],
+        [new Vector3(NaN, 1, 0), Vector3.Up()],
+        [new Vector3(Infinity, 0, 0), Vector3.Up()],
+        [Vector3.Up(), Vector3.Up()],
+        [Vector3.Down(), Vector3.Up()],
+        [new Vector3(1, 2, 3), Vector3.Zero()],
+        [new Vector3(1, 2, 3), new Vector3(Infinity, 0, 0)],
+        [new Vector3(0, 1, 1e-9), Vector3.Up()],
+        [new Vector3(1e300, 2e300, -3e300), new Vector3(0, 1e-300, 0)],
+    ])("produces a finite direct orthonormal basis for degenerate or extreme inputs", (forward, up) => {
+        const q = quaternionFromForwardUpRH(forward, up);
+        expect(q.asArray().every(Number.isFinite)).toBe(true);
+        const x = Vector3.Right().applyRotationQuaternion(q);
+        const y = Vector3.Up().applyRotationQuaternion(q);
+        const z = new Vector3(0, 0, 1).applyRotationQuaternion(q);
+        for (const axis of [x, y, z]) {
+            expect(axis.length()).toBeCloseTo(1, 6);
+        }
+        expect(Vector3.Dot(x, y)).toBeCloseTo(0, 6);
+        expect(Vector3.Dot(y, z)).toBeCloseTo(0, 6);
+        expect(Vector3.Dot(z, x)).toBeCloseTo(0, 6);
+        expect(Vector3.Dot(Vector3.Cross(x, y), z)).toBeCloseTo(1, 6);
+        const scale = Math.max(Math.abs(forward.x), Math.abs(forward.y), Math.abs(forward.z));
+        if (Number.isFinite(scale) && scale > 0) {
+            const expected = new Vector3(forward.x / scale, forward.y / scale, forward.z / scale).normalize();
+            expect(z.negate().equalsWithEpsilon(expected, 1e-6)).toBe(true);
+        } else {
+            expect(x.equalsWithEpsilon(Vector3.RightReadOnly, 1e-6)).toBe(true);
+            expect(y.equalsWithEpsilon(Vector3.UpReadOnly, 1e-6)).toBe(true);
+        }
     });
 });

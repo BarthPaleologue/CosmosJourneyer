@@ -25,6 +25,7 @@ import type { OnSurfacePlacementModel, OnSurfacePlacementRotation } from "@/back
 
 import { wait } from "@/utils/wait";
 
+import { quaternionFromForwardUpRH } from "../helpers/rotation";
 import type { OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { TelluricPlanet } from "../universe/planets/telluricPlanet/telluricPlanet";
 import type { ITerrainSystem, TaskId } from "../universe/planets/telluricPlanet/terrain/system/terrainSystem";
@@ -246,7 +247,7 @@ function createOnSurfacePlacement(
  * @param rotation Heading, pitch, and roll relative to the local surface frame.
  * @returns Position and orientation in the planet's local coordinate system.
  */
-function createSurfaceTransform(
+export function createSurfaceTransform(
     latitude: number,
     longitude: number,
     radius: number,
@@ -286,5 +287,5 @@ function createSurfaceTransform(
     const rolledUp = Vector3.Zero();
     pitchedUp.rotateByQuaternionToRef(Quaternion.RotationAxis(forward, roll), rolledUp);
 
-    return { position: up.scale(radius), rotation: Quaternion.FromLookDirectionRH(forward, rolledUp) };
+    return { position: up.scale(radius), rotation: quaternionFromForwardUpRH(forward, rolledUp) };
 }
