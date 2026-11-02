@@ -28,7 +28,7 @@ import { lerp, lerpAngle, lerpSmooth, smoothstep } from "@/utils/math";
 import type { Controls } from "../controls";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
 import { easeInOutCubic } from "../helpers/animations/interpolations";
-import { alignRotationToRef } from "../helpers/rotation";
+import { alignRotationToRef, quaternionFromForwardUpRH } from "../helpers/rotation";
 import { getRotationQuaternion } from "../helpers/transform";
 import { toggleDoor } from "./door";
 import { thirdPersonCameraPresets } from "./thirdPersonCameraPresets";
@@ -173,7 +173,7 @@ export class VehicleControls implements Controls {
                 .getAbsolutePosition()
                 .add(this.thirdPersonTransform.up.scale(this.thirdPersonCameraYOffset)),
         );
-        this.thirdPersonTransform.rotationQuaternion = Quaternion.FromLookDirectionRH(
+        this.thirdPersonTransform.rotationQuaternion = quaternionFromForwardUpRH(
             vehicleTransform.forward,
             this.thirdPersonTransform.up,
         );

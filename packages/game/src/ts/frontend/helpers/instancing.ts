@@ -19,6 +19,8 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 
+import { quaternionFromForwardUpRH } from "./rotation";
+
 /**
  * Scatters randomly scaled and rotated instances across a square grid on the XZ plane.
  * @param position - Patch center projected onto the XZ plane.
@@ -59,7 +61,7 @@ export function createSquareMatrixBuffer(
 }
 
 /**
- * Places equally spaced instances on an XZ circle facing its center.
+ * Places equally spaced instances on an XZ circle with local -Z facing its center.
  * @param radius - Radius in the coordinate units used by the input geometry.
  * @param nbPoints - Number of instances distributed around the circle.
  * @returns Packed matrices for the circular arrangement.
@@ -73,7 +75,7 @@ export function createCircleInstanceBuffer(radius: number, nbPoints: number): Fl
 
         const matrix = Matrix.Compose(
             Vector3.OneReadOnly,
-            Quaternion.FromLookDirectionRH(new Vector3(-position.x, 0, -position.z).normalize(), Vector3.UpReadOnly),
+            quaternionFromForwardUpRH(new Vector3(-position.x, 0, -position.z).normalize(), Vector3.UpReadOnly),
             position,
         );
         matrix.copyToArray(buffer, i * 16);
