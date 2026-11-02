@@ -30,7 +30,7 @@
         "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
-        "@babylonjs/core": "9.31.0",
+        "@babylonjs/core": "9.33.1",
         "eslint": "catalog:",
         "http-server": "catalog:",
         "oxfmt": "catalog:",

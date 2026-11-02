@@ -37,14 +37,14 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "electron-updater": "6.8.9"
+        "electron-updater": "6.8.11"
     },
     "devDependencies": {
         "@types/node": "catalog:",
         "concurrently": "10.0.6",
         "cross-env": "10.1.0",
-        "electron": "44.9.1",
-        "electron-builder": "26.15.3",
+        "electron": "44.10.0",
+        "electron-builder": "26.18.0",
         "eslint": "catalog:",
         "oxfmt": "catalog:",
         "typescript": "catalog:",
