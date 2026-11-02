@@ -55,6 +55,7 @@
     "devDependencies": {
         "@eslint/js": "catalog:",
         "@next/eslint-plugin-next": "catalog:",
+        "clang-format-node": "4.0.4",
         "eslint": "catalog:",
         "eslint-import-resolver-typescript": "catalog:",
         "eslint-plugin-import-x": "catalog:",
@@ -66,7 +67,8 @@
         "typescript-eslint": "catalog:"
     },
     "lint-staged": {
-        "*": "oxfmt --write --no-error-on-unmatched-pattern"
+        "*.slang": "clang-format -i",
+        "!(*.slang)": "oxfmt --write --no-error-on-unmatched-pattern"
     },
     "engines": {
         "node": ">=24.15.0"

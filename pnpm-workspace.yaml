@@ -5,6 +5,7 @@ saveExact: true
 
 allowBuilds:
     "@parcel/watcher": true
+    clang-format-node: true
     electron: true
     electron-winstaller: true
     esbuild: true

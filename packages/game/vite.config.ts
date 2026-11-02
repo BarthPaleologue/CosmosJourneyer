@@ -7,6 +7,7 @@ import { defineConfig } from "vite";
 import type { Plugin } from "vite";
 import glsl from "vite-plugin-glsl";
 import wasm from "vite-plugin-wasm";
+import slang from "vite-slang";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,6 +66,7 @@ export default defineConfig(({ mode }) => {
             basicSsl({
                 name: "cosmos-journeyer",
             }),
+            slang(),
             glsl(),
             wasm() as Plugin,
         ],
