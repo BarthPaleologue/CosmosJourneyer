@@ -32,7 +32,7 @@ import { getSystemTargets } from "@/frontend/targeting/createTargets";
 import { createDefaultTargetContact } from "@/frontend/targeting/targetContact";
 import { TargetingSystem } from "@/frontend/targeting/targetingSystem";
 import { TargetCursorLayer } from "@/frontend/ui/targeting/targetCursorLayer";
-import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
+import { TerrainSystemGpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemGpu";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 
@@ -68,7 +68,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
 
     const depthRendererManager = new DepthRendererManager(scene);
 
-    const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
+    const terrainSystemResult = TerrainSystemGpu.New(engine, Settings.VERTEX_RESOLUTION);
     if (!terrainSystemResult.success) {
         throw terrainSystemResult.error;
     }

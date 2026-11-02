@@ -225,7 +225,7 @@ Then run the end-to-end tests with `pnpm test:e2e`.
 
 ### Formatting
 
-Cosmos Journeyer uses [oxfmt](https://oxc.rs/docs/guide/usage/oxfmt) for code formatting. Changed files are automatically formatted via a pre-commit hook. You can also format the entire project with `pnpm format`.
+Cosmos Journeyer uses [oxfmt](https://oxc.rs/docs/guide/usage/oxfmt) for code formatting and `clang-format-node` for Slang shaders. Both use four-space indentation and a 120-column limit; the Slang style is configured in `.clang-format`. Changed files are automatically formatted via a pre-commit hook. You can also format the entire project with `pnpm format` or check formatting with `pnpm format:check`.
 
 ### Linting
 

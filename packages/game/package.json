@@ -33,8 +33,8 @@
         "build:watch": "vite build --watch --mode development",
         "serve": "vite",
         "serve:prod": "http-server dist -p 8080",
-        "format:check": "oxfmt . --check",
-        "format": "oxfmt . --write",
+        "format:check": "oxfmt . --check && find src/shaders -name '*.slang' -exec clang-format --dry-run --Werror {} +",
+        "format": "oxfmt . --write && find src/shaders -name '*.slang' -exec clang-format -i {} +",
         "test:unit": "vitest run",
         "test:e2e": "pnpm build && playwright test",
         "test:e2e:update": "pnpm build && playwright test --update-snapshots",
@@ -66,7 +66,6 @@
         "manifold-3d": "3.5.4",
         "markdown-it": "15.0.3",
         "qrcode": "1.5.4",
-        "terrain-generation": "workspace:^",
         "zod": "catalog:"
     },
     "devDependencies": {
@@ -83,7 +82,7 @@
         "typescript": "catalog:",
         "vite": "catalog:",
         "vite-plugin-glsl": "1.6.2",
-        "vite-plugin-wasm": "3.6.0",
+        "vite-slang": "0.7.0",
         "vitest": "catalog:"
     }
 }

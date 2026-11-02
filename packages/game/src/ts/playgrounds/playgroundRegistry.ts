@@ -68,6 +68,7 @@ import { createBlackHoleScene } from "./stellarObjects/blackHole";
 import { createNeutronStarScene } from "./stellarObjects/neutronStar";
 import { CreateSwimmingScene } from "./swimming";
 import { createTelluricPlanetScene } from "./telluricPlanet";
+import { createTerrainHeightmapScene } from "./terrainHeightmap";
 import { createThrusterExhaustScene } from "./thrusterExhaust";
 import { createTriPlanarNormalScene } from "./triPlanarNormal";
 import { createTutorialScene } from "./tutorial";
@@ -127,6 +128,7 @@ export class PlaygroundRegistry {
         ["triPlanarNormal", createTriPlanarNormalScene],
         ["forest", createForestScene],
         ["sphericalHeightFieldTerrain", createSphericalHeightFieldTerrainScene],
+        ["terrainHeightmap", createTerrainHeightmapScene],
         ["cryptographicSecret", createCryptographicSecretScene],
         ["customSystem", createCustomSystemScene],
         ["qrScan", createQrScanScene],

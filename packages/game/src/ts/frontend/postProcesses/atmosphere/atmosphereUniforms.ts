@@ -17,6 +17,17 @@
 
 import type { Effect } from "@babylonjs/core/Materials/effect";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import {
+    computeAtmospherePressureScaleHeight,
+    computeGravityAcceleration,
+    computeMeanMolecularWeight,
+    computeRayleighBetaRGB,
+    computeSpectralMie,
+    getHeightForPressure,
+    PresetBands,
+} from "@cosmos-journeyer/physics";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { AtmosphereModel } from "@cosmos-journeyer/universe-model";
 
 import { Settings } from "@/settings";
 
@@ -63,7 +74,7 @@ export class AtmosphereUniforms {
     /**
      * Mie scattering asymmetry factor (between -1 and 1)
      */
-    mieAsymmetry: number;
+    mieAsymmetry: Vector3;
 
     /**
      * Height of the ozone layer in meters above the planet surface
@@ -86,19 +97,26 @@ export class AtmosphereUniforms {
      */
     lightIntensity: number;
 
-    constructor(planetBoundingRadius: number, atmosphereThickness: number) {
-        this.atmosphereRadius = planetBoundingRadius + atmosphereThickness;
-        this.rayleighHeight = (8e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.rayleighScatteringCoefficients = new Vector3(5.8e-6, 13.5e-6, 33.1e-6).scaleInPlace(
-            Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
+    constructor(planetBoundingRadius: number, mass: number, temperature: number, model: DeepReadonly<AtmosphereModel>) {
+        const meanMolecularWeight = computeMeanMolecularWeight(model.gasMix);
+        const gravity = computeGravityAcceleration(mass, planetBoundingRadius);
+        const rayleighScaleHeight = computeAtmospherePressureScaleHeight(temperature, gravity, meanMolecularWeight);
+        const atmosphereThickness = getHeightForPressure(
+            3.2e-2,
+            { pressure: model.seaLevelPressure, height: 0 },
+            rayleighScaleHeight,
         );
 
-        // https://playerunknownproductions.net/news/atmospheric-scattering
-        this.mieHeight = (1.2e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
-        this.mieScatteringCoefficients = new Vector3(0.00002, 0.00002, 0.00002).scaleInPlace(
-            Settings.EARTH_ATMOSPHERE_THICKNESS / atmosphereThickness,
+        this.atmosphereRadius = planetBoundingRadius + atmosphereThickness;
+        this.rayleighHeight = rayleighScaleHeight;
+        this.rayleighScatteringCoefficients = Vector3.FromArray(
+            computeRayleighBetaRGB(model.gasMix, model.seaLevelPressure, temperature, PresetBands.PHOTOPIC),
         );
-        this.mieAsymmetry = 0.76;
+
+        const mie = computeSpectralMie(model.aerosols, rayleighScaleHeight, PresetBands.PHOTOPIC);
+        this.mieHeight = mie.aerosolScaleHeight;
+        this.mieScatteringCoefficients = Vector3.FromArray(mie.betaRGB);
+        this.mieAsymmetry = Vector3.FromArray(mie.gRGB);
 
         this.ozoneHeight = (25e3 * atmosphereThickness) / Settings.EARTH_ATMOSPHERE_THICKNESS;
         this.ozoneAbsorptionCoefficients = new Vector3(0.6e-6, 1.8e-6, 0.085e-6).scaleInPlace(
@@ -114,7 +132,7 @@ export class AtmosphereUniforms {
         effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_RAYLEIGH_COEFFS, this.rayleighScatteringCoefficients);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_HEIGHT, this.mieHeight);
         effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_MIE_COEFFS, this.mieScatteringCoefficients);
-        effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_MIE_ASYMMETRY, this.mieAsymmetry);
+        effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_MIE_ASYMMETRY, this.mieAsymmetry);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_OZONE_HEIGHT, this.ozoneHeight);
         effect.setVector3(AtmosphereUniformNames.ATMOSPHERE_OZONE_COEFFS, this.ozoneAbsorptionCoefficients);
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_OZONE_FALLOFF, this.ozoneFalloff);
