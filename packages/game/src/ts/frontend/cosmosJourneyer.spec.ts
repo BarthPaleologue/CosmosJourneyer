@@ -62,17 +62,17 @@ describe("CosmosJourneyer", () => {
                 getMainScene: () => ({ activeCamera: {} }),
             },
             engine: {},
-            getCurrentUniverseCoordinates: () => ({
-                type: "relative",
-                universeObjectId: {
-                    systemCoordinates: systemModel.coordinates,
-                    idInSystem: stellarObject.id,
-                },
-                position: { x: 0, y: 0, z: 0 },
-                rotation: { x: 0, y: 0, z: 0, w: 1 },
-            }),
             player,
             starSystemView: {
+                getCurrentUniverseCoordinates: () => ({
+                    type: "relative",
+                    universeObjectId: {
+                        systemCoordinates: systemModel.coordinates,
+                        idInSystem: stellarObject.id,
+                    },
+                    position: { x: 0, y: 0, z: 0 },
+                    rotation: { x: 0, y: 0, z: 0, w: 1 },
+                }),
                 getSpaceshipControls: () => ({
                     getSpaceship: (): { id: string; isLandedAtFacility: () => boolean } => spaceship,
                     getTransform: (): object => ({}),
