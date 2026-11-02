@@ -36,6 +36,11 @@ import type { TFunction } from "i18next";
 
 import type { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { ItinerarySchema } from "@/backend/player/serializedPlayer";
+import type {
+    AtStationCoordinates,
+    RelativeCoordinates,
+    UniverseCoordinates,
+} from "@/backend/save/universeCoordinates";
 import type { StarSystemContentModel, UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -51,7 +56,7 @@ import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
-import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
+import { positionNearObject, positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
 import { alignRotationToRef } from "@/frontend/helpers/rotation";
 import { getRotationQuaternion, lookAt, setRotationQuaternion } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
@@ -721,6 +726,126 @@ export class StarSystemView implements View {
         this.scene.getEngine().loadingScreen.hideLoadingUI();
 
         this._isLoadingSystem = false;
+    }
+
+    public async loadLocation(location: UniverseCoordinates): Promise<void> {
+        if (location.type === "relative") {
+            await this.loadRelativeLocation(location);
+        } else if (location.type === "atStation") {
+            await this.loadAtStationLocation(location);
+        }
+    }
+
+    private async loadRelativeLocation(location: RelativeCoordinates): Promise<void> {
+        const controls = this.getActiveControls();
+        if (controls === null) {
+            console.warn("No controls!");
+            return;
+        }
+
+        const playerTransform = controls.getTransform();
+        const starSystem = this.getStarSystem();
+        const nearestOrbitalObject = starSystem.getOrbitalObjectById(location.universeObjectId.idInSystem);
+
+        if (nearestOrbitalObject === undefined) {
+            const fallbackObject = starSystem.getStellarObjects()[0];
+            positionNearObject(
+                fallbackObject,
+                new Vector3(0, 0, fallbackObject.getBoundingRadius() * 4),
+                new Quaternion(0, 0, 0, 1),
+                playerTransform,
+            );
+
+            await alertModal(
+                "The object you are trying to spawn near to could not be found. You will spawn around the first stellar object of the system instead.",
+                this.soundPlayer,
+                this.t,
+            );
+
+            return;
+        }
+
+        positionNearObject(
+            nearestOrbitalObject,
+            new Vector3(location.position.x, location.position.y, location.position.z),
+            new Quaternion(location.rotation.x, location.rotation.y, location.rotation.z, location.rotation.w),
+            playerTransform,
+        );
+
+        const distanceToObject = Vector3.Distance(
+            playerTransform.getAbsolutePosition(),
+            nearestOrbitalObject.getTransform().getAbsolutePosition(),
+        );
+        const objectRadius = nearestOrbitalObject.getBoundingRadius();
+
+        if (distanceToObject < objectRadius * 1.1) {
+            if (distanceToObject < 0.1) {
+                playerTransform.position.addInPlace(new Vector3(0, 0, objectRadius * 5.0));
+            } else {
+                playerTransform.position.scaleInPlace((objectRadius * 1.1) / distanceToObject);
+            }
+        }
+
+        // set the ui target to the nearest orbital object
+        this.targetingSystem.setTarget(nearestOrbitalObject);
+    }
+
+    private async loadAtStationLocation(location: AtStationCoordinates): Promise<void> {
+        const controls = this.getActiveControls();
+        if (controls === null) {
+            console.warn("No controls!");
+            return;
+        }
+
+        const playerTransform = controls.getTransform();
+        const starSystem = this.getStarSystem();
+        const station = starSystem.getOrbitalObjectById(location.universeObjectId.idInSystem);
+
+        const doesStationExist =
+            station !== undefined && (station.type === "spaceStation" || station.type === "spaceElevator");
+
+        if (!doesStationExist) {
+            const fallbackObject = starSystem.getStellarObjects()[0];
+
+            positionNearObject(
+                fallbackObject,
+                new Vector3(0, 0, fallbackObject.getBoundingRadius() * 4),
+                new Quaternion(0, 0, 0, 1),
+                playerTransform,
+            );
+
+            await alertModal(
+                "The space station you are trying to spawn at could not be found. You will spawn around the first stellar object of the system instead.",
+                this.soundPlayer,
+                this.t,
+            );
+
+            return;
+        }
+
+        const landingPad = station.getLandingPadManager().getAvailableLandingPads().at(0);
+        if (landingPad === undefined) {
+            const fallbackObject = station;
+
+            positionNearObject(
+                fallbackObject,
+                new Vector3(0, 0, fallbackObject.getBoundingRadius() * 4),
+                new Quaternion(0, 0, 0, 1),
+                playerTransform,
+            );
+
+            await alertModal(
+                "There are no available pads at the space station you are trying to spawn at. You have been moved outside of the station instead.",
+                this.soundPlayer,
+                this.t,
+            );
+
+            return;
+        }
+
+        const shipControls = this.getSpaceshipControls();
+        shipControls.getSpaceship().spawnOnPad(landingPad);
+        shipControls.syncCameraTransform();
     }
 
     private initTargetingSystem(
