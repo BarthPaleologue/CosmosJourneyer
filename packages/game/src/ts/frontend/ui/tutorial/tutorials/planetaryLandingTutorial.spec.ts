@@ -19,7 +19,6 @@ import { createInstance } from "i18next";
 import { describe, expect, it } from "vitest";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { PlanetaryLandingTutorial } from "./planetaryLandingTutorial";
@@ -28,7 +27,7 @@ const t = createInstance().getFixedT("en-US");
 
 describe("PlanetaryLandingTutorial", () => {
     it("spawns near a landable celestial body", () => {
-        const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+        const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const tutorial = new PlanetaryLandingTutorial(t);
 
         const saveDataResult = tutorial.getSaveData();

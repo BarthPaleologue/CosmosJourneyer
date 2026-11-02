@@ -19,7 +19,6 @@ import { createInstance } from "i18next";
 import { describe, expect, it } from "vitest";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { Mission } from "@/frontend/missions/mission";
@@ -30,7 +29,7 @@ const t = createInstance().getFixedT("en-US");
 
 describe("StarMapTutorial", () => {
     it("spawns near a space station", () => {
-        const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+        const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const tutorial = new StarMapTutorial(t);
 
         const saveDataResult = tutorial.getSaveData();
@@ -67,7 +66,7 @@ describe("StarMapTutorial", () => {
     });
 
     it("has correct mission objectives", () => {
-        const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+        const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const tutorial = new StarMapTutorial(t);
 
         const saveDataResult = tutorial.getSaveData();

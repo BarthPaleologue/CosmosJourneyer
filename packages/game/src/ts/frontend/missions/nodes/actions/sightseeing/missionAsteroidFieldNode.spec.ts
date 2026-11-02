@@ -10,7 +10,8 @@ import { MissionAsteroidFieldNode } from "./missionAsteroidFieldNode";
 describe("MissionAsteroidFieldNode", () => {
     it("creates a mission for a ringed planet and describes its destination", async () => {
         const system = getSolSystemModel();
-        const universeBackend = new UniverseBackend(new SystemEntityBackend(), system);
+        const universeBackend = new UniverseBackend(new SystemEntityBackend());
+        universeBackend.registerAuthoredSystem(system);
         const planet = system.planets.find((candidate) => candidate.rings !== null);
         if (planet === undefined) {
             throw new Error("Sol has no ringed planet");
@@ -39,7 +40,8 @@ describe("MissionAsteroidFieldNode", () => {
 
     it("rejects objects without planetary rings and missing objects", () => {
         const system = getSolSystemModel();
-        const universeBackend = new UniverseBackend(new SystemEntityBackend(), system);
+        const universeBackend = new UniverseBackend(new SystemEntityBackend());
+        universeBackend.registerAuthoredSystem(system);
         for (const idInSystem of [system.stellarObjects[0].id, "missing"]) {
             expect(
                 MissionAsteroidFieldNode.New({ systemCoordinates: system.coordinates, idInSystem }, universeBackend),

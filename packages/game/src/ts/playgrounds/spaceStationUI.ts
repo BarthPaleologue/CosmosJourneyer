@@ -63,7 +63,9 @@ export async function createSpaceStationUIScene(
     const notificationManager = new NotificationManagerMock();
 
     const systemEntityBackend = new SystemEntityBackend();
-    const systemDatabase = new UniverseBackend(systemEntityBackend, getLoneStarSystem());
+    const systemModel = getLoneStarSystem();
+    const systemDatabase = new UniverseBackend(systemEntityBackend);
+    systemDatabase.registerAuthoredSystem(systemModel);
 
     const player = Player.Default(systemDatabase);
 
@@ -89,8 +91,6 @@ export async function createSpaceStationUIScene(
     const camera = shipControls.thirdPersonCamera;
     camera.attachControl();
     scene.activeCamera = camera;
-
-    const systemModel = systemDatabase.fallbackSystem;
 
     const encyclopaedia = new EncyclopaediaGalacticaManager();
 

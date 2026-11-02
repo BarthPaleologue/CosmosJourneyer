@@ -20,7 +20,6 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 
-import { getLoneStarSystem } from "./customSystems/loneStar";
 import { getSolSystemModel } from "./customSystems/sol/sol";
 import { UniverseBackend } from "./universeBackend";
 
@@ -28,20 +27,23 @@ describe("UniverseBackend", () => {
     let universeBackend: UniverseBackend;
 
     beforeEach(() => {
-        universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+        universeBackend = new UniverseBackend(new SystemEntityBackend());
     });
 
-    describe("registerCustomSystem", () => {
+    describe("registerAuthoredSystem", () => {
         it("should add a custom system that can be retrieved", () => {
             const customSystem = getSolSystemModel();
             universeBackend.registerAuthoredSystem(customSystem);
 
-            const retrievedSystems = universeBackend.getSystemModelsInStarSector(
-                customSystem.coordinates.starSectorX,
-                customSystem.coordinates.starSectorY,
-                customSystem.coordinates.starSectorZ,
-            );
-            expect(retrievedSystems).toContain(customSystem);
+            const { starSectorX, starSectorY, starSectorZ } = customSystem.coordinates;
+            const coordinates = universeBackend.getSystemCoordinatesInStarSector(starSectorX, starSectorY, starSectorZ);
+            expect(coordinates.filter((entry) => entry === customSystem.coordinates)).toHaveLength(1);
+            const models = universeBackend.getSystemModelsInStarSector(starSectorX, starSectorY, starSectorZ);
+            expect(models.filter((model) => model === customSystem)).toHaveLength(1);
+            expect(universeBackend.getSystemContentModelAt(customSystem.coordinates)?.system).toBe(customSystem);
+            const positions = universeBackend.getSystemPositionsInStarSector(starSectorX, starSectorY, starSectorZ);
+            expect(positions).toHaveLength(coordinates.length);
+            expect(positions).toContainEqual(universeBackend.getSystemGalacticPosition(customSystem.coordinates));
         });
     });
 

@@ -39,7 +39,7 @@ describe("CosmosJourneyer", () => {
 
     it("snapshots the player before awaiting thumbnail creation", async () => {
         const systemModel = getLoneStarSystem();
-        const universeBackend = new UniverseBackend(new SystemEntityBackend(), systemModel);
+        const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const player = Player.Default(universeBackend);
         const serializedSpaceship = player.serializedSpaceships[0];
         const stellarObject = systemModel.stellarObjects[0];

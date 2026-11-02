@@ -35,7 +35,7 @@ describe("Player", () => {
     let universeBackend: UniverseBackend;
 
     beforeEach(() => {
-        universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+        universeBackend = new UniverseBackend(new SystemEntityBackend());
         vi.clearAllMocks();
     });
 
@@ -259,24 +259,24 @@ describe("Player", () => {
         it("should handle mission serialization/deserialization", () => {
             const player = Player.Default(universeBackend);
 
-            // Get a valid space station from the fallback system for the mission giver
-            const fallbackSystem = universeBackend.fallbackSystem;
-            const spaceStation = fallbackSystem.orbitalFacilities[0];
+            const system = getLoneStarSystem();
+            universeBackend.registerAuthoredSystem(system);
+            const spaceStation = system.orbitalFacilities[0];
             if (!spaceStation) {
-                throw new Error("No space station found in fallback system for test");
+                throw new Error("No space station found in authored system for test");
             }
 
             // Create a mock serialized mission with valid structure
             const mockSerializedMission = {
                 missionGiver: {
-                    systemCoordinates: fallbackSystem.coordinates,
+                    systemCoordinates: system.coordinates,
                     idInSystem: spaceStation.id,
                 },
                 tree: {
                     type: "fly_by",
                     objectId: {
-                        systemCoordinates: fallbackSystem.coordinates,
-                        idInSystem: fallbackSystem.stellarObjects[0].id,
+                        systemCoordinates: system.coordinates,
+                        idInSystem: system.stellarObjects[0].id,
                     },
                     state: FlyByState.NOT_IN_SYSTEM,
                 },

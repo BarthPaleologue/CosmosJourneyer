@@ -20,13 +20,12 @@ import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import { expect, test } from "vitest";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { getNeighborStarSystemCoordinates } from "./getNeighborStarSystems";
 
 test("getNeighborStarSystemCoordinates", () => {
-    const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+    const universeBackend = new UniverseBackend(new SystemEntityBackend());
 
     const systemCoordinates = universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
 
