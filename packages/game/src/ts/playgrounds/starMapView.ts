@@ -47,7 +47,9 @@ export async function createStarMapViewScene(
     const t = await initI18n();
 
     const systemEntityBackend = new SystemEntityBackend();
-    const universeBackend = new UniverseBackend(systemEntityBackend, getLoneStarSystem());
+    const authoredSystem = getLoneStarSystem();
+    const universeBackend = new UniverseBackend(systemEntityBackend);
+    universeBackend.registerAuthoredSystem(authoredSystem);
 
     const player = Player.Default(universeBackend);
 
@@ -72,7 +74,7 @@ export async function createStarMapViewScene(
         notificationManager,
         t,
     );
-    starMap.setCurrentStarSystem(universeBackend.fallbackSystem.coordinates, true);
+    starMap.setCurrentStarSystem(authoredSystem.coordinates, true);
 
     // Get system coordinates from URL parameters
     const urlParams = new URLSearchParams(window.location.search);

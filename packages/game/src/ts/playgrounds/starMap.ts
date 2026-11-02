@@ -41,7 +41,8 @@ export async function createStarMapScene(
     scene.clearColor.set(0, 0, 0, 1);
 
     const systemEntityBackend = new SystemEntityBackend();
-    const universeBackend = new UniverseBackend(systemEntityBackend, getLoneStarSystem());
+    const universeBackend = new UniverseBackend(systemEntityBackend);
+    universeBackend.registerAuthoredSystem(getLoneStarSystem());
 
     const particleTextures = await loadParticleTextures(engine, progressMonitor);
 

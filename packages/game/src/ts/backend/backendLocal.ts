@@ -27,7 +27,6 @@ import { SaveBackendMultiFile } from "./save/saveBackendMultiFile";
 import { SaveBackendSingleFile } from "./save/saveBackendSingleFile";
 import { SaveLocalStorage } from "./save/saveLocalStorage";
 import { SystemEntityBackend } from "./systemEntity/systemEntityBackend";
-import { getLoneStarSystem } from "./universe/customSystems/loneStar";
 import { UniverseBackend } from "./universe/universeBackend";
 
 export class CosmosJourneyerBackendLocal implements ICosmosJourneyerBackend {
@@ -43,7 +42,7 @@ export class CosmosJourneyerBackendLocal implements ICosmosJourneyerBackend {
 
     static async New(): Promise<Result<CosmosJourneyerBackendLocal, Error>> {
         const systemEntityBackend = new SystemEntityBackend();
-        const universeBackend = new UniverseBackend(systemEntityBackend, getLoneStarSystem());
+        const universeBackend = new UniverseBackend(systemEntityBackend);
 
         const encyclopaedia = new EncyclopaediaGalacticaManager();
         encyclopaedia.backends.push(new EncyclopaediaGalacticaLocal(universeBackend));

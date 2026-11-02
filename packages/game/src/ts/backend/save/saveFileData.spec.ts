@@ -1,19 +1,17 @@
 import type { DeepPartial } from "@cosmos-journeyer/typescript";
 import { expect, test } from "vitest";
 
-import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
-import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { safeParseSave } from "./saveFileData";
 import type { Save } from "./saveFileData";
 
 test("Loading a correct save file", () => {
-    const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+    const authoredSystem = getLoneStarSystem();
     const shipId = crypto.randomUUID();
-    const fallbackStation = universeBackend.fallbackSystem.orbitalFacilities[0];
-    if (fallbackStation === undefined) {
-        throw new Error("Fallback station is undefined!");
+    const station = authoredSystem.orbitalFacilities[0];
+    if (station === undefined) {
+        throw new Error("Station is undefined!");
     }
 
     const saveFileString: DeepPartial<Save> = {
@@ -85,7 +83,7 @@ test("Loading a correct save file", () => {
             currentMissions: [
                 {
                     missionGiver: {
-                        idInSystem: fallbackStation.id,
+                        idInSystem: station.id,
                         systemCoordinates: {
                             starSectorX: 0,
                             starSectorY: 0,
@@ -98,7 +96,7 @@ test("Loading a correct save file", () => {
                     tree: {
                         type: "fly_by",
                         objectId: {
-                            idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
+                            idInSystem: authoredSystem.stellarObjects[0].id,
                             systemCoordinates: {
                                 starSectorX: -3,
                                 starSectorY: -1,
@@ -124,8 +122,8 @@ test("Loading a correct save file", () => {
             [shipId]: {
                 type: "relative",
                 universeObjectId: {
-                    idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
-                    systemCoordinates: universeBackend.fallbackSystem.coordinates,
+                    idInSystem: authoredSystem.stellarObjects[0].id,
+                    systemCoordinates: authoredSystem.coordinates,
                 },
                 position: {
                     x: -0.3993145315439042,
@@ -147,7 +145,7 @@ test("Loading a correct save file", () => {
 });
 
 test("Loading a minimal save file", () => {
-    const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+    const authoredSystem = getLoneStarSystem();
     const shipId = crypto.randomUUID();
     const saveFileString: DeepPartial<Save> = {
         player: {
@@ -168,8 +166,8 @@ test("Loading a minimal save file", () => {
             [shipId]: {
                 type: "relative",
                 universeObjectId: {
-                    idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
-                    systemCoordinates: universeBackend.fallbackSystem.coordinates,
+                    idInSystem: authoredSystem.stellarObjects[0].id,
+                    systemCoordinates: authoredSystem.coordinates,
                 },
                 position: {
                     x: 0,
@@ -195,11 +193,11 @@ test("Loading a minimal save file", () => {
 });
 
 test("Loading a save file with legacy numeric mission node types", () => {
-    const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+    const authoredSystem = getLoneStarSystem();
     const shipId = crypto.randomUUID();
-    const fallbackStation = universeBackend.fallbackSystem.orbitalFacilities[0];
-    if (fallbackStation === undefined) {
-        throw new Error("Fallback station is undefined!");
+    const station = authoredSystem.orbitalFacilities[0];
+    if (station === undefined) {
+        throw new Error("Station is undefined!");
     }
 
     const saveFileString: Record<string, unknown> = {
@@ -213,8 +211,8 @@ test("Loading a save file with legacy numeric mission node types", () => {
             currentMissions: [
                 {
                     missionGiver: {
-                        idInSystem: fallbackStation.id,
-                        systemCoordinates: universeBackend.fallbackSystem.coordinates,
+                        idInSystem: station.id,
+                        systemCoordinates: authoredSystem.coordinates,
                     },
                     tree: {
                         type: 1001,
@@ -222,8 +220,8 @@ test("Loading a save file with legacy numeric mission node types", () => {
                             {
                                 type: 0,
                                 objectId: {
-                                    idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
-                                    systemCoordinates: universeBackend.fallbackSystem.coordinates,
+                                    idInSystem: authoredSystem.stellarObjects[0].id,
+                                    systemCoordinates: authoredSystem.coordinates,
                                 },
                                 state: "notInSystem",
                             },
@@ -243,8 +241,8 @@ test("Loading a save file with legacy numeric mission node types", () => {
             [shipId]: {
                 type: "relative",
                 universeObjectId: {
-                    idInSystem: universeBackend.fallbackSystem.stellarObjects[0].id,
-                    systemCoordinates: universeBackend.fallbackSystem.coordinates,
+                    idInSystem: authoredSystem.stellarObjects[0].id,
+                    systemCoordinates: authoredSystem.coordinates,
                 },
                 position: {
                     x: 0,

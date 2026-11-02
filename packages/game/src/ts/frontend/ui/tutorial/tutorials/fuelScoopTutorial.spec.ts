@@ -19,7 +19,6 @@ import { createInstance } from "i18next";
 import { describe, expect, it } from "vitest";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { FuelScoopTutorial } from "./fuelScoopTutorial";
@@ -28,7 +27,7 @@ const t = createInstance().getFixedT("en-US");
 
 describe("FuelScoopTutorial", () => {
     it("spawns near a star", () => {
-        const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+        const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const tutorial = new FuelScoopTutorial(t);
 
         const saveDataResult = tutorial.getSaveData();

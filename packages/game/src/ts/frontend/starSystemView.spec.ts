@@ -24,7 +24,6 @@ import { ok } from "@cosmos-journeyer/typescript";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
-import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { Player } from "@/frontend/player/player";
@@ -39,7 +38,7 @@ describe("StarSystemView", () => {
     });
 
     it("atomically replaces the player and spaceship controls after instantiation", async () => {
-        const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+        const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const player = Player.Default(universeBackend);
         const nextPlayer = Player.Default(universeBackend);
         const currentPlayerUuid = player.uuid;
@@ -106,7 +105,7 @@ describe("StarSystemView", () => {
     });
 
     it("keeps the current player when the replacement spaceship cannot be instantiated", async () => {
-        const universeBackend = new UniverseBackend(new SystemEntityBackend(), getLoneStarSystem());
+        const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const player = Player.Default(universeBackend);
         const nextPlayer = Player.Default(universeBackend);
         const currentSpaceshipSerialized = player.serializedSpaceships[0];

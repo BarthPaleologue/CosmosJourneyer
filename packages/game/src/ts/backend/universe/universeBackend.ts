@@ -74,15 +74,9 @@ export class UniverseBackend {
      */
     private readonly universeDensity: (starSectorX: number, starSectorY: number, starSectorZ: number) => number;
 
-    /**
-     * Fallback system that is guaranteed to exist
-     * This can be useful for default mechanisms relying on finding a system in the database if nothing is found
-     */
-    readonly fallbackSystem: DeepReadonly<StarSystemModel>;
-
     private readonly systemEntities: SystemEntityBackend;
 
-    constructor(systemEntityBackend: SystemEntityBackend, fallbackSystem: StarSystemModel) {
+    constructor(systemEntityBackend: SystemEntityBackend) {
         this.systemEntities = systemEntityBackend;
 
         const densityRng = getRngFromSeed(Settings.UNIVERSE_SEED);
@@ -93,8 +87,6 @@ export class UniverseBackend {
 
         this.universeDensity = (x: number, y: number, z: number): number =>
             (1.0 - Math.abs(densityPerlin(x * 0.2, y * 0.2, z * 0.2))) ** 8;
-
-        this.fallbackSystem = fallbackSystem;
     }
 
     /**
@@ -171,15 +163,11 @@ export class UniverseBackend {
     }
 
     /**
-     * Looks up a generated system model, including the configured fallback system.
+     * Looks up an authored or generated system model.
      * @param coordinates - Sector and local coordinates identifying the star system.
      * @returns Read-only model when the coordinates are known, or `null` when no model exists.
      */
     private getSystemModelAt(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemModel> | null {
-        if (starSystemCoordinatesEquals(coordinates, this.fallbackSystem.coordinates)) {
-            return this.fallbackSystem;
-        }
-
         const customSystem = this.getCustomSystemFromCoordinates(coordinates);
         if (customSystem !== undefined) {
             return customSystem;
@@ -238,7 +226,7 @@ export class UniverseBackend {
      * @param sectorX - The coordinate of the sector to query.
      * @param sectorY - The coordinate of the sector to query.
      * @param sectorZ - The coordinate of the sector to query.
-     * @returns Generated coordinates, custom-system coordinates, then the fallback coordinates when present.
+     * @returns Generated coordinates followed by custom-system coordinates.
      */
     public getSystemCoordinatesInStarSector(
         sectorX: number,
@@ -255,14 +243,6 @@ export class UniverseBackend {
         });
         result.push(...customSystemCoordinates);
 
-        if (
-            this.fallbackSystem.coordinates.starSectorX === sectorX &&
-            this.fallbackSystem.coordinates.starSectorY === sectorY &&
-            this.fallbackSystem.coordinates.starSectorZ === sectorZ
-        ) {
-            result.push(this.fallbackSystem.coordinates);
-        }
-
         return result;
     }
 
@@ -271,7 +251,7 @@ export class UniverseBackend {
      * @param sectorX - The coordinate of the sector to query.
      * @param sectorY - The coordinate of the sector to query.
      * @param sectorZ - The coordinate of the sector to query.
-     * @returns Read-only system models, including the fallback system when it belongs to the sector.
+     * @returns Read-only generated and authored system models in the sector.
      */
     getSystemModelsInStarSector(
         sectorX: number,
@@ -293,14 +273,6 @@ export class UniverseBackend {
         const customSystemModels: Array<DeepReadonly<StarSystemModel>> = [
             ...this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ),
         ];
-
-        if (
-            this.fallbackSystem.coordinates.starSectorX === sectorX &&
-            this.fallbackSystem.coordinates.starSectorY === sectorY &&
-            this.fallbackSystem.coordinates.starSectorZ === sectorZ
-        ) {
-            customSystemModels.push(this.fallbackSystem);
-        }
 
         return generatedModels.concat(customSystemModels);
     }
@@ -384,7 +356,7 @@ export class UniverseBackend {
     }
 
     /**
-     * Collects generated, fallback, and custom system offsets within a sector.
+     * Collects generated and custom system offsets within a sector.
      * @param sectorX - The coordinate of the sector to query.
      * @param sectorY - The coordinate of the sector to query.
      * @param sectorZ - The coordinate of the sector to query.
@@ -394,18 +366,6 @@ export class UniverseBackend {
         const localPositions: Array<Vector3Like> = [];
 
         localPositions.push(...this.getGeneratedLocalPositionsInStarSector(sectorX, sectorY, sectorZ));
-
-        if (
-            this.fallbackSystem.coordinates.starSectorX === sectorX &&
-            this.fallbackSystem.coordinates.starSectorY === sectorY &&
-            this.fallbackSystem.coordinates.starSectorZ === sectorZ
-        ) {
-            localPositions.push({
-                x: this.fallbackSystem.coordinates.localX,
-                y: this.fallbackSystem.coordinates.localY,
-                z: this.fallbackSystem.coordinates.localZ,
-            });
-        }
 
         const customSystemModels = this.getCustomSystemsFromSector(sectorX, sectorY, sectorZ);
 

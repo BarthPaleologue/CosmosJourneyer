@@ -53,7 +53,9 @@ export async function createStarSystemViewScene(
     const t = await initI18n();
 
     const systemEntityBackend = new SystemEntityBackend();
-    const universeBackend = new UniverseBackend(systemEntityBackend, getAlphaTestisSystemModel());
+    const authoredSystem = getAlphaTestisSystemModel();
+    const universeBackend = new UniverseBackend(systemEntityBackend);
+    universeBackend.registerAuthoredSystem(authoredSystem);
 
     const systemEntityLoader = new SystemEntityLoader();
     const systemEntityProcessors = new SystemEntityProcessors();
@@ -102,7 +104,7 @@ export async function createStarSystemViewScene(
 
     await starSystemView.switchToSpaceshipControls();
 
-    const loadResult = await starSystemView.loadStarSystem({ system: universeBackend.fallbackSystem, entities: [] });
+    const loadResult = await starSystemView.loadStarSystem({ system: authoredSystem, entities: [] });
     if (!loadResult.success) {
         throw loadResult.error;
     }
