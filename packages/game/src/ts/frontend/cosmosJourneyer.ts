@@ -23,14 +23,13 @@ import { CreateAudioEngineAsync } from "@babylonjs/core/AudioV2/webAudio/webAudi
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import HavokPhysics from "@babylonjs/havok";
 import { err, ok, promiseToResult } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
-import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
 import type { ICosmosJourneyerBackend } from "@/backend";
@@ -38,7 +37,7 @@ import { CosmosJourneyerBackendLocal } from "@/backend/backendLocal";
 import { createUrlFromSave } from "@/backend/save/saveFileData";
 import type { Save } from "@/backend/save/saveFileData";
 import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
-import type { RelativeCoordinates, UniverseCoordinates } from "@/backend/save/universeCoordinates";
+import type { UniverseCoordinates } from "@/backend/save/universeCoordinates";
 
 import { loadAssets } from "@/frontend/assets/assets";
 import type { Assets } from "@/frontend/assets/assets";
@@ -50,7 +49,6 @@ import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { Tts } from "@/frontend/audio/tts";
 import { initializeCsg2 } from "@/frontend/helpers/csg2";
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
-import { alignRotationToRef } from "@/frontend/helpers/rotation";
 import { bytesToDataUrl, downloadPng, makeScreenshotPng } from "@/frontend/helpers/screenshot";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
@@ -864,7 +862,7 @@ export class CosmosJourneyer {
         }
 
         const screenshotPng = await makeScreenshotPng(this.engine, camera, {
-            location: this.getCurrentUniverseCoordinates(activeControls.getTransform(), null),
+            location: this.starSystemView.getCurrentUniverseCoordinates(activeControls.getTransform(), null),
         });
 
         downloadPng(screenshotPng, screenshotName);
@@ -892,84 +890,6 @@ export class CosmosJourneyer {
         }
     }
 
-    public getCurrentUniverseCoordinates(
-        transform: TransformNode,
-        minimumDistanceRadiusRatio: number | null = 1.1,
-    ): RelativeCoordinates {
-        const currentStarSystem = this.starSystemView.getStarSystem();
-
-        const currentWorldPosition = transform.getAbsolutePosition();
-        const currentWorldRotation = transform.absoluteRotationQuaternion;
-        let isTooCloseToNearestObject = false;
-
-        // Finding the index of the nearest orbital object
-        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(currentWorldPosition);
-
-        const universeObjectId: UniverseObjectId = {
-            systemCoordinates: currentStarSystem.model.coordinates,
-            idInSystem: nearestOrbitalObject.model.id,
-        };
-
-        // Finding the position of the player in the nearest orbital object's frame of reference
-        const nearestOrbitalObjectInverseWorld = nearestOrbitalObject
-            .getTransform()
-            .computeWorldMatrix(true)
-            .clone()
-            .invert();
-        const currentLocalPosition = Vector3.TransformCoordinates(
-            currentWorldPosition,
-            nearestOrbitalObjectInverseWorld,
-        );
-
-        if (minimumDistanceRadiusRatio !== null) {
-            const distanceToNearestOrbitalObject = currentLocalPosition.length();
-            const minimumDistanceToNearestOrbitalObject =
-                nearestOrbitalObject.getBoundingRadius() * minimumDistanceRadiusRatio;
-            if (distanceToNearestOrbitalObject < minimumDistanceToNearestOrbitalObject) {
-                currentLocalPosition.copyFromFloats(0, 0, nearestOrbitalObject.getBoundingRadius() * 5.0);
-                isTooCloseToNearestObject = true;
-            }
-        }
-
-        // Finding the rotation of the player in the nearest orbital object's frame of reference
-        const nearestOrbitalObjectInverseRotation = nearestOrbitalObject
-            .getTransform()
-            .absoluteRotationQuaternion.clone()
-            .invert();
-
-        const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
-        if (isTooCloseToNearestObject) {
-            const recoveryWorldPosition = Vector3.TransformCoordinates(
-                currentLocalPosition,
-                nearestOrbitalObject.getTransform().getWorldMatrix(),
-            );
-            const targetForward = nearestOrbitalObject
-                .getTransform()
-                .getAbsolutePosition()
-                .subtract(recoveryWorldPosition)
-                .normalize();
-            const localForward = Vector3.Forward(transform.getScene().useRightHandedSystem);
-            alignRotationToRef(currentWorldRotation, localForward, targetForward, currentLocalRotation);
-            currentLocalRotation.multiplyInPlace(nearestOrbitalObjectInverseRotation);
-        }
-
-        return {
-            type: "relative",
-            universeObjectId: universeObjectId,
-            position: {
-                x: currentLocalPosition.x,
-                y: currentLocalPosition.y,
-                z: currentLocalPosition.z,
-            },
-            rotation: {
-                x: currentLocalRotation.x,
-                y: currentLocalRotation.y,
-                z: currentLocalRotation.z,
-                w: currentLocalRotation.w,
-            },
-        };
-    }
-
     /**
      * Generates a save file data object from the current star system and the player's position
      * @returns A serialized save containing the player's current location and state.
@@ -978,7 +898,9 @@ export class CosmosJourneyer {
         const spaceShipControls = this.starSystemView.getSpaceshipControls();
         const spaceship = spaceShipControls.getSpaceship();
 
-        const shipUniverseCoordinates = this.getCurrentUniverseCoordinates(spaceShipControls.getTransform());
+        const shipUniverseCoordinates = this.starSystemView.getCurrentUniverseCoordinates(
+            spaceShipControls.getTransform(),
+        );
 
         const shipLocation: UniverseCoordinates = spaceship.isLandedAtFacility()
             ? {
