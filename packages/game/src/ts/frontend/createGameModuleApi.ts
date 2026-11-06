@@ -18,6 +18,7 @@
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { GameModuleApi } from "@/modules/gameModuleApi";
+import type { StarMapSystemInfoExtensionPoint } from "@/modules/starMapSystemInfo";
 
 import type { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
 import type { SystemEntityProcessors } from "./systemEntity/systemEntityProcessors";
@@ -27,14 +28,17 @@ import type { SystemEntityProcessors } from "./systemEntity/systemEntityProcesso
  * @param universeBackend Backend that stores authored star systems and entities.
  * @param systemEntityLoader Registry for entity content factories.
  * @param systemEntityProcessors Registries for entity runtime processors.
+ * @param starMapSystemInfo Registry for system information supplied by modules.
  * @returns API exposed to game modules during registration.
  */
 export function createGameModuleApi(
     universeBackend: UniverseBackend,
     systemEntityLoader: SystemEntityLoader,
     systemEntityProcessors: SystemEntityProcessors,
+    starMapSystemInfo: StarMapSystemInfoExtensionPoint,
 ): GameModuleApi {
     return {
+        starMapSystemInfo,
         starSystems: {
             registerAuthored: (model) => {
                 universeBackend.registerAuthoredSystem(model);

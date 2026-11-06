@@ -23,6 +23,7 @@ import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { createGameModuleApi } from "@/frontend/createGameModuleApi";
 import { Mission } from "@/frontend/missions/mission";
+import { StarMapSystemInfoRegistry } from "@/frontend/starmap/starMapSystemInfoRegistry";
 import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
 import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
 
@@ -37,7 +38,12 @@ describe("StarMapTutorial", () => {
     beforeEach(() => {
         universeBackend = new UniverseBackend(new SystemEntityBackend());
         OrbitalFacilitiesModule.setup(
-            createGameModuleApi(universeBackend, new SystemEntityLoader(), new SystemEntityProcessors()),
+            createGameModuleApi(
+                universeBackend,
+                new SystemEntityLoader(),
+                new SystemEntityProcessors(),
+                new StarMapSystemInfoRegistry(),
+            ),
         );
     });
     it("spawns near a space station", () => {
