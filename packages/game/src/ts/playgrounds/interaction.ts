@@ -61,7 +61,7 @@ export async function createInteractionDemo(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    const t = await initI18n();
+    const { t } = await initI18n();
 
     const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
 

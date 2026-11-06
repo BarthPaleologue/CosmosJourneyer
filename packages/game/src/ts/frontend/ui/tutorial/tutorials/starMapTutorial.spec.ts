@@ -35,7 +35,9 @@ const t = createInstance().getFixedT("en-US");
 
 describe("StarMapTutorial", () => {
     let universeBackend: UniverseBackend;
-    beforeEach(() => {
+    beforeEach(async () => {
+        const i18n = createInstance();
+        await i18n.init({ lng: "en-US", resources: {} });
         universeBackend = new UniverseBackend(new SystemEntityBackend());
         OrbitalFacilitiesModule.setup(
             createGameModuleApi(
@@ -43,7 +45,8 @@ describe("StarMapTutorial", () => {
                 new SystemEntityLoader(),
                 new SystemEntityProcessors(),
                 new StarMapSystemInfoRegistry(),
-            ),
+                i18n,
+            )(OrbitalFacilitiesModule.id),
         );
     });
     it("spawns near a space station", () => {

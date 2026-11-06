@@ -51,7 +51,7 @@ export async function createTutorialScene(
     // This attaches the camera to the canvas
     camera.attachControl();
 
-    const t = await initI18n();
+    const { t } = await initI18n();
 
     const tutorialLayer = new TutorialLayer(new SoundPlayerMock(), t);
     document.body.appendChild(tutorialLayer.root);

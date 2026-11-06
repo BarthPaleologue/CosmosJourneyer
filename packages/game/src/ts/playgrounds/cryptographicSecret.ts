@@ -93,7 +93,7 @@ export async function createCryptographicSecretScene(
 
     const soundPlayerMock = new SoundPlayerMock();
 
-    const t = await initI18n();
+    const { t } = await initI18n();
 
     void promptModalString(
         "Enter the decryption passphrase to reveal the secret function:",

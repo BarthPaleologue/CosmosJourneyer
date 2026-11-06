@@ -17,7 +17,7 @@ describe("translated side panels", () => {
     let t: TFunction;
 
     beforeAll(async () => {
-        t = await initI18n();
+        t = (await initI18n()).t;
     });
 
     it("builds each panel with its translated title", () => {

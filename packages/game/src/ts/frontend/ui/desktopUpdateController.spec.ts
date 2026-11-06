@@ -45,7 +45,7 @@ describe("DesktopUpdateController", () => {
     let t: TFunction;
 
     beforeAll(async () => {
-        t = await initI18n();
+        t = (await initI18n()).t;
     });
 
     beforeEach(() => {

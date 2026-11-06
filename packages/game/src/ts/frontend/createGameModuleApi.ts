@@ -15,9 +15,11 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { i18n } from "i18next";
+
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
-import type { GameModuleApi } from "@/modules/gameModuleApi";
+import type { GameModuleApiFactory } from "@/modules/gameModuleApi";
 import type { StarMapSystemInfoExtensionPoint } from "@/modules/starMapSystemInfo";
 
 import type { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
@@ -29,15 +31,25 @@ import type { SystemEntityProcessors } from "./systemEntity/systemEntityProcesso
  * @param systemEntityLoader Registry for entity content factories.
  * @param systemEntityProcessors Registries for entity runtime processors.
  * @param starMapSystemInfo Registry for system information supplied by modules.
- * @returns API exposed to game modules during registration.
+ * @param i18n Translation instance owned by the game.
+ * @returns API factory that scopes translations to each module ID.
  */
 export function createGameModuleApi(
     universeBackend: UniverseBackend,
     systemEntityLoader: SystemEntityLoader,
     systemEntityProcessors: SystemEntityProcessors,
     starMapSystemInfo: StarMapSystemInfoExtensionPoint,
-): GameModuleApi {
-    return {
+    i18n: Pick<i18n, "addResourceBundle" | "getFixedT">,
+): GameModuleApiFactory {
+    return (moduleId) => ({
+        i18n: {
+            registerResources: (resources) => {
+                for (const [language, translations] of Object.entries(resources)) {
+                    i18n.addResourceBundle(language, `module/${moduleId}`, translations);
+                }
+            },
+            t: i18n.getFixedT(null, `module/${moduleId}`),
+        },
         starMapSystemInfo,
         starSystems: {
             registerAuthored: (model) => {
@@ -101,5 +113,5 @@ export function createGameModuleApi(
                 },
             },
         },
-    };
+    });
 }

@@ -54,7 +54,7 @@ export async function createStationLandingScene(
     });
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
-    const t = await initI18n();
+    const { t } = await initI18n();
 
     await enablePhysics(scene);
 

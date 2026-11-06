@@ -30,7 +30,7 @@ import HavokPhysics from "@babylonjs/havok";
 import { err, ok, promiseToResult } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
-import type { TFunction } from "i18next";
+import type { i18n, TFunction } from "i18next";
 
 import type { ICosmosJourneyerBackend } from "@/backend";
 import { CosmosJourneyerBackendLocal } from "@/backend/backendLocal";
@@ -435,10 +435,11 @@ export class CosmosJourneyer {
 
     /**
      * Creates the engine and the scenes and loads the assets async
-     * @param t Translation function used to render player-facing text.
+     * @param i18n Translation instance shared with game modules.
      * @returns A promise that resolves when the engine and the scenes are created and the assets are loaded
      */
-    public static async New(t: TFunction): Promise<Result<CosmosJourneyer, Error>> {
+    public static async New(i18n: i18n): Promise<Result<CosmosJourneyer, Error>> {
+        const { t } = i18n;
         const canvas = document.createElement("canvas");
         document.body.prepend(canvas);
 
@@ -522,15 +523,16 @@ export class CosmosJourneyer {
         const systemEntityProcessors = new SystemEntityProcessors();
 
         const starMapSystemInfo = new StarMapSystemInfoRegistry();
-        const gameModuleApi = createGameModuleApi(
+        const createModuleApi = createGameModuleApi(
             backend.universe,
             systemEntityLoader,
             systemEntityProcessors,
             starMapSystemInfo,
+            i18n,
         );
 
         const builtinModules = getBuiltinModules();
-        const modulesResult = setupModules(builtinModules, gameModuleApi);
+        const modulesResult = setupModules(builtinModules, createModuleApi);
         if (!modulesResult.success) {
             return modulesResult;
         }

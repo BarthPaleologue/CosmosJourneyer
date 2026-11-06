@@ -48,7 +48,7 @@ export async function createFlightDemoScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
     scene.defaultCursor = "crosshair";
-    const t = await initI18n();
+    const { t } = await initI18n();
 
     await enablePhysics(scene);
 
