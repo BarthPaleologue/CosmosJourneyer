@@ -8,6 +8,7 @@ import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend"
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { createGameModuleApi } from "@/frontend/createGameModuleApi";
+import { StarMapSystemInfoRegistry } from "@/frontend/starmap/starMapSystemInfoRegistry";
 import type { SystemEntity } from "@/frontend/systemEntity/systemEntity";
 import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
 import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
@@ -26,6 +27,7 @@ describe("orbital facility rendering", () => {
             new UniverseBackend(new SystemEntityBackend()),
             new SystemEntityLoader(),
             processors,
+            new StarMapSystemInfoRegistry(),
         );
         OrbitalFacilitiesModule.setup(api);
         const content = {
@@ -63,7 +65,9 @@ describe("orbital facility generation", () => {
         backend.registerAuthoredSystem(system);
         vi.spyOn(backend, "getSystemGalacticPosition").mockReturnValue(galacticPosition);
         const processors = new SystemEntityProcessors();
-        OrbitalFacilitiesModule.setup(createGameModuleApi(backend, new SystemEntityLoader(), processors));
+        OrbitalFacilitiesModule.setup(
+            createGameModuleApi(backend, new SystemEntityLoader(), processors, new StarMapSystemInfoRegistry()),
+        );
         try {
             const content = backend.getSystemContentModelAt(system.coordinates);
             expect(content).not.toBeNull();

@@ -83,6 +83,7 @@ describe("space telescope module in Vesta", () => {
         loader = new SystemEntityLoader();
         processors = new SystemEntityProcessors();
         const api: GameModuleApi = {
+            starMapSystemInfo: { register: vi.fn() },
             starSystems: { registerAuthored: registerAuthoredSystem },
             systemEntities: {
                 registerAuthored: vi.fn(),

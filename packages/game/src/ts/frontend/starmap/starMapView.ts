@@ -58,6 +58,7 @@ import type { StarMapTextures } from "./starMap";
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";
 import { getGreasedLinePathFromSystemSegments } from "./starMapPath";
+import type { StarMapSystemInfoRegistry } from "./starMapSystemInfoRegistry";
 import { StarMapUI } from "./starMapUI";
 import { StellarPathfinder } from "./stellarPathfinder";
 
@@ -109,6 +110,7 @@ export class StarMapView implements View {
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
+        starMapSystemInfo: Pick<StarMapSystemInfoRegistry, "getInfo">,
         t: TFunction,
     ) {
         this.scene = scene;
@@ -134,7 +136,7 @@ export class StarMapView implements View {
             }
 
             this.soundPlayer.playNow("target_lock");
-            this.starMapUI.setSelectedSystem(starSystemModel.system, this.currentSystemCoordinates);
+            this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
             this.selectedSystemCoordinates = starSystemCoordinates;
             this.focusOnSystem(starSystemCoordinates);
         });
@@ -155,7 +157,14 @@ export class StarMapView implements View {
 
         this.stellarPathfinder = new StellarPathfinder(universeBackend);
 
-        this.starMapUI = new StarMapUI(this.scene, this.player, this.universeBackend, this.soundPlayer, t);
+        this.starMapUI = new StarMapUI(
+            this.scene,
+            this.player,
+            this.universeBackend,
+            this.soundPlayer,
+            starMapSystemInfo,
+            t,
+        );
         this.starMapUI.onSystemFocusObservable.add((starSystemCoordinates) => {
             this.focusOnSystem(starSystemCoordinates);
         });
@@ -454,7 +463,7 @@ export class StarMapView implements View {
                 `Could not find star system model for coordinates ${JSON.stringify(starSystemCoordinates)}`,
             );
         }
-        this.starMapUI.setSelectedSystem(starSystemModel.system, this.currentSystemCoordinates);
+        this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
         this.starMapUI.setHoveredSystem(null);
     }
 

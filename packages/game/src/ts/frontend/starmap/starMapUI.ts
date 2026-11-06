@@ -20,10 +20,10 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
-import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
+import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
+import type { StarSystemContentModel, UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
@@ -31,6 +31,7 @@ import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObje
 
 import type { Player } from "../player/player";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
+import type { StarMapSystemInfoRegistry } from "./starMapSystemInfoRegistry";
 import { SystemIcons } from "./systemIcons";
 
 export class StarMapUI {
@@ -49,6 +50,7 @@ export class StarMapUI {
     readonly shortHandUITitle: HTMLHeadingElement;
     readonly shortHandUISystemType: HTMLParagraphElement;
     readonly shortHandUIDistanceFromCurrent: HTMLParagraphElement;
+    readonly shortHandUISystemInfo: HTMLDivElement;
     readonly shortHandUIButtonContainer: HTMLDivElement;
     readonly shortHandUIPlotItineraryButton: HTMLButtonElement;
     readonly shortHandUIBookmarkButton: StarMapBookmarkButton;
@@ -65,6 +67,7 @@ export class StarMapUI {
 
     private readonly universeBackend: UniverseBackend;
     private readonly t: TFunction;
+    private readonly starMapSystemInfo: Pick<StarMapSystemInfoRegistry, "getInfo">;
 
     readonly onSystemFocusObservable = new Observable<StarSystemCoordinates>();
 
@@ -80,6 +83,7 @@ export class StarMapUI {
         player: Player,
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
+        starMapSystemInfo: Pick<StarMapSystemInfoRegistry, "getInfo">,
         t: TFunction,
     ) {
         this.scene = scene;
@@ -89,6 +93,7 @@ export class StarMapUI {
 
         this.universeBackend = universeBackend;
         this.t = t;
+        this.starMapSystemInfo = starMapSystemInfo;
 
         this.htmlRoot = document.createElement("div");
         this.htmlRoot.classList.add("starMapUI");
@@ -154,6 +159,9 @@ export class StarMapUI {
 
         this.shortHandUIDistanceFromCurrent = document.createElement("p");
         this.shortHandUI.appendChild(this.shortHandUIDistanceFromCurrent);
+
+        this.shortHandUISystemInfo = document.createElement("div");
+        this.shortHandUI.appendChild(this.shortHandUISystemInfo);
 
         this.shortHandUIButtonContainer = document.createElement("div");
         this.shortHandUIButtonContainer.classList.add("buttonContainer");
@@ -303,9 +311,10 @@ export class StarMapUI {
     }
 
     setSelectedSystem(
-        targetSystemModel: DeepReadonly<StarSystemModel>,
+        systemContent: DeepReadonly<StarSystemContentModel>,
         currentSystemCoordinates: StarSystemCoordinates | null,
     ): void {
+        const targetSystemModel = systemContent.system;
         this.selectedSystem = targetSystemModel.coordinates;
 
         const targetPosition = wrapVector3(
@@ -329,6 +338,13 @@ export class StarMapUI {
         this.shortHandUISystemType.textContent = getOrbitalObjectTypeToI18nString(starModel, this.t);
         this.shortHandUIBookmarkButton.setSelectedSystemSeed(targetSystemModel.coordinates);
         this.shortHandUITitle.textContent = targetSystemModel.name;
+        this.shortHandUISystemInfo.replaceChildren(
+            ...this.starMapSystemInfo.getInfo(systemContent).map((info) => {
+                const paragraph = document.createElement("p");
+                paragraph.textContent = info;
+                return paragraph;
+            }),
+        );
     }
 
     rebuildSystemIcons(): void {
