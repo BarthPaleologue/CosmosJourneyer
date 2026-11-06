@@ -38,6 +38,8 @@ import { Settings } from "@/settings";
 
 import type { GameModule } from "../gameModule";
 import type { GameModuleApi } from "../gameModuleApi";
+import enUS from "./locales/en-US.json";
+import frFR from "./locales/fr-FR.json";
 import { generateSpaceElevatorModel } from "./proceduralGeneration/spaceElevatorModelGenerator";
 import { generateSpaceStationModel } from "./proceduralGeneration/spaceStationModelGenerator";
 import { SpaceElevator } from "./spaceElevator";
@@ -48,6 +50,14 @@ import type { SpaceStationModel } from "./spaceStationModel";
 export const OrbitalFacilitiesModule: GameModule = {
     id: "orbital-facilities",
     setup: (api): void => {
+        api.i18n.registerResources({ "en-US": enUS, "fr-FR": frFR });
+        api.starMapSystemInfo.register(({ entities }) => {
+            const inhabited = entities.some(
+                (entity) => isOrbitalFacilityModel(entity) && entity.content.population > 0,
+            );
+            return api.i18n.t(inhabited ? "inhabited" : "uninhabited");
+        });
+
         setupSpaceStation(api);
         setupSpaceElevator(api);
 
@@ -265,4 +275,14 @@ function createClimberTargets(climber: SpaceElevatorClimber): Array<Target> {
             type: TargetType.SPACE_ELEVATOR_CLIMBER,
         },
     ];
+}
+
+/**
+ * @param entity Model from the open set of system entity types.
+ * @returns Whether this module owns the entity's content model.
+ */
+function isOrbitalFacilityModel(
+    entity: DeepReadonly<SystemEntityModel>,
+): entity is DeepReadonly<SystemEntityModel<SpaceStationModel | SpaceElevatorModel>> {
+    return entity.content.type === "spaceStation" || entity.content.type === "spaceElevator";
 }

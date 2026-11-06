@@ -39,7 +39,7 @@ document.body.appendChild(canvas);
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const t = await initI18n();
+const { t } = await initI18n();
 const loadingScreen = new LoadingScreen(canvas, t);
 
 const engine = new Engine(canvas, true, { useHighPrecisionMatrix: true });

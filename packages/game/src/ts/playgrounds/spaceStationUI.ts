@@ -55,7 +55,7 @@ export async function createSpaceStationUIScene(
 
     await enablePhysics(scene);
 
-    const t = await initI18n();
+    const { t } = await initI18n();
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 

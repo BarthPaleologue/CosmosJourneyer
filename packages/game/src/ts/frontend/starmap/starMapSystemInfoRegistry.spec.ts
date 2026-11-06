@@ -23,12 +23,12 @@ describe("star-map system information", () => {
         const backend = new UniverseBackend(new SystemEntityBackend());
         const processors = new SystemEntityProcessors();
         const info = new StarMapSystemInfoRegistry();
-        const api = createGameModuleApi(backend, new SystemEntityLoader(), processors, info);
+        const i18n = createInstance();
+        await i18n.init({ lng: "en-US", resources: {} });
+        const api = createGameModuleApi(backend, new SystemEntityLoader(), processors, info, i18n)("info-test");
         api.starMapSystemInfo.register(({ system }) => system.name);
         api.starMapSystemInfo.register(() => null);
         api.starMapSystemInfo.register(({ entities }) => (entities.length > 0 ? "<strong>Station</strong>" : null));
-        const i18n = createInstance();
-        await i18n.init({ lng: "en-US", resources: {} });
         const ui = new StarMapUI(scene, Player.Default(backend), backend, new SoundPlayerMock(), info, i18n.t);
         const content = getLoneStarSystem();
         try {

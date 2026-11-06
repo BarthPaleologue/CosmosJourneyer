@@ -73,7 +73,7 @@ export async function createOnFootScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
-    const t = await initI18n();
+    const { t } = await initI18n();
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 

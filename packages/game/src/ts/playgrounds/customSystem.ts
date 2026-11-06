@@ -56,7 +56,8 @@ export async function createCustomSystemScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
-    const t = await initI18n();
+    const i18n = await initI18n();
+    const { t } = i18n;
 
     const urlParams = new URLSearchParams(window.location.search);
     const systemKey = urlParams.get("system");
@@ -71,13 +72,14 @@ export async function createCustomSystemScene(
     const systemEntityLoader = new SystemEntityLoader();
     const systemEntityProcessors = new SystemEntityProcessors();
 
-    const gameModuleApi = createGameModuleApi(
+    const createModuleApi = createGameModuleApi(
         backend.universe,
         systemEntityLoader,
         systemEntityProcessors,
         new StarMapSystemInfoRegistry(),
+        i18n,
     );
-    const moduleSetupResult = setupModules(getBuiltinModules(), gameModuleApi);
+    const moduleSetupResult = setupModules(getBuiltinModules(), createModuleApi);
     if (!moduleSetupResult.success) {
         throw moduleSetupResult.error;
     }

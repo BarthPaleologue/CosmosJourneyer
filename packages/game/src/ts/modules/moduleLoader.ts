@@ -21,7 +21,7 @@ import type { Result } from "@cosmos-journeyer/typescript";
 import { ChronosModule } from "./chronos";
 import { DarkKnightModule } from "./darkKnight";
 import type { GameModule } from "./gameModule";
-import type { GameModuleApi } from "./gameModuleApi";
+import type { GameModuleApiFactory } from "./gameModuleApi";
 import { MonolithModule } from "./monolith";
 import { OrbitalFacilitiesModule } from "./orbitalFacilities";
 import { SpaceTelescopesModule } from "./spaceTelescopes";
@@ -41,13 +41,13 @@ export function getBuiltinModules(): Array<GameModule> {
 
 /**
  * @param gameModules - Modules in setup order.
- * @param api - Content registration API.
+ * @param createApi - Creates an API scoped to the module ID.
  * @returns Success, or the first setup error.
  */
-export function setupModules(gameModules: Iterable<GameModule>, api: GameModuleApi): Result<void, Error> {
+export function setupModules(gameModules: Iterable<GameModule>, createApi: GameModuleApiFactory): Result<void, Error> {
     for (const gameModule of gameModules) {
         try {
-            gameModule.setup(api);
+            gameModule.setup(createApi(gameModule.id));
         } catch (error) {
             return err(new Error(`Could not setup module "${gameModule.id}"`, { cause: error }));
         }

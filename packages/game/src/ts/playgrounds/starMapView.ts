@@ -45,7 +45,7 @@ export async function createStarMapViewScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
-    const t = await initI18n();
+    const { t } = await initI18n();
 
     const systemEntityBackend = new SystemEntityBackend();
     const universeBackend = new UniverseBackend(systemEntityBackend);

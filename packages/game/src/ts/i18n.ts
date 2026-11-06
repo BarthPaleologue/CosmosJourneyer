@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { createInstance } from "i18next";
-import type { Resource, ResourceKey, ResourceLanguage, TFunction } from "i18next";
+import type { Resource, ResourceKey, ResourceLanguage, i18n } from "i18next";
 import { z } from "zod";
 
 import { renderMarkdownInline } from "./utils/markdown";
@@ -74,9 +74,9 @@ function loadResources(): Resource {
 
 /**
  * Uses the URL language override, falling back to the browser language.
- * @returns Translator after applying static page translations.
+ * @returns Translation instance after applying static page translations.
  */
-export async function initI18n(): Promise<TFunction> {
+export async function initI18n(): Promise<i18n> {
     // init language to url parameter if defined, otherwise use the browser language
     const urlParams = new URLSearchParams(window.location.search);
     const language = urlParams.get("lang") ?? navigator.language;
@@ -99,5 +99,5 @@ export async function initI18n(): Promise<TFunction> {
         element.innerHTML = renderMarkdownInline(t(key));
     });
 
-    return t;
+    return i18n;
 }

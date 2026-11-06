@@ -17,6 +17,7 @@
 
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
+import type { I18nExtensionPoint } from "./i18n";
 import type { LandingPadExtensionPoint } from "./landingPads";
 import type { MusicExtensionPoint } from "./music";
 import type { RenderingExtensionPoint } from "./rendering";
@@ -25,6 +26,7 @@ import type { SystemEntitiesExtensionPoint } from "./systemEntities";
 import type { TargetingExtensionPoint } from "./targeting";
 
 export type GameModuleApi = Readonly<{
+    i18n: I18nExtensionPoint;
     starSystems: {
         registerAuthored(model: StarSystemModel): void;
     };
@@ -35,3 +37,5 @@ export type GameModuleApi = Readonly<{
     landingPad: LandingPadExtensionPoint;
     starMapSystemInfo: StarMapSystemInfoExtensionPoint;
 }>;
+
+export type GameModuleApiFactory = (moduleId: string) => GameModuleApi;

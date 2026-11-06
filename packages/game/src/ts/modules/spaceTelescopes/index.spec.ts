@@ -24,6 +24,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 import { astronomicalUnitToMeters, getOrbitalPeriod } from "@cosmos-journeyer/physics";
+import { createInstance } from "i18next";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CrateMaterial } from "@/frontend/assets/materials/crate";
@@ -84,6 +85,7 @@ describe("space telescope module in Vesta", () => {
         processors = new SystemEntityProcessors();
         const api: GameModuleApi = {
             starMapSystemInfo: { register: vi.fn() },
+            i18n: { registerResources: vi.fn(), t: createInstance().getFixedT("en-US") },
             starSystems: { registerAuthored: registerAuthoredSystem },
             systemEntities: {
                 registerAuthored: vi.fn(),

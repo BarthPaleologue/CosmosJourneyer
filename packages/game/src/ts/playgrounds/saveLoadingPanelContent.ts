@@ -47,7 +47,7 @@ export async function createSaveLoadingPanelContentScene(
     const camera = new FreeCamera("camera", Vector3.Zero(), scene);
     camera.attachControl();
 
-    const t = await initI18n();
+    const { t } = await initI18n();
 
     const systemEntityBackend = new SystemEntityBackend();
     const universeBackend = new UniverseBackend(systemEntityBackend);
