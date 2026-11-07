@@ -27,15 +27,11 @@ describe("DesktopAutoUpdateService", () => {
         const updater = new MockUpdater();
         const now = Date.parse("2026-11-07T12:00:00.000Z");
         vi.spyOn(Date, "now").mockReturnValue(now);
-        vi.stubGlobal(
-            "fetch",
-            vi.fn().mockResolvedValue(
-                new Response(JSON.stringify({
-                    published_at: new Date(now - 60 * 60 * 1_000).toISOString(),
-                    draft: false,
-                })),
-            ),
-        );
+        const release = {
+            published_at: new Date(now - 60 * 60 * 1_000).toISOString(),
+            draft: false,
+        };
+        vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify(release))));
 
         new DesktopAutoUpdateService(updater, () => {});
         expect(await updater.isUpdateSupported(createUpdateInfo())).toBe(false);

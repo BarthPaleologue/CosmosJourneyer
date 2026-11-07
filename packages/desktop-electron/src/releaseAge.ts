@@ -27,7 +27,9 @@ export function requireMinimumReleaseAge(originalCheck: VerifyUpdateSupport): Ve
                 signal: AbortSignal.timeout(githubApiTimeoutMs),
             });
             if (!response.ok) {
-                console.warn(`Could not verify desktop release ${info.version}: GitHub returned HTTP ${response.status}.`);
+                console.warn(
+                    `Could not verify desktop release ${info.version}: GitHub returned HTTP ${response.status}.`,
+                );
                 return false;
             }
 
