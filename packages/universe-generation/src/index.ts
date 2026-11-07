@@ -12,4 +12,3 @@ export * from "./proceduralGenerators/stellarObjects/neutronStarModelGenerator";
 export * from "./proceduralGenerators/stellarObjects/starModelGenerator";
 export * from "./proceduralGenerators/telluricPlanetModelGenerator";
 export * from "./proceduralGenerators/telluricSatelliteModelGenerator";
-export * from "./society/factions";

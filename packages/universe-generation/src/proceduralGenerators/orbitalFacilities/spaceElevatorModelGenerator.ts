@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { HydroponicToConventionalRatio, IndividualAverageDailyIntake, SeedHalfRange } from "#/constants";
-import { getFactionFromCoordinates } from "#/society/factions";
 import { CropTypes, getEdibleEnergyPerAreaPerDay } from "#/utils/agriculture";
 import type { CropType } from "#/utils/agriculture";
 import { getDistancesToStellarObjects } from "#/utils/distanceToStellarObject";
@@ -91,8 +90,6 @@ export function generateSpaceElevatorModel(
         axisAzimuth: 0,
         initialRotationAngle: 0,
     };
-
-    const faction = getFactionFromCoordinates(systemModel.coordinates, rng);
 
     const population = 2_000_000;
     const annualEnergyPerCapitaKWh = 200_000; // US average is at 80k KWh https://www.eia.gov/tools/faqs/faq.php?id=85&t=1
@@ -223,7 +220,6 @@ export function generateSpaceElevatorModel(
         populationDensity: targetPopulationDensity,
         agricultureMix,
         nbHydroponicLayers,
-        faction,
         solarPanelEfficiency,
         sections,
     };

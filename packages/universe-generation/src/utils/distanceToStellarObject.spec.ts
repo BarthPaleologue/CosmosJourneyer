@@ -135,7 +135,6 @@ describe("distanceToStellarObject", () => {
                     localZ: 0,
                 },
                 nbHydroponicLayers: 15,
-                faction: "satori_concord",
                 annualEnergyPerCapitaKWh: 4000,
                 mass: 1e6,
                 sections: [],
