@@ -310,8 +310,7 @@ export class ShipControls implements Controls {
     private handleUpDownInput(): void {
         const spaceship = this.spaceship;
         if (spaceship.isLanded()) {
-            this.cancelLandingRequest(spaceship);
-            spaceship.takeOff();
+            this.takeOff();
         } else if (spaceship.isLanding()) {
             this.cancelLandingRequest(spaceship);
             spaceship.cancelLanding();
@@ -322,6 +321,11 @@ export class ShipControls implements Controls {
                 spaceship.aggregate.body.getObjectCenterWorld(),
             );
         }
+    }
+
+    public takeOff(): void {
+        this.cancelLandingRequest(this.spaceship);
+        this.spaceship.takeOff();
     }
 
     private cancelLandingRequest(spaceship: Spaceship): void {
