@@ -286,6 +286,7 @@ export async function createOnFootScene(
         characterControls.update(deltaSeconds);
         roverControls.update(deltaSeconds);
         shipControls.update(deltaSeconds);
+        shipControls.finalizeCamera(deltaSeconds);
         interactionSystem.update(deltaSeconds);
         interactionLayer.update(deltaSeconds);
         clusteredLightingSystem.update(activeControls.getActiveCamera());

@@ -139,6 +139,7 @@ export async function createStationLandingScene(
         const deltaSeconds = engine.getDeltaTime() / 1000;
         shipControls.update(deltaSeconds);
         spaceStation.update([], camera.globalPosition, deltaSeconds);
+        shipControls.finalizeCamera(deltaSeconds);
         clusteredLightingSystem.update(camera);
     });
 

@@ -34,4 +34,11 @@ export interface Controls extends Transformable {
      * @param deltaSeconds the time between 2 frames
      */
     update(deltaSeconds: number): void;
+
+    /**
+     * Finalizes the camera pose after all world transforms have been updated for the frame.
+     * Controllers whose cameras follow transforms outside their own update must implement this.
+     * @param deltaSeconds the time between 2 frames
+     */
+    finalizeCamera?(deltaSeconds: number): void;
 }
