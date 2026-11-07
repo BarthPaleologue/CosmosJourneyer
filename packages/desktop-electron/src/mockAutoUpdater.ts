@@ -38,6 +38,7 @@ export function createDevelopmentAutoUpdater(
 export class MockAutoUpdaterClient extends EventEmitter implements AutoUpdaterClient {
     public autoDownload = false;
     public autoInstallOnAppQuit = false;
+    public isUpdateSupported = (): boolean => true;
 
     private readonly updateInfo: UpdateInfo;
     private readonly onInstallNow: () => void;

@@ -1,6 +1,7 @@
 import { autoUpdater, CancellationToken } from "electron-updater";
 import type { ProgressInfo, UpdateInfo } from "electron-updater";
 
+import { requireMinimumReleaseAge } from "./releaseAge.js";
 import type { DesktopUpdateState } from "./updateContract.js";
 
 const updateCheckIntervalMs = 4 * 60 * 60 * 1_000;
@@ -8,6 +9,7 @@ const updateCheckIntervalMs = 4 * 60 * 60 * 1_000;
 export interface AutoUpdaterClient {
     autoDownload: boolean;
     autoInstallOnAppQuit: boolean;
+    isUpdateSupported: (info: UpdateInfo) => boolean | Promise<boolean>;
     checkForUpdates(): Promise<unknown>;
     downloadUpdate(cancellationToken?: CancellationToken): Promise<Array<string>>;
     quitAndInstall(isSilent?: boolean, isForceRunAfter?: boolean): void;
@@ -29,6 +31,7 @@ export class DesktopAutoUpdateService {
         this.onStateChanged = onStateChanged;
         this.updater.autoDownload = false;
         this.updater.autoInstallOnAppQuit = false;
+        this.updater.isUpdateSupported = requireMinimumReleaseAge(this.updater.isUpdateSupported.bind(this.updater));
     }
 
     public start(): void {
