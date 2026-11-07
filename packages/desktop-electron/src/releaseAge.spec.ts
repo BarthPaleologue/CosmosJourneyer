@@ -21,7 +21,8 @@ const updateInfo: UpdateInfo = {
  * @returns The mocked fetch function.
  */
 function stubGitHubRelease(publishedAt: unknown, draft = false) {
-    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ published_at: publishedAt, draft })));
+    const makeResponse = () => new Response(JSON.stringify({ published_at: publishedAt, draft }));
+    const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(makeResponse()));
     vi.stubGlobal("fetch", fetchMock);
     return fetchMock;
 }
@@ -37,10 +38,10 @@ describe("requireMinimumReleaseAge", () => {
         const fetchMock = stubGitHubRelease(new Date(now - 24 * oneHour).toISOString());
 
         expect(await requireMinimumReleaseAge(() => true)(updateInfo)).toBe(true);
-        expect(fetchMock).toHaveBeenCalledWith(
+        expect(fetchMock.mock.calls.at(0)?.[0]).toBe(
             "https://api.github.com/repos/BarthPaleologue/CosmosJourneyer/releases/tags/v1.12.0",
-            expect.objectContaining({ signal: expect.any(AbortSignal) }),
         );
+        expect(fetchMock.mock.calls.at(0)?.[1]?.signal).toBeInstanceOf(AbortSignal);
     });
 
     it("rejects a fresh release, then accepts it on a later check", async () => {
