@@ -1060,6 +1060,10 @@ export class StarSystemView implements View {
 
         starSystem.update(deltaSeconds, this.terrainSystem, this.systemEntityProcessors);
 
+        if (activeControls === this.spaceshipControls) {
+            this.spaceshipControls.syncThirdPersonCameraPosition();
+        }
+
         this.clusteredLightingSystem.update(activeControls.getActiveCamera());
 
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(
