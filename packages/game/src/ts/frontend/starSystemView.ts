@@ -88,7 +88,6 @@ import { CustomAnimation } from "./helpers/animations/customAnimation";
 import { easeInOutCubic } from "./helpers/animations/interpolations";
 import { DepthRendererManager } from "./helpers/depthRendererManager";
 import { setCollisionsEnabled } from "./helpers/havok";
-import { getOrbitAxisObjectList } from "./helpers/orbitAxisRendering";
 import { InteractionSystem } from "./inputs/interaction/interactionSystem";
 import type { Player } from "./player/player";
 import { isScannerInRange } from "./spaceship/components/discoveryScanner";
@@ -642,10 +641,10 @@ export class StarSystemView implements View {
             spaceship,
         );
 
-        const orbitAxisRenderList = getOrbitAxisObjectList(starSystem);
+        const orbitalObjects = [...starSystem.getKeplerianObjects()];
 
-        this.orbitRenderer.setOrbitalObjects(orbitAxisRenderList, scene);
-        this.axisRenderer.setOrbitalObjects(orbitAxisRenderList, scene);
+        this.orbitRenderer.setOrbitalObjects(orbitalObjects, scene);
+        this.axisRenderer.setOrbitalObjects(orbitalObjects, scene);
 
         const celestialBodies = starSystem.getCelestialBodies();
 
@@ -1132,6 +1131,7 @@ export class StarSystemView implements View {
         this.vehicleControls.setUpDirection(upDirection);
 
         this.orbitRenderer.update(this.getStarSystem().getReferencePlaneRotation());
+        this.axisRenderer.update();
 
         // update missions
         const missionContext: MissionContext = {

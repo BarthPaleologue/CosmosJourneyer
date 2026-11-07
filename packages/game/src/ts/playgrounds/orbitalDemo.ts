@@ -123,8 +123,8 @@ export async function createOrbitalDemoScene(
         },
     });
 
-    const bodies = [sun, earth, moon];
-    const orbitalSimulation = new KeplerianOrbitalSimulation(bodies.map(toKeplerian));
+    const bodies = [sun, earth, moon].map(toKeplerian);
+    const orbitalSimulation = new KeplerianOrbitalSimulation(bodies);
 
     const orbitRenderer = new OrbitRenderer(CreateGreasedLineHelper);
     orbitRenderer.setOrbitalObjects(bodies, scene);
@@ -149,7 +149,7 @@ export async function createOrbitalDemoScene(
 
         orbitalSimulation.update(elapsedSeconds);
         bodies.forEach((body) => {
-            const orbitalTransform = orbitalSimulation.getTransform(body.model.id);
+            const orbitalTransform = orbitalSimulation.getTransform(body.id);
             if (orbitalTransform === undefined) {
                 return;
             }
@@ -160,6 +160,7 @@ export async function createOrbitalDemoScene(
         });
 
         orbitRenderer.update(referencePlaneRotation);
+        axisRenderer.update();
     });
 
     return Promise.resolve(scene);

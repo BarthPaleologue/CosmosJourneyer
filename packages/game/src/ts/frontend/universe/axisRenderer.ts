@@ -19,7 +19,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math";
 import type { Mesh } from "@babylonjs/core/Meshes";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { HasBoundingSphere } from "./architecture/hasBoundingSphere";
+import { getBoundingRadius } from "../helpers/boundingRadius";
 import type { Transformable } from "./architecture/transformable";
 import type { CreateLinesMeshFunction } from "./lineRendering";
 
@@ -42,7 +42,7 @@ export class AxisRenderer {
      * @param objects - The orbital objects whose rotation axes should be rendered.
      * @param scene - The Babylon.js scene that owns the rendered meshes.
      */
-    setOrbitalObjects(objects: ReadonlyArray<Transformable & HasBoundingSphere>, scene: Scene): void {
+    setOrbitalObjects(objects: ReadonlyArray<Transformable>, scene: Scene): void {
         this.reset();
 
         for (const object of objects) {
@@ -52,11 +52,8 @@ export class AxisRenderer {
         this.setVisibility(this._isVisible);
     }
 
-    private createAxisMesh(orbitalObject: Transformable & HasBoundingSphere, scene: Scene): void {
-        const points = [
-            new Vector3(0, -orbitalObject.getBoundingRadius() * 2, 0),
-            new Vector3(0, orbitalObject.getBoundingRadius() * 2, 0),
-        ];
+    private createAxisMesh(orbitalObject: Transformable, scene: Scene): void {
+        const points = [new Vector3(0, -0.5, 0), new Vector3(0, 0.5, 0)];
 
         const rotationAxisHelper = this.createAxisMeshFromPoints(
             `${orbitalObject.getTransform().name}AxisHelper`,
@@ -68,7 +65,6 @@ export class AxisRenderer {
         rotationAxisHelper.ignoreCameraMaxZ = true;
         rotationAxisHelper.alwaysSelectAsActiveMesh = true;
 
-        rotationAxisHelper.parent = orbitalObject.getTransform();
         this.axisMeshes.set(orbitalObject, rotationAxisHelper);
     }
 
@@ -92,6 +88,22 @@ export class AxisRenderer {
      */
     isVisible(): boolean {
         return this._isVisible;
+    }
+
+    update(): void {
+        if (!this._isVisible) {
+            return;
+        }
+
+        for (const [object, axisMesh] of this.axisMeshes) {
+            const transform = object.getTransform();
+            const radius = getBoundingRadius(transform);
+
+            axisMesh.scaling.y = 2 * radius * 1.5;
+            axisMesh.position.copyFrom(transform.getAbsolutePosition());
+            axisMesh.rotationQuaternion = transform.absoluteRotationQuaternion.clone();
+            axisMesh.computeWorldMatrix(true);
+        }
     }
 
     /**
