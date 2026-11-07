@@ -21,7 +21,7 @@ const updateInfo: UpdateInfo = {
  * @returns The mocked fetch function.
  */
 function stubGitHubRelease(publishedAt: unknown, draft = false) {
-    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ published_at: publishedAt, draft })));
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ published_at: publishedAt, draft })));
     vi.stubGlobal("fetch", fetchMock);
     return fetchMock;
 }
