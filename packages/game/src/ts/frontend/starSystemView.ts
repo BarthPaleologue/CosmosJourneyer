@@ -1131,6 +1131,7 @@ export class StarSystemView implements View {
         this.vehicleControls.setUpDirection(upDirection);
 
         this.orbitRenderer.update(this.getStarSystem().getReferencePlaneRotation());
+        this.axisRenderer.update();
 
         // update missions
         const missionContext: MissionContext = {

@@ -53,8 +53,7 @@ export class AxisRenderer {
     }
 
     private createAxisMesh(orbitalObject: Transformable, scene: Scene): void {
-        const boundingRadius = getBoundingRadius(orbitalObject.getTransform());
-        const points = [new Vector3(0, -boundingRadius * 2, 0), new Vector3(0, boundingRadius * 2, 0)];
+        const points = [new Vector3(0, -0.5, 0), new Vector3(0, 0.5, 0)];
 
         const rotationAxisHelper = this.createAxisMeshFromPoints(
             `${orbitalObject.getTransform().name}AxisHelper`,
@@ -66,7 +65,6 @@ export class AxisRenderer {
         rotationAxisHelper.ignoreCameraMaxZ = true;
         rotationAxisHelper.alwaysSelectAsActiveMesh = true;
 
-        rotationAxisHelper.parent = orbitalObject.getTransform();
         this.axisMeshes.set(orbitalObject, rotationAxisHelper);
     }
 
@@ -90,6 +88,22 @@ export class AxisRenderer {
      */
     isVisible(): boolean {
         return this._isVisible;
+    }
+
+    update(): void {
+        if (!this._isVisible) {
+            return;
+        }
+
+        for (const [object, axisMesh] of this.axisMeshes) {
+            const transform = object.getTransform();
+            const radius = getBoundingRadius(transform);
+
+            axisMesh.scaling.y = 2 * radius * 1.5;
+            axisMesh.position.copyFrom(transform.getAbsolutePosition());
+            axisMesh.rotationQuaternion = transform.absoluteRotationQuaternion.clone();
+            axisMesh.computeWorldMatrix(true);
+        }
     }
 
     /**

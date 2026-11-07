@@ -160,6 +160,7 @@ export async function createOrbitalDemoScene(
         });
 
         orbitRenderer.update(referencePlaneRotation);
+        axisRenderer.update();
     });
 
     return Promise.resolve(scene);
