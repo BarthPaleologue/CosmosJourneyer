@@ -312,6 +312,7 @@ describe("ShipControls camera transforms", () => {
         controls.thirdPersonCamera.radius = 10;
         controls.thirdPersonCamera.fov = 0.5;
         controls.reset();
+        const alphaBeforeUpdate = controls.thirdPersonCamera.alpha;
 
         controls.update(0.5);
 
@@ -319,6 +320,8 @@ describe("ShipControls camera transforms", () => {
         const betaAfterUpdate = controls.thirdPersonCamera.beta;
         const radiusAfterUpdate = controls.thirdPersonCamera.radius;
         const fovAfterUpdate = controls.thirdPersonCamera.fov;
+        expect(alphaAfterUpdate).not.toBe(alphaBeforeUpdate);
+        expect(fovAfterUpdate).not.toBe(0.5);
 
         controls.syncThirdPersonCameraPosition();
 
