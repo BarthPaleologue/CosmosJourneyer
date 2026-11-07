@@ -22,7 +22,7 @@ const updateInfo: UpdateInfo = {
  */
 function stubGitHubRelease(publishedAt: unknown, draft = false) {
     const makeResponse = () => new Response(JSON.stringify({ published_at: publishedAt, draft }));
-    const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(makeResponse()));
+    const fetchMock = vi.fn<typeof fetch>(async () => await Promise.resolve(makeResponse()));
     vi.stubGlobal("fetch", fetchMock);
     return fetchMock;
 }
