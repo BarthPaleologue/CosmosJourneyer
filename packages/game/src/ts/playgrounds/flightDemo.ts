@@ -102,7 +102,6 @@ export async function createFlightDemoScene(
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         ship.update(deltaSeconds);
-        ship.finalizeCamera(deltaSeconds);
         clusteredLightingSystem.update(camera);
     });
 

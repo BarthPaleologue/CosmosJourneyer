@@ -1060,7 +1060,9 @@ export class StarSystemView implements View {
 
         starSystem.update(deltaSeconds, this.terrainSystem, this.systemEntityProcessors);
 
-        activeControls.finalizeCamera?.(deltaSeconds);
+        if (activeControls === this.spaceshipControls) {
+            this.spaceshipControls.syncThirdPersonCameraPosition();
+        }
 
         this.clusteredLightingSystem.update(activeControls.getActiveCamera());
 

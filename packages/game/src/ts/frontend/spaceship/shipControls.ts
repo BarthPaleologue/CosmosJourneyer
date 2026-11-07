@@ -430,10 +430,7 @@ export class ShipControls implements Controls {
             yaw(this.getTransform(), -this.spaceship.maxYawSpeed * this.rotationInertia.x * deltaSeconds);
             pitch(this.getTransform(), this.spaceship.maxPitchSpeed * this.rotationInertia.y * deltaSeconds);
         }
-    }
 
-    public finalizeCamera(deltaSeconds: number): void {
-        this.getTransform().computeWorldMatrix(true);
         this.thirdPersonCameraTransform.position.copyFrom(this.getTransform().getAbsolutePosition());
         this.thirdPersonCameraTransform.rotationQuaternion = slerpSmoothToRef(
             this.getTransform().absoluteRotationQuaternion,
@@ -444,7 +441,7 @@ export class ShipControls implements Controls {
         );
         this.thirdPersonCameraTransform.computeWorldMatrix(true);
 
-        this.targetFov = Tools.ToRadians(60 + 10 * this.spaceship.getThrottle());
+        this.targetFov = Tools.ToRadians(60 + 10 * spaceship.getThrottle());
         this.thirdPersonCamera.fov = lerpSmooth(this.thirdPersonCamera.fov, this.targetFov, 0.08, deltaSeconds);
 
         if (this.thirdPersonCameraAnimation !== null) {
@@ -462,11 +459,18 @@ export class ShipControls implements Controls {
         this.getActiveCamera().getViewMatrix(true);
     }
 
+    public syncThirdPersonCameraPosition(): void {
+        const shipTransform = this.getTransform();
+        shipTransform.computeWorldMatrix(true);
+
+        this.thirdPersonCameraTransform.position.copyFrom(shipTransform.getAbsolutePosition());
+        this.thirdPersonCameraTransform.computeWorldMatrix(true);
+        this.thirdPersonCamera.getViewMatrix(true);
+    }
+
     syncCameraTransform(): void {
-        this.getTransform().computeWorldMatrix(true);
         this.thirdPersonCameraTransform.rotationQuaternion?.copyFrom(this.getTransform().absoluteRotationQuaternion);
         this.thirdPersonCameraTransform.position.copyFrom(this.getTransform().getAbsolutePosition());
-        this.thirdPersonCameraTransform.computeWorldMatrix(true);
     }
 
     reset(): void {
