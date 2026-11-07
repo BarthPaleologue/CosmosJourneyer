@@ -1,7 +1,7 @@
 import { EventEmitter } from "node:events";
 
 import type { CancellationToken, ProgressInfo, UpdateInfo } from "electron-updater";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DesktopAutoUpdateService } from "./autoUpdate.js";
 import type { DesktopUpdateState } from "./updateContract.js";
@@ -9,6 +9,7 @@ import type { DesktopUpdateState } from "./updateContract.js";
 class MockUpdater extends EventEmitter {
     public autoDownload = true;
     public autoInstallOnAppQuit = true;
+    public isUpdateSupported: (info: UpdateInfo) => boolean | Promise<boolean> = () => true;
     public readonly checkForUpdates = vi.fn<() => Promise<null>>(async () => Promise.resolve(null));
     public readonly downloadUpdate = vi.fn<(token?: CancellationToken) => Promise<Array<string>>>(async () =>
         Promise.resolve(["update"]),
@@ -17,6 +18,29 @@ class MockUpdater extends EventEmitter {
 }
 
 describe("DesktopAutoUpdateService", () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
+    });
+
+    it("installs the minimum release age check on the updater", async () => {
+        const updater = new MockUpdater();
+        const now = Date.parse("2026-11-07T12:00:00.000Z");
+        vi.spyOn(Date, "now").mockReturnValue(now);
+        vi.stubGlobal(
+            "fetch",
+            vi.fn().mockResolvedValue(
+                new Response(JSON.stringify({
+                    published_at: new Date(now - 60 * 60 * 1_000).toISOString(),
+                    draft: false,
+                })),
+            ),
+        );
+
+        new DesktopAutoUpdateService(updater, () => {});
+        expect(await updater.isUpdateSupported(createUpdateInfo())).toBe(false);
+    });
+
     it("waits for explicit consent before downloading and installing", async () => {
         const updater = new MockUpdater();
         const states: DesktopUpdateState[] = [];
