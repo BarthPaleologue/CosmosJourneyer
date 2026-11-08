@@ -180,3 +180,48 @@ describe("character gravity alignment", () => {
         }
     });
 });
+
+describe("ship camera synchronization", () => {
+    it.each([true, false])("runs after the world update only for active ship controls (active: %s)", (shipActive) => {
+        const phases: string[] = [];
+        const camera = {};
+        const transform = { getAbsolutePosition: () => Vector3.Zero() };
+        const spaceshipControls = {
+            getActiveCamera: () => camera,
+            getTransform: () => transform,
+            update: () => phases.push("controls"),
+            syncThirdPersonCameraPosition: () => phases.push("camera"),
+        };
+        const activeControls = shipActive ? spaceshipControls : { ...spaceshipControls };
+        const stopAfterWorldUpdate = new Error("Stop before unrelated gameplay updates");
+        const chunkForge = { update: () => phases.push("chunks") };
+        const starSystem = {
+            gravitySystem: { getLastComputedForce: () => null },
+            update: vi.fn(() => phases.push("world")),
+            getNearestOrbitalObject: () => {
+                throw stopAfterWorldUpdate;
+            },
+        };
+        const context = {
+            _isLoadingSystem: false,
+            activeControls,
+            spaceshipControls,
+            characterControls: { avatar: { aggregate: { body: {} } } },
+            scene: { activeCamera: camera },
+            chunkForge,
+            getStarSystem: () => starSystem,
+        } as unknown as StarSystemView;
+        const prototype = StarSystemView.prototype as unknown as {
+            updateBeforeRender(this: StarSystemView, deltaSeconds: number): void;
+        };
+
+        expect(() => {
+            prototype.updateBeforeRender.call(context, 1 / 60);
+        }).toThrow(stopAfterWorldUpdate);
+
+        expect(starSystem.update).toHaveBeenCalledWith(1 / 60, chunkForge);
+        expect(phases).toEqual(
+            shipActive ? ["chunks", "controls", "world", "camera"] : ["chunks", "controls", "world"],
+        );
+    });
+});

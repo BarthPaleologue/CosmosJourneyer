@@ -22,6 +22,7 @@ import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Observable } from "@babylonjs/core/Misc/observable";
@@ -32,6 +33,7 @@ import { Scene } from "@babylonjs/core/scene";
 import HavokPhysics from "@babylonjs/havok";
 import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 
+import { Settings } from "../../settings";
 import type { ISoundPlayer } from "../audio/soundPlayer";
 import type { ITts } from "../audio/tts";
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
@@ -202,4 +204,202 @@ describe("ShipControls camera transforms", () => {
             }
         });
     }
+    it("synchronizes the third-person rig after a landing pad advances", () => {
+        const ship = createControls();
+        const station = new TransformNode("station", scene);
+        station.rotationQuaternion = Quaternion.Identity();
+        const bay = new TransformNode("bay", scene);
+        bay.parent = station;
+        bay.position.set(500, 0, 0);
+        bay.rotationQuaternion = Quaternion.Identity();
+        bay.computeWorldMatrix(true);
+        ship.parent = bay;
+        ship.position.set(500, 10, 0);
+        ship.computeWorldMatrix(true);
+        controls.syncCameraTransform();
+
+        const angularSpeed = 0.0443;
+        for (const deltaSeconds of [1 / 60, 1 / 50, 1 / 144, 1 / 30]) {
+            controls.update(deltaSeconds);
+            const rigBeforePadAdvance = controls.thirdPersonCameraTransform.getAbsolutePosition().clone();
+            bay.rotate(Axis.Y, angularSpeed * deltaSeconds);
+            ship.computeWorldMatrix(true);
+
+            expect(Vector3.Distance(rigBeforePadAdvance, ship.getAbsolutePosition())).toBeGreaterThan(0.1);
+
+            controls.syncThirdPersonCameraPosition();
+
+            expect(controls.thirdPersonCameraTransform.getAbsolutePosition().asArray()).toEqual(
+                ship.getAbsolutePosition().asArray(),
+            );
+            expect(Vector3.Distance(controls.thirdPersonCamera.globalPosition, ship.getAbsolutePosition())).toBeCloseTo(
+                controls.thirdPersonCamera.radius,
+                4,
+            );
+        }
+    });
+
+    it("preserves world-space rotation smoothing in the early camera update", () => {
+        const ship = createControls();
+        controls.syncCameraTransform();
+        const previousRigRotation = controls.thirdPersonCameraTransform.rotationQuaternion?.clone();
+        if (previousRigRotation === undefined) {
+            throw new Error("Third-person rig has no rotation quaternion");
+        }
+
+        const deltaSeconds = 1 / 60;
+        const rotationHalfLife = 0.3;
+        ship.rotationQuaternion = Quaternion.RotationAxis(Vector3.Up(), 0.4);
+        ship.computeWorldMatrix(true);
+        const targetRotation = ship.absoluteRotationQuaternion.clone();
+        const expectedRotation = Quaternion.Slerp(
+            targetRotation,
+            previousRigRotation,
+            2 ** (-deltaSeconds / rotationHalfLife),
+        );
+
+        controls.update(deltaSeconds);
+
+        const actualRotation = controls.thirdPersonCameraTransform.rotationQuaternion;
+        if (actualRotation === null) {
+            throw new Error("Third-person rig has no rotation quaternion");
+        }
+        expect(Math.abs(Quaternion.Dot(actualRotation, expectedRotation))).toBeCloseTo(1, 9);
+        expect(Math.abs(Quaternion.Dot(actualRotation, targetRotation))).toBeLessThan(0.999);
+    });
+
+    it("does not advance rotation smoothing during late position synchronization", () => {
+        const ship = createControls();
+        const pad = new TransformNode("pad", scene);
+        pad.position.set(500, 0, 0);
+        pad.rotationQuaternion = Quaternion.Identity();
+        pad.computeWorldMatrix(true);
+        ship.parent = pad;
+        ship.position.set(0, 10, 0);
+        ship.rotationQuaternion = Quaternion.Identity();
+        ship.computeWorldMatrix(true);
+        controls.syncCameraTransform();
+        controls.update(1 / 60);
+
+        const rigRotationAfterUpdate = controls.thirdPersonCameraTransform.rotationQuaternion?.clone();
+        if (rigRotationAfterUpdate === undefined) {
+            throw new Error("Third-person rig has no rotation quaternion");
+        }
+
+        pad.rotate(Axis.Y, 0.2);
+        ship.rotationQuaternion = Quaternion.RotationAxis(Vector3.Up(), 0.4);
+        ship.computeWorldMatrix(true);
+
+        controls.syncThirdPersonCameraPosition();
+
+        const rigRotationAfterSync = controls.thirdPersonCameraTransform.rotationQuaternion;
+        if (rigRotationAfterSync === null) {
+            throw new Error("Third-person rig has no rotation quaternion");
+        }
+        expect(rigRotationAfterSync.asArray()).toEqual(rigRotationAfterUpdate.asArray());
+    });
+
+    it("does not advance FOV or camera preset animations during late position synchronization", () => {
+        createControls();
+        controls.thirdPersonCamera.alpha = 0;
+        controls.thirdPersonCamera.beta = 0.1;
+        controls.thirdPersonCamera.radius = 10;
+        controls.thirdPersonCamera.fov = 0.5;
+        controls.reset();
+        const alphaBeforeUpdate = controls.thirdPersonCamera.alpha;
+
+        controls.update(0.5);
+
+        const alphaAfterUpdate = controls.thirdPersonCamera.alpha;
+        const betaAfterUpdate = controls.thirdPersonCamera.beta;
+        const radiusAfterUpdate = controls.thirdPersonCamera.radius;
+        const fovAfterUpdate = controls.thirdPersonCamera.fov;
+        expect(alphaAfterUpdate).not.toBe(alphaBeforeUpdate);
+        expect(fovAfterUpdate).not.toBe(0.5);
+
+        controls.syncThirdPersonCameraPosition();
+
+        expect(controls.thirdPersonCamera.alpha).toBe(alphaAfterUpdate);
+        expect(controls.thirdPersonCamera.beta).toBe(betaAfterUpdate);
+        expect(controls.thirdPersonCamera.radius).toBe(radiusAfterUpdate);
+        expect(controls.thirdPersonCamera.fov).toBe(fovAfterUpdate);
+    });
+
+    it("keeps a parented ship coherent with its camera through floating-origin rebasing", () => {
+        const ship = createControls();
+        const pad = new TransformNode("pad", scene);
+        pad.position.set(500, 0, 0);
+        pad.rotationQuaternion = Quaternion.Identity();
+        pad.computeWorldMatrix(true);
+        ship.parent = pad;
+        ship.position.set(0, 10, 0);
+        ship.computeWorldMatrix(true);
+
+        controls.syncCameraTransform();
+        controls.update(1 / 60);
+        controls.thirdPersonCamera.getViewMatrix(true);
+        const cameraPosition = controls.thirdPersonCamera.globalPosition.clone();
+        expect(Vector3.Distance(cameraPosition, ship.getAbsolutePosition())).toBeCloseTo(
+            controls.thirdPersonCamera.radius,
+            4,
+        );
+
+        const floatingOrigin = new FloatingOriginSystem(scene, 1);
+        floatingOrigin.update(cameraPosition);
+        controls.syncThirdPersonCameraPosition();
+
+        expect(controls.thirdPersonCameraTransform.getAbsolutePosition().asArray()).toEqual(
+            ship.getAbsolutePosition().asArray(),
+        );
+        expect(controls.thirdPersonCamera.globalPosition.length()).toBeLessThan(0.1);
+    });
+
+    it("synchronizes after a large single-frame displacement triggers a floating-origin rebase", () => {
+        const ship = createControls();
+        const floatingOrigin = new FloatingOriginSystem(scene, Settings.FLOATING_ORIGIN_THRESHOLD);
+        controls.syncCameraTransform();
+        controls.update(1 / 60);
+
+        const destination = new Vector3(Settings.FLOATING_ORIGIN_THRESHOLD * 2, 0, 0);
+        ship.setAbsolutePosition(destination);
+        ship.computeWorldMatrix(true);
+        controls.update(1 / 60);
+        controls.thirdPersonCamera.getViewMatrix(true);
+        const cameraPosition = controls.thirdPersonCamera.globalPosition.clone();
+        expect(Vector3.Distance(cameraPosition, destination)).toBeCloseTo(controls.thirdPersonCamera.radius, 4);
+        expect(cameraPosition.length()).toBeGreaterThan(Settings.FLOATING_ORIGIN_THRESHOLD);
+
+        floatingOrigin.update(cameraPosition);
+        controls.syncThirdPersonCameraPosition();
+
+        expect(controls.thirdPersonCameraTransform.getAbsolutePosition().asArray()).toEqual(
+            ship.getAbsolutePosition().asArray(),
+        );
+        expect(controls.thirdPersonCamera.globalPosition.length()).toBeLessThan(0.1);
+    });
+
+    it("synchronizes the camera across landing and take-off reparenting", () => {
+        const ship = createControls();
+        const pad = new TransformNode("pad", scene);
+        pad.position.set(500, 0, 0);
+        pad.rotationQuaternion = Quaternion.Identity();
+        pad.computeWorldMatrix(true);
+
+        ship.parent = pad;
+        ship.position.set(0, 10, 0);
+        ship.computeWorldMatrix(true);
+        controls.syncCameraTransform();
+        controls.syncThirdPersonCameraPosition();
+        expect(controls.thirdPersonCameraTransform.getAbsolutePosition().asArray()).toEqual(
+            ship.getAbsolutePosition().asArray(),
+        );
+
+        ship.setParent(null);
+        ship.setAbsolutePosition(pad.getAbsolutePosition().add(new Vector3(0, 20, 0)));
+        controls.syncCameraTransform();
+        controls.syncThirdPersonCameraPosition();
+        expect(controls.thirdPersonCameraTransform.getAbsolutePosition().asArray()).toEqual(
+            ship.getAbsolutePosition().asArray(),
+        );
+    });
 });

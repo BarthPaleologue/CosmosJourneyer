@@ -959,6 +959,10 @@ export class StarSystemView implements View {
 
         starSystem.update(deltaSeconds, this.chunkForge);
 
+        if (activeControls === this.spaceshipControls) {
+            this.spaceshipControls.syncThirdPersonCameraPosition();
+        }
+
         const nearestOrbitalObject = starSystem.getNearestOrbitalObject(
             activeControls.getTransform().getAbsolutePosition(),
         );

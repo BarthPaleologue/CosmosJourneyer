@@ -444,6 +444,15 @@ export class ShipControls implements Controls {
         this.getActiveCamera().getViewMatrix(true);
     }
 
+    public syncThirdPersonCameraPosition(): void {
+        const shipTransform = this.getTransform();
+        shipTransform.computeWorldMatrix(true);
+
+        this.thirdPersonCameraTransform.position.copyFrom(shipTransform.getAbsolutePosition());
+        this.thirdPersonCameraTransform.computeWorldMatrix(true);
+        this.thirdPersonCamera.getViewMatrix(true);
+    }
+
     syncCameraTransform() {
         this.thirdPersonCameraTransform.rotationQuaternion?.copyFrom(this.getTransform().absoluteRotationQuaternion);
         this.thirdPersonCameraTransform.position.copyFrom(this.getTransform().getAbsolutePosition());
