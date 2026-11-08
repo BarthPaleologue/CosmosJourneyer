@@ -147,6 +147,7 @@ export class TokamakSection implements StationSection {
             radiatorEmissiveColor.g,
             radiatorEmissiveColor.b,
         );
+        this.radiatorMaterial.emissiveIntensity = 5;
 
         const radiatorWidth = 30;
         const radiatorCount = armCount * 3;
@@ -171,6 +172,7 @@ export class TokamakSection implements StationSection {
             light.parent = this.attachment;
             light.diffuse = this.radiatorMaterial.emissiveColor;
             light.range = radiatorDepth * 5;
+            light.intensity = this.radiatorMaterial.emissiveIntensity;
             this.lights.push(light);
         }
     }

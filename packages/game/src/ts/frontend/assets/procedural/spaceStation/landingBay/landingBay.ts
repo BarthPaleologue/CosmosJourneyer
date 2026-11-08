@@ -38,6 +38,8 @@ import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
 import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
+import { Settings } from "@/settings";
+
 import { ProceduralSpotLightInstances } from "../../spotLight";
 import type { ProceduralSpotLightInstanceData } from "../../spotLight";
 import { LandingPad } from "../landingPad/landingPad";
@@ -144,6 +146,8 @@ export class LandingBay {
             const light = new PointLight(`LandingBayLightCaps${i}`, new Vector3(x, y, z), scene, true);
             light.range = deltaRadius * 2;
             light.parent = lightMeshInstances;
+            light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
+            light.intensity = Settings.FACILITY_LIGHT_INTENSITY;
 
             this.lights.push(light);
         }

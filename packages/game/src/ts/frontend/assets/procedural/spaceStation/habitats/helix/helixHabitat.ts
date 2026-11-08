@@ -218,6 +218,7 @@ export class HelixHabitat implements Transformable {
             light.range = this.deltaRadius * 0.8;
             light.parent = this.getTransform();
             light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
+            light.intensity = Settings.FACILITY_LIGHT_INTENSITY;
             this.lights.push(light);
         }
         lightInstances.thinInstanceSetBuffer("matrix", lightInstanceBuffer, 16, true);
