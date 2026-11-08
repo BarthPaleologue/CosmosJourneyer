@@ -416,10 +416,7 @@ export class ShipControls implements Controls {
             pitch(this.getTransform(), this.spaceship.maxPitchSpeed * this.rotationInertia.y * deltaSeconds);
         }
 
-        this.thirdPersonCameraTransform.position =
-            this.getTransform().parent === null
-                ? this.getTransform().position
-                : this.getTransform().getAbsolutePosition();
+        this.thirdPersonCameraTransform.position.copyFrom(this.getTransform().getAbsolutePosition());
         this.thirdPersonCameraTransform.rotationQuaternion = slerpSmoothToRef(
             this.getTransform().absoluteRotationQuaternion,
             this.thirdPersonCameraTransform.rotationQuaternion ?? Quaternion.Identity(),
@@ -449,7 +446,7 @@ export class ShipControls implements Controls {
 
     syncCameraTransform() {
         this.thirdPersonCameraTransform.rotationQuaternion?.copyFrom(this.getTransform().absoluteRotationQuaternion);
-        this.thirdPersonCameraTransform.position = this.getTransform().getAbsolutePosition();
+        this.thirdPersonCameraTransform.position.copyFrom(this.getTransform().getAbsolutePosition());
     }
 
     reset() {
