@@ -95,6 +95,12 @@ const nextMissionInteraction = new PressInteraction(
     }),
 );
 
+const toggleCameraInteraction = new PressInteraction(
+    new Action({
+        bindings: [keyboard.getControl("KeyB")],
+    }),
+);
+
 const resetCameraInteraction = new PressInteraction(
     new Action({
         bindings: [keyboard.getControl("Numpad0"), keyboard.getControl("Digit0")],
@@ -148,6 +154,7 @@ export const SpaceShipControlsInputs = new InputMap("SpaceShipInputs", {
     throttleToZero: throttleToZeroInteraction,
     previousMission: previousMissionInteraction,
     nextMission: nextMissionInteraction,
+    toggleCamera: toggleCameraInteraction,
     resetCamera: resetCameraInteraction,
     switchToCameraPreset1,
     switchToCameraPreset2,

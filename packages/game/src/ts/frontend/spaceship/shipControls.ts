@@ -65,6 +65,8 @@ export class ShipControls implements Controls {
 
     readonly firstPersonCamera: FreeCamera;
 
+    private activeCamera: Camera;
+
     private cameraShakeAnimation: CustomAnimation<Vector2> | null = null;
 
     private closestLandableFacility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null = null;
@@ -78,6 +80,7 @@ export class ShipControls implements Controls {
     private readonly rotationInertia = Vector3.Zero();
 
     private readonly toggleWarpDriveHandler: () => void;
+    private readonly toggleCameraHandler: () => void;
     private readonly landingHandler: () => void;
     private readonly emitLandingRequestHandler: () => void;
     private readonly throttleToZeroHandler: () => void;
@@ -135,6 +138,8 @@ export class ShipControls implements Controls {
                 )) /
             2;
         this.thirdPersonCamera.upperRadiusLimit = 500;
+
+        this.activeCamera = this.thirdPersonCamera;
 
         this.cameraShakeAnimation = null;
 
@@ -268,6 +273,16 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.throttleToZero.on("complete", this.throttleToZeroHandler);
 
+        this.toggleCameraHandler = (): void => {
+            if (this.activeCamera === this.firstPersonCamera) {
+                this.switchToThirdPersonCamera();
+            } else {
+                this.switchToFirstPersonCamera();
+            }
+        };
+
+        SpaceShipControlsInputs.map.toggleCamera.on("complete", this.toggleCameraHandler);
+
         this.resetCameraHandler = (presetName: ThirdPersonCameraPresetNames): void => {
             this.thirdPersonCameraAnimation = CustomAnimation.FromTo(
                 {
@@ -347,11 +362,19 @@ export class ShipControls implements Controls {
     }
 
     public getActiveCamera(): Camera {
-        return this.thirdPersonCamera;
+        return this.activeCamera;
     }
 
     public getCameras(): Camera[] {
         return [this.thirdPersonCamera, this.firstPersonCamera];
+    }
+
+    public switchToFirstPersonCamera(): void {
+        this.activeCamera = this.firstPersonCamera;
+    }
+
+    public switchToThirdPersonCamera(): void {
+        this.activeCamera = this.thirdPersonCamera;
     }
 
     public setClosestLandableFacility(facility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null): void {
@@ -477,6 +500,7 @@ export class ShipControls implements Controls {
     }
 
     reset(): void {
+        this.switchToThirdPersonCamera();
         this.resetCameraHandler("behindCentered");
         this.closestLandableFacility = null;
     }
@@ -579,6 +603,7 @@ export class ShipControls implements Controls {
         SpaceShipControlsInputs.map.landing.off("complete", this.landingHandler);
         SpaceShipControlsInputs.map.emitLandingRequest.off("complete", this.emitLandingRequestHandler);
         SpaceShipControlsInputs.map.throttleToZero.off("complete", this.throttleToZeroHandler);
+        SpaceShipControlsInputs.map.toggleCamera.off("complete", this.toggleCameraHandler);
         for (const { input, handler } of this.cameraPresetInputHandlers) {
             input.off("complete", handler);
         }
