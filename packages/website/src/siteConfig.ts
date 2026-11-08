@@ -1,6 +1,6 @@
 const repositoryUrl = "https://github.com/BarthPaleologue/CosmosJourneyer";
 const contactEmail = "barth.paleologue@cosmosjourneyer.com";
-const desktopReleaseVersion = "1.11.3";
+const desktopReleaseVersion = "1.11.5";
 const desktopReleaseUrl = `${repositoryUrl}/releases/download/v${desktopReleaseVersion}`;
 
 export const siteConfig = {
