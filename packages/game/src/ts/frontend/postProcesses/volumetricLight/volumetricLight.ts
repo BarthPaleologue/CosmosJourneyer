@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { type AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { type Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -45,6 +46,23 @@ export class VolumetricLight extends VolumetricLightScatteringPostProcess {
 
         // This is necessary because BabylonJS post process sets the scene using the camera. However, I don't pass a camera to the constructor as I use a PostProcessRenderPipeline.
         this._scene = scene;
+
+        // Camera targets run after active-mesh evaluation, including after terrain disposal clears the list.
+        const pass = this.getPass();
+        const index = scene.customRenderTargets.indexOf(pass);
+        if (index !== -1) {
+            scene.customRenderTargets.splice(index, 1);
+        }
+        const registerCamera = (camera: Camera): void => {
+            if (!camera.customRenderTargets.includes(pass)) {
+                camera.customRenderTargets.push(pass);
+            }
+        };
+        scene.cameras.forEach(registerCamera);
+        const cameraObserver = scene.onNewCameraAddedObservable.add(registerCamera);
+        pass.onDisposeObservable.addOnce(() => {
+            scene.onNewCameraAddedObservable.remove(cameraObserver);
+        });
 
         this.exposure = volumetricLightUniforms.exposure;
         this.decay = volumetricLightUniforms.decay;
