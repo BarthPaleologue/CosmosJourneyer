@@ -38,10 +38,13 @@ import type { ISoundPlayer } from "../audio/soundPlayer";
 import type { ITts } from "../audio/tts";
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
 import type { INotificationManager } from "../ui/notificationManager";
+import { ObjectTargetCursorType } from "../universe/architecture/targetable";
+import { LandingPadManager, LandingPadSize, type ILandingPad } from "../universe/orbitalFacility/landingPadManager";
 import { ShipControls } from "./shipControls";
 import type { Spaceship } from "./spaceship";
+import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
 
-describe("ShipControls camera transforms", () => {
+describe("ShipControls", () => {
     const engine = new NullEngine();
     let scene: Scene;
     let controls: ShipControls;
@@ -51,6 +54,8 @@ describe("ShipControls camera transforms", () => {
     });
 
     afterEach(() => {
+        window.dispatchEvent(new KeyboardEvent("keyup", { code: "KeyR" }));
+        SpaceShipControlsInputs.map.upDown.enabled = false;
         controls.dispose({} as ISoundPlayer);
         scene.dispose();
         vi.restoreAllMocks();
@@ -401,5 +406,56 @@ describe("ShipControls camera transforms", () => {
         expect(controls.thirdPersonCameraTransform.getAbsolutePosition().asArray()).toEqual(
             ship.getAbsolutePosition().asArray(),
         );
+    });
+
+    it.each(["station UI", "keyboard"])("releases the reserved pad before takeoff through %s", (method) => {
+        const ship = createControls();
+        const pad: ILandingPad = {
+            getTransform: () => ship,
+            getBoundingRadius: () => 10,
+            getTypeName: () => "LandingPad",
+            getPadSize: () => LandingPadSize.SMALL,
+            getPadHeight: () => 0,
+            targetInfo: { type: ObjectTargetCursorType.LANDING_PAD, name: "Pad", minDistance: 0, maxDistance: 0 },
+        };
+        const manager = new LandingPadManager([pad]);
+        controls.setClosestLandableFacility({
+            getTransform: () => ship,
+            getBoundingRadius: () => 100,
+            getLandingPadManager: () => manager,
+        });
+        let targetPad: ILandingPad | null = manager.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
+        const spaceship = controls.getSpaceship();
+        spaceship.getTargetLandingPad = () => targetPad;
+        const takeOff = vi.fn(() => {
+            expect(manager.getAvailableLandingPads()).toEqual([pad]);
+            targetPad = null;
+        });
+        spaceship.takeOff = takeOff;
+        expect(manager.getAvailableLandingPads()).toEqual([]);
+
+        if (method === "keyboard") {
+            SpaceShipControlsInputs.map.upDown.enabled = true;
+            window.dispatchEvent(new KeyboardEvent("keydown", { code: "KeyR" }));
+            expect(SpaceShipControlsInputs.map.upDown.value).toBe(1);
+            controls.update(1 / 60);
+        } else {
+            controls.takeOff();
+        }
+
+        expect(takeOff).toHaveBeenCalledExactlyOnceWith();
+        expect(manager.getAvailableLandingPads()).toEqual([pad]);
+    });
+
+    it("allows surface takeoff without a facility reservation", () => {
+        createControls();
+        const spaceship = controls.getSpaceship();
+        spaceship.getTargetLandingPad = () => null;
+        const takeOff = vi.fn();
+        spaceship.takeOff = takeOff;
+
+        controls.takeOff();
+
+        expect(takeOff).toHaveBeenCalledExactlyOnceWith();
     });
 });

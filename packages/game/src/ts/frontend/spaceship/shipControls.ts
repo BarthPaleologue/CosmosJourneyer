@@ -360,11 +360,7 @@ export class ShipControls implements Controls {
 
             if (SpaceShipControlsInputs.map.upDown.value !== 0) {
                 if (spaceship.isLanded()) {
-                    const currentLandingPad = spaceship.getTargetLandingPad();
-                    if (currentLandingPad !== null) {
-                        this.closestLandableFacility?.getLandingPadManager().cancelLandingRequest(currentLandingPad);
-                    }
-                    spaceship.takeOff();
+                    this.takeOff();
                 } else if (spaceship.isLanding()) {
                     const currentLandingPad = spaceship.getTargetLandingPad();
                     if (currentLandingPad !== null) {
@@ -442,6 +438,14 @@ export class ShipControls implements Controls {
         }
 
         this.getActiveCamera().getViewMatrix(true);
+    }
+
+    public takeOff(): void {
+        const currentLandingPad = this.spaceship.getTargetLandingPad();
+        if (currentLandingPad !== null) {
+            this.closestLandableFacility?.getLandingPadManager().cancelLandingRequest(currentLandingPad);
+        }
+        this.spaceship.takeOff();
     }
 
     public syncThirdPersonCameraPosition(): void {
