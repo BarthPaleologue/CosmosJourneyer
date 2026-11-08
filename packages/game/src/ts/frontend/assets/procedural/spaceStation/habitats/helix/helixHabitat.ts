@@ -215,7 +215,7 @@ export class HelixHabitat implements Transformable {
         for (const [i, { position, rotation }] of lightPoints.entries()) {
             lightInstanceBuffer.set(Matrix.Compose(Vector3.OneReadOnly, rotation, position).asArray(), i * 16);
             const light = new PointLight(`HelixHabitatLight${i}`, position, scene, true);
-            light.range = 200;
+            light.range = this.deltaRadius * 0.8;
             light.parent = this.getTransform();
             light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
             this.lights.push(light);
