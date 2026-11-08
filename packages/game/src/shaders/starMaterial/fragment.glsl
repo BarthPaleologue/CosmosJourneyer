@@ -55,5 +55,7 @@ void main() {
 
     finalColor -= vec3(pow(noiseValue, 4.0));
 
+    finalColor = max(finalColor, vec3(0.0));
+
     gl_FragColor = vec4(finalColor, 1.0);// apply color and lighting
 } 
