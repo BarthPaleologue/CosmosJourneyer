@@ -20,6 +20,7 @@ import type { DeepReadonly, TagMetadataOf, Result, Tagged } from "@cosmos-journe
 
 import type { SystemContentModel, SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
 
+import type { ModuleAssets } from "../assets/moduleAssets";
 import type { RenderingAssets } from "../assets/renderingAssets";
 import type { Transformable } from "../universe/architecture/transformable";
 import type { KeplerianObject } from "../universe/keplerianOrbitalSimulation";
@@ -73,4 +74,5 @@ export type SystemContentFactoryOf<T extends AnySystemContentType> = (
 export type SystemContentFactoryContext = {
     scene: Scene;
     assets: RenderingAssets;
+    moduleAssets: ModuleAssets;
 };

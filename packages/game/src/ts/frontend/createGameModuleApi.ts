@@ -19,6 +19,7 @@ import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { GameModuleApi } from "@/modules/gameModuleApi";
 
+import type { ModuleAssetRegistry } from "./assets/moduleAssetRegistry";
 import type { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
 import type { SystemEntityProcessors } from "./systemEntity/systemEntityProcessors";
 
@@ -27,17 +28,24 @@ import type { SystemEntityProcessors } from "./systemEntity/systemEntityProcesso
  * @param universeBackend Backend that stores authored star systems and entities.
  * @param systemEntityLoader Registry for entity content factories.
  * @param systemEntityProcessors Registries for entity runtime processors.
+ * @param moduleAssetRegistry Registry for assets shared by game modules.
  * @returns API exposed to game modules during registration.
  */
 export function createGameModuleApi(
     universeBackend: UniverseBackend,
     systemEntityLoader: SystemEntityLoader,
     systemEntityProcessors: SystemEntityProcessors,
+    moduleAssetRegistry: ModuleAssetRegistry,
 ): GameModuleApi {
     return {
         starSystems: {
             registerAuthored: (model) => {
                 universeBackend.registerAuthoredSystem(model);
+            },
+        },
+        assets: {
+            registerContainer: (id, loader) => {
+                moduleAssetRegistry.registerContainer(id, loader);
             },
         },
         systemEntities: {

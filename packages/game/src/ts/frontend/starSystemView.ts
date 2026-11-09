@@ -45,6 +45,7 @@ import type {
 import type { StarSystemContentModel, UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ModuleAssets } from "@/frontend/assets/moduleAssets";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -247,6 +248,7 @@ export class StarSystemView implements View {
     private readonly interactionLayer: InteractionLayer;
 
     private readonly assets: RenderingAssets;
+    private readonly moduleAssets: ModuleAssets;
 
     private readonly progressMonitor: ILoadingProgressMonitor;
 
@@ -271,6 +273,7 @@ export class StarSystemView implements View {
      * @param tts The text-to-speech system
      * @param notificationManager The notification manager
      * @param assets The rendering assets
+     * @param moduleAssets The assets loaded for game modules
      * @param terrainSystem The system used to generate surface chunks for telluric planets
      * @param t Translation function for player-facing text.
      * @param progressMonitor The loading progress monitor to report star system loading progress
@@ -288,6 +291,7 @@ export class StarSystemView implements View {
         tts: ITts,
         notificationManager: INotificationManager,
         assets: RenderingAssets,
+        moduleAssets: ModuleAssets,
         terrainSystem: ITerrainSystem,
         t: TFunction,
         progressMonitor: ILoadingProgressMonitor,
@@ -309,6 +313,7 @@ export class StarSystemView implements View {
         this.tts = tts;
         this.notificationManager = notificationManager;
         this.assets = assets;
+        this.moduleAssets = moduleAssets;
         this.terrainSystem = terrainSystem;
         this.progressMonitor = progressMonitor;
 
@@ -568,6 +573,7 @@ export class StarSystemView implements View {
             this.systemEntityLoader,
             this.terrainSystem,
             this.assets,
+            this.moduleAssets,
             this.scene,
             this.progressMonitor,
         );

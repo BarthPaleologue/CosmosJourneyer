@@ -24,6 +24,7 @@ import { getAlphaTestisSystemModel } from "@/backend/universe/customSystems/alph
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { ModuleAssets } from "@/frontend/assets/moduleAssets";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
@@ -76,6 +77,7 @@ export async function createStarSystemViewScene(
     const havokPlugin = await enablePhysics(scene);
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
+    const moduleAssets = new ModuleAssets([]);
     const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
     if (!terrainSystemResult.success) {
         throw terrainSystemResult.error;
@@ -95,6 +97,7 @@ export async function createStarSystemViewScene(
         ttsMock,
         notificationManager,
         assets,
+        moduleAssets,
         terrainSystem,
         t,
         progressMonitor,

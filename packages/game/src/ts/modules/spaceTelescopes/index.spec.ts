@@ -28,6 +28,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CrateMaterial } from "@/frontend/assets/materials/crate";
 import { FoilMaterial } from "@/frontend/assets/materials/foil";
+import { ModuleAssets } from "@/frontend/assets/moduleAssets";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
 import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
@@ -84,6 +85,9 @@ describe("space telescope module in Vesta", () => {
         processors = new SystemEntityProcessors();
         const api: GameModuleApi = {
             starSystems: { registerAuthored: registerAuthoredSystem },
+            assets: {
+                registerContainer: vi.fn(),
+            },
             systemEntities: {
                 registerAuthored: vi.fn(),
                 registerProcedural,
@@ -177,6 +181,7 @@ describe("space telescope module in Vesta", () => {
         const context = {
             scene,
             assets,
+            moduleAssets: new ModuleAssets([]),
             orbitalObjects: [],
             orbitalSimulation,
             terrainSystem: {
@@ -257,6 +262,7 @@ describe("space telescope module in Vesta", () => {
         const result = await loader.load([{ ...model, content: { type: "spaceTelescope" } }], {
             scene,
             assets,
+            moduleAssets: new ModuleAssets([]),
             orbitalObjects: [],
             orbitalSimulation: new KeplerianOrbitalSimulation([]),
             terrainSystem: {

@@ -21,6 +21,7 @@ import type { AbstractEngine } from "@babylonjs/core";
 import { getSolSystemModel } from "@/backend/universe/customSystems/sol/sol";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { ModuleAssets } from "@/frontend/assets/moduleAssets";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
@@ -56,6 +57,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
     const t = await initI18n();
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
+    const moduleAssets = new ModuleAssets([]);
 
     const scalingFactor = 6_000e3 * 11;
 
@@ -84,6 +86,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         systemEntityLoader,
         terrainSystem,
         assets,
+        moduleAssets,
         scene,
         progressMonitor,
     );

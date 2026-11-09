@@ -74,6 +74,7 @@ import { Settings } from "@/settings";
 
 import { LoadingProgressMonitor } from "./assets/loadingProgressMonitor";
 import type { ILoadingProgressMonitor } from "./assets/loadingProgressMonitor";
+import { ModuleAssetRegistry } from "./assets/moduleAssetRegistry";
 import { createGameModuleApi } from "./createGameModuleApi";
 import { lookAt } from "./helpers/transform";
 import type { SystemEntity } from "./systemEntity/systemEntity";
@@ -508,7 +509,14 @@ export class CosmosJourneyer {
 
         const systemEntityProcessors = new SystemEntityProcessors();
 
-        const gameModuleApi = createGameModuleApi(backend.universe, systemEntityLoader, systemEntityProcessors);
+        const moduleAssetRegistry = new ModuleAssetRegistry();
+
+        const gameModuleApi = createGameModuleApi(
+            backend.universe,
+            systemEntityLoader,
+            systemEntityProcessors,
+            moduleAssetRegistry,
+        );
 
         const builtinModules = getBuiltinModules();
         const modulesResult = setupModules(builtinModules, gameModuleApi);
@@ -516,7 +524,14 @@ export class CosmosJourneyer {
             return modulesResult;
         }
 
-        const assets = await loadAssets(starSystemViewScene, audioEngine, loadingProgressMonitor);
+        const [assets, moduleAssetsResult] = await Promise.all([
+            loadAssets(starSystemViewScene, audioEngine, loadingProgressMonitor),
+            moduleAssetRegistry.load(starSystemViewScene, loadingProgressMonitor),
+        ]);
+        if (!moduleAssetsResult.success) {
+            return moduleAssetsResult;
+        }
+        const moduleAssets = moduleAssetsResult.value;
 
         const soundPlayer = new SoundPlayer(assets.audio.sounds);
         const tts = new Tts(assets.audio.speakerVoiceLines);
@@ -540,6 +555,7 @@ export class CosmosJourneyer {
             tts,
             notificationManager,
             assets.rendering,
+            moduleAssets,
             terrainSystemResult.value,
             t,
             loadingProgressMonitor,
