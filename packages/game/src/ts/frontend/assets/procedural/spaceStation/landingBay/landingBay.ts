@@ -38,6 +38,8 @@ import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import { createCircleInstanceBuffer } from "@/frontend/helpers/instancing";
 import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFacility/landingPadManager";
 
+import { Settings } from "@/settings";
+
 import { ProceduralSpotLightInstances } from "../../spotLight";
 import type { ProceduralSpotLightInstanceData } from "../../spotLight";
 import { LandingPad } from "../landingPad/landingPad";
@@ -63,6 +65,8 @@ export class LandingBay {
     private readonly landingPadLights: ProceduralSpotLightInstances;
 
     private readonly lights: Array<Light> = [];
+
+    private readonly lightIntensity = 10;
 
     constructor(model: LandingBayModel, displayName: string, assets: RenderingAssets, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
@@ -142,6 +146,8 @@ export class LandingBay {
             const light = new PointLight(`LandingBayLightCaps${i}`, new Vector3(x, y, z), scene, true);
             light.range = deltaRadius * 2;
             light.parent = lightMeshInstances;
+            light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
+            light.intensity = Settings.FACILITY_LIGHT_INTENSITY;
 
             this.lights.push(light);
         }
@@ -241,7 +247,7 @@ export class LandingBay {
                     lightInstanceData.push({
                         rootPosition: corner,
                         lookAtTarget: landingPadCenter,
-                        color: new Color3(1, 1, 0.8),
+                        color: new Color3(1, 1, 0.8).scaleInPlace(this.lightIntensity),
                         upDirection: landingPadUp,
                         range: 50 * landingPad.getPadSize(),
                         lampSize: landingPad.getPadSize(),
@@ -270,6 +276,7 @@ export class LandingBay {
             default:
                 assertUnreachable(status);
         }
+        statusColor.scaleInPlace(this.lightIntensity);
         this.landingPadLights.setColorAt(landingPadIndex * 4, statusColor);
         this.landingPadLights.setColorAt(landingPadIndex * 4 + 1, statusColor);
         this.landingPadLights.setColorAt(landingPadIndex * 4 + 2, statusColor);

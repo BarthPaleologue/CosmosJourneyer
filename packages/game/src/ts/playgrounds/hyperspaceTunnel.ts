@@ -25,6 +25,7 @@ import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressM
 import { HyperSpaceTunnel } from "@/frontend/assets/procedural/hyperSpaceTunnel";
 import { loadNoiseTextures } from "@/frontend/assets/textures/noises";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
+import { ColorCorrection } from "@/frontend/postProcesses/colorCorrection";
 
 /**
  * @param engine - Rendering engine.
@@ -49,6 +50,9 @@ export async function createHyperspaceTunnelDemo(
     directionalLight.intensity = 0.7;
 
     const hyperSpaceTunnel = new HyperSpaceTunnel(Axis.Z, scene, textures);
+
+    const colorCorrection = new ColorCorrection("colorCorrection", scene);
+    camera.attachPostProcess(colorCorrection);
 
     scene.onBeforeRenderObservable.add(() => {
         defaultControls.update(engine.getDeltaTime() / 1000);

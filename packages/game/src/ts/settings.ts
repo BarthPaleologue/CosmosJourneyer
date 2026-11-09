@@ -79,6 +79,7 @@ export const Settings = {
     QUALITY_CHARS: "FEDCBA",
 
     FACILITY_LIGHT_COLOR: "#FFFFFF",
+    FACILITY_LIGHT_INTENSITY: 5,
 };
 
 export const CollisionMask = {

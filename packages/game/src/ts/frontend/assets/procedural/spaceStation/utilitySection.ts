@@ -128,7 +128,8 @@ export class UtilitySection implements StationSection {
                     const light = new PointLight(`utilitySectionLight${ring}_${sideIndex}`, lightPosition, scene, true);
                     light.parent = this.getTransform();
                     light.range = 200;
-                    light.diffuse = Color3.FromHexString(Settings.FACILITY_LIGHT_COLOR);
+                    light.diffuse = lightMaterial.emissiveColor;
+                    light.intensity = Settings.FACILITY_LIGHT_INTENSITY;
 
                     this.lights.push(light);
                 }

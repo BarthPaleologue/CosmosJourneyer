@@ -124,7 +124,7 @@ export class PostProcessManager {
     private readonly celestialBodyToPostProcesses: Map<Transformable, PostProcess[]> = new Map();
 
     /**
-     * The color correction post process responsible for tone mapping, saturation, contrast, brightness and gamma.
+     * The color correction post process responsible for tone mapping, display encoding, saturation, contrast and brightness.
      */
     readonly colorCorrection: ColorCorrection;
 
@@ -164,9 +164,6 @@ export class PostProcessManager {
         this.renderingPipelineManager = scene.postProcessRenderPipelineManager;
 
         this.colorCorrection = new ColorCorrection("colorCorrection", scene);
-        this.colorCorrection.exposure = 1.5;
-        this.colorCorrection.gamma = 1.0;
-        this.colorCorrection.saturation = 1.2;
 
         this.fxaa = new FxaaPostProcess(
             "fxaa",
@@ -192,7 +189,7 @@ export class PostProcessManager {
         this.renderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "renderingPipeline");
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
 
-        this.bloomRenderEffect = new BloomEffect(scene, 1.0, 0.3, 32, Constants.TEXTURETYPE_HALF_FLOAT);
+        this.bloomRenderEffect = new BloomEffect(scene, 1.0, 0.05, 16, Constants.TEXTURETYPE_HALF_FLOAT);
         this.bloomRenderEffect.threshold = 0.0;
 
         this.sphereShadows = new SphereShadowsPostProcess(depthRendererManager, scene);
@@ -564,8 +561,8 @@ export class PostProcessManager {
         this.renderingPipeline.addEffect(this.bodyRenderEffect);
         this.renderingPipeline.addEffect(this.bloomRenderEffect);
         this.renderingPipeline.addEffect(this.lensFlareRenderEffect);
-        this.renderingPipeline.addEffect(this.fxaaRenderEffect);
         this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
+        this.renderingPipeline.addEffect(this.fxaaRenderEffect);
 
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
         this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
@@ -602,8 +599,8 @@ export class PostProcessManager {
 
         this.renderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "renderingPipeline");
         this.renderingPipeline.addEffect(this.bloomRenderEffect);
-        this.renderingPipeline.addEffect(this.fxaaRenderEffect);
         this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
+        this.renderingPipeline.addEffect(this.fxaaRenderEffect);
 
         this.renderingPipelineManager.addPipeline(this.renderingPipeline);
         this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, this.scene.cameras);

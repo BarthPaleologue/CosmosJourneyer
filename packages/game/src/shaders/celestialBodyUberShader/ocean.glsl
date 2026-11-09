@@ -90,7 +90,9 @@ vec3 celestialBodyUberShaderShadeOcean(vec3 backgroundColor, vec3 rayDir, float 
     vec3 shallowColor = vec3(32.0, 193.0, 180.0) / 255.0;
     vec3 oceanColor = mix(shallowColor, deepColor, opticalDepth01);
 
-    vec3 ambient = mix(oceanColor, backgroundColor, alpha);
+    vec3 ambient = oceanColor * (1.0 - alpha);
+    // The terrain colour already includes stellar illumination; transmission must not light it twice.
+    vec3 transmittedColor = backgroundColor * alpha;
 
     if (impactPoint > 0.0) {
         vec3 reflectedSkyColor = vec3(0.6, 0.8, 0.95);
@@ -107,6 +109,7 @@ vec3 celestialBodyUberShaderShadeOcean(vec3 backgroundColor, vec3 rayDir, float 
         float amountReflected = fractionReflected(cosThetaI, cosThetaT, nAir, nWater);
 
         ambient = mix(ambient, reflectedSkyColor, amountReflected);
+        transmittedColor *= 1.0 - amountReflected;
     }
 
     float foamSize = 10.0;
@@ -118,8 +121,9 @@ vec3 celestialBodyUberShaderShadeOcean(vec3 backgroundColor, vec3 rayDir, float 
 
     vec3 foamColor = vec3(0.8);
     ambient = mix(ambient, foamColor, foamFactor);
+    transmittedColor *= 1.0 - foamFactor;
 
-    vec3 finalColor = vec3(0.0);
+    vec3 finalColor = transmittedColor;
     for (int i = 0; i < nbStars; i++) {
         vec3 sunDir = star_directions[i];
         float directLightVisibility = 1.0;

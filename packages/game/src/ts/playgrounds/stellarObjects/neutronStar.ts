@@ -27,6 +27,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { lookAt } from "@/frontend/helpers/transform";
 import { CelestialBodyUberShaderPass } from "@/frontend/postProcesses/celestialBodyUberShader/celestialBodyUberShaderPass";
+import { ColorCorrection } from "@/frontend/postProcesses/colorCorrection";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
 import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
@@ -46,6 +47,7 @@ export async function createNeutronStarScene(
 ): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
+    scene.clearColor.setAll(0);
 
     await enablePhysics(scene);
 
@@ -92,6 +94,9 @@ export async function createNeutronStarScene(
         scene,
     );
     camera.attachPostProcess(lensFlare);
+
+    const colorCorrection = new ColorCorrection("colorCorrection", scene);
+    camera.attachPostProcess(colorCorrection);
 
     camera.maxZ = 1e12;
     lookAt(defaultControls.getTransform(), neutronStar.getTransform().position, scene.useRightHandedSystem);

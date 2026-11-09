@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { Constants } from "@babylonjs/core/Engines/constants";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
@@ -82,5 +83,12 @@ describe("VolumetricLight render target lifecycle", () => {
             expect(sceneCamera.customRenderTargets).toEqual([replacement.getPass()]);
         }
         replacement.dispose(vehicle);
+    });
+
+    it("allocates half-float textures for the scene input and scattering pass", () => {
+        light.resize(64, 64, camera);
+
+        expect(light.inputTexture.texture?.type).toBe(Constants.TEXTURETYPE_HALF_FLOAT);
+        expect(light.getPass().textureType).toBe(Constants.TEXTURETYPE_HALF_FLOAT);
     });
 });
