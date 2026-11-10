@@ -85,8 +85,9 @@ if (urlParams.get("debug") !== null) {
 if (urlParams.get("physicsViewer") !== null) {
     const physicsViewer = new PhysicsViewer(scene);
     scene.onBeforeRenderObservable.add(() => {
-        for (const mesh of scene.meshes) {
-            const physicsBody = mesh.physicsBody;
+        // Bodies may live on TransformNode roots (e.g. module content with a shape container), not only on meshes.
+        for (const node of [...scene.meshes, ...scene.transformNodes]) {
+            const physicsBody = node.physicsBody;
             if (!physicsBody) {
                 continue;
             }
