@@ -17,9 +17,6 @@
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
 
-import { readFile } from "node:fs/promises";
-import { createRequire } from "node:module";
-
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -32,11 +29,11 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { PhysicsEngine } from "@babylonjs/core/Physics/v2/physicsEngine";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
-import HavokPhysics from "@babylonjs/havok";
 import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { FoilMaterial } from "@/frontend/assets/materials/foil";
+import { createHavokForTests } from "@/frontend/helpers/havokTest";
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
@@ -134,9 +131,7 @@ describe("SpaceTelescope collisions", () => {
     let physics: PhysicsEngine;
     let telescope: SpaceTelescope;
     beforeAll(async () => {
-        const wasmPath = createRequire(import.meta.url).resolve("@babylonjs/havok/lib/esm/HavokPhysics.wasm");
-        const wasmBinary = new Uint8Array(await readFile(wasmPath)).buffer;
-        havok = await HavokPhysics({ wasmBinary });
+        havok = await createHavokForTests();
     });
     beforeEach(() => {
         engine = new NullEngine();

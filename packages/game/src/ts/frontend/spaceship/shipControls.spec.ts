@@ -17,9 +17,6 @@
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
 
-import { readFile } from "node:fs/promises";
-import { createRequire } from "node:module";
-
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
@@ -29,7 +26,6 @@ import { PhysicsMotionType, PhysicsPrestepType } from "@babylonjs/core/Physics/v
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
-import HavokPhysics from "@babylonjs/havok";
 import type { TFunction } from "i18next";
 import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 
@@ -38,6 +34,7 @@ import { Settings } from "@/settings";
 import type { ISoundPlayer } from "../audio/soundPlayer";
 import type { ITts } from "../audio/tts";
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
+import { createHavokForTests } from "../helpers/havokTest";
 import type { INotificationManager } from "../ui/notificationManager";
 import { ShipControls } from "./shipControls";
 import type { Spaceship } from "./spaceship";
@@ -145,9 +142,7 @@ describe("ShipControls camera transforms", () => {
 
         it(`${synchronize} follows Havok teleports and rebases across motion type changes`, async () => {
             const ship = createControls();
-            const wasmPath = createRequire(import.meta.url).resolve("@babylonjs/havok/lib/esm/HavokPhysics.wasm");
-            const wasmBinary = new Uint8Array(await readFile(wasmPath)).buffer;
-            const havok = await HavokPhysics({ wasmBinary });
+            const havok = await createHavokForTests();
             const plugin = new HavokPlugin(true, havok);
             scene.enablePhysics(Vector3.Zero(), plugin);
             const body = new PhysicsBody(ship, PhysicsMotionType.ANIMATED, false, scene);
