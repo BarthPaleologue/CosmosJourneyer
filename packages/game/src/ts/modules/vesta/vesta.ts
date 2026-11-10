@@ -49,6 +49,7 @@ import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel
 import { CropType } from "@/utils/agriculture";
 
 import type { MonolithModel } from "../monolith/entity";
+import type { RussellTeaPotModel } from "../russellTeaPot/russellTeaPotModel";
 import { createSpaceTelescopeModel } from "../spaceTelescopes/spaceTelescopeModel";
 import type { SpaceTelescopeModel } from "../spaceTelescopes/spaceTelescopeModel";
 
@@ -445,6 +446,41 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
     };
 
+    const russellTeapot: SystemEntityModel<RussellTeaPotModel> = {
+        id: "russellTeapot",
+        name: "Unassuming teapot",
+        content: {
+            type: "russellTeaPot",
+        },
+        placement: {
+            type: "inOrbit",
+            mass: 0.5,
+            orbit: {
+                parentIds: [melpomene.id],
+                semiMajorAxis: 4.2 * melpomene.radius,
+                eccentricity: 0.2,
+                inclination: degreesToRadians(22),
+                longitudeOfAscendingNode: 0,
+                argumentOfPeriapsis: 0,
+                initialMeanAnomaly: 0,
+                p: 2,
+            },
+            attitude: {
+                spin: {
+                    axialTilt: degreesToRadians(67),
+                    axisAzimuth: 0,
+                    initialRotationAngle: 0,
+                    siderealPeriod: durationToSeconds({ minutes: 4, seconds: 23 }),
+                },
+                localFrameOrientation: {
+                    yaw: 0,
+                    pitch: 0,
+                    roll: 0,
+                },
+            },
+        },
+    };
+
     return {
         starSystem: {
             name: "Vesta",
@@ -455,6 +491,6 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             anomalies: [],
             orbitalFacilities: [newJulesVerne],
         },
-        systemEntities: [monolith, spaceTelescope],
+        systemEntities: [monolith, spaceTelescope, russellTeapot],
     };
 }

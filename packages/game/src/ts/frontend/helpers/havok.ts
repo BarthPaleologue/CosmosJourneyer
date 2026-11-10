@@ -16,11 +16,51 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { PhysicsShapeContainer } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
 
 import { CollisionMask } from "@/settings";
+
+/**
+ * Creates a physics shape for a mesh.
+ */
+export type PhysicsShapeFactory = (mesh: Mesh, scene: Scene) => PhysicsShape;
+
+/**
+ * Creates a shape container matching the meshes under a transform hierarchy.
+ *
+ * Each mesh descendant gets one shape positioned relatively to `root`; non-mesh
+ * descendants are ignored. The caller owns the returned container and shapes, and
+ * can configure them after creation.
+ * @param root - Root of the hierarchy used for collision.
+ * @param scene - Scene that owns the created physics resources.
+ * @param createShape - Creates the shape used for each mesh.
+ * @returns The container and the shapes it references.
+ */
+export function createPhysicsShapesFromHierarchy(
+    root: TransformNode,
+    scene: Scene,
+    createShape: PhysicsShapeFactory,
+): { container: PhysicsShapeContainer; shapes: Array<PhysicsShape> } {
+    const container = new PhysicsShapeContainer(scene);
+    const shapes: Array<PhysicsShape> = [];
+    for (const mesh of root.getChildMeshes()) {
+        if (!(mesh instanceof Mesh)) {
+            continue;
+        }
+
+        const shape = createShape(mesh, scene);
+        shapes.push(shape);
+        container.addChildFromParent(root, shape, mesh);
+    }
+
+    return { container, shapes };
+}
 
 /**
  * Creates a massless environment collider that collides with dynamic objects.

@@ -29,6 +29,7 @@ import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import type { ModuleAssets } from "@/frontend/assets/moduleAssets";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { SystemTarget } from "@/frontend/universe/systemTarget";
@@ -183,6 +184,7 @@ export class StarSystemController {
         entityLoader: SystemEntityLoader,
         terrainSystem: ITerrainSystem,
         assets: RenderingAssets,
+        moduleAssets: ModuleAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
     ): Promise<Result<StarSystemController, Error>> {
@@ -201,6 +203,7 @@ export class StarSystemController {
         const entityLoaderContext: SystemEntityLoadContext = {
             scene,
             assets,
+            moduleAssets,
             terrainSystem,
             orbitalObjects,
             orbitalSimulation,

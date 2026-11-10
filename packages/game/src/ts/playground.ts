@@ -21,7 +21,7 @@ import "@babylonjs/node-editor";
 
 import { Engine, PhysicsViewer, Tools } from "@babylonjs/core";
 import type { Scene } from "@babylonjs/core";
-import { Inspector } from "@babylonjs/inspector";
+import { ShowInspector } from "@babylonjs/inspector";
 
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 
@@ -70,13 +70,13 @@ window.scene = scene;
 loadingProgressMonitor.completeTask();
 
 if (urlParams.get("debug") !== null) {
-    Inspector.Show(scene, { overlay: true });
+    let inspector = ShowInspector(scene, { overlay: true });
     document.addEventListener("keypress", (e) => {
         if (e.key === "i") {
-            if (Inspector.IsVisible) {
-                Inspector.Hide();
+            if (!inspector.isDisposed) {
+                void inspector.dispose();
             } else {
-                Inspector.Show(scene, { overlay: true });
+                inspector = ShowInspector(scene, { overlay: true });
             }
         }
     });
@@ -85,8 +85,9 @@ if (urlParams.get("debug") !== null) {
 if (urlParams.get("physicsViewer") !== null) {
     const physicsViewer = new PhysicsViewer(scene);
     scene.onBeforeRenderObservable.add(() => {
-        for (const mesh of scene.meshes) {
-            const physicsBody = mesh.physicsBody;
+        // Bodies may live on TransformNode roots (e.g. module content with a shape container), not only on meshes.
+        for (const node of [...scene.meshes, ...scene.transformNodes]) {
+            const physicsBody = node.physicsBody;
             if (!physicsBody) {
                 continue;
             }

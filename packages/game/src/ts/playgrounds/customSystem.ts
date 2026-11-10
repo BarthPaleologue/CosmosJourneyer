@@ -25,6 +25,7 @@ import { getEclipseTestSystemModel } from "@/backend/universe/customSystems/ecli
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { ModuleAssetRegistry } from "@/frontend/assets/moduleAssetRegistry";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
@@ -70,7 +71,18 @@ export async function createCustomSystemScene(
     const systemEntityLoader = new SystemEntityLoader();
     const systemEntityProcessors = new SystemEntityProcessors();
 
-    const gameModuleApi = createGameModuleApi(backend.universe, systemEntityLoader, systemEntityProcessors);
+    const scene = new Scene(engine, { useFloatingOrigin: true });
+    scene.useRightHandedSystem = true;
+    scene.clearColor.set(0, 0, 0, 1);
+
+    const moduleAssetRegistry = new ModuleAssetRegistry();
+
+    const gameModuleApi = createGameModuleApi(
+        backend.universe,
+        systemEntityLoader,
+        systemEntityProcessors,
+        moduleAssetRegistry,
+    );
     const moduleSetupResult = setupModules(getBuiltinModules(), gameModuleApi);
     if (!moduleSetupResult.success) {
         throw moduleSetupResult.error;
@@ -105,13 +117,16 @@ export async function createCustomSystemScene(
     const ttsMock = new TtsMock();
     const notificationManager: INotificationManager = new NotificationManagerMock();
 
-    const scene = new Scene(engine, { useFloatingOrigin: true });
-    scene.useRightHandedSystem = true;
-    scene.clearColor.set(0, 0, 0, 1);
-
     const havokPlugin = await enablePhysics(scene);
 
-    const assets = await loadRenderingAssets(scene, progressMonitor);
+    const [assets, moduleAssetsResult] = await Promise.all([
+        loadRenderingAssets(scene, progressMonitor),
+        moduleAssetRegistry.load(scene, progressMonitor),
+    ]);
+    if (!moduleAssetsResult.success) {
+        throw moduleAssetsResult.error;
+    }
+    const moduleAssets = moduleAssetsResult.value;
     const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
     if (!terrainSystemResult.success) {
         throw terrainSystemResult.error;
@@ -131,6 +146,7 @@ export async function createCustomSystemScene(
         ttsMock,
         notificationManager,
         assets,
+        moduleAssets,
         terrainSystem,
         t,
         progressMonitor,
