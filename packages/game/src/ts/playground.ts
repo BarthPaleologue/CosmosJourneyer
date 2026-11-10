@@ -21,7 +21,7 @@ import "@babylonjs/node-editor";
 
 import { Engine, PhysicsViewer, Tools } from "@babylonjs/core";
 import type { Scene } from "@babylonjs/core";
-import { Inspector } from "@babylonjs/inspector";
+import { ShowInspector } from "@babylonjs/inspector";
 
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 
@@ -70,13 +70,13 @@ window.scene = scene;
 loadingProgressMonitor.completeTask();
 
 if (urlParams.get("debug") !== null) {
-    Inspector.Show(scene, { overlay: true });
+    let inspector = ShowInspector(scene, { overlay: true });
     document.addEventListener("keypress", (e) => {
         if (e.key === "i") {
-            if (Inspector.IsVisible) {
-                Inspector.Hide();
+            if (!inspector.isDisposed) {
+                void inspector.dispose();
             } else {
-                Inspector.Show(scene, { overlay: true });
+                inspector = ShowInspector(scene, { overlay: true });
             }
         }
     });
