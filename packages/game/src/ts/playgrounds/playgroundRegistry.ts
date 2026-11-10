@@ -67,6 +67,7 @@ import { createStationLandingScene } from "./stationLanding";
 import { createBlackHoleScene } from "./stellarObjects/blackHole";
 import { createNeutronStarScene } from "./stellarObjects/neutronStar";
 import { CreateSwimmingScene } from "./swimming";
+import { createTeapotScene } from "./teapot";
 import { createTelluricPlanetScene } from "./telluricPlanet";
 import { createThrusterExhaustScene } from "./thrusterExhaust";
 import { createTriPlanarNormalScene } from "./triPlanarNormal";
@@ -130,6 +131,7 @@ export class PlaygroundRegistry {
         ["cryptographicSecret", createCryptographicSecretScene],
         ["customSystem", createCustomSystemScene],
         ["qrScan", createQrScanScene],
+        ["teapot", createTeapotScene],
     ]);
 
     register(
