@@ -37,57 +37,67 @@ describe("CosmosJourneyer", () => {
         vi.clearAllMocks();
     });
 
-    it("snapshots the player before awaiting thumbnail creation", async () => {
-        const systemModel = getLoneStarSystem();
-        const universeBackend = new UniverseBackend(new SystemEntityBackend());
-        const player = Player.Default(universeBackend);
-        const serializedSpaceship = player.serializedSpaceships[0];
-        const stellarObject = systemModel.stellarObjects[0];
-        if (serializedSpaceship === undefined) {
-            throw new Error("Default player has no spaceship");
-        }
+    it.each([false, true])(
+        "snapshots the player and docking location before thumbnail creation (docked: %s)",
+        async (docked) => {
+            const systemModel = getLoneStarSystem();
+            const universeBackend = new UniverseBackend(new SystemEntityBackend());
+            const player = Player.Default(universeBackend);
+            const serializedSpaceship = player.serializedSpaceships[0];
+            const stellarObject = systemModel.stellarObjects[0];
+            if (serializedSpaceship === undefined) {
+                throw new Error("Default player has no spaceship");
+            }
 
-        let resolveScreenshot: ((value: Uint8Array) => void) | undefined;
-        const screenshotPromise = new Promise<Uint8Array>((resolve) => {
-            resolveScreenshot = resolve;
-        });
-        vi.mocked(makeScreenshotPng).mockReturnValue(screenshotPromise);
+            let resolveScreenshot: ((value: Uint8Array) => void) | undefined;
+            const screenshotPromise = new Promise<Uint8Array>((resolve) => {
+                resolveScreenshot = resolve;
+            });
+            vi.mocked(makeScreenshotPng).mockReturnValue(screenshotPromise);
 
-        const spaceship = {
-            id: serializedSpaceship.id,
-            isLandedAtFacility: (): boolean => false,
-        };
-        const context = {
-            activeView: {
-                getMainScene: () => ({ activeCamera: {} }),
-            },
-            engine: {},
-            player,
-            starSystemView: {
-                getCurrentUniverseCoordinates: () => ({
-                    type: "relative",
-                    universeObjectId: {
-                        systemCoordinates: systemModel.coordinates,
-                        idInSystem: stellarObject.id,
-                    },
-                    position: { x: 0, y: 0, z: 0 },
-                    rotation: { x: 0, y: 0, z: 0, w: 1 },
-                }),
-                getSpaceshipControls: () => ({
-                    getSpaceship: (): { id: string; isLandedAtFacility: () => boolean } => spaceship,
-                    getTransform: (): object => ({}),
-                }),
-            },
-        } as unknown as CosmosJourneyer;
+            const spaceship = {
+                id: serializedSpaceship.id,
+                isLandedAtFacility: (): boolean => docked,
+            };
+            const context = {
+                activeView: {
+                    getMainScene: () => ({ activeCamera: {} }),
+                },
+                engine: {},
+                player,
+                starSystemView: {
+                    getCurrentUniverseCoordinates: () => ({
+                        type: "relative",
+                        universeObjectId: {
+                            systemCoordinates: systemModel.coordinates,
+                            idInSystem: stellarObject.id,
+                        },
+                        position: { x: 0, y: 0, z: 0 },
+                        rotation: { x: 0, y: 0, z: 0, w: 1 },
+                    }),
+                    getSpaceshipControls: () => ({
+                        getSpaceship: (): { id: string; isLandedAtFacility: () => boolean } => spaceship,
+                        getTransform: (): object => ({}),
+                        getLandingFacility: () => (docked ? { id: "module-station" } : null),
+                    }),
+                },
+            } as unknown as CosmosJourneyer;
 
-        const savePromise = CosmosJourneyer.prototype.generateSaveData.call(context);
+            const savePromise = CosmosJourneyer.prototype.generateSaveData.call(context);
 
-        player.serializedSpaceships.length = 0;
-        player.tutorials.flightCompleted = true;
-        resolveScreenshot?.(new Uint8Array());
+            player.serializedSpaceships.length = 0;
+            player.tutorials.flightCompleted = true;
+            resolveScreenshot?.(new Uint8Array());
 
-        const save = await savePromise;
-        expect(save.player.spaceShips).toEqual([serializedSpaceship]);
-        expect(save.player.tutorials.flightCompleted).toBe(false);
-    });
+            const save = await savePromise;
+            const location = save.shipLocations[spaceship.id];
+            if (location?.type !== "relative" && location?.type !== "atStation") {
+                throw new Error("Expected a saved object location");
+            }
+            expect(location.universeObjectId.idInSystem).toBe(docked ? "module-station" : stellarObject.id);
+            expect(location.type).toBe(docked ? "atStation" : "relative");
+            expect(save.player.spaceShips).toEqual([serializedSpaceship]);
+            expect(save.player.tutorials.flightCompleted).toBe(false);
+        },
+    );
 });

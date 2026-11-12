@@ -38,12 +38,13 @@ import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { AudioMasks } from "@/frontend/audio/audioMasks";
 import type { ISoundInstance } from "@/frontend/audio/soundInstance";
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
+import type { ClusteredLightingRegion } from "@/frontend/helpers/clusteredLightingSystem";
 import { translate } from "@/frontend/helpers/transform";
-import type { ClusteredLightingRegion } from "@/frontend/universe/architecture/clusteredLightingRegion";
 import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import type { CelestialBody, OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
+import type { SystemObject } from "@/frontend/universe/systemObject";
 
 import { CollisionMask } from "@/settings";
 
@@ -95,7 +96,7 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
 
     private state: ShipState = "flying";
 
-    private nearestOrbitalObject: OrbitalObject | null = null;
+    private nearestObject: OrbitalObject | SystemObject | null = null;
     private nearestCelestialBody: CelestialBody | null = null;
 
     readonly spaceDots: SpaceDots;
@@ -295,8 +296,8 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
         return this.altimeter;
     }
 
-    public setNearestOrbitalObject(orbitalObject: OrbitalObject): void {
-        this.nearestOrbitalObject = orbitalObject;
+    public setNearestObject(object: OrbitalObject | SystemObject): void {
+        this.nearestObject = object;
     }
 
     public setNearestCelestialBody(celestialBody: CelestialBody): void {
@@ -417,8 +418,20 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
         return this.closestWalkableObject;
     }
 
-    public getNearestOrbitalObject(): OrbitalObject | null {
-        return this.nearestOrbitalObject;
+    /**
+     * @param currentVelocity Forward speed used to predict clearance, in meters per second.
+     * @returns Whether both nearby geometry and celestial rings permit warp.
+     */
+    public canEngageWarpDrive(currentVelocity: number): boolean {
+        const transform = this.getTransform();
+        const altimeter = this.getAltimeter();
+        return (
+            (this.nearestObject === null ||
+                canEngageWarpDrive(transform, altimeter.getAltitude(), currentVelocity, this.nearestObject)) &&
+            (this.nearestCelestialBody === null ||
+                this.nearestCelestialBody === this.nearestObject ||
+                canEngageWarpDrive(transform, null, currentVelocity, this.nearestCelestialBody))
+        );
     }
 
     public engageSurfaceLanding(landingTarget: TransformNode): void {
@@ -587,24 +600,17 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
         const shipForward = this.aggregate.transformNode.forward;
 
         if (warpDrive.isEnabled()) {
-            if (this.nearestOrbitalObject !== null) {
-                if (
-                    !canEngageWarpDrive(
-                        this.getTransform(),
-                        this.getAltimeter(),
-                        this.getSpeed(),
-                        this.nearestOrbitalObject,
-                    )
-                ) {
-                    this.emergencyStopWarpDrive();
-                    return;
-                }
+            if (!this.canEngageWarpDrive(this.getSpeed())) {
+                this.emergencyStopWarpDrive();
+                return;
+            }
 
+            if (this.nearestObject !== null) {
                 warpInfluences.push({
                     type: "solid",
                     volume: {
-                        center: this.nearestOrbitalObject.getTransform().getAbsolutePosition(),
-                        radius: this.nearestOrbitalObject.getBoundingRadius(),
+                        center: this.nearestObject.getTransform().getAbsolutePosition(),
+                        radius: this.nearestObject.getBoundingRadius(),
                     },
                 });
             }

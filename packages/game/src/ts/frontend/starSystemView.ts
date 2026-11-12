@@ -56,6 +56,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
+import type { ClusteredLightingRegion } from "@/frontend/helpers/clusteredLightingSystem";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
 import { positionNearObject, positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
@@ -195,6 +196,8 @@ export class StarSystemView implements View {
      * The controller of the current star system. This controller is unique per star system and is destroyed when the star system is changed.
      */
     private starSystem: StarSystemController | null = null;
+
+    private readonly entityLightingRegions = new Set<ClusteredLightingRegion>();
 
     /**
      * The star system loader used to load the star system. It is constant for the whole game.
@@ -555,7 +558,12 @@ export class StarSystemView implements View {
         this._isLoadingSystem = true;
 
         if (this.starSystem !== null) {
-            this.spaceshipControls?.setClosestLandableFacility(null);
+            for (const region of this.entityLightingRegions) {
+                this.clusteredLightingSystem.unregisterRegion(region);
+            }
+            this.entityLightingRegions.clear();
+
+            this.spaceshipControls?.reset();
             this.terrainSystem.reset();
             this.postProcessManager.reset();
             for (const facility of this.starSystem.getOrbitalFacilities()) {
@@ -576,6 +584,7 @@ export class StarSystemView implements View {
             this.moduleAssets,
             this.scene,
             this.progressMonitor,
+            this.systemEntityProcessors,
         );
 
         if (!starSystemResult.success) {
@@ -604,6 +613,16 @@ export class StarSystemView implements View {
             this.systemEntityProcessors.shadowCasters.dispatch(entity),
         );
         this.starSystem.stellarLightSystem.addShadowCasters(systemEntityShadowCasters);
+
+        for (const entity of systemEntities) {
+            const region = this.systemEntityProcessors.lightingRegions.dispatch(entity);
+            if (region === null) {
+                continue;
+            }
+
+            this.clusteredLightingSystem.registerRegion(region);
+            this.entityLightingRegions.add(region);
+        }
 
         return ok(this.starSystem);
     }
@@ -746,55 +765,41 @@ export class StarSystemView implements View {
         const currentWorldRotation = transform.absoluteRotationQuaternion;
         let isTooCloseToNearestObject = false;
 
-        // Finding the index of the nearest orbital object
-        const nearestOrbitalObject = currentStarSystem.getNearestOrbitalObject(currentWorldPosition);
+        const nearestObject = currentStarSystem.getNearestSystemObject(currentWorldPosition);
 
         const universeObjectId: UniverseObjectId = {
             systemCoordinates: currentStarSystem.model.coordinates,
-            idInSystem: nearestOrbitalObject.model.id,
+            idInSystem: nearestObject.id,
         };
 
-        // Finding the position of the player in the nearest orbital object's frame of reference
-        const nearestOrbitalObjectInverseWorld = nearestOrbitalObject
-            .getTransform()
-            .computeWorldMatrix(true)
-            .clone()
-            .invert();
-        const currentLocalPosition = Vector3.TransformCoordinates(
-            currentWorldPosition,
-            nearestOrbitalObjectInverseWorld,
-        );
+        const nearestObjectInverseWorld = nearestObject.getTransform().computeWorldMatrix(true).clone().invert();
+        const currentLocalPosition = Vector3.TransformCoordinates(currentWorldPosition, nearestObjectInverseWorld);
 
         if (minimumDistanceRadiusRatio !== null) {
-            const distanceToNearestOrbitalObject = currentLocalPosition.length();
-            const minimumDistanceToNearestOrbitalObject =
-                nearestOrbitalObject.getBoundingRadius() * minimumDistanceRadiusRatio;
-            if (distanceToNearestOrbitalObject < minimumDistanceToNearestOrbitalObject) {
-                currentLocalPosition.copyFromFloats(0, 0, nearestOrbitalObject.getBoundingRadius() * 5.0);
+            const distanceToNearestObject = currentLocalPosition.length();
+            const minimumDistanceToNearestObject = nearestObject.getBoundingRadius() * minimumDistanceRadiusRatio;
+            if (distanceToNearestObject < minimumDistanceToNearestObject) {
+                currentLocalPosition.copyFromFloats(0, 0, nearestObject.getBoundingRadius() * 5.0);
                 isTooCloseToNearestObject = true;
             }
         }
 
-        // Finding the rotation of the player in the nearest orbital object's frame of reference
-        const nearestOrbitalObjectInverseRotation = nearestOrbitalObject
-            .getTransform()
-            .absoluteRotationQuaternion.clone()
-            .invert();
+        const nearestObjectInverseRotation = nearestObject.getTransform().absoluteRotationQuaternion.clone().invert();
 
-        const currentLocalRotation = currentWorldRotation.multiply(nearestOrbitalObjectInverseRotation);
+        const currentLocalRotation = currentWorldRotation.multiply(nearestObjectInverseRotation);
         if (isTooCloseToNearestObject) {
             const recoveryWorldPosition = Vector3.TransformCoordinates(
                 currentLocalPosition,
-                nearestOrbitalObject.getTransform().getWorldMatrix(),
+                nearestObject.getTransform().getWorldMatrix(),
             );
-            const targetForward = nearestOrbitalObject
+            const targetForward = nearestObject
                 .getTransform()
                 .getAbsolutePosition()
                 .subtract(recoveryWorldPosition)
                 .normalize();
             const localForward = Vector3.Forward(transform.getScene().useRightHandedSystem);
             alignRotationToRef(currentWorldRotation, localForward, targetForward, currentLocalRotation);
-            currentLocalRotation.multiplyInPlace(nearestOrbitalObjectInverseRotation);
+            currentLocalRotation.multiplyInPlace(nearestObjectInverseRotation);
         }
 
         return {
@@ -831,9 +836,9 @@ export class StarSystemView implements View {
 
         const playerTransform = controls.getTransform();
         const starSystem = this.getStarSystem();
-        const nearestOrbitalObject = starSystem.getOrbitalObjectById(location.universeObjectId.idInSystem);
+        const nearestObject = starSystem.getSystemObjectById(location.universeObjectId.idInSystem);
 
-        if (nearestOrbitalObject === undefined) {
+        if (nearestObject === undefined) {
             const fallbackObject = starSystem.getStellarObjects()[0];
             positionNearObject(
                 fallbackObject,
@@ -852,7 +857,7 @@ export class StarSystemView implements View {
         }
 
         positionNearObject(
-            nearestOrbitalObject,
+            nearestObject,
             new Vector3(location.position.x, location.position.y, location.position.z),
             new Quaternion(location.rotation.x, location.rotation.y, location.rotation.z, location.rotation.w),
             playerTransform,
@@ -860,20 +865,32 @@ export class StarSystemView implements View {
 
         const distanceToObject = Vector3.Distance(
             playerTransform.getAbsolutePosition(),
-            nearestOrbitalObject.getTransform().getAbsolutePosition(),
+            nearestObject.getTransform().getAbsolutePosition(),
         );
-        const objectRadius = nearestOrbitalObject.getBoundingRadius();
+        const objectRadius = nearestObject.getBoundingRadius();
 
         if (distanceToObject < objectRadius * 1.1) {
             if (distanceToObject < 0.1) {
-                playerTransform.position.addInPlace(new Vector3(0, 0, objectRadius * 5.0));
+                playerTransform.setAbsolutePosition(
+                    nearestObject
+                        .getTransform()
+                        .getAbsolutePosition()
+                        .add(new Vector3(0, 0, objectRadius * 5.0)),
+                );
             } else {
-                playerTransform.position.scaleInPlace((objectRadius * 1.1) / distanceToObject);
+                const offset = playerTransform
+                    .getAbsolutePosition()
+                    .subtract(nearestObject.getTransform().getAbsolutePosition());
+                playerTransform.setAbsolutePosition(
+                    nearestObject
+                        .getTransform()
+                        .getAbsolutePosition()
+                        .add(offset.scale((objectRadius * 1.1) / distanceToObject)),
+                );
             }
         }
 
-        // set the ui target to the nearest orbital object
-        this.targetingSystem.setTarget(nearestOrbitalObject);
+        this.targetingSystem.setTarget(nearestObject);
     }
 
     private async loadAtStationLocation(location: AtStationCoordinates): Promise<void> {
@@ -885,12 +902,9 @@ export class StarSystemView implements View {
 
         const playerTransform = controls.getTransform();
         const starSystem = this.getStarSystem();
-        const station = starSystem.getOrbitalObjectById(location.universeObjectId.idInSystem);
+        const station = starSystem.getLandableFacilityById(location.universeObjectId.idInSystem);
 
-        const doesStationExist =
-            station !== undefined && (station.type === "spaceStation" || station.type === "spaceElevator");
-
-        if (!doesStationExist) {
+        if (station === undefined) {
             const fallbackObject = starSystem.getStellarObjects()[0];
 
             positionNearObject(
@@ -932,8 +946,7 @@ export class StarSystemView implements View {
         }
 
         const shipControls = this.getSpaceshipControls();
-        shipControls.setClosestLandableFacility(station);
-        shipControls.getSpaceship().spawnOnPad(landingPad);
+        shipControls.spawnOnPad(station, landingPad);
         shipControls.syncCameraTransform();
     }
 
@@ -1290,15 +1303,15 @@ export class StarSystemView implements View {
         this.postProcessManager.update(deltaSeconds);
 
         const spaceship = this.spaceshipControls.getSpaceship();
-        spaceship.setNearestOrbitalObject(nearestOrbitalObject);
         spaceship.setNearestCelestialBody(nearestCelestialBody);
         spaceship.setClosestWalkableObject(nearestCelestialBody);
 
-        if (nearestOrbitalObject.type === "spaceStation" || nearestOrbitalObject.type === "spaceElevator") {
-            this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);
-        } else {
-            this.spaceshipControls.setClosestLandableFacility(null);
-        }
+        const nearestObject = starSystem.getNearestSystemObject(spaceship.getTransform().getAbsolutePosition());
+        spaceship.setNearestObject(
+            nearestObject.id === nearestOrbitalObject.model.id ? nearestOrbitalObject : nearestObject,
+        );
+
+        this.spaceshipControls.setClosestLandableFacility(starSystem.getLandableFacilityById(nearestObject.id) ?? null);
 
         const shipDiscoveryScanner = spaceship.getInternals().getDiscoveryScanner();
         if (
@@ -1409,22 +1422,14 @@ export class StarSystemView implements View {
             this.targetingSystem.setTarget(targetLandingPad);
         }
 
-        if (spaceship.isLandedAtFacility() && this.isUiEnabled) {
+        const landingFacility = this.spaceshipControls.getLandingFacility();
+        if (spaceship.isLandedAtFacility() && this.isUiEnabled && landingFacility !== null) {
             this.spaceStationLayer.setVisibility(true);
-            const facility = this.spaceshipControls.getClosestLandableFacility();
-            this.getStarSystem()
-                .getOrbitalFacilities()
-                .find((spaceStation) => {
-                    if (spaceStation === facility) {
-                        this.spaceStationLayer.setStation(
-                            { systemCoordinates: starSystem.model.coordinates, idInSystem: spaceStation.model.id },
-                            spaceStation.model.name,
-                            this.player,
-                        );
-                        return true;
-                    }
-                    return false;
-                });
+            this.spaceStationLayer.setStation(
+                { systemCoordinates: starSystem.model.coordinates, idInSystem: landingFacility.id },
+                landingFacility.name,
+                this.player,
+            );
         } else {
             this.spaceStationLayer.setVisibility(false);
         }

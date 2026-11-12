@@ -58,6 +58,9 @@ export function createGameModuleApi(
             registerContentFactory: (type, factory) => {
                 systemEntityLoader.registerFactory(type, factory);
             },
+            registerSpatialGeometry: (type, getGeometry) => {
+                systemEntityProcessors.spatialGeometry.register(type, getGeometry);
+            },
             registerUpdate: (type, update) => {
                 systemEntityProcessors.registerUpdate(type, update);
             },
@@ -85,6 +88,20 @@ export function createGameModuleApi(
                     registerSphereOccluders: (type, getSphereOccluders) => {
                         systemEntityProcessors.sphereOccluders.register(type, getSphereOccluders);
                     },
+                },
+            },
+            lighting: {
+                systemEntities: {
+                    registerRegion: (type, getRegion) => {
+                        systemEntityProcessors.lightingRegions.register(type, getRegion);
+                    },
+                },
+            },
+        },
+        landingPad: {
+            systemEntities: {
+                register: (type, getLandingPadProvider) => {
+                    systemEntityProcessors.landingPadProviders.register(type, getLandingPadProvider);
                 },
             },
         },

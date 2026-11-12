@@ -24,6 +24,7 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
 
+import { getBoundingRadius } from "@/frontend/helpers/boundingRadius";
 import type { SystemContent } from "@/frontend/systemEntity/systemEntity";
 
 import { CollisionMask } from "@/settings";
@@ -33,6 +34,8 @@ export type MonolithModel = {
 };
 
 export class Monolith implements SystemContent {
+    readonly radius: number;
+
     private readonly mesh: Mesh;
 
     private readonly material: Material;
@@ -48,6 +51,7 @@ export class Monolith implements SystemContent {
         this.mesh = CreateBox("Monolith", { width, height, depth }, scene);
         this.mesh.position.y = height / 2;
         this.mesh.bakeCurrentTransformIntoVertices();
+        this.radius = getBoundingRadius(this.mesh);
 
         const material = new PBRMaterial("MonolithMaterial", scene);
         material.metallic = 0;

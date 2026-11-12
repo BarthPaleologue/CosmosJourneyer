@@ -15,36 +15,47 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import type { Musics } from "../assets/audio/musics";
 import type { SystemEntityMusicContext } from "../audio/musicSystem";
+import type { ClusteredLightingRegion } from "../helpers/clusteredLightingSystem";
 import type { Target } from "../targeting/target";
 import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
 import type { Transformable } from "../universe/architecture/transformable";
+import type { LandingPadProvider } from "../universe/orbitalFacility/landingPadProvider";
+import type { SpatialGeometry } from "../universe/systemObject";
 import type { AnySystemContentType, SystemEntity } from "./systemEntity";
 import { SystemEntityProcessorRegistry } from "./systemEntityProcessor";
 import type { SystemEntityProcessor } from "./systemEntityProcessor";
 
 export type SystemEntityUpdateContext = {
+    camera: Camera;
     observerPosition: Vector3;
     deltaSeconds: number;
 };
 
 export class SystemEntityProcessors {
+    readonly spatialGeometry: SystemEntityProcessorRegistry<void, SpatialGeometry | null>;
     readonly targeting: SystemEntityProcessorRegistry<void, Array<Target>>;
     readonly music: SystemEntityProcessorRegistry<SystemEntityMusicContext, Array<keyof Musics>>;
     private readonly update: SystemEntityProcessorRegistry<SystemEntityUpdateContext, void>;
     readonly shadowCasters: SystemEntityProcessorRegistry<void, Array<TransformNode>>;
     readonly sphereOccluders: SystemEntityProcessorRegistry<void, Array<Transformable & HasBoundingSphere>>;
+    readonly landingPadProviders: SystemEntityProcessorRegistry<void, LandingPadProvider | null>;
+    readonly lightingRegions: SystemEntityProcessorRegistry<void, ClusteredLightingRegion | null>;
 
     constructor() {
+        this.spatialGeometry = new SystemEntityProcessorRegistry(() => null);
         this.targeting = new SystemEntityProcessorRegistry(() => []);
         this.music = new SystemEntityProcessorRegistry(() => []);
         this.update = new SystemEntityProcessorRegistry(() => {});
         this.shadowCasters = new SystemEntityProcessorRegistry(() => []);
         this.sphereOccluders = new SystemEntityProcessorRegistry(() => []);
+        this.landingPadProviders = new SystemEntityProcessorRegistry(() => null);
+        this.lightingRegions = new SystemEntityProcessorRegistry(() => null);
     }
 
     registerUpdate<T extends AnySystemContentType>(
@@ -61,10 +72,13 @@ export class SystemEntityProcessors {
     }
 
     dispose() {
+        this.spatialGeometry.dispose();
         this.targeting.dispose();
         this.music.dispose();
         this.update.dispose();
         this.shadowCasters.dispose();
         this.sphereOccluders.dispose();
+        this.landingPadProviders.dispose();
+        this.lightingRegions.dispose();
     }
 }

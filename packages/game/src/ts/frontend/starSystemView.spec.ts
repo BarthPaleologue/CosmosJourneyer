@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { NullEngine, NullEngineOptions } from "@babylonjs/core/Engines/nullEngine";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
@@ -147,20 +147,25 @@ describe("StarSystemView", () => {
         expect(nextPlayer.serializedSpaceships).toEqual([nextSpaceshipSerialized]);
     });
 
-    it("rewires facility lights before disposing the previous star system", async () => {
+    it("removes the registered entity regions and legacy facility lights before disposing the system", async () => {
         const oldFacility = {};
         const newFacility = {};
+        const oldRegion = {};
+        const oldEntity = {};
+        const newEntity = {};
         const oldStarSystem = {
             dispose: vi.fn(),
-            getOrbitalFacilities: (): ReadonlyArray<object> => [oldFacility],
+            getOrbitalFacilities: () => [oldFacility],
+            getSystemEntities: () => [oldEntity],
         };
         const newStarSystem = {
             getOrbitalFacilities: () => [newFacility],
-            getSystemEntities: () => [],
+            getSystemEntities: () => [newEntity],
             stellarLightSystem: { addShadowCaster: vi.fn(), addShadowCasters: vi.fn() },
         } as unknown as StarSystemController;
         vi.spyOn(StarSystemController, "CreateAsync").mockResolvedValue(ok(newStarSystem));
-
+        const getRegion = vi.fn(() => ({}));
+        const registeredRegions = new Set([oldRegion]);
         const clusteredLightingSystem = {
             registerRegion: vi.fn(),
             unregisterRegion: vi.fn(),
@@ -170,6 +175,7 @@ describe("StarSystemView", () => {
             assets: {},
             characterControls: null,
             clusteredLightingSystem,
+            entityLightingRegions: registeredRegions,
             loader: {},
             postProcessManager: { reset: vi.fn() },
             progressMonitor: {},
@@ -178,18 +184,29 @@ describe("StarSystemView", () => {
             spaceshipControls: null,
             starSystem: oldStarSystem,
             systemEntityLoader: {},
+            systemEntityProcessors: {
+                lightingRegions: { dispatch: getRegion },
+                shadowCasters: { dispatch: () => [] },
+            },
             targetingSystem: { reset: vi.fn() },
             terrainSystem: { reset: vi.fn() },
         } as unknown as StarSystemView;
 
         await StarSystemView.prototype.loadStarSystem.call(context, { system: {}, entities: [] } as never);
 
-        expect(clusteredLightingSystem.unregisterRegion).toHaveBeenCalledWith(oldFacility);
+        expect(clusteredLightingSystem.unregisterRegion).toHaveBeenCalledTimes(2);
+        expect(clusteredLightingSystem.unregisterRegion.mock.calls[0]?.[0]).toBe(oldRegion);
+        expect(clusteredLightingSystem.unregisterRegion.mock.calls[1]?.[0]).toBe(oldFacility);
         expect(oldStarSystem.dispose).toHaveBeenCalledOnce();
         expect(clusteredLightingSystem.registerRegion).toHaveBeenCalledWith(newFacility);
-        expect(clusteredLightingSystem.unregisterRegion.mock.invocationCallOrder[0]).toBeLessThan(
-            oldStarSystem.dispose.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
-        );
+        expect(getRegion).toHaveBeenCalledExactlyOnceWith(newEntity);
+        const newRegion: unknown = getRegion.mock.results[0]?.value;
+        expect(clusteredLightingSystem.registerRegion.mock.calls[1]?.[0]).toBe(newRegion);
+        expect(registeredRegions.size).toBe(1);
+        expect([...registeredRegions][0]).toBe(newRegion);
+        for (const order of clusteredLightingSystem.unregisterRegion.mock.invocationCallOrder) {
+            expect(order).toBeLessThan(oldStarSystem.dispose.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY);
+        }
     });
 
     it.each([
@@ -264,6 +281,124 @@ describe("StarSystemView", () => {
     });
 });
 
+describe("entity save locations", () => {
+    it("round-trips relative coordinates around a translated, rotating station", async () => {
+        const options = new NullEngineOptions();
+        options.useHighPrecisionMatrix = true;
+        const engine = new NullEngine(options);
+        const scene = new Scene(engine);
+        const stationTransform = new TransformNode("station", scene);
+        stationTransform.position.set(1e9, 2e8, -3e8);
+        stationTransform.rotationQuaternion = Quaternion.RotationYawPitchRoll(0.8, 0.3, -0.5);
+        stationTransform.computeWorldMatrix(true);
+        const object = {
+            id: "station",
+            name: "Station",
+            getTransform: () => stationTransform,
+            getBoundingRadius: () => 100,
+        };
+        const transform = new TransformNode("ship", scene);
+        transform.position.copyFrom(
+            Vector3.TransformCoordinates(new Vector3(0, 0, 500), stationTransform.getWorldMatrix()),
+        );
+        transform.rotationQuaternion = Quaternion.RotationYawPitchRoll(0.4, 0.2, 0.7);
+        transform.computeWorldMatrix(true);
+        const position = transform.getAbsolutePosition().clone();
+        const rotation = transform.absoluteRotationQuaternion.clone();
+        const starSystem = {
+            model: { coordinates: { starSectorX: 0, starSectorY: 0, starSectorZ: 0, localX: 0, localY: 0, localZ: 0 } },
+            getNearestSystemObject: () => object,
+            getSystemObjectById: (id: string) => (id === object.id ? object : undefined),
+        };
+        const setTarget = vi.fn();
+        const context = {
+            getStarSystem: () => starSystem,
+            getActiveControls: () => ({ getTransform: () => transform }),
+            targetingSystem: { setTarget },
+        } as unknown as StarSystemView;
+        const prototype = StarSystemView.prototype as unknown as {
+            loadRelativeLocation(
+                this: StarSystemView,
+                location: ReturnType<StarSystemView["getCurrentUniverseCoordinates"]>,
+            ): Promise<void>;
+        };
+        try {
+            const location = StarSystemView.prototype.getCurrentUniverseCoordinates.call(context, transform, null);
+            expect(location.universeObjectId.idInSystem).toBe("station");
+            transform.position.setAll(0);
+            transform.rotationQuaternion = Quaternion.Identity();
+            await prototype.loadRelativeLocation.call(context, location);
+            transform.computeWorldMatrix(true);
+            expect(transform.getAbsolutePosition().equalsWithEpsilon(position, 1e-3)).toBe(true);
+            expect(Math.abs(Quaternion.Dot(transform.absoluteRotationQuaternion, rotation))).toBeCloseTo(1);
+            expect(setTarget).toHaveBeenCalledWith(object);
+        } finally {
+            scene.dispose();
+            engine.dispose();
+        }
+    });
+    it.each([
+        { offset: 0, expectedDistance: 500 },
+        { offset: 0.00001, expectedDistance: 110 },
+        { offset: 50, expectedDistance: 200 },
+    ])(
+        "recovers a relative spawn at distance $offset from a translated entity",
+        async ({ offset, expectedDistance }) => {
+            const options = new NullEngineOptions();
+            options.useHighPrecisionMatrix = true;
+            const engine = new NullEngine(options);
+            const scene = new Scene(engine);
+            const station = new TransformNode("station", scene);
+            station.position.set(1e9, 2e8, -3e8);
+            station.rotationQuaternion = Quaternion.RotationYawPitchRoll(0.8, 0.3, -0.5);
+            station.computeWorldMatrix(true);
+            const player = new TransformNode("player", scene);
+            const object = { id: "station", getTransform: () => station, getBoundingRadius: () => 100 };
+            const context = {
+                getStarSystem: () => ({ getSystemObjectById: () => object }),
+                getActiveControls: () => ({ getTransform: () => player }),
+                targetingSystem: { setTarget: vi.fn() },
+            } as unknown as StarSystemView;
+            const prototype = StarSystemView.prototype as unknown as {
+                loadRelativeLocation(
+                    this: StarSystemView,
+                    location: ReturnType<StarSystemView["getCurrentUniverseCoordinates"]>,
+                ): Promise<void>;
+            };
+            try {
+                await prototype.loadRelativeLocation.call(context, {
+                    type: "relative",
+                    universeObjectId: {
+                        idInSystem: "station",
+                        systemCoordinates: {
+                            starSectorX: 0,
+                            starSectorY: 0,
+                            starSectorZ: 0,
+                            localX: 0,
+                            localY: 0,
+                            localZ: 0,
+                        },
+                    },
+                    position: { x: 0, y: 0, z: offset },
+                    rotation: { x: 0, y: 0, z: 0, w: 1 },
+                });
+                const worldOffset = player.getAbsolutePosition().subtract(station.getAbsolutePosition());
+                expect(worldOffset.length()).toBeCloseTo(expectedDistance, 2);
+                if (offset > 0) {
+                    const direction = Vector3.TransformNormal(
+                        new Vector3(0, 0, 1),
+                        station.getWorldMatrix(),
+                    ).normalize();
+                    expect(Vector3.Dot(worldOffset.normalize(), direction)).toBeCloseTo(1);
+                }
+            } finally {
+                scene.dispose();
+                engine.dispose();
+            }
+        },
+    );
+});
+
 describe("station save loading", () => {
     it("reserves the spawned pad and establishes its installation before spawning", async () => {
         const engine = new NullEngine();
@@ -278,27 +413,24 @@ describe("station save loading", () => {
         };
         const provider = new LandingPadProvider([pad]);
         const station = {
-            type: "spaceStation" as const,
-            model: { id: "station", name: "Station" },
+            id: "station",
+            name: "Station",
             getTransform: () => transform,
             getBoundingRadius: () => 100,
             getLandingPadProvider: () => provider,
         };
-        const setClosestLandableFacility = vi.fn();
         const spawnOnPad = vi.fn(() => {
             expect(provider.getAvailableLandingPads()).toHaveLength(0);
-            expect(setClosestLandableFacility).toHaveBeenCalledExactlyOnceWith(station);
         });
         const controls = {
-            getSpaceship: () => ({ spawnOnPad }),
-            setClosestLandableFacility,
+            spawnOnPad,
             syncCameraTransform: vi.fn(),
         };
         const context = {
             getActiveControls: () => ({ getTransform: () => transform }),
             getSpaceshipControls: () => controls,
             getStarSystem: () => ({
-                getOrbitalObjectById: (id: string) => (id === station.model.id ? station : undefined),
+                getLandableFacilityById: (id: string) => (id === station.id ? station : undefined),
             }),
         } as unknown as StarSystemView;
         const prototype = StarSystemView.prototype as unknown as {
@@ -319,7 +451,7 @@ describe("station save loading", () => {
                     },
                 },
             });
-            expect(spawnOnPad).toHaveBeenCalledWith(pad);
+            expect(spawnOnPad).toHaveBeenCalledExactlyOnceWith(station, pad);
             expect(controls.syncCameraTransform).toHaveBeenCalledOnce();
         } finally {
             scene.dispose();

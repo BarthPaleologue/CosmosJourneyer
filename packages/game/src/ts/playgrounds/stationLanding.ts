@@ -115,6 +115,14 @@ export async function createStationLandingScene(
         throw new Error("Space station has no landing bay");
     }
 
+    const facility = {
+        id: spaceStation.model.id,
+        name: spaceStation.model.name,
+        getTransform: () => spaceStation.getTransform(),
+        getBoundingRadius: () => spaceStation.getBoundingRadius(),
+        getLandingPadProvider: () => spaceStation.getLandingPadProvider(),
+    };
+
     const spawnOnPadParam = urlParams.get("spawnOnPad");
     if (spawnOnPadParam !== null) {
         const landingPad = landingBay.landingPads[0];
@@ -129,7 +137,7 @@ export async function createStationLandingScene(
 
     shipControls.getTransform().computeWorldMatrix(true);
     shipControls.syncCameraTransform();
-    shipControls.setClosestLandableFacility(spaceStation);
+    shipControls.setClosestLandableFacility(facility);
 
     new DirectionalLight("sun", new Vector3(-1, -1, 1).normalize(), scene);
     new GlowLayer("glow", scene);
