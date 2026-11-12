@@ -29,8 +29,8 @@ import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { Player } from "@/frontend/player/player";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
-import { LandingPadManager, LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
-import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { LandingPadProvider, LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
+import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 
 import { StarSystemView } from "./starSystemView";
@@ -276,17 +276,17 @@ describe("station save loading", () => {
             getPadSize: () => LandingPadSize.SMALL,
             getPadHeight: () => 1,
         };
-        const manager = new LandingPadManager([pad]);
+        const provider = new LandingPadProvider([pad]);
         const station = {
             type: "spaceStation" as const,
             model: { id: "station", name: "Station" },
             getTransform: () => transform,
             getBoundingRadius: () => 100,
-            getLandingPadManager: () => manager,
+            getLandingPadProvider: () => provider,
         };
         const setClosestLandableFacility = vi.fn();
         const spawnOnPad = vi.fn(() => {
-            expect(manager.getAvailableLandingPads()).toHaveLength(0);
+            expect(provider.getAvailableLandingPads()).toHaveLength(0);
             expect(setClosestLandableFacility).toHaveBeenCalledExactlyOnceWith(station);
         });
         const controls = {

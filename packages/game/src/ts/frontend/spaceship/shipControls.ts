@@ -36,7 +36,7 @@ import { pitch, roll, yaw } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
 import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 import type { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
@@ -241,7 +241,7 @@ export class ShipControls implements Controls {
             if (this.closestLandableFacility === null) {
                 return;
             }
-            const landingPad = this.closestLandableFacility.getLandingPadManager().handleLandingRequest({
+            const landingPad = this.closestLandableFacility.getLandingPadProvider().handleLandingRequest({
                 minimumPadSize: LandingPadSize.SMALL,
             });
             if (landingPad === null) {
@@ -349,7 +349,7 @@ export class ShipControls implements Controls {
     private cancelLandingRequest(spaceship: Spaceship): void {
         const currentLandingPad = spaceship.getTargetLandingPad();
         if (currentLandingPad !== null) {
-            this.closestLandableFacility?.getLandingPadManager().cancelLandingRequest(currentLandingPad);
+            this.closestLandableFacility?.getLandingPadProvider().cancelLandingRequest(currentLandingPad);
         }
     }
 

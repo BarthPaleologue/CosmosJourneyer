@@ -112,7 +112,7 @@ import { createDefaultTargetContact, createTargetContact, TargetAcquisition } fr
 import { InteractionLayer } from "./ui/interactionLayer";
 import type { INotificationManager } from "./ui/notificationManager";
 import { CreateLinesHelper } from "./universe/lineRendering";
-import { LandingPadSize } from "./universe/orbitalFacility/landingPadManager";
+import { LandingPadSize } from "./universe/orbitalFacility/landingPadProvider";
 import { VehicleControls } from "./vehicle/vehicleControls";
 import { VehicleInputs } from "./vehicle/vehicleControlsInputs";
 import { createWolfMk2 } from "./vehicle/wolfMk2";
@@ -909,7 +909,7 @@ export class StarSystemView implements View {
             return;
         }
 
-        const landingPad = station.getLandingPadManager().handleLandingRequest({
+        const landingPad = station.getLandingPadProvider().handleLandingRequest({
             minimumPadSize: LandingPadSize.SMALL,
         });
         if (landingPad === null) {

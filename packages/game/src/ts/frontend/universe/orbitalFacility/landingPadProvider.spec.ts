@@ -18,8 +18,8 @@
 import { TransformNode } from "@babylonjs/core";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { LandingPadManager, LandingPadSize } from "./landingPadManager";
-import type { ILandingPad, LandingRequest } from "./landingPadManager";
+import { LandingPadProvider, LandingPadSize } from "./landingPadProvider";
+import type { ILandingPad, LandingRequest } from "./landingPadProvider";
 
 vi.mock("@babylonjs/core");
 
@@ -64,12 +64,12 @@ class MockLandingPad implements ILandingPad {
     }
 }
 
-describe("LandingPadManager", () => {
+describe("LandingPadProvider", () => {
     let smallPad: ILandingPad;
     let mediumPad: ILandingPad;
     let largePad: ILandingPad;
     let allPads: ILandingPad[];
-    let landingPadManager: LandingPadManager;
+    let landingPadProvider: LandingPadProvider;
 
     beforeEach(() => {
         // Create fresh instances for each test
@@ -79,63 +79,63 @@ describe("LandingPadManager", () => {
         allPads = [smallPad, mediumPad, largePad];
 
         // Pass the array directly instead of a lambda
-        landingPadManager = new LandingPadManager(allPads);
+        landingPadProvider = new LandingPadProvider(allPads);
     });
 
     it("should return all landing pads", () => {
-        expect(landingPadManager.getLandingPads()).toEqual(allPads);
-        expect(landingPadManager.getLandingPads().length).toBe(3);
+        expect(landingPadProvider.getLandingPads()).toEqual(allPads);
+        expect(landingPadProvider.getLandingPads().length).toBe(3);
     });
 
     it("should initially return all landing pads as available", () => {
-        expect(landingPadManager.getAvailableLandingPads()).toEqual(allPads);
-        expect(landingPadManager.getAvailableLandingPads().length).toBe(3);
+        expect(landingPadProvider.getAvailableLandingPads()).toEqual(allPads);
+        expect(landingPadProvider.getAvailableLandingPads().length).toBe(3);
     });
 
     it("should handle landing request for small pad", () => {
         const request: LandingRequest = { minimumPadSize: LandingPadSize.SMALL };
-        const assignedPad = landingPadManager.handleLandingRequest(request);
+        const assignedPad = landingPadProvider.handleLandingRequest(request);
 
         // Should get smallest suitable pad (in this case, small)
         expect(assignedPad).toBe(smallPad);
 
         // The small pad should now be unavailable
-        expect(landingPadManager.getAvailableLandingPads().length).toBe(2);
-        expect(landingPadManager.getAvailableLandingPads()).not.toContain(smallPad);
+        expect(landingPadProvider.getAvailableLandingPads().length).toBe(2);
+        expect(landingPadProvider.getAvailableLandingPads()).not.toContain(smallPad);
     });
 
     it("should handle landing request for medium pad", () => {
         const request: LandingRequest = { minimumPadSize: LandingPadSize.MEDIUM };
-        const assignedPad = landingPadManager.handleLandingRequest(request);
+        const assignedPad = landingPadProvider.handleLandingRequest(request);
 
         // Should get smallest suitable pad (in this case, medium)
         expect(assignedPad).toBe(mediumPad);
 
         // The medium pad should now be unavailable
-        expect(landingPadManager.getAvailableLandingPads().length).toBe(2);
-        expect(landingPadManager.getAvailableLandingPads()).not.toContain(mediumPad);
+        expect(landingPadProvider.getAvailableLandingPads().length).toBe(2);
+        expect(landingPadProvider.getAvailableLandingPads()).not.toContain(mediumPad);
     });
 
     it("should handle landing request for large pad", () => {
         const request: LandingRequest = { minimumPadSize: LandingPadSize.LARGE };
-        const assignedPad = landingPadManager.handleLandingRequest(request);
+        const assignedPad = landingPadProvider.handleLandingRequest(request);
 
         // Should get smallest suitable pad (in this case, large)
         expect(assignedPad).toBe(largePad);
 
         // The large pad should now be unavailable
-        expect(landingPadManager.getAvailableLandingPads().length).toBe(2);
-        expect(landingPadManager.getAvailableLandingPads()).not.toContain(largePad);
+        expect(landingPadProvider.getAvailableLandingPads().length).toBe(2);
+        expect(landingPadProvider.getAvailableLandingPads()).not.toContain(largePad);
     });
 
     it("should return null when no suitable landing pad is available", () => {
         // Allocate all pads
-        landingPadManager.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
-        landingPadManager.handleLandingRequest({ minimumPadSize: LandingPadSize.MEDIUM });
-        landingPadManager.handleLandingRequest({ minimumPadSize: LandingPadSize.LARGE });
+        landingPadProvider.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
+        landingPadProvider.handleLandingRequest({ minimumPadSize: LandingPadSize.MEDIUM });
+        landingPadProvider.handleLandingRequest({ minimumPadSize: LandingPadSize.LARGE });
 
         // Try to allocate another pad
-        const assignedPad = landingPadManager.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
+        const assignedPad = landingPadProvider.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
 
         expect(assignedPad).toBeNull();
     });
@@ -143,19 +143,19 @@ describe("LandingPadManager", () => {
     it("should cancel landing request and make pad available again", () => {
         // Allocate a pad
         const request: LandingRequest = { minimumPadSize: LandingPadSize.MEDIUM };
-        const assignedPad = landingPadManager.handleLandingRequest(request);
+        const assignedPad = landingPadProvider.handleLandingRequest(request);
         if (assignedPad === null) {
             throw new Error("Assigned pad is null");
         }
 
-        expect(landingPadManager.getAvailableLandingPads().length).toBe(2);
+        expect(landingPadProvider.getAvailableLandingPads().length).toBe(2);
 
         // Cancel the request
-        landingPadManager.cancelLandingRequest(assignedPad);
+        landingPadProvider.cancelLandingRequest(assignedPad);
 
         // The pad should be available again
-        expect(landingPadManager.getAvailableLandingPads().length).toBe(3);
-        expect(landingPadManager.getAvailableLandingPads()).toContain(assignedPad);
+        expect(landingPadProvider.getAvailableLandingPads().length).toBe(3);
+        expect(landingPadProvider.getAvailableLandingPads()).toContain(assignedPad);
     });
 
     it("should prioritize smallest suitable pad", () => {
@@ -163,21 +163,21 @@ describe("LandingPadManager", () => {
         const request: LandingRequest = { minimumPadSize: LandingPadSize.MEDIUM };
 
         // Should get medium pad, not large
-        const assignedPad = landingPadManager.handleLandingRequest(request);
+        const assignedPad = landingPadProvider.handleLandingRequest(request);
         expect(assignedPad).toBe(mediumPad);
         if (assignedPad !== mediumPad) {
             throw new Error("Assigned pad is not the expected medium pad");
         }
 
         // Make medium unavailable
-        landingPadManager.cancelLandingRequest(assignedPad);
+        landingPadProvider.cancelLandingRequest(assignedPad);
 
         // Now make both small and medium unavailable
-        landingPadManager.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
-        landingPadManager.handleLandingRequest({ minimumPadSize: LandingPadSize.MEDIUM });
+        landingPadProvider.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
+        landingPadProvider.handleLandingRequest({ minimumPadSize: LandingPadSize.MEDIUM });
 
         // Now if we request medium again, we should get large since it's the only suitable one left
-        const newAssignedPad = landingPadManager.handleLandingRequest({ minimumPadSize: LandingPadSize.MEDIUM });
+        const newAssignedPad = landingPadProvider.handleLandingRequest({ minimumPadSize: LandingPadSize.MEDIUM });
         expect(newAssignedPad).toBe(largePad);
     });
 });

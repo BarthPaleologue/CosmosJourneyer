@@ -37,7 +37,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
-import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadManager";
+import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 

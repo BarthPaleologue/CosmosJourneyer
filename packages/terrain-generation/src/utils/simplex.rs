@@ -236,8 +236,8 @@ static F3: f32 = 0.333_333_34;
 static G3: f32 = 0.166_666_67;
 
 /** 3D simplex noise with derivatives.
-* If the last tthree arguments are not null, the analytic derivative
-* (the 3D gradient of the scalar noise field) is also calculated.
+ * If the last tthree arguments are not null, the analytic derivative
+ * (the 3D gradient of the scalar noise field) is also calculated.
  */
 #[allow(dead_code)]
 fn sdnoise3(x: f32, y: f32, z: f32, gradient: &mut Vector3) -> f32 {
@@ -507,8 +507,8 @@ fn corner_contribution(
 }
 
 /** 4D SIMPLEX noise with derivatives.
-* If the last four arguments are not null, the analytic derivative
-* (the 4D gradient of the scalar noise field) is also calculated.
+ * If the last four arguments are not null, the analytic derivative
+ * (the 4D gradient of the scalar noise field) is also calculated.
  */
 fn sdnoise4(x: f32, y: f32, z: f32, w: f32, gradient: &mut Vector3) -> f32 {
     // Skew the (x,y,z,w) space to determine which cell of 24 simplices we're in
