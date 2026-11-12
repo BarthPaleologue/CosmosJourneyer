@@ -28,12 +28,14 @@ import { SubSurfaceBlock } from "@babylonjs/core/Materials/Node/Blocks/PBR/subSu
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 
+import { parse } from "./bslInput";
+import type { BslInput } from "./bslInput";
 import type { TargetOptions } from "./target";
 
 export type PerturbNormalOptions = TargetOptions & {
     parallax: {
-        viewDirection: NodeMaterialConnectionPoint;
-        scale: NodeMaterialConnectionPoint;
+        viewDirection: BslInput;
+        scale: BslInput;
     };
 };
 
@@ -53,32 +55,32 @@ export type PerturbNormalOutput = {
  * @returns The perturbed normal and adjusted UV coordinates.
  */
 export function perturbNormal(
-    uv: NodeMaterialConnectionPoint,
-    positionWorldVec3: NodeMaterialConnectionPoint,
-    normalWorldVec3: NodeMaterialConnectionPoint,
-    normalTexture: NodeMaterialConnectionPoint,
-    bumpStrengthFloat: NodeMaterialConnectionPoint,
+    uv: BslInput,
+    positionWorldVec3: BslInput,
+    normalWorldVec3: BslInput,
+    normalTexture: BslInput,
+    bumpStrengthFloat: BslInput,
     options?: Partial<PerturbNormalOptions>,
 ): PerturbNormalOutput {
     const perturbedNormal = new PerturbNormalBlock("Perturb normal");
     perturbedNormal.target = options?.target ?? NodeMaterialBlockTargets.Fragment;
     perturbedNormal.useParallaxOcclusion = options?.parallax !== undefined;
 
-    uv.connectTo(perturbedNormal.uv);
-    positionWorldVec3.connectTo(perturbedNormal.worldPosition);
-    normalWorldVec3.connectTo(perturbedNormal.worldNormal);
-    normalTexture.connectTo(perturbedNormal.normalMapColor);
-    bumpStrengthFloat.connectTo(perturbedNormal.strength);
-    options?.parallax?.scale.connectTo(perturbedNormal.parallaxScale);
-    options?.parallax?.viewDirection.connectTo(perturbedNormal.viewDirection);
+    parse(uv, options).connectTo(perturbedNormal.uv);
+    parse(positionWorldVec3, options).connectTo(perturbedNormal.worldPosition);
+    parse(normalWorldVec3, options).connectTo(perturbedNormal.worldNormal);
+    parse(normalTexture, options).connectTo(perturbedNormal.normalMapColor);
+    parse(bumpStrengthFloat, options).connectTo(perturbedNormal.strength);
+    parse(options?.parallax?.scale, options)?.connectTo(perturbedNormal.parallaxScale);
+    parse(options?.parallax?.viewDirection, options)?.connectTo(perturbedNormal.viewDirection);
 
     return perturbedNormal;
 }
 
 export type SubSurfaceScatteringOptions = {
-    tintColor: SubSurfaceBlock["tintColor"];
-    translucencyIntensity: SubSurfaceBlock["translucencyIntensity"];
-    translucencyDiffusionDistance: SubSurfaceBlock["translucencyDiffusionDist"];
+    tintColor: BslInput;
+    translucencyIntensity: BslInput;
+    translucencyDiffusionDistance: BslInput;
     refraction: SubSurfaceBlock["refraction"];
     dispersion: SubSurfaceBlock["dispersion"];
 };
@@ -90,15 +92,15 @@ export type SubSurfaceScatteringOptions = {
  * @returns Subsurface scattering connection for the shader graph.
  */
 export function subSurfaceScatter(
-    thickness: NodeMaterialConnectionPoint,
+    thickness: BslInput,
     options?: Partial<SubSurfaceScatteringOptions>,
 ): NodeMaterialConnectionPoint {
     const sssBlock = new SubSurfaceBlock("SubSurfaceScattering");
     sssBlock.target = NodeMaterialBlockTargets.Fragment;
-    thickness.connectTo(sssBlock.thickness);
-    options?.tintColor?.connectTo(sssBlock.tintColor);
-    options?.translucencyIntensity?.connectTo(sssBlock.translucencyIntensity);
-    options?.translucencyDiffusionDistance?.connectTo(sssBlock.translucencyDiffusionDist);
+    parse(thickness).connectTo(sssBlock.thickness);
+    parse(options?.tintColor)?.connectTo(sssBlock.tintColor);
+    parse(options?.translucencyIntensity)?.connectTo(sssBlock.translucencyIntensity);
+    parse(options?.translucencyDiffusionDistance)?.connectTo(sssBlock.translucencyDiffusionDist);
     options?.refraction?.connectTo(sssBlock.refraction);
     options?.dispersion?.connectTo(sssBlock.dispersion);
     return sssBlock.subsurface;
@@ -111,11 +113,11 @@ export function subSurfaceScatter(
  * @returns The reflection connection for the pbr helper.
  */
 export function reflection(
-    positionVec3: NodeMaterialConnectionPoint,
+    positionVec3: BslInput,
     worldMat4: NodeMaterialConnectionPoint,
 ): NodeMaterialConnectionPoint {
     const reflectionBlock = new ReflectionBlock("Reflection");
-    positionVec3.connectTo(reflectionBlock.position);
+    parse(positionVec3).connectTo(reflectionBlock.position);
     worldMat4.connectTo(reflectionBlock.world);
     return reflectionBlock.reflection;
 }
@@ -124,10 +126,10 @@ export type PBROptions = {
     useEnergyConservation: boolean;
     useRadianceOcclusion: boolean;
     useHorizonOcclusion: boolean;
-    albedoRgb: PBRMetallicRoughnessBlock["baseColor"];
-    ambientOcclusion: PBRMetallicRoughnessBlock["ambientOcc"];
-    opacity: PBRMetallicRoughnessBlock["opacity"];
-    perturbedNormal: PBRMetallicRoughnessBlock["perturbedNormal"];
+    albedoRgb: BslInput;
+    ambientOcclusion: BslInput;
+    opacity: BslInput;
+    perturbedNormal: BslInput;
     subSurfaceScattering: PBRMetallicRoughnessBlock["subsurface"];
     reflection: PBRMetallicRoughnessBlock["reflection"];
     lightFalloff: typeof Light.FALLOFF_PHYSICAL | typeof Light.FALLOFF_GLTF | typeof Light.FALLOFF_STANDARD;
@@ -151,12 +153,12 @@ export type PBROutput = {
  * @returns Lighting, alpha, and shadow connections from the material block.
  */
 export function pbr(
-    metallicFloat: NodeMaterialConnectionPoint,
-    roughnessFloat: NodeMaterialConnectionPoint,
-    normalWorldVec3: NodeMaterialConnectionPoint,
+    metallicFloat: BslInput,
+    roughnessFloat: BslInput,
+    normalWorldVec3: BslInput,
     viewMat4: NodeMaterialConnectionPoint,
-    cameraPositionVec3: NodeMaterialConnectionPoint,
-    positionWorldVec3: NodeMaterialConnectionPoint,
+    cameraPositionVec3: BslInput,
+    positionWorldVec3: BslInput,
     options?: Partial<PBROptions>,
 ): PBROutput {
     const PBRMetallicRoughness = new PBRMetallicRoughnessBlock("PBRMetallicRoughness");
@@ -166,17 +168,17 @@ export function pbr(
     PBRMetallicRoughness.useHorizonOcclusion = options?.useHorizonOcclusion ?? true;
     PBRMetallicRoughness.lightFalloff = options?.lightFalloff ?? Light.FALLOFF_GLTF;
 
-    metallicFloat.connectTo(PBRMetallicRoughness.metallic);
-    roughnessFloat.connectTo(PBRMetallicRoughness.roughness);
-    normalWorldVec3.connectTo(PBRMetallicRoughness.worldNormal);
+    parse(metallicFloat).connectTo(PBRMetallicRoughness.metallic);
+    parse(roughnessFloat).connectTo(PBRMetallicRoughness.roughness);
+    parse(normalWorldVec3).connectTo(PBRMetallicRoughness.worldNormal);
     viewMat4.connectTo(PBRMetallicRoughness.view);
-    cameraPositionVec3.connectTo(PBRMetallicRoughness.cameraPosition);
-    positionWorldVec3.connectTo(PBRMetallicRoughness.worldPosition);
+    parse(cameraPositionVec3).connectTo(PBRMetallicRoughness.cameraPosition);
+    parse(positionWorldVec3).connectTo(PBRMetallicRoughness.worldPosition);
 
-    options?.albedoRgb?.connectTo(PBRMetallicRoughness.baseColor);
-    options?.ambientOcclusion?.connectTo(PBRMetallicRoughness.ambientOcc);
-    options?.opacity?.connectTo(PBRMetallicRoughness.opacity);
-    options?.perturbedNormal?.connectTo(PBRMetallicRoughness.perturbedNormal);
+    parse(options?.albedoRgb)?.connectTo(PBRMetallicRoughness.baseColor);
+    parse(options?.ambientOcclusion)?.connectTo(PBRMetallicRoughness.ambientOcc);
+    parse(options?.opacity)?.connectTo(PBRMetallicRoughness.opacity);
+    parse(options?.perturbedNormal)?.connectTo(PBRMetallicRoughness.perturbedNormal);
     options?.subSurfaceScattering?.connectTo(PBRMetallicRoughness.subsurface);
     options?.reflection?.connectTo(PBRMetallicRoughness.reflection);
 

@@ -20,15 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-export * from "./color";
-export * from "./f32";
-export * from "./input";
-export * from "./instance";
-export * from "./material";
-export * from "./math";
-export * from "./matrix";
-export * from "./output";
 export * from "./target";
-export * from "./texture";
+export * from "./input";
+export * from "./f32";
 export * from "./trigonometry";
 export * from "./vec";
+export * from "./color";
+export * from "./math";
+export * from "./texture";
+export * from "./instance";
+export * from "./matrix";
+export * from "./material";
+export * from "./output";
+export type { BslInput } from "./bslInput";

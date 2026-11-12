@@ -22,13 +22,10 @@
 
 import { AnimatedInputBlockTypes } from "@babylonjs/core/Materials/Node/Blocks/Input/animatedInputBlockTypes";
 import { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inputBlock";
-import { NodeMaterialBlockConnectionPointTypes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockConnectionPointTypes";
+import type { NodeMaterialBlockConnectionPointTypes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockConnectionPointTypes";
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import { NodeMaterialSystemValues } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialSystemValues";
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
-import type { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { Vector2 } from "@babylonjs/core/Maths/math.vector";
-import type { Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 
 import type { TargetOptions } from "./target";
 

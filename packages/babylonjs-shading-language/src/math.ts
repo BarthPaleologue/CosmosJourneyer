@@ -35,14 +35,15 @@ import { SmoothStepBlock } from "@babylonjs/core/Materials/Node/Blocks/smoothSte
 import { StepBlock } from "@babylonjs/core/Materials/Node/Blocks/stepBlock";
 import { SubtractBlock } from "@babylonjs/core/Materials/Node/Blocks/subtractBlock";
 import {
-    TrigonometryBlockOperations,
     TrigonometryBlock,
+    TrigonometryBlockOperations,
 } from "@babylonjs/core/Materials/Node/Blocks/trigonometryBlock";
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import { Vector2 } from "@babylonjs/core/Maths/math.vector";
 
-import { f } from "./f32";
+import { parse } from "./bslInput";
+import type { BslInput } from "./bslInput";
 import type { TargetOptions } from "./target";
 import { trig } from "./trigonometry";
 
@@ -125,16 +126,12 @@ export function fract(
  * @param options - Optional target options.
  * @returns Product of `left` and `right` as a shader expression.
  */
-export function mul(
-    left: NodeMaterialConnectionPoint,
-    right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function mul(left: BslInput, right: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const mulBlock = new MultiplyBlock("mul");
     mulBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    left.connectTo(mulBlock.left);
-    right.connectTo(mulBlock.right);
+    parse(left, options).connectTo(mulBlock.left);
+    parse(right, options).connectTo(mulBlock.right);
 
     return mulBlock.output;
 }
@@ -145,16 +142,12 @@ export function mul(
  * @param options - Optional target options.
  * @returns Quotient of `left` and `right` as a shader expression.
  */
-export function div(
-    left: NodeMaterialConnectionPoint,
-    right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function div(left: BslInput, right: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const mulBlock = new DivideBlock("div");
     mulBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    left.connectTo(mulBlock.left);
-    right.connectTo(mulBlock.right);
+    parse(left, options).connectTo(mulBlock.left);
+    parse(right, options).connectTo(mulBlock.right);
 
     return mulBlock.output;
 }
@@ -165,16 +158,12 @@ export function div(
  * @param options - Optional target options.
  * @returns `value` raised to `power` as a shader expression.
  */
-export function pow(
-    value: NodeMaterialConnectionPoint,
-    power: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function pow(value: BslInput, power: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const powBlock = new PowBlock("pow");
     powBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    value.connectTo(powBlock.value);
-    power.connectTo(powBlock.power);
+    parse(value, options).connectTo(powBlock.value);
+    parse(power, options).connectTo(powBlock.power);
 
     return powBlock.output;
 }
@@ -185,16 +174,12 @@ export function pow(
  * @param options - Optional target options.
  * @returns Zero below `edge`, otherwise one, as a shader expression.
  */
-export function step(
-    edge: NodeMaterialConnectionPoint,
-    x: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function step(edge: BslInput, x: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const stepBlock = new StepBlock("step");
     stepBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    edge.connectTo(stepBlock.edge);
-    x.connectTo(stepBlock.value);
+    parse(edge, options).connectTo(stepBlock.edge);
+    parse(x, options).connectTo(stepBlock.value);
 
     return stepBlock.output;
 }
@@ -210,17 +195,17 @@ export function step(
  * @returns The smoothly interpolated value.
  */
 export function smoothstep(
-    edge0: NodeMaterialConnectionPoint,
-    edge1: NodeMaterialConnectionPoint,
-    x: NodeMaterialConnectionPoint,
+    edge0: BslInput,
+    edge1: BslInput,
+    x: BslInput,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const stepBlock = new SmoothStepBlock("smoothstep");
     stepBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    edge0.connectTo(stepBlock.edge0);
-    edge1.connectTo(stepBlock.edge1);
-    x.connectTo(stepBlock.value);
+    parse(edge0, options).connectTo(stepBlock.edge0);
+    parse(edge1, options).connectTo(stepBlock.edge1);
+    parse(x, options).connectTo(stepBlock.value);
 
     return stepBlock.output;
 }
@@ -249,17 +234,17 @@ export function abs(input: NodeMaterialConnectionPoint, options?: Partial<Target
  * @returns Interpolated value as a shader expression.
  */
 export function mix(
-    x: NodeMaterialConnectionPoint,
-    y: NodeMaterialConnectionPoint,
-    a: NodeMaterialConnectionPoint,
+    x: BslInput,
+    y: BslInput,
+    a: BslInput,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const mixBlock = new LerpBlock("mix");
     mixBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    x.connectTo(mixBlock.left);
-    y.connectTo(mixBlock.right);
-    a.connectTo(mixBlock.gradient);
+    parse(x, options).connectTo(mixBlock.left);
+    parse(y, options).connectTo(mixBlock.right);
+    parse(a, options).connectTo(mixBlock.gradient);
 
     return mixBlock.output;
 }
@@ -270,16 +255,12 @@ export function mix(
  * @param options - Optional target options.
  * @returns Sum of `left` and `right` as a shader expression.
  */
-export function add(
-    left: NodeMaterialConnectionPoint,
-    right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function add(left: BslInput, right: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const addBlock = new AddBlock("add");
     addBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    left.connectTo(addBlock.left);
-    right.connectTo(addBlock.right);
+    parse(left, options).connectTo(addBlock.left);
+    parse(right, options).connectTo(addBlock.right);
 
     return addBlock.output;
 }
@@ -290,16 +271,12 @@ export function add(
  * @param options - Optional target options.
  * @returns `left` minus `right` as a shader expression.
  */
-export function sub(
-    left: NodeMaterialConnectionPoint,
-    right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function sub(left: BslInput, right: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const subBlock = new SubtractBlock("sub");
     subBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    left.connectTo(subBlock.left);
-    right.connectTo(subBlock.right);
+    parse(left, options).connectTo(subBlock.left);
+    parse(right, options).connectTo(subBlock.right);
 
     return subBlock.output;
 }
@@ -310,16 +287,12 @@ export function sub(
  * @param options - Optional target options.
  * @returns Remainder of `left` divided by `right` as a shader expression.
  */
-export function mod(
-    left: NodeMaterialConnectionPoint,
-    right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function mod(left: BslInput, right: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const modBlock = new ModBlock("mod");
     modBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    left.connectTo(modBlock.left);
-    right.connectTo(modBlock.right);
+    parse(left, options).connectTo(modBlock.left);
+    parse(right, options).connectTo(modBlock.right);
 
     return modBlock.output;
 }
@@ -347,16 +320,12 @@ export function oneMinus(
  * @param options - Optional target options.
  * @returns The minimum value as a connection point.
  */
-export function min(
-    left: NodeMaterialConnectionPoint,
-    right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function min(left: BslInput, right: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const minBlock = new MinBlock("min");
     minBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    left.connectTo(minBlock.left);
-    right.connectTo(minBlock.right);
+    parse(left, options).connectTo(minBlock.left);
+    parse(right, options).connectTo(minBlock.right);
 
     return minBlock.output;
 }
@@ -368,16 +337,12 @@ export function min(
  * @param options - Optional target options.
  * @returns The maximum value as a connection point.
  */
-export function max(
-    left: NodeMaterialConnectionPoint,
-    right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function max(left: BslInput, right: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const maxBlock = new MaxBlock("max");
     maxBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    left.connectTo(maxBlock.left);
-    right.connectTo(maxBlock.right);
+    parse(left, options).connectTo(maxBlock.left);
+    parse(right, options).connectTo(maxBlock.right);
 
     return maxBlock.output;
 }
@@ -393,8 +358,8 @@ export function hash11(
     input: NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
-    const a = fract(mul(input, f(0.1031, options), options), options);
-    const b = mul(a, add(a, f(33.33, options), options), options);
+    const a = fract(mul(input, 0.1031, options), options);
+    const b = mul(a, add(a, 33.33, options), options);
     const c = mul(b, add(b, b, options), options);
     return fract(c, options);
 }

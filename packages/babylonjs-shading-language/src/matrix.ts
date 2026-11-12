@@ -26,6 +26,8 @@ import { ViewDirectionBlock } from "@babylonjs/core/Materials/Node/Blocks/viewDi
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 
+import { parse } from "./bslInput";
+import type { BslInput } from "./bslInput";
 import type { TargetOptions } from "./target";
 
 /**
@@ -35,15 +37,15 @@ import type { TargetOptions } from "./target";
  * @returns Direction from the world position toward the camera.
  */
 export function getViewDirection(
-    worldPosition: NodeMaterialConnectionPoint,
-    cameraPosition: NodeMaterialConnectionPoint,
+    worldPosition: BslInput,
+    cameraPosition: BslInput,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const viewDirection = new ViewDirectionBlock("viewDirection");
     viewDirection.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    worldPosition.connectTo(viewDirection.worldPosition);
-    cameraPosition.connectTo(viewDirection.cameraPosition);
+    parse(worldPosition, options).connectTo(viewDirection.worldPosition);
+    parse(cameraPosition, options).connectTo(viewDirection.cameraPosition);
 
     return viewDirection.output;
 }
@@ -56,7 +58,7 @@ export function getViewDirection(
  */
 export function transformPosition(
     transformMat4: NodeMaterialConnectionPoint,
-    positionVec3: NodeMaterialConnectionPoint,
+    positionVec3: BslInput,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const transformBlock = new TransformBlock("TransformPosition");
@@ -64,7 +66,7 @@ export function transformPosition(
     transformBlock.complementZ = 0;
     transformBlock.complementW = 1;
 
-    positionVec3.connectTo(transformBlock.vector);
+    parse(positionVec3, options).connectTo(transformBlock.vector);
     transformMat4.connectTo(transformBlock.transform);
 
     return transformBlock.output;
@@ -78,7 +80,7 @@ export function transformPosition(
  */
 export function transformDirection(
     transformMat4: NodeMaterialConnectionPoint,
-    directionVec3: NodeMaterialConnectionPoint,
+    directionVec3: BslInput,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const transformBlock = new TransformBlock("TransformDirection");
@@ -86,7 +88,7 @@ export function transformDirection(
     transformBlock.complementZ = 0;
     transformBlock.complementW = 0;
 
-    directionVec3.connectTo(transformBlock.vector);
+    parse(directionVec3, options).connectTo(transformBlock.vector);
     transformMat4.connectTo(transformBlock.transform);
 
     return transformBlock.output;

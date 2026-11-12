@@ -27,6 +27,8 @@ import { VertexOutputBlock } from "@babylonjs/core/Materials/Node/Blocks/Vertex/
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 
+import { parse } from "./bslInput";
+import type { BslInput } from "./bslInput";
 import type { TargetOptions } from "./target";
 
 /**
@@ -35,12 +37,12 @@ import type { TargetOptions } from "./target";
  * @param cutoff - The cutoff threshold.
  * @returns The configured fragment discard block.
  */
-export function discardTest(value: NodeMaterialConnectionPoint, cutoff: NodeMaterialConnectionPoint): DiscardBlock {
+export function discardTest(value: BslInput, cutoff: BslInput): DiscardBlock {
     const discardBlock = new DiscardBlock("discard");
     discardBlock.target = NodeMaterialBlockTargets.Fragment;
 
-    value.connectTo(discardBlock.value);
-    cutoff.connectTo(discardBlock.cutoff);
+    parse(value).connectTo(discardBlock.value);
+    parse(cutoff).connectTo(discardBlock.cutoff);
 
     return discardBlock;
 }
@@ -48,8 +50,8 @@ export function discardTest(value: NodeMaterialConnectionPoint, cutoff: NodeMate
 export type OutputFragColorOptions = {
     convertToLinearSpace: boolean;
     convertToGammaSpace: boolean;
-    alpha: NodeMaterialConnectionPoint;
-    glow: NodeMaterialConnectionPoint;
+    alpha: BslInput;
+    glow: BslInput;
 };
 
 /**
@@ -58,18 +60,15 @@ export type OutputFragColorOptions = {
  * @param options - Optional properties for the fragment output block.
  * @returns The fragment output block connected to the color.
  */
-export function outputFragColor(
-    colorRgb: NodeMaterialConnectionPoint,
-    options?: Partial<OutputFragColorOptions>,
-): FragmentOutputBlock {
+export function outputFragColor(colorRgb: BslInput, options?: Partial<OutputFragColorOptions>): FragmentOutputBlock {
     const FragmentOutput = new FragmentOutputBlock("FragmentOutput");
     FragmentOutput.target = NodeMaterialBlockTargets.Fragment;
     FragmentOutput.convertToGammaSpace = options?.convertToGammaSpace ?? false;
     FragmentOutput.convertToLinearSpace = options?.convertToLinearSpace ?? false;
 
-    colorRgb.connectTo(FragmentOutput.rgb);
-    options?.alpha?.connectTo(FragmentOutput.a);
-    options?.glow?.connectTo(FragmentOutput.additionalColor);
+    parse(colorRgb).connectTo(FragmentOutput.rgb);
+    parse(options?.alpha)?.connectTo(FragmentOutput.a);
+    parse(options?.glow)?.connectTo(FragmentOutput.additionalColor);
 
     return FragmentOutput;
 }
@@ -80,14 +79,11 @@ export function outputFragColor(
  * @param options - Optional target options.
  * @returns The vertex output block connected to the position.
  */
-export function outputVertexPosition(
-    positionVec4: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): VertexOutputBlock {
+export function outputVertexPosition(positionVec4: BslInput, options?: Partial<TargetOptions>): VertexOutputBlock {
     const VertexOutput = new VertexOutputBlock("VertexOutput");
     VertexOutput.target = options?.target ?? NodeMaterialBlockTargets.Vertex;
 
-    positionVec4.connectTo(VertexOutput.vector);
+    parse(positionVec4, options).connectTo(VertexOutput.vector);
 
     return VertexOutput;
 }

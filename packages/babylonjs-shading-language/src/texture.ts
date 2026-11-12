@@ -27,8 +27,10 @@ import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/n
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 
-import type { TargetOptions } from "./target";
+import { parse } from "./bslInput";
+import type { BslInput } from "./bslInput";
 import { Target } from "./target";
+import type { TargetOptions } from "./target";
 
 export type TextureBlockOptions = TargetOptions & {
     convertToLinearSpace: boolean;
@@ -45,7 +47,7 @@ export type TextureBlockOptions = TargetOptions & {
  */
 export function textureSample(
     texture: NodeMaterialConnectionPoint,
-    uv: NodeMaterialConnectionPoint,
+    uv: BslInput,
     options?: Partial<TextureBlockOptions>,
 ): TextureBlock {
     const textureBlock = new TextureBlock("texture");
@@ -55,7 +57,7 @@ export function textureSample(
     textureBlock.disableLevelMultiplication = options?.disableLevelMultiplication ?? false;
 
     texture.connectTo(textureBlock.source);
-    uv.connectTo(textureBlock.uv);
+    parse(uv, options).connectTo(textureBlock.uv);
 
     return textureBlock;
 }
@@ -80,7 +82,7 @@ export function uniformTexture2d(texture: Texture, options?: Partial<TargetOptio
 }
 
 export type TriPlanarSampleOptions = TargetOptions & {
-    sharpness: NodeMaterialConnectionPoint;
+    sharpness: BslInput;
     convertToLinearSpace: boolean;
     convertToGammaSpace: boolean;
 };
@@ -95,8 +97,8 @@ export type TriPlanarSampleOptions = TargetOptions & {
  */
 export function textureTriPlanarSample(
     texture: NodeMaterialConnectionPoint,
-    position: NodeMaterialConnectionPoint,
-    normal: NodeMaterialConnectionPoint,
+    position: BslInput,
+    normal: BslInput,
     options?: Partial<TriPlanarSampleOptions>,
 ): TriPlanarBlock {
     const triPlanarBlock = new TriPlanarBlock("TriPlanar");
@@ -106,10 +108,10 @@ export function textureTriPlanarSample(
 
     texture.connectTo(triPlanarBlock.source);
 
-    position.connectTo(triPlanarBlock.position);
-    normal.connectTo(triPlanarBlock.normal);
+    parse(position, options).connectTo(triPlanarBlock.position);
+    parse(normal, options).connectTo(triPlanarBlock.normal);
 
-    options?.sharpness?.connectTo(triPlanarBlock.sharpness);
+    parse(options?.sharpness, options)?.connectTo(triPlanarBlock.sharpness);
 
     return triPlanarBlock;
 }
@@ -124,8 +126,8 @@ export function textureTriPlanarSample(
  */
 export function triPlanarMapping(
     textures: [NodeMaterialConnectionPoint?, NodeMaterialConnectionPoint?, NodeMaterialConnectionPoint?],
-    position: NodeMaterialConnectionPoint,
-    normal: NodeMaterialConnectionPoint,
+    position: BslInput,
+    normal: BslInput,
     options?: Partial<TriPlanarSampleOptions>,
 ): TriPlanarBlock {
     const triPlanarBlock = new TriPlanarBlock("TriPlanar");
@@ -139,10 +141,10 @@ export function triPlanarMapping(
     triPlanarBlock.convertToGammaSpace = options?.convertToGammaSpace ?? false;
     triPlanarBlock.convertToLinearSpace = options?.convertToLinearSpace ?? false;
 
-    position.connectTo(triPlanarBlock.position);
-    normal.connectTo(triPlanarBlock.normal);
+    parse(position, options).connectTo(triPlanarBlock.position);
+    parse(normal, options).connectTo(triPlanarBlock.normal);
 
-    options?.sharpness?.connectTo(triPlanarBlock.sharpness);
+    parse(options?.sharpness, options)?.connectTo(triPlanarBlock.sharpness);
 
     return triPlanarBlock;
 }

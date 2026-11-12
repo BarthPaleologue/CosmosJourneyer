@@ -22,12 +22,14 @@
 
 import { ArcTan2Block } from "@babylonjs/core/Materials/Node/Blocks/arcTan2Block";
 import {
-    TrigonometryBlockOperations,
     TrigonometryBlock,
+    TrigonometryBlockOperations,
 } from "@babylonjs/core/Materials/Node/Blocks/trigonometryBlock";
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 
+import { parse } from "./bslInput";
+import type { BslInput } from "./bslInput";
 import type { TargetOptions } from "./target";
 
 /**
@@ -56,16 +58,12 @@ export function trig(
  * @param options - Optional target options.
  * @returns The angle of `(x, y)` in radians, preserving its quadrant.
  */
-export function atan2(
-    x: NodeMaterialConnectionPoint,
-    y: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function atan2(x: BslInput, y: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const atan2Block = new ArcTan2Block("atan2");
     atan2Block.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    x.connectTo(atan2Block.x);
-    y.connectTo(atan2Block.y);
+    parse(x, options).connectTo(atan2Block.x);
+    parse(y, options).connectTo(atan2Block.y);
 
     return atan2Block.output;
 }

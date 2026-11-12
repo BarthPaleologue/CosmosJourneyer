@@ -31,12 +31,11 @@ import { VectorSplitterBlock } from "@babylonjs/core/Materials/Node/Blocks/vecto
 import { NodeMaterialBlockConnectionPointTypes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockConnectionPointTypes";
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
-import type { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
-import { Vector2 } from "@babylonjs/core/Maths/math.vector";
-import type { Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
+import type { Vector2, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 
-import { float } from "./f32";
-import { sub, mul, add } from "./math";
+import { parse } from "./bslInput";
+import type { BslInput } from "./bslInput";
+import { add, mul, oneMinus } from "./math";
 import type { TargetOptions } from "./target";
 import { cos, sin } from "./trigonometry";
 
@@ -49,7 +48,7 @@ export function vec(
     inputVector: Vector2 | Vector3 | Vector4,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
-    const vector = new InputBlock("Mesh UV scale factor");
+    const vector = new InputBlock("vector");
     vector.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
     vector.isConstant = true;
     vector.value = inputVector;
@@ -63,20 +62,16 @@ export function vec(
  * @param options - Optional target options.
  * @returns The composed vec2 as a shader expression.
  */
-export function vec2(
-    x: NodeMaterialConnectionPoint,
-    y: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function vec2(x: BslInput, y: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     return merge({ x, y }, options).xyOut;
 }
 
 type Vec3Input = Partial<{
-    xyz: NodeMaterialConnectionPoint;
-    xy: NodeMaterialConnectionPoint;
-    x: NodeMaterialConnectionPoint;
-    y: NodeMaterialConnectionPoint;
-    z: NodeMaterialConnectionPoint;
+    xyz: BslInput;
+    xy: BslInput;
+    x: BslInput;
+    y: BslInput;
+    z: BslInput;
 }>;
 
 /**
@@ -98,14 +93,14 @@ export function vec4(inputs: MergeInput, options?: Partial<TargetOptions>): Node
 }
 
 type MergeInput = Partial<{
-    xyzw: NodeMaterialConnectionPoint;
-    xyz: NodeMaterialConnectionPoint;
-    xy: NodeMaterialConnectionPoint;
-    zw: NodeMaterialConnectionPoint;
-    x: NodeMaterialConnectionPoint;
-    y: NodeMaterialConnectionPoint;
-    z: NodeMaterialConnectionPoint;
-    w: NodeMaterialConnectionPoint;
+    xyzw: BslInput;
+    xyz: BslInput;
+    xy: BslInput;
+    zw: BslInput;
+    x: BslInput;
+    y: BslInput;
+    z: BslInput;
+    w: BslInput;
 }>;
 
 type MergeOutput = {
@@ -125,14 +120,14 @@ export function merge(inputs: MergeInput, options?: Partial<TargetOptions>): Mer
     const merger = new VectorMergerBlock("Merge");
     merger.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    inputs.xyzw?.connectTo(merger.xyzwIn);
-    inputs.xyz?.connectTo(merger.xyzIn);
-    inputs.xy?.connectTo(merger.xyIn);
-    inputs.zw?.connectTo(merger.zwIn);
-    inputs.x?.connectTo(merger.x);
-    inputs.y?.connectTo(merger.y);
-    inputs.z?.connectTo(merger.z);
-    inputs.w?.connectTo(merger.w);
+    parse(inputs.xyzw, options)?.connectTo(merger.xyzwIn);
+    parse(inputs.xyz, options)?.connectTo(merger.xyzIn);
+    parse(inputs.xy, options)?.connectTo(merger.xyIn);
+    parse(inputs.zw, options)?.connectTo(merger.zwIn);
+    parse(inputs.x, options)?.connectTo(merger.x);
+    parse(inputs.y, options)?.connectTo(merger.y);
+    parse(inputs.z, options)?.connectTo(merger.z);
+    parse(inputs.w, options)?.connectTo(merger.w);
 
     return merger;
 }
@@ -254,15 +249,15 @@ export function length(
  * @returns Distance between the points as a shader expression.
  */
 export function distance(
-    left: NodeMaterialConnectionPoint,
-    right: NodeMaterialConnectionPoint,
+    left: BslInput,
+    right: BslInput,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
     const distanceBlock = new DistanceBlock("distance");
     distanceBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    left.connectTo(distanceBlock.left);
-    right.connectTo(distanceBlock.right);
+    parse(left, options).connectTo(distanceBlock.left);
+    parse(right, options).connectTo(distanceBlock.right);
     return distanceBlock.output;
 }
 
@@ -289,16 +284,12 @@ export function normalize(
  * @param options - Optional target options.
  * @returns Cross product of `left` and `right` as a shader expression.
  */
-export function cross(
-    left: NodeMaterialConnectionPoint,
-    right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function cross(left: BslInput, right: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const crossBlock = new CrossBlock("cross");
     crossBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    left.connectTo(crossBlock.left);
-    right.connectTo(crossBlock.right);
+    parse(left, options).connectTo(crossBlock.left);
+    parse(right, options).connectTo(crossBlock.right);
 
     return crossBlock.output;
 }
@@ -309,16 +300,12 @@ export function cross(
  * @param options - Optional target options.
  * @returns Dot product of `left` and `right` as a shader expression.
  */
-export function dot(
-    left: NodeMaterialConnectionPoint,
-    right: NodeMaterialConnectionPoint,
-    options?: Partial<TargetOptions>,
-): NodeMaterialConnectionPoint {
+export function dot(left: BslInput, right: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const dotBlock = new DotBlock("dot");
     dotBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
 
-    left.connectTo(dotBlock.left);
-    right.connectTo(dotBlock.right);
+    parse(left, options).connectTo(dotBlock.left);
+    parse(right, options).connectTo(dotBlock.right);
 
     return dotBlock.output;
 }
@@ -333,14 +320,14 @@ export function dot(
  * @see https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
  */
 export function rotateAround(
-    vector: NodeMaterialConnectionPoint,
-    axis: NodeMaterialConnectionPoint,
-    theta: NodeMaterialConnectionPoint,
+    vector: BslInput,
+    axis: BslInput,
+    theta: number | NodeMaterialConnectionPoint,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint {
-    const cosTheta = cos(theta, options);
-    const sinTheta = sin(theta, options);
-    const oneMinusCosTheta = sub(float(1, options), cosTheta, options);
+    const cosTheta = typeof theta === "number" ? Math.cos(theta) : cos(theta, options);
+    const sinTheta = typeof theta === "number" ? Math.sin(theta) : sin(theta, options);
+    const oneMinusCosTheta = typeof cosTheta === "number" ? 1 - cosTheta : oneMinus(cosTheta, options);
 
     const term1 = mul(cosTheta, vector, options);
     const term2 = mul(sinTheta, cross(axis, vector, options), options);
