@@ -25,7 +25,7 @@ import type { Mission } from "../missions/mission";
 import type { Spaceship } from "../spaceship/spaceship";
 import type { SystemEntity } from "../systemEntity/systemEntity";
 import type { Anomaly, OrbitalFacility, OrbitalObject } from "../universe/architecture/orbitalObject";
-import type { ILandingPad } from "../universe/orbitalFacility/landingPadManager";
+import type { ILandingPad } from "../universe/orbitalFacility/landingPadProvider";
 import type { StarSystemController } from "../universe/starSystemController";
 import type { SystemTarget } from "../universe/systemTarget";
 import type { Vehicle } from "../vehicle/vehicle";
@@ -187,7 +187,7 @@ export function createVehicleTarget(vehicle: Vehicle): Target {
 function createOrbitalFacilityTargets(orbitalFacility: OrbitalFacility): Array<Target> {
     const out: Array<Target> = [createOrbitalObjectTarget(orbitalFacility)];
 
-    const landingPads = orbitalFacility.getLandingPadManager().getLandingPads();
+    const landingPads = orbitalFacility.getLandingPadProvider().getLandingPads();
     const landingPadTargets = landingPads.flatMap((pad) => createLandingPadTargets(pad));
     out.push(...landingPadTargets);
 
