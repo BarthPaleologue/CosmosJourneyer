@@ -26,6 +26,7 @@ import { createMengerSpongeScene } from "./anomalies/mengerSponge";
 import { createSierpinskiScene } from "./anomalies/sierpinski";
 import { createAsteroidFieldScene } from "./asteroidField";
 import { createAtmosphericScatteringScene } from "./atmosphericScattering";
+import { createAuroraScene } from "./aurora";
 import { createAutomaticLandingScene } from "./automaticLanding";
 import { createButterflyScene } from "./butterfly";
 import { createCharacterDemoScene } from "./character";
@@ -132,6 +133,7 @@ export class PlaygroundRegistry {
         ["customSystem", createCustomSystemScene],
         ["qrScan", createQrScanScene],
         ["teapot", createTeapotScene],
+        ["aurora", createAuroraScene],
     ]);
 
     register(

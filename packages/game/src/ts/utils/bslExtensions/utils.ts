@@ -17,7 +17,7 @@
 
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { abs, add, mod, mul, normalize, remap, splitVec, sub, vec3 } from "babylonjs-shading-language";
+import { abs, add, mod, mul, normalize, remap, sin, splitVec, sub, vec3 } from "babylonjs-shading-language";
 import type { BslInput, TargetOptions } from "babylonjs-shading-language";
 
 /**
@@ -118,4 +118,8 @@ export function scaleTangentNormal(
             z: tangentNormalSplit.z,
         }),
     );
+}
+
+export function sineWave(x: BslInput, angularFrequency: BslInput, phase: BslInput): NodeMaterialConnectionPoint {
+    return sin(add(mul(x, angularFrequency), phase));
 }
