@@ -17,8 +17,8 @@
 
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { abs, add, f, mod, mul, normalize, remap, splitVec, sub, vec, vec3 } from "babylonjs-shading-language";
-import type { TargetOptions } from "babylonjs-shading-language";
+import { abs, add, mod, mul, normalize, remap, splitVec, sub, vec3 } from "babylonjs-shading-language";
+import type { BslInput, TargetOptions } from "babylonjs-shading-language";
 
 /**
  * Builds a repeating triangular waveform from a shader value.
@@ -32,7 +32,7 @@ export function triangleWave3d(
     phase: Vector3,
     period: number,
 ): NodeMaterialConnectionPoint {
-    return abs(sub(mod(add(input, vec(phase)), f(period)), f(period * 0.5)));
+    return abs(sub(mod(add(input, phase), period), period * 0.5));
 }
 
 /**
@@ -43,11 +43,11 @@ export function triangleWave3d(
  */
 export function unpackNormal(
     normalMapSample: NodeMaterialConnectionPoint,
-    options?: Partial<{ normalStrength: NodeMaterialConnectionPoint; invertY: boolean }>,
+    options?: Partial<{ normalStrength: BslInput; invertY: boolean }>,
 ): NodeMaterialConnectionPoint {
     let unpackedNormal = remap(normalMapSample, [0, 1], [-1, 1]);
     if (options?.invertY !== undefined && options.invertY) {
-        unpackedNormal = mul(unpackedNormal, vec(new Vector3(1, -1, 1)));
+        unpackedNormal = mul(unpackedNormal, new Vector3(1, -1, 1));
     }
 
     if (options?.normalStrength !== undefined) {
@@ -57,11 +57,7 @@ export function unpackNormal(
     return unpackedNormal;
 }
 
-type ConnectionPointList = readonly [
-    NodeMaterialConnectionPoint,
-    NodeMaterialConnectionPoint,
-    ...NodeMaterialConnectionPoint[],
-];
+type InputList = readonly [BslInput, BslInput, ...BslInput[]];
 
 /**
  * Adds two or more shader values from left to right.
@@ -69,7 +65,7 @@ type ConnectionPointList = readonly [
  * @param options - Babylon shading-language options forwarded to each addition.
  * @returns Shader connection point containing the sum; undefined later entries are skipped.
  */
-export function addN(inputs: ConnectionPointList, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+export function addN(inputs: InputList, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     let result = add(inputs[0], inputs[1], options);
 
     for (let i = 2; i < inputs.length; i++) {
@@ -90,7 +86,7 @@ export function addN(inputs: ConnectionPointList, options?: Partial<TargetOption
  * @param options - Babylon shading-language options forwarded to each multiplication.
  * @returns Shader connection point containing the product; undefined later entries are skipped.
  */
-export function mulN(inputs: ConnectionPointList, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+export function mulN(inputs: InputList, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     let result = mul(inputs[0], inputs[1], options);
 
     for (let i = 2; i < inputs.length; i++) {
@@ -113,7 +109,7 @@ export function mulN(inputs: ConnectionPointList, options?: Partial<TargetOption
  */
 export function scaleTangentNormal(
     tangentNormal: NodeMaterialConnectionPoint,
-    normalStrength: NodeMaterialConnectionPoint,
+    normalStrength: BslInput,
 ): NodeMaterialConnectionPoint {
     const tangentNormalSplit = splitVec(tangentNormal);
     return normalize(

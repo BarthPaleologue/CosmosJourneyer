@@ -24,8 +24,11 @@ uv.output.connectTo(albedoTexture.uv);
 write that:
 
 ```typescript
-const uv = BSL.vertexAttribute("uv");
-const albedoTexture = BSL.textureSample(Textures.CRATE_ALBEDO, uv, { convertToLinearSpace: true });
+import { builtinAttribute, textureSample, uniformTexture2d } from "babylonjs-shading-language";
+
+const uv = builtinAttribute("uv");
+const albedo = uniformTexture2d(Textures.CRATE_ALBEDO).source;
+const albedoTexture = textureSample(albedo, uv, { convertToLinearSpace: true });
 ```
 
 As you can see the BSL version is much more glsl-like and easier to read and reason about.
@@ -45,9 +48,18 @@ factor.output.connectTo(scaledUV.right);
 Write that:
 
 ```typescript
-const factor = BSL.vec(new Vector2(2, 10));
-const scaledUV = BSL.mul(uv, factor);
+const scaledUV = mul(uv, new Vector2(2, 10));
 ```
+
+Operations that combine shader values accept numbers, Babylon.js vectors, and colors directly:
+
+```typescript
+const scaledUV = mul(uv, 2);
+const albedo = mix(texture.rgb, new Color3(1, 0, 0), 0.5);
+```
+
+Unary operations such as `sin`, `normalize`, and `oneMinus` take shader connections.
+Compute literal-only expressions in JavaScript instead of adding GPU operations.
 
 ## How to use BSL?
 

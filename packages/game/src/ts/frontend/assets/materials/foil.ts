@@ -19,7 +19,6 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Scene } from "@babylonjs/core/scene";
 import {
     builtinAttribute,
-    float,
     getFrontFacing,
     mul,
     outputFragColor,
@@ -54,16 +53,16 @@ export class FoilMaterial {
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
         // Plane-local XY coordinates preserve a ten-metre repeat for sheets of any size.
-        const uv = mul(swizzle(position, "xy"), float(0.1));
+        const uv = mul(swizzle(position, "xy"), 0.1);
         const albedo = textureSample(uniformTexture2d(textures.albedo).source, uv, {
             convertToLinearSpace: true,
         });
         const normalMap = textureSample(uniformTexture2d(textures.normal).source, uv);
         const roughness = textureSample(uniformTexture2d(textures.roughness).source, uv);
-        const { output: perturbedNormal } = perturbNormal(uv, positionW, normalW, normalMap.rgb, float(0.2));
-        const faceSign = sub(float(1), mul(getFrontFacing(), float(2)));
+        const { output: perturbedNormal } = perturbNormal(uv, positionW, normalW, normalMap.rgb, 0.2);
+        const faceSign = sub(1, mul(getFrontFacing(), 2));
 
-        const pbrLighting = pbr(float(1), roughness.r, normalW, view, cameraPosition, positionW, {
+        const pbrLighting = pbr(1, roughness.r, normalW, view, cameraPosition, positionW, {
             albedoRgb: albedo.rgb,
             perturbedNormal: mul(perturbedNormal, faceSign),
             reflection: reflection(position, world),

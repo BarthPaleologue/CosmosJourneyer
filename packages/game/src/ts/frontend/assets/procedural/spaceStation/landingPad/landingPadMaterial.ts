@@ -22,7 +22,6 @@ import type { Scene } from "@babylonjs/core/scene";
 import {
     add,
     builtinAttribute,
-    f,
     length,
     min,
     mix,
@@ -45,7 +44,6 @@ import {
     uniformView,
     uniformViewProjection,
     uniformWorld,
-    vec,
     vec2,
 } from "babylonjs-shading-language";
 
@@ -65,11 +63,11 @@ export class LandingPadMaterial extends NodeMaterial {
         const uv = builtinAttribute("uv");
         const uvSplit = splitVec(uv);
 
-        const centeredUV = splitVec(sub(uv, f(0.5)));
-        const centeredUVScaled = vec2(mul(centeredUV.x, f(Settings.LANDING_PAD_ASPECT_RATIO)), centeredUV.y);
+        const centeredUV = splitVec(sub(uv, 0.5));
+        const centeredUVScaled = vec2(mul(centeredUV.x, Settings.LANDING_PAD_ASPECT_RATIO), centeredUV.y);
 
         const positionXZ = swizzle(position, "xz");
-        const proceduralUV = mul(positionXZ, f(0.1));
+        const proceduralUV = mul(positionXZ, 0.1);
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
@@ -82,36 +80,36 @@ export class LandingPadMaterial extends NodeMaterial {
 
         // Fragment Shader
 
-        const paintAlbedo = vec(Vector3.One());
-        const paintMetallic = f(0);
-        const paintRoughness = f(0.2);
-        const paintAmbientOcclusion = f(1);
+        const paintAlbedo = Vector3.One();
+        const paintMetallic = 0;
+        const paintRoughness = 0.2;
+        const paintAmbientOcclusion = 1;
 
-        const borderThickness = f(0.03);
+        const borderThickness = 0.03;
 
         const borderLeftMask = step(uvSplit.x, borderThickness);
-        const borderRightMask = step(sub(f(1), uvSplit.x), borderThickness);
+        const borderRightMask = step(sub(1, uvSplit.x), borderThickness);
 
         const borderX = add(borderLeftMask, borderRightMask);
 
         const borderTopMask = step(uvSplit.y, borderThickness);
-        const borderBottomMask = step(sub(f(1), uvSplit.y), borderThickness);
+        const borderBottomMask = step(sub(1, uvSplit.y), borderThickness);
 
         const borderY = add(borderTopMask, borderBottomMask);
 
-        const borderWeight = min(add(borderX, borderY), f(1));
+        const borderWeight = min(add(borderX, borderY), 1);
 
-        const circleRadius = f(0.25);
-        const circleThickness = f(0.01);
+        const circleRadius = 0.25;
+        const circleThickness = 0.01;
         const distToCenter = length(centeredUVScaled);
 
         const circleMinRadius = sub(circleRadius, circleThickness);
         const circleMaxRadius = add(circleRadius, circleThickness);
-        const smoothness = f(0.005);
+        const smoothness = 0.005;
 
         const circleMask = mul(
             smoothstep(circleMinRadius, add(circleMinRadius, smoothness), distToCenter),
-            sub(f(1), smoothstep(sub(circleMaxRadius, smoothness), circleMaxRadius, distToCenter)),
+            sub(1, smoothstep(sub(circleMaxRadius, smoothness), circleMaxRadius, distToCenter)),
         );
 
         const fullPaintWeight = add(borderWeight, circleMask);
@@ -138,7 +136,7 @@ export class LandingPadMaterial extends NodeMaterial {
             positionW,
             normalW,
             normalMapValue.rgb,
-            sub(f(1), mul(fullPaintWeight, f(0.8))),
+            sub(1, mul(fullPaintWeight, 0.8)),
         );
 
         const view = uniformView();

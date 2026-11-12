@@ -21,7 +21,6 @@ import type { Scene } from "@babylonjs/core/scene";
 import {
     add,
     builtinAttribute,
-    f,
     getViewDirection,
     outputFragColor,
     outputVertexPosition,
@@ -75,11 +74,11 @@ export class CrateMaterial {
             positionW,
             normalW,
             normalHeightMapValue.rgb,
-            f(1),
+            1,
             {
                 parallax: {
                     viewDirection: viewDirection,
-                    scale: f(0.04),
+                    scale: 0.04,
                 },
             },
         );

@@ -21,7 +21,6 @@ import type { Scene } from "@babylonjs/core/scene";
 import {
     add,
     builtinAttribute,
-    f,
     getViewDirection,
     mul,
     outputFragColor,
@@ -70,7 +69,7 @@ export class TireMaterial {
 
         const splitUV = splitVec(uv);
 
-        const scaling = f(3);
+        const scaling = 3;
         const scaledUV = mul(vec2(splitUV.y, splitUV.x), scaling);
 
         const cameraPosition = uniformCameraPosition();
@@ -83,11 +82,11 @@ export class TireMaterial {
             positionW,
             normalW,
             normalHeightMapValue.rgb,
-            f(1),
+            1,
             {
                 parallax: {
                     viewDirection: viewDirection,
-                    scale: f(0.04),
+                    scale: 0.04,
                 },
             },
         );
@@ -106,7 +105,7 @@ export class TireMaterial {
 
         const view = uniformView();
 
-        const pbrShading = pbr(f(0.0), roughness.r, normalW, view, cameraPosition, positionW, {
+        const pbrShading = pbr(0.0, roughness.r, normalW, view, cameraPosition, positionW, {
             reflection: reflection(position, world),
             albedoRgb: albedo.rgb,
             perturbedNormal,

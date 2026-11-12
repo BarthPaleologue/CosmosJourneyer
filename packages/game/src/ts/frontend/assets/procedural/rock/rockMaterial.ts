@@ -20,7 +20,6 @@ import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Scene } from "@babylonjs/core/scene";
 import {
     builtinAttribute,
-    f,
     getInstanceData,
     mul,
     outputFragColor,
@@ -69,14 +68,14 @@ export class RockMaterial {
 
         const cameraPosition = uniformCameraPosition();
 
-        const rockSamples = triPlanarMaterial(textures, mul(position, f(0.5)), normal, {
-            normalStrength: f(1.0),
+        const rockSamples = triPlanarMaterial(textures, mul(position, 0.5), normal, {
+            normalStrength: 1.0,
         });
 
         const finalNormalW = transformDirection(instanceWorld, rockSamples.normal);
 
         const view = uniformView();
-        const pbrShading = pbr(f(0), rockSamples.roughness, normalW, view, cameraPosition, positionW, {
+        const pbrShading = pbr(0, rockSamples.roughness, normalW, view, cameraPosition, positionW, {
             reflection: reflection(position, instanceWorld),
             albedoRgb: rockSamples.albedo,
             perturbedNormal: finalNormalW,

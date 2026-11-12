@@ -29,7 +29,6 @@ import { AdvancedDynamicTexture, Control, Rectangle, Slider, StackPanel, TextBlo
 import { degreesToRadians } from "@cosmos-journeyer/physics";
 import {
     builtinAttribute,
-    f,
     normalize,
     outputFragColor,
     outputVertexPosition,
@@ -99,7 +98,7 @@ export async function createTriPlanarNormalScene(
     const normalY01 = textureSample(normalTexture, uvY).rgb;
     const normalZ01 = textureSample(normalTexture, uvZ).rgb;
 
-    const normalStrength = f(2.0);
+    const normalStrength = 2.0;
     const invertY = true;
     const tangentNormalX = unpackNormal(normalX01, { normalStrength, invertY });
     const tangentNormalY = unpackNormal(normalY01, { normalStrength, invertY });
@@ -118,7 +117,7 @@ export async function createTriPlanarNormalScene(
 
     const cameraPosition = uniformCameraPosition();
     const view = uniformView();
-    const pbrShading = pbr(f(0.0), f(0.4), normalW, view, cameraPosition, positionW, {
+    const pbrShading = pbr(0.0, 0.4, normalW, view, cameraPosition, positionW, {
         reflection: reflection(position, world),
         perturbedNormal: perturbedNormalW,
     });

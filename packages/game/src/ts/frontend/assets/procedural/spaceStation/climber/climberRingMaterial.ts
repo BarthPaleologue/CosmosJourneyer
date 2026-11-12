@@ -21,7 +21,6 @@ import { Vector2 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
 import {
     builtinAttribute,
-    float,
     mul,
     outputFragColor,
     outputVertexPosition,
@@ -36,7 +35,6 @@ import {
     uniformView,
     uniformViewProjection,
     uniformWorld,
-    vec,
 } from "babylonjs-shading-language";
 
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
@@ -52,7 +50,7 @@ export class ClimberRingMaterial extends NodeMaterial {
         const normal = builtinAttribute("normal");
         const uv = builtinAttribute("uv");
 
-        const meshUVScaleFactor = vec(new Vector2(2, 10));
+        const meshUVScaleFactor = new Vector2(2, 10);
         const proceduralUV = mul(uv, meshUVScaleFactor);
 
         const world = uniformWorld();
@@ -76,7 +74,7 @@ export class ClimberRingMaterial extends NodeMaterial {
         const aoTextureValue = textureSample(aoTexture, proceduralUV);
         const normalTextureValue = textureSample(normalTexture, proceduralUV);
 
-        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalTextureValue.rgb, float(1));
+        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalTextureValue.rgb, 1);
 
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();

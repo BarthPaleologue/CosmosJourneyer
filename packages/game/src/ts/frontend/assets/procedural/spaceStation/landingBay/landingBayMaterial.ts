@@ -23,7 +23,6 @@ import {
     abs,
     atan2,
     builtinAttribute,
-    f,
     fract,
     length,
     mix,
@@ -110,8 +109,8 @@ export class LandingBayMaterial extends NodeMaterial {
 
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
-        const mask = sub(f(1), step(f(0.02), abs(splitVec(normal).y)));
-        const scaledUvY = mul(splitVec(uv).y, mix(f(1.0), f(height), mask));
+        const mask = sub(1, step(0.02, abs(splitVec(normal).y)));
+        const scaledUvY = mul(splitVec(uv).y, mix(1.0, height, mask));
 
         const viewProjection = uniformViewProjection();
         const positionClipSpace = transformPosition(viewProjection, positionW);
@@ -130,7 +129,7 @@ export class LandingBayMaterial extends NodeMaterial {
             [0.0, 1.0],
         );
 
-        const proceduralUvX = mul(theta, f(meanRadius / deltaRadius));
+        const proceduralUvX = mul(theta, meanRadius / deltaRadius);
         const proceduralUV = vec2(proceduralUvX, scaledUvY);
 
         const albedoTexture = uniformTexture2d(textures.albedo).source;
@@ -146,29 +145,29 @@ export class LandingBayMaterial extends NodeMaterial {
         const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
         const occlusion = textureSample(occlusionTexture, proceduralUV);
 
-        const namePlateUvX = mul(theta, f(1.0 / Math.PI));
+        const namePlateUvX = mul(theta, 1.0 / Math.PI);
         const namePlateUvY = distanceToCenter01;
 
         /* if (vNormal.y < 1.0) {
             namePlateUV *= 0.0;
         } */
-        const namePlateUvMask = step(f(1.0), splitVec(normal).y);
-        const namePlateUV = mix(vec2(f(0.0), f(0.0)), vec2(namePlateUvX, namePlateUvY), namePlateUvMask);
+        const namePlateUvMask = step(1.0, splitVec(normal).y);
+        const namePlateUV = mix(vec2(0.0, 0.0), vec2(namePlateUvX, namePlateUvY), namePlateUvMask);
 
         const namePlateColor = textureSample(namePlate, fract(namePlateUV));
         const paintWeight = namePlateColor.a;
 
         const finalAlbedo = mix(albedo.rgb, namePlateColor.rgb, paintWeight);
-        const finalMetallic = mix(metallicRoughness.r, f(0.0), paintWeight);
-        const finalRoughness = mix(metallicRoughness.g, f(0.7), paintWeight);
-        const finalAo = mix(occlusion.r, f(1.0), paintWeight);
+        const finalMetallic = mix(metallicRoughness.r, 0.0, paintWeight);
+        const finalRoughness = mix(metallicRoughness.g, 0.7, paintWeight);
+        const finalAo = mix(occlusion.r, 1.0, paintWeight);
 
         const perturbedNormal = perturbNormal(
             proceduralUV,
             positionW,
             normalW,
             normalMap.rgb,
-            sub(f(1), mul(paintWeight, f(0.7))),
+            sub(1, mul(paintWeight, 0.7)),
         );
 
         const view = uniformView();

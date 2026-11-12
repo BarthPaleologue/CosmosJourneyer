@@ -17,12 +17,12 @@
 
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { BslInput } from "babylonjs-shading-language";
 import {
     abs,
     add,
     div,
     dot,
-    f,
     mix,
     mul,
     normalize,
@@ -31,7 +31,6 @@ import {
     swizzle,
     textureSample,
     uniformTexture2d,
-    vec,
     vec2,
     vec3,
 } from "babylonjs-shading-language";
@@ -59,7 +58,7 @@ export function triPlanarMaterial(
     textures: TerrainTextures,
     samplePoint: NodeMaterialConnectionPoint,
     surfaceNormal: NodeMaterialConnectionPoint,
-    options?: Partial<{ normalStrength: NodeMaterialConnectionPoint; invertNormalY: boolean }>,
+    options?: Partial<{ normalStrength: BslInput; invertNormalY: boolean }>,
 ): TriPlanarMaterialSamples {
     const { uvX, uvY, uvZ } = getTriPlanarUVs(samplePoint);
 
@@ -74,7 +73,7 @@ export function triPlanarMaterial(
     const { rgb: normalZ01, a: ambientOcclusionZ } = textureSample(normalAmbientOcclusionTexture, uvZ);
 
     const invertY = options?.invertNormalY ?? false;
-    const normalStrength = options?.normalStrength ?? f(1);
+    const normalStrength = options?.normalStrength ?? 1;
     const tangentNormalX = unpackNormal(normalX01, { normalStrength, invertY });
     const tangentNormalY = unpackNormal(normalY01, { normalStrength, invertY });
     const tangentNormalZ = unpackNormal(normalZ01, { normalStrength, invertY });
@@ -174,8 +173,8 @@ export function whiteoutBlend(
  * @returns Function that blends X-, Y-, and Z-projection samples with normalized weights.
  */
 export function getTriPlanarBlending(surfaceNormal: NodeMaterialConnectionPoint, blendSharpness: number) {
-    const blendWeights = pow(abs(surfaceNormal), vec(Vector3.One().scaleInPlace(blendSharpness)));
-    const blendWeightsSum = dot(blendWeights, vec(Vector3.One()));
+    const blendWeights = pow(abs(surfaceNormal), Vector3.One().scaleInPlace(blendSharpness));
+    const blendWeightsSum = dot(blendWeights, Vector3.One());
     const normalizedBlendWeights = splitVec(div(blendWeights, blendWeightsSum));
     return (
         sampleX: NodeMaterialConnectionPoint,

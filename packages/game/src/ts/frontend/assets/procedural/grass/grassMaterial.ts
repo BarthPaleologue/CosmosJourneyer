@@ -24,7 +24,6 @@ import {
     builtinAttribute,
     cos,
     distance,
-    f,
     getInstanceData,
     hash11,
     mix,
@@ -86,39 +85,39 @@ export class GrassMaterial {
 
         const windStrength = textureSample(
             noiseTexture,
-            add(mul(f(0.015), instancePositionXZ), mul(f(0.05), elapsedSeconds)),
+            add(mul(0.015, instancePositionXZ), mul(0.05, elapsedSeconds)),
         ).r;
         const windDir = mul(
-            f(2.0 * Math.PI),
-            textureSample(noiseTexture, add(mul(f(0.003), instancePositionXZ), mul(f(0.003), elapsedSeconds))).r,
+            2.0 * Math.PI,
+            textureSample(noiseTexture, add(mul(0.003, instancePositionXZ), mul(0.003, elapsedSeconds))).r,
         );
 
         const windCurveAmount = remap(windStrength, [0, 1], [-0.25, 1]);
 
         const leanAxis = vec3({
             x: cos(windDir),
-            y: f(0.0),
+            y: 0.0,
             z: sin(windDir),
         });
 
-        const maxCurveAngle = f(0.6);
+        const maxCurveAngle = 0.6;
 
         const perBladeCurve = mul(hash, height01);
 
-        const curveAmount = add(mul(perBladeCurve, maxCurveAngle), pow(windCurveAmount, f(2)));
+        const curveAmount = add(mul(perBladeCurve, maxCurveAngle), pow(windCurveAmount, 2));
 
         const curvedNormal = rotateAround(normal, leanAxis, curveAmount);
         const curvedPosition = rotateAround(position, leanAxis, curveAmount);
 
-        const scalingTextureValue = textureSample(noiseTexture, mul(f(0.015), instancePositionXZ)).r;
+        const scalingTextureValue = textureSample(noiseTexture, mul(0.015, instancePositionXZ)).r;
         const scalingFactor = remap(scalingTextureValue, [0, 1], [0.4, 1.0]);
 
         const cameraPosition = uniformCameraPosition();
 
         const bladeCameraDistance = distance(splitVec(instancePosition).xyzOut, cameraPosition);
-        const fadeDistance = add(f(options?.fadeDistance ?? 60.0), mul(hash, f(10.0)));
-        const fadeStartDistance = sub(fadeDistance, f(10.0));
-        const fadeInFactor = sub(f(1.0), smoothstep(fadeStartDistance, fadeDistance, bladeCameraDistance));
+        const fadeDistance = add(options?.fadeDistance ?? 60.0, mul(hash, 10.0));
+        const fadeStartDistance = sub(fadeDistance, 10.0);
+        const fadeInFactor = sub(1.0, smoothstep(fadeStartDistance, fadeDistance, bladeCameraDistance));
 
         const finalScalingFactor = mul(scalingFactor, fadeInFactor);
 
@@ -145,9 +144,9 @@ export class GrassMaterial {
             height01,
         );
 
-        const ambientOcclusion = mix(f(0.7), f(1.0), pow(height01, f(2.0)));
+        const ambientOcclusion = mix(0.7, 1.0, pow(height01, 2.0));
 
-        const pbrShading = pbr(f(0.0), f(0.4), normalW, view, cameraPosition, positionW, {
+        const pbrShading = pbr(0.0, 0.4, normalW, view, cameraPosition, positionW, {
             reflection: reflection(scaledCurvedPosition, instanceWorld),
             albedoRgb,
             ambientOcclusion,

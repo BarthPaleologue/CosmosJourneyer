@@ -25,9 +25,7 @@ import {
     abs,
     add,
     builtinAttribute,
-    color,
     cross,
-    f,
     hash11,
     mod,
     mul,
@@ -123,16 +121,16 @@ export class SpaceDotsMaterial {
             mul(diskSample.x, sin(rollCompensationAngle)),
             mul(diskSample.y, cos(rollCompensationAngle)),
         );
-        const phaseHash = hash11(add(dotIndex, f(47)));
-        const tunnelLength = f(this.tunnelLength);
-        const halfTunnelLength = f(this.tunnelLength / 2);
+        const phaseHash = hash11(add(dotIndex, 47));
+        const tunnelLength = this.tunnelLength;
+        const halfTunnelLength = this.tunnelLength / 2;
         const initialPhase = mul(phaseHash, tunnelLength);
         const translationPhase = mod(add(initialPhase, translationOffset), tunnelLength);
         const translation = sub(translationPhase, halfTunnelLength);
         const centeredDistance = abs(translation);
         const curve01 = remap(centeredDistance, [0, this.tunnelLength / 2], [0, 1]);
         const curveAmount = mul(curve01, curve01);
-        const bendDistance = mul(curveAmount, f(DEFAULT_MAX_BEND));
+        const bendDistance = mul(curveAmount, DEFAULT_MAX_BEND);
         const bendYaw = this.uBendYaw.output;
         const bendPitch = this.uBendPitch.output;
         const localX = add(rotatedDiskSampleX, mul(bendYaw, bendDistance));
@@ -150,7 +148,7 @@ export class SpaceDotsMaterial {
             mul(warpForward, translation),
         ]);
 
-        const width = f(options?.width ?? DEFAULT_WIDTH);
+        const width = options?.width ?? DEFAULT_WIDTH;
         const stretch = remap(
             throttle,
             [0, 1],
@@ -172,7 +170,7 @@ export class SpaceDotsMaterial {
         const viewProjection = uniformViewProjection();
         const vertexPositionClip = transformPosition(viewProjection, vertexPositionWorld);
 
-        const outputColor = color(Color3.White());
+        const outputColor = Color3.White();
 
         this.material.addOutputNode(outputVertexPosition(vertexPositionClip));
         this.material.addOutputNode(outputFragColor(outputColor, { glow: outputColor }));

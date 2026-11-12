@@ -20,7 +20,6 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Scene } from "@babylonjs/core/scene";
 import {
     builtinAttribute,
-    float,
     mul,
     outputFragColor,
     outputVertexPosition,
@@ -53,9 +52,9 @@ export class MetalSectionMaterial extends NodeMaterial {
         const uv = builtinAttribute("uv");
 
         const positionY = splitVec(position).y;
-        const uvY = mul(positionY, float(1 / 50));
+        const uvY = mul(positionY, 1 / 50);
 
-        const scaledUV = mul(uv, float(6.0));
+        const scaledUV = mul(uv, 6.0);
         const proceduralUV = vec2(splitVec(scaledUV).x, uvY);
 
         const world = uniformWorld();
@@ -81,7 +80,7 @@ export class MetalSectionMaterial extends NodeMaterial {
         const ao = textureSample(aoTexture, proceduralUV);
         const normalTextureValue = textureSample(normalTexture, proceduralUV);
 
-        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalTextureValue.rgb, float(1));
+        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalTextureValue.rgb, 1);
 
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();

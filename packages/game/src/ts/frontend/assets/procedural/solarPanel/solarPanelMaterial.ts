@@ -20,7 +20,6 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Scene } from "@babylonjs/core/scene";
 import {
     builtinAttribute,
-    float,
     mul,
     outputFragColor,
     outputVertexPosition,
@@ -49,7 +48,7 @@ export class SolarPanelMaterial extends NodeMaterial {
         const normal = builtinAttribute("normal");
 
         const positionXZ = swizzle(position, "xz");
-        const uv = mul(positionXZ, float(0.1));
+        const uv = mul(positionXZ, 0.1);
 
         const world = uniformWorld();
         const positionW = transformPosition(world, position);
@@ -64,7 +63,7 @@ export class SolarPanelMaterial extends NodeMaterial {
 
         const normalHeightTexture = uniformTexture2d(textures.normal).source;
         const normalHeightMapValue = textureSample(normalHeightTexture, uv);
-        const { output: perturbedNormal } = perturbNormal(uv, positionW, normalW, normalHeightMapValue.rgb, float(1));
+        const { output: perturbedNormal } = perturbNormal(uv, positionW, normalW, normalHeightMapValue.rgb, 1);
 
         const albedoTexture = uniformTexture2d(textures.albedo).source;
         const metallicTexture = uniformTexture2d(textures.metallic).source;
