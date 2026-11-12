@@ -26,7 +26,6 @@ import {
     cos,
     discardTest,
     div,
-    f,
     fract,
     getInstanceData,
     hash11,
@@ -52,7 +51,6 @@ import {
     uniformView,
     uniformViewProjection,
     uniformWorld,
-    vec,
     vec3,
 } from "babylonjs-shading-language";
 
@@ -84,24 +82,24 @@ export class ButterflyMaterial {
         const scaledPosition = mul(position, scaling);
 
         const flappingPeriod = remap(hash, [0, 1], [0.25, 0.75]);
-        const flappingOmega = div(f(2 * Math.PI), flappingPeriod);
-        const phase = mul(hash, f(2 * Math.PI));
+        const flappingOmega = div(2 * Math.PI, flappingPeriod);
+        const phase = mul(hash, 2 * Math.PI);
         const wingFlapJitter = sin(add(mul(flappingOmega, elapsedSeconds), phase));
 
-        const movementY = add(sin(add(mul(f(0.2), elapsedSeconds), phase)), f(3));
+        const movementY = add(sin(add(mul(0.2, elapsedSeconds), phase)), 3);
 
         const wingAngleShape = abs(cos(add(mul(flappingOmega, elapsedSeconds), phase)));
-        const wingAngle = remap(sub(f(1), wingAngleShape), [0, 1], [-0.7, 1]);
+        const wingAngle = remap(sub(1, wingAngleShape), [0, 1], [-0.7, 1]);
 
         const splitPosition = splitVec(position);
-        const butterflyForward = vec(new Vector3(1, 0, 0));
+        const butterflyForward = new Vector3(1, 0, 0);
 
         const signedWingAngle = mul(sign(splitPosition.z), wingAngle);
         const flappingPosition = rotateAround(scaledPosition, butterflyForward, signedWingAngle);
 
         const flappingNormal = rotateAround(normal, butterflyForward, signedWingAngle);
 
-        const totalMovementY = add(mul(f(0.3), movementY), mul(mul(scaling, f(0.2)), wingFlapJitter));
+        const totalMovementY = add(mul(0.3, movementY), mul(mul(scaling, 0.2), wingFlapJitter));
 
         const splitFlappingPosition = splitVec(flappingPosition);
 
@@ -112,9 +110,9 @@ export class ButterflyMaterial {
         });
         const rotationAngle = cos(elapsedSeconds);
 
-        const position3 = rotateAround(position2, vec(Vector3.Up()), rotationAngle);
+        const position3 = rotateAround(position2, Vector3.Up(), rotationAngle);
 
-        const finalNormal = rotateAround(flappingNormal, vec(Vector3.Up()), rotationAngle);
+        const finalNormal = rotateAround(flappingNormal, Vector3.Up(), rotationAngle);
 
         const positionW = transformPosition(instanceWorld, position3);
         const normalW = transformDirection(instanceWorld, finalNormal);
@@ -127,7 +125,7 @@ export class ButterflyMaterial {
         const albedoTexture = uniformTexture2d(butterflyTexture).source;
         const albedo = textureSample(albedoTexture, uv);
 
-        discardTest(albedo.a, f(0.1));
+        discardTest(albedo.a, 0.1);
 
         const albedoHsl = rgbToHsl(albedo.rgb);
         const splitAlbedoHsl = splitVec(albedoHsl);
@@ -138,12 +136,12 @@ export class ButterflyMaterial {
 
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
-        const shading = pbr(f(0), f(1), normalW, view, cameraPosition, positionW, {
+        const shading = pbr(0, 1, normalW, view, cameraPosition, positionW, {
             albedoRgb: shiftedAlbedo,
             reflection: reflection(position3, instanceWorld),
         });
 
-        const ambient = mul(f(0.8), shiftedAlbedo);
+        const ambient = mul(0.8, shiftedAlbedo);
 
         const fragOutput = outputFragColor(add(ambient, shading.lighting), { alpha: albedo.a });
 

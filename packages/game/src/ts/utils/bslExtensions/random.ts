@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
-import { add, cos, f, hash11, mul, remap, sin, sqrt } from "babylonjs-shading-language";
+import { add, cos, hash11, mul, remap, sin, sqrt } from "babylonjs-shading-language";
 
 export type DiskSampleOptions = {
     minRadius: number;
@@ -33,11 +33,11 @@ export function sampleDisk(
     id: NodeMaterialConnectionPoint,
     options: DiskSampleOptions,
 ): { x: NodeMaterialConnectionPoint; y: NodeMaterialConnectionPoint } {
-    const radiusHash = hash11(add(id, f(11)));
-    const thetaHash = hash11(add(id, f(29)));
+    const radiusHash = hash11(add(id, 11));
+    const thetaHash = hash11(add(id, 29));
 
     const radius = remap(sqrt(radiusHash), [0, 1], [options.minRadius, options.maxRadius]);
-    const theta = mul(thetaHash, f(2.0 * Math.PI));
+    const theta = mul(thetaHash, 2.0 * Math.PI);
 
     return {
         x: mul(radius, cos(theta)),

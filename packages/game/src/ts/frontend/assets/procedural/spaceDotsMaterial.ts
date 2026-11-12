@@ -25,9 +25,7 @@ import {
     abs,
     add,
     builtinAttribute,
-    color,
     cross,
-    f,
     hash11,
     mod,
     mul,
@@ -43,7 +41,7 @@ import {
     swizzle,
     transformPosition,
     uniformCameraPosition,
-    uniformFloat,
+    uniformF32,
     uniformViewProjection,
     uniformWorld,
     instanceIndex,
@@ -96,13 +94,13 @@ export class SpaceDotsMaterial {
         this.material = new NodeMaterial("SpaceDotsMaterial", scene);
         this.material.backFaceCulling = false;
 
-        this.uTranslationOffset = uniformFloat("uTranslationOffset", { defaultValue: 0 });
-        this.uThrottle = uniformFloat("uThrottle", { defaultValue: 0 });
+        this.uTranslationOffset = uniformF32("uTranslationOffset", { defaultValue: 0 });
+        this.uThrottle = uniformF32("uThrottle", { defaultValue: 0 });
         this.uWarpForward = createUniformVector3("uWarpForward", new Vector3(0, 0, 1));
         this.uSteeringUp = createUniformVector3("uSteeringUp", new Vector3(0, 1, 0));
-        this.uRollCompensationAngle = uniformFloat("uRollCompensationAngle", { defaultValue: 0 });
-        this.uBendYaw = uniformFloat("uBendYaw", { defaultValue: 0 });
-        this.uBendPitch = uniformFloat("uBendPitch", { defaultValue: 0 });
+        this.uRollCompensationAngle = uniformF32("uRollCompensationAngle", { defaultValue: 0 });
+        this.uBendYaw = uniformF32("uBendYaw", { defaultValue: 0 });
+        this.uBendPitch = uniformF32("uBendPitch", { defaultValue: 0 });
 
         const position = builtinAttribute("position");
         const dotIndex = instanceIndex();
@@ -123,16 +121,16 @@ export class SpaceDotsMaterial {
             mul(diskSample.x, sin(rollCompensationAngle)),
             mul(diskSample.y, cos(rollCompensationAngle)),
         );
-        const phaseHash = hash11(add(dotIndex, f(47)));
-        const tunnelLength = f(this.tunnelLength);
-        const halfTunnelLength = f(this.tunnelLength / 2);
+        const phaseHash = hash11(add(dotIndex, 47));
+        const tunnelLength = this.tunnelLength;
+        const halfTunnelLength = this.tunnelLength / 2;
         const initialPhase = mul(phaseHash, tunnelLength);
         const translationPhase = mod(add(initialPhase, translationOffset), tunnelLength);
         const translation = sub(translationPhase, halfTunnelLength);
         const centeredDistance = abs(translation);
         const curve01 = remap(centeredDistance, [0, this.tunnelLength / 2], [0, 1]);
         const curveAmount = mul(curve01, curve01);
-        const bendDistance = mul(curveAmount, f(DEFAULT_MAX_BEND));
+        const bendDistance = mul(curveAmount, DEFAULT_MAX_BEND);
         const bendYaw = this.uBendYaw.output;
         const bendPitch = this.uBendPitch.output;
         const localX = add(rotatedDiskSampleX, mul(bendYaw, bendDistance));
@@ -150,7 +148,7 @@ export class SpaceDotsMaterial {
             mul(warpForward, translation),
         ]);
 
-        const width = f(options?.width ?? DEFAULT_WIDTH);
+        const width = options?.width ?? DEFAULT_WIDTH;
         const stretch = remap(
             throttle,
             [0, 1],
@@ -172,7 +170,7 @@ export class SpaceDotsMaterial {
         const viewProjection = uniformViewProjection();
         const vertexPositionClip = transformPosition(viewProjection, vertexPositionWorld);
 
-        const outputColor = color(Color3.White());
+        const outputColor = Color3.White();
 
         this.material.addOutputNode(outputVertexPosition(vertexPositionClip));
         this.material.addOutputNode(outputFragColor(outputColor, { glow: outputColor }));

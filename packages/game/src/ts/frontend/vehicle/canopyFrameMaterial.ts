@@ -20,7 +20,6 @@ import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import type { Scene } from "@babylonjs/core/scene";
 import {
     builtinAttribute,
-    f,
     mul,
     outputFragColor,
     outputVertexPosition,
@@ -64,7 +63,7 @@ export class CanopyFrameMaterial {
 
         const vertexOutput = outputVertexPosition(positionClipSpace);
 
-        const samplePosition = mul(position, f(1.0));
+        const samplePosition = mul(position, 1.0);
 
         const albedoTexture = uniformTexture2d(textures.albedo).source;
         const normalTexture = uniformTexture2d(textures.normal).source;
@@ -83,9 +82,9 @@ export class CanopyFrameMaterial {
 
         const view = uniformView();
 
-        const perturbedNormal = perturbNormal(uv, positionW, normalW, normalMapValue.rgb, f(1));
+        const perturbedNormal = perturbNormal(uv, positionW, normalW, normalMapValue.rgb, 1);
 
-        const pbrShading = pbr(f(0.0), roughness.r, normalW, view, cameraPosition, positionW, {
+        const pbrShading = pbr(0.0, roughness.r, normalW, view, cameraPosition, positionW, {
             reflection: reflection(position, world),
             albedoRgb: albedo.rgb,
             perturbedNormal: perturbedNormal.output,

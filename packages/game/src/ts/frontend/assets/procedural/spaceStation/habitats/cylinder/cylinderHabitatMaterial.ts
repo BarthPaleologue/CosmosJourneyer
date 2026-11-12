@@ -22,7 +22,6 @@ import {
     abs,
     atan2,
     builtinAttribute,
-    f,
     length,
     mix,
     mul,
@@ -70,8 +69,8 @@ export class CylinderHabitatMaterial extends NodeMaterial {
 
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
-        const mask = sub(f(1), step(f(0.02), abs(splitVec(normal).y)));
-        const scaledUvY = mul(splitVec(uv).y, mix(f(1.0), f(height / sectorSize), mask));
+        const mask = sub(1, step(0.02, abs(splitVec(normal).y)));
+        const scaledUvY = mul(splitVec(uv).y, mix(1.0, height / sectorSize, mask));
 
         const viewProjection = uniformViewProjection();
         const positionClipSpace = transformPosition(viewProjection, positionW);
@@ -82,7 +81,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
 
         const theta = atan2(splitPosition.z, splitPosition.x, { target: Target.FRAG });
         const positionXZ = vec2(splitPosition.x, splitPosition.z);
-        const distanceToCenter = mul(length(positionXZ, { target: Target.FRAG }), f(1.0 / sectorSize));
+        const distanceToCenter = mul(length(positionXZ, { target: Target.FRAG }), 1.0 / sectorSize);
 
         const proceduralUvX = remap(theta, [0, 2 * Math.PI], [0, nbSectors]);
         const proceduralUvY = mix(distanceToCenter, scaledUvY, mask);
@@ -100,7 +99,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
         const occlusion = textureSample(occlusionTexture, proceduralUV);
 
-        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, f(1));
+        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, 1);
 
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();

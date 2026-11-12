@@ -32,7 +32,6 @@ import {
     builtinAttribute,
     distance,
     dot,
-    f,
     length,
     mix,
     mul,
@@ -54,7 +53,6 @@ import {
     uniformView,
     uniformViewProjection,
     uniformWorld,
-    vec,
 } from "babylonjs-shading-language";
 
 import type { TerrainTextures } from "@/frontend/assets/textures/terrains";
@@ -107,12 +105,12 @@ export class TelluricPlanetMaterial {
         const normalPlanetSpace = normal;
         const gravityUpPlanetSpace = normalize(positionPlanetSpace);
 
-        const northPlanetSpace = vec(Vector3.Up());
+        const northPlanetSpace = Vector3.Up();
         const cosLatitude = dot(gravityUpPlanetSpace, northPlanetSpace); // [-1, 1]
         const equatorFactor = oneMinus(abs(cosLatitude)); // 1 at equator, 0 at poles
         const elevationAboveSeaLevel = sub(
             length(positionPlanetSpace),
-            f(planetModel.radius + (planetModel.ocean?.depth ?? 0)),
+            planetModel.radius + (planetModel.ocean?.depth ?? 0),
         );
 
         const poleTemperature = planetModel.temperature.min;
@@ -120,10 +118,10 @@ export class TelluricPlanetMaterial {
 
         const canHaveLiquidWater = planetModel.ocean !== null;
 
-        const seaLevelTemperature = mix(f(poleTemperature), f(equatorTemperature), equatorFactor);
+        const seaLevelTemperature = mix(poleTemperature, equatorTemperature, equatorFactor);
         const atmosphereStrength = 0.7; // will be a parameter
         const temperatureHeightFalloff = lerp(0.0, 0.0065, atmosphereStrength); // K per meter
-        const altitudeCooling = mul(elevationAboveSeaLevel, f(temperatureHeightFalloff));
+        const altitudeCooling = mul(elevationAboveSeaLevel, temperatureHeightFalloff);
         const temperature = sub(seaLevelTemperature, altitudeCooling);
 
         const samplePointPlanetSpace = triangleWave3d(positionPlanetSpace, new Vector3(-132.0, 17.0, 53.0), 2048.0);
@@ -132,7 +130,7 @@ export class TelluricPlanetMaterial {
         const distanceToCamera = distance(swizzle(positionW, "xyz"), cameraPosition);
 
         // Fade normals in the distance to smooth visual noise
-        const normalStrength = oneMinus(smoothstep(f(300), f(350), distanceToCamera));
+        const normalStrength = oneMinus(smoothstep(300, 350, distanceToCamera));
 
         let worldType: WorldType = "airless";
         if (canHaveLiquidWater) {
@@ -180,13 +178,13 @@ export class TelluricPlanetMaterial {
                 assertUnreachable(worldType);
         }
 
-        const normalPlanetSmoothing = mul(smoothstep(f(300e3), f(600e3), distanceToCamera), f(0.6));
+        const normalPlanetSmoothing = mul(smoothstep(300e3, 600e3, distanceToCamera), 0.6);
         const finalNormal = mix(finalSamples.normal, gravityUpPlanetSpace, normalPlanetSmoothing);
 
         const finalNormalW = transformDirection(world, finalNormal);
 
         const view = uniformView();
-        const pbrShading = pbr(f(0), finalSamples.roughness, normalW, view, cameraPosition, positionW, {
+        const pbrShading = pbr(0, finalSamples.roughness, normalW, view, cameraPosition, positionW, {
             reflection: reflection(position, world),
             albedoRgb: finalSamples.albedo,
             perturbedNormal: finalNormalW,
@@ -213,36 +211,36 @@ export class TelluricPlanetMaterial {
             noise: Texture;
         },
     ): TriPlanarMaterialSamples {
-        const rockSamples = triPlanarMaterial(textures.rock, mul(samplePointPlanetSpace, f(0.1)), normalPlanetSpace, {
+        const rockSamples = triPlanarMaterial(textures.rock, mul(samplePointPlanetSpace, 0.1), normalPlanetSpace, {
             normalStrength,
         });
 
-        const snowSamples = triPlanarMaterial(textures.snow, mul(samplePointPlanetSpace, f(0.1)), normalPlanetSpace, {
+        const snowSamples = triPlanarMaterial(textures.snow, mul(samplePointPlanetSpace, 0.1), normalPlanetSpace, {
             normalStrength,
         });
 
         const noiseTexture = uniformTexture2d(textures.noise).source;
         const noiseSample = textureTriPlanarSample(
             noiseTexture,
-            mul(samplePointPlanetSpace, f(0.0009)),
+            mul(samplePointPlanetSpace, 0.0009),
             normalPlanetSpace,
         );
-        const noiseValue = dot(noiseSample.rgba, vec(new Vector4(0.5, 0.25, 0.125, 0.0625)));
+        const noiseValue = dot(noiseSample.rgba, new Vector4(0.5, 0.25, 0.125, 0.0625));
 
-        const detailedFlatnessNormal = normalize(mix(rockSamples.normal, normalPlanetSpace, f(0.9)));
+        const detailedFlatnessNormal = normalize(mix(rockSamples.normal, normalPlanetSpace, 0.9));
         const detailedFlatness = dot(detailedFlatnessNormal, gravityUpPlanetSpace);
         const flatnessFactorOffset = remap(noiseValue, [0, 1], [-0.2, 0.2]);
-        const flatnessFactor = smoothstep(f(0.85), f(1.0), add(detailedFlatness, flatnessFactorOffset));
+        const flatnessFactor = smoothstep(0.85, 1.0, add(detailedFlatness, flatnessFactorOffset));
 
-        const iceSublimationTemperature = f(170); // in Kelvin
+        const iceSublimationTemperature = 170; // in Kelvin
         const temperatureFactorOffset = remap(noiseValue, [0, 1], [-1, 1]);
         const temperatureFactor = smoothstep(
             iceSublimationTemperature,
-            add(iceSublimationTemperature, f(10)),
+            add(iceSublimationTemperature, 10),
             add(temperature, temperatureFactorOffset),
         );
 
-        const surfaceIceAmount = smoothstep(f(0.0), f(0.1), f(iceMassFraction));
+        const surfaceIceAmount = smoothstep(0.0, 0.1, iceMassFraction);
         const snowWeight = mul(surfaceIceAmount, oneMinus(temperatureFactor));
         const flatSamples = mixTriPlanarSamples(rockSamples, snowSamples, snowWeight);
 
@@ -265,65 +263,58 @@ export class TelluricPlanetMaterial {
             noise: Texture;
         },
     ): TriPlanarMaterialSamples {
-        const grassSamples = triPlanarMaterial(textures.grass, mul(samplePointPlanetSpace, f(0.1)), normalPlanetSpace, {
+        const grassSamples = triPlanarMaterial(textures.grass, mul(samplePointPlanetSpace, 0.1), normalPlanetSpace, {
             normalStrength,
         });
 
-        const rockSamples = triPlanarMaterial(textures.rock, mul(samplePointPlanetSpace, f(0.1)), normalPlanetSpace, {
+        const rockSamples = triPlanarMaterial(textures.rock, mul(samplePointPlanetSpace, 0.1), normalPlanetSpace, {
             normalStrength,
         });
 
-        const snowSamples = triPlanarMaterial(textures.snow, mul(samplePointPlanetSpace, f(0.1)), normalPlanetSpace, {
+        const snowSamples = triPlanarMaterial(textures.snow, mul(samplePointPlanetSpace, 0.1), normalPlanetSpace, {
             normalStrength,
         });
 
-        const sandSamples = triPlanarMaterial(textures.sand, mul(samplePointPlanetSpace, f(0.1)), normalPlanetSpace, {
+        const sandSamples = triPlanarMaterial(textures.sand, mul(samplePointPlanetSpace, 0.1), normalPlanetSpace, {
             normalStrength,
         });
 
         const noiseTexture = uniformTexture2d(textures.noise).source;
         const noiseSample = textureTriPlanarSample(
             noiseTexture,
-            mul(samplePointPlanetSpace, f(0.0009)),
+            mul(samplePointPlanetSpace, 0.0009),
             normalPlanetSpace,
         );
-        const noiseValue = dot(noiseSample.rgba, vec(new Vector4(0.5, 0.25, 0.125, 0.0625)));
+        const noiseValue = dot(noiseSample.rgba, new Vector4(0.5, 0.25, 0.125, 0.0625));
 
         const wetnessSample = textureTriPlanarSample(
             noiseTexture,
-            mul(gravityUpPlanetSpace, f(0.1)),
+            mul(gravityUpPlanetSpace, 0.1),
             gravityUpPlanetSpace,
         );
-        const wetnessValue = dot(wetnessSample.rgba, vec(new Vector4(0.5, 0.25, 0.125, 0.0625)));
+        const wetnessValue = dot(wetnessSample.rgba, new Vector4(0.5, 0.25, 0.125, 0.0625));
         const wetnessThreshold = 0.45;
         const wetnessStd = 0.02;
-        let wetnessFactor = smoothstep(
-            f(wetnessThreshold - wetnessStd),
-            f(wetnessThreshold + wetnessStd),
-            wetnessValue,
-        );
+        let wetnessFactor = smoothstep(wetnessThreshold - wetnessStd, wetnessThreshold + wetnessStd, wetnessValue);
         // high temperature cutoff
-        wetnessFactor = mul(
-            wetnessFactor,
-            oneMinus(smoothstep(f(celsiusToKelvin(35)), f(celsiusToKelvin(45)), temperature)),
-        );
+        wetnessFactor = mul(wetnessFactor, oneMinus(smoothstep(celsiusToKelvin(35), celsiusToKelvin(45), temperature)));
 
         const temperatureFactorOffset = remap(noiseValue, [0, 1], [-1, 1]);
-        const temperatureFactor = smoothstep(f(272.95), f(273.05), add(temperature, temperatureFactorOffset));
+        const temperatureFactor = smoothstep(272.95, 273.05, add(temperature, temperatureFactorOffset));
 
-        const detailedFlatnessNormal = normalize(mix(rockSamples.normal, normalPlanetSpace, f(0.9)));
+        const detailedFlatnessNormal = normalize(mix(rockSamples.normal, normalPlanetSpace, 0.9));
         const detailedFlatness = dot(detailedFlatnessNormal, gravityUpPlanetSpace);
         const flatnessFactorOffset = remap(noiseValue, [0, 1], [-0.2, 0.2]);
-        const flatnessFactor = smoothstep(f(0.85), f(1.0), add(detailedFlatness, flatnessFactorOffset));
+        const flatnessFactor = smoothstep(0.85, 1.0, add(detailedFlatness, flatnessFactorOffset));
 
         let flatSamples = mixTriPlanarSamples(sandSamples, grassSamples, wetnessFactor);
         if (oceanDepth !== undefined) {
             const beachElevationSpan = BeachElevationSpan;
-            const beachElevationStart = f(-beachElevationSpan / 2);
-            const beachElevationEnd = f(beachElevationSpan / 2);
+            const beachElevationStart = -beachElevationSpan / 2;
+            const beachElevationEnd = beachElevationSpan / 2;
             const beachWeight = mul(
-                smoothstep(beachElevationStart, f(0), elevationAboveSeaLevel),
-                oneMinus(smoothstep(f(0), beachElevationEnd, elevationAboveSeaLevel)),
+                smoothstep(beachElevationStart, 0, elevationAboveSeaLevel),
+                oneMinus(smoothstep(0, beachElevationEnd, elevationAboveSeaLevel)),
             );
             flatSamples = mixTriPlanarSamples(flatSamples, sandSamples, beachWeight);
         }
@@ -346,33 +337,33 @@ export class TelluricPlanetMaterial {
             noise: Texture;
         },
     ): TriPlanarMaterialSamples {
-        const rockSamples = triPlanarMaterial(textures.rock, mul(samplePointPlanetSpace, f(0.1)), normalPlanetSpace, {
+        const rockSamples = triPlanarMaterial(textures.rock, mul(samplePointPlanetSpace, 0.1), normalPlanetSpace, {
             normalStrength,
         });
 
-        const snowSamples = triPlanarMaterial(textures.snow, mul(samplePointPlanetSpace, f(0.1)), normalPlanetSpace, {
+        const snowSamples = triPlanarMaterial(textures.snow, mul(samplePointPlanetSpace, 0.1), normalPlanetSpace, {
             normalStrength,
         });
 
-        const sandSamples = triPlanarMaterial(textures.sand, mul(samplePointPlanetSpace, f(0.1)), normalPlanetSpace, {
+        const sandSamples = triPlanarMaterial(textures.sand, mul(samplePointPlanetSpace, 0.1), normalPlanetSpace, {
             normalStrength,
         });
 
         const noiseTexture = uniformTexture2d(textures.noise).source;
         const noiseSample = textureTriPlanarSample(
             noiseTexture,
-            mul(samplePointPlanetSpace, f(0.0009)),
+            mul(samplePointPlanetSpace, 0.0009),
             normalPlanetSpace,
         );
-        const noiseValue = dot(noiseSample.rgba, vec(new Vector4(0.5, 0.25, 0.125, 0.0625)));
+        const noiseValue = dot(noiseSample.rgba, new Vector4(0.5, 0.25, 0.125, 0.0625));
 
         const temperatureFactorOffset = remap(noiseValue, [0, 1], [-1, 1]);
-        const temperatureFactor = smoothstep(f(272.95), f(273.05), add(temperature, temperatureFactorOffset));
+        const temperatureFactor = smoothstep(272.95, 273.05, add(temperature, temperatureFactorOffset));
 
-        const detailedFlatnessNormal = normalize(mix(rockSamples.normal, normalPlanetSpace, f(0.9)));
+        const detailedFlatnessNormal = normalize(mix(rockSamples.normal, normalPlanetSpace, 0.9));
         const detailedFlatness = dot(detailedFlatnessNormal, gravityUpPlanetSpace);
         const flatnessFactorOffset = remap(noiseValue, [0, 1], [-0.2, 0.2]);
-        const flatnessFactor = smoothstep(f(0.85), f(1.0), add(detailedFlatness, flatnessFactorOffset));
+        const flatnessFactor = smoothstep(0.85, 1.0, add(detailedFlatness, flatnessFactorOffset));
 
         const flatSamples = mixTriPlanarSamples(snowSamples, sandSamples, temperatureFactor);
 

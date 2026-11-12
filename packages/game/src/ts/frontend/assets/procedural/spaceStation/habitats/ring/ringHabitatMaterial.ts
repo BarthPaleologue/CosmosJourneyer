@@ -21,7 +21,6 @@ import type { Scene } from "@babylonjs/core/scene";
 import {
     abs,
     builtinAttribute,
-    f,
     mix,
     mul,
     outputFragColor,
@@ -59,11 +58,11 @@ export class RingHabitatMaterial extends NodeMaterial {
         const normalW = transformDirection(world, normal);
 
         const splitUV = splitVec(uv);
-        const scaledUvX = mul(splitUV.x, f((2.0 * Math.PI * meanRadius) / deltaRadius));
+        const scaledUvX = mul(splitUV.x, (2.0 * Math.PI * meanRadius) / deltaRadius);
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
-        const mask = sub(f(1), step(f(0.02), abs(splitVec(normal).y)));
-        const scaledUvY = mul(splitUV.y, mix(f(1.0), f(height / deltaRadius), mask));
+        const mask = sub(1, step(0.02, abs(splitVec(normal).y)));
+        const scaledUvY = mul(splitUV.y, mix(1.0, height / deltaRadius, mask));
         const proceduralUV = vec2(scaledUvX, scaledUvY);
 
         const viewProjection = uniformViewProjection();
@@ -85,7 +84,7 @@ export class RingHabitatMaterial extends NodeMaterial {
         const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
         const occlusion = textureSample(occlusionTexture, proceduralUV);
 
-        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, f(1));
+        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, 1);
 
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
