@@ -17,11 +17,14 @@
 
 import type { Orbit, OrbitalObjectId, SpinModel } from "@cosmos-journeyer/universe-model";
 
-export type SystemEntityModel<TContent extends SystemContentModel = SystemContentModel> = {
+export type SystemEntityModel<
+    TContent extends SystemContentModel = SystemContentModel,
+    TPlacement extends SystemEntityPlacementModel = SystemEntityPlacementModel,
+> = {
     id: string;
     name: string;
     content: TContent;
-    placement: SystemEntityPlacementModel;
+    placement: TPlacement;
 };
 
 export type SystemContentModel<T extends string = string> = {

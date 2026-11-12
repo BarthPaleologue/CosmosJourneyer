@@ -30,7 +30,7 @@ export const SpaceTelescopesModule: GameModule = {
     setup: ({ systemEntities, targeting, rendering }): void => {
         const type = makeSystemContentType<SpaceTelescopeModel, SpaceTelescope>("spaceTelescope");
         systemEntities.registerContentFactory(type, (model, { scene, assets }) => {
-            const parsed = SpaceTelescopeModelSchema.safeParse(model);
+            const parsed = SpaceTelescopeModelSchema.safeParse(model.content);
             if (!parsed.success) {
                 return err(new Error(`Invalid space telescope model: ${parsed.error.message}`));
             }
