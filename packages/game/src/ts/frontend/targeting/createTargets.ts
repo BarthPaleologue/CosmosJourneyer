@@ -250,23 +250,28 @@ function createClimberTargets(climber: SpaceElevatorClimber): Array<Target> {
 }
 
 /**
- * Finds current-system objects referenced by mission guidance.
- * @param missions Missions that provide guidance object identifiers.
- * @param starSystem Current system used to resolve those identifiers.
- * @returns Targets for guidance objects that exist in the current system.
+ * @param missions Active missions supplying guidance identifiers.
+ * @param starSystem Current system containing the guidance objects.
+ * @param systemEntityTargetFactory Module targets for an entity.
+ * @returns Guidance targets available in the current system.
  */
 export function getMissionKnownTargets(
     missions: ReadonlyArray<Pick<Mission, "getGuidanceTargetObjectIds">>,
-    starSystem: Pick<StarSystemController, "getOrbitalObjectById"> & {
+    starSystem: Pick<StarSystemController, "getOrbitalObjectById" | "getSystemEntities"> & {
         readonly model: Pick<StarSystemController["model"], "coordinates">;
     },
+    systemEntityTargetFactory: SystemEntityTargetFactory,
 ): Array<Target> {
     const relevantObjectIds = missions
         .flatMap((mission) => mission.getGuidanceTargetObjectIds())
         .filter((objectId) => starSystemCoordinatesEquals(objectId.systemCoordinates, starSystem.model.coordinates));
 
-    return relevantObjectIds
-        .map((objectId) => starSystem.getOrbitalObjectById(objectId.idInSystem))
-        .filter((object) => object !== undefined)
-        .map((object) => createOrbitalObjectTarget(object));
+    return relevantObjectIds.flatMap((objectId) => {
+        const body = starSystem.getOrbitalObjectById(objectId.idInSystem);
+        if (body !== undefined) {
+            return [createOrbitalObjectTarget(body)];
+        }
+        const entity = starSystem.getSystemEntities().find((candidate) => candidate.model.id === objectId.idInSystem);
+        return entity === undefined ? [] : systemEntityTargetFactory(entity);
+    });
 }

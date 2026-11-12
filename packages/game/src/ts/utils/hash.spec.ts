@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import { hashArray } from "./hash";
+import { hashArray, hashString } from "./hash";
 
 describe("hashArray", () => {
     it("should return a number between 0 and 1", () => {
@@ -57,5 +57,15 @@ describe("hashArray", () => {
         expect(hash1).not.toEqual(hash2);
         expect(hash1).not.toEqual(hash3);
         expect(hash2).not.toEqual(hash3);
+    });
+});
+
+describe("hashString", () => {
+    it.each([
+        ["", 0x811c9dc5],
+        ["a", 0xe40c292c],
+        ["foobar", 0xbf9cf968],
+    ] as const)("keeps the unsigned FNV-1a hash stable for %j", (input, expected) => {
+        expect(hashString(input)).toBe(expected);
     });
 });

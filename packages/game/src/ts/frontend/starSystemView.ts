@@ -1374,7 +1374,11 @@ export class StarSystemView implements View {
 
         this.player.completedMissions.push(...newlyCompletedMissions);
         this.player.currentMissions = this.player.currentMissions.filter((mission) => !mission.isCompleted());
-        this.targetingSystem.setKnownTargets(getMissionKnownTargets(this.player.currentMissions, starSystem));
+        this.targetingSystem.setKnownTargets(
+            getMissionKnownTargets(this.player.currentMissions, starSystem, (entity) =>
+                this.systemEntityProcessors.targeting.dispatch(entity),
+            ),
+        );
 
         this.interactionSystem.update(deltaSeconds);
         this.interactionLayer.update(deltaSeconds);
@@ -1412,7 +1416,11 @@ export class StarSystemView implements View {
                 .getOrbitalFacilities()
                 .find((spaceStation) => {
                     if (spaceStation === facility) {
-                        this.spaceStationLayer.setStation(spaceStation.model, this.player);
+                        this.spaceStationLayer.setStation(
+                            { systemCoordinates: starSystem.model.coordinates, idInSystem: spaceStation.model.id },
+                            spaceStation.model.name,
+                            this.player,
+                        );
                         return true;
                     }
                     return false;

@@ -48,3 +48,19 @@ export function hashArray(arr: ReadonlyArray<number>): number {
     hash >>>= 0;
     return hash / 0xffffffff;
 }
+
+/**
+ * FNV-1a (32-bit)
+ * @param str Text to hash.
+ * @returns Deterministic unsigned 32-bit hash.
+ */
+export function hashString(str: string): number {
+    let hash = 0x811c9dc5;
+
+    for (const byte of new TextEncoder().encode(str)) {
+        hash ^= byte;
+        hash = Math.imul(hash, 0x01000193);
+    }
+
+    return hash >>> 0;
+}
