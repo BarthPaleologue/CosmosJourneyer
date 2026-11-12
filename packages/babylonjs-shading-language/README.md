@@ -60,6 +60,7 @@ const albedo = mix(texture.rgb, new Color3(1, 0, 0), 0.5);
 
 Unary operations such as `sin`, `normalize`, and `oneMinus` take shader connections.
 Compute literal-only expressions in JavaScript instead of adding GPU operations.
+Use `f32`, `vec`, or `color` when an explicit constant connection is needed for the raw Node Material API.
 
 ## How to use BSL?
 

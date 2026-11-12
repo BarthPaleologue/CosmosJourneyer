@@ -41,7 +41,7 @@ import {
     swizzle,
     transformPosition,
     uniformCameraPosition,
-    uniformFloat,
+    uniformF32,
     uniformViewProjection,
     uniformWorld,
     instanceIndex,
@@ -94,13 +94,13 @@ export class SpaceDotsMaterial {
         this.material = new NodeMaterial("SpaceDotsMaterial", scene);
         this.material.backFaceCulling = false;
 
-        this.uTranslationOffset = uniformFloat("uTranslationOffset", { defaultValue: 0 });
-        this.uThrottle = uniformFloat("uThrottle", { defaultValue: 0 });
+        this.uTranslationOffset = uniformF32("uTranslationOffset", { defaultValue: 0 });
+        this.uThrottle = uniformF32("uThrottle", { defaultValue: 0 });
         this.uWarpForward = createUniformVector3("uWarpForward", new Vector3(0, 0, 1));
         this.uSteeringUp = createUniformVector3("uSteeringUp", new Vector3(0, 1, 0));
-        this.uRollCompensationAngle = uniformFloat("uRollCompensationAngle", { defaultValue: 0 });
-        this.uBendYaw = uniformFloat("uBendYaw", { defaultValue: 0 });
-        this.uBendPitch = uniformFloat("uBendPitch", { defaultValue: 0 });
+        this.uRollCompensationAngle = uniformF32("uRollCompensationAngle", { defaultValue: 0 });
+        this.uBendYaw = uniformF32("uBendYaw", { defaultValue: 0 });
+        this.uBendPitch = uniformF32("uBendPitch", { defaultValue: 0 });
 
         const position = builtinAttribute("position");
         const dotIndex = instanceIndex();

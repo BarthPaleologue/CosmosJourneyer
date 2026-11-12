@@ -31,7 +31,7 @@ import type { TargetOptions } from "./target";
  * @param options - Optional target options.
  * @returns The value as a constant shader input.
  */
-export function float(value: number, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+export function f32(value: number, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
     const inputBlock = new InputBlock("float");
     inputBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
     inputBlock.value = value;
@@ -41,40 +41,11 @@ export function float(value: number, options?: Partial<TargetOptions>): NodeMate
 }
 
 /**
- * Shorthand alias for {@link float}.
- * @param value - Float value to wrap in a constant input block.
- * @param options - Optional target selection for the input block.
- * @returns The same constant float connection as {@link float}.
- */
-export function f(value: number, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
-    return float(value, options);
-}
-
-/**
- * @param name - The name of the input block.
- * @param value - The float value.
- * @param options - Optional target options.
- * @returns The named value as a constant shader input.
- */
-export function constFloat(name: string, value: number, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
-    const inputBlock = new InputBlock(name);
-    inputBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
-    inputBlock.value = value;
-    inputBlock.isConstant = true;
-
-    return inputBlock.output;
-}
-
-export type UniformFloatOptions = TargetOptions & {
-    defaultValue: number;
-};
-
-/**
  * @param name - The name of the input block.
  * @param options - Optional input block options, including `defaultValue` and `target`.
  * @returns A uniform float input block initialized from `defaultValue` or zero.
  */
-export function uniformFloat(name: string, options?: Partial<UniformFloatOptions>): InputBlock {
+export function uniformF32(name: string, options?: Partial<UniformF32Options>): InputBlock {
     const inputBlock = new InputBlock(name);
     inputBlock.target = options?.target ?? NodeMaterialBlockTargets.Neutral;
     inputBlock.matrixMode = 0;
@@ -82,3 +53,7 @@ export function uniformFloat(name: string, options?: Partial<UniformFloatOptions
 
     return inputBlock;
 }
+
+export type UniformF32Options = TargetOptions & {
+    defaultValue: number;
+};
