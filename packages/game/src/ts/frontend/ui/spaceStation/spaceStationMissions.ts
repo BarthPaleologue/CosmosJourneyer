@@ -15,8 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { OrbitalFacilityModel } from "@cosmos-journeyer/universe-model";
+import { ok } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
+import type { UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
@@ -29,32 +30,26 @@ import { MissionContainer } from "./missionContainer";
 
 /**
  * Generates all missions available at the given space station for the player. Missions are generated based on the current timestamp (hourly basis).
- * @param stationModel The space station model where the missions are generated
+ * @param stationId Universe identifier of the station offering the missions
  * @param player The player for which the missions are generated
  * @param universeBackend Backend used to resolve the station's star system.
  * @param soundPlayer Sound player passed to each mission entry.
  * @param t Translation function for mission labels and actions.
- * @returns The DOM element containing the generated missions as HTML
+ * @returns Mission entries, or an error when the station system cannot be resolved.
  */
 export function generateMissionsDom(
-    stationModel: DeepReadonly<OrbitalFacilityModel>,
+    stationId: DeepReadonly<UniverseObjectId>,
     player: Player,
     universeBackend: UniverseBackend,
     soundPlayer: ISoundPlayer,
     t: TFunction,
-): HTMLDivElement {
-    const systemContentModel = universeBackend.getSystemContentModelAt(stationModel.starSystemCoordinates);
-    if (systemContentModel === null) {
-        throw new Error("Cannot generate missions for a space station in an unknown star system");
+): Result<HTMLDivElement, Error> {
+    const sightSeeingMissionsResult = generateSightseeingMissions(stationId, universeBackend, player, Date.now());
+    if (!sightSeeingMissionsResult.success) {
+        return sightSeeingMissionsResult;
     }
 
-    const sightSeeingMissions = generateSightseeingMissions(
-        stationModel,
-        systemContentModel,
-        universeBackend,
-        player,
-        Date.now(),
-    );
+    const sightSeeingMissions = sightSeeingMissionsResult.value;
 
     const htmlRoot = document.createElement("div");
 
@@ -83,5 +78,5 @@ export function generateMissionsDom(
     tradingMissionH3.innerText = "Trading";
     htmlRoot.appendChild(tradingMissionH3);
 
-    return htmlRoot;
+    return ok(htmlRoot);
 }

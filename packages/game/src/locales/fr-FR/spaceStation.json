@@ -1,6 +1,7 @@
 {
     "welcomeTo": "Bienvenue à",
     "missions": "Missions",
+    "missionGenerationFailed": "Impossible de charger les missions de cette station. Veuillez réessayer.",
     "missionsDescription": "Trouvez votre prochaine destination",
     "market": "Marché",
     "marketDescription": "Achetez et vendez des ressources",
