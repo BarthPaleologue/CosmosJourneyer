@@ -25,3 +25,4 @@ export * from "./stellarTypes";
 export * from "./thermodynamics";
 export * from "./unitConversions";
 export * from "./gasGiants";
+export * from "./aurora";
