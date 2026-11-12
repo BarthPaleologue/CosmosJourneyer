@@ -16,9 +16,12 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { SystemEntityModelGenerator } from "@/backend/systemEntity/systemEntityBackend";
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
+
+import { getVestaModel } from "@/modules/vesta/vesta";
 
 import { getSolSystemModel } from "./customSystems/sol/sol";
 import { UniverseBackend } from "./universeBackend";
@@ -71,5 +74,46 @@ describe("UniverseBackend", () => {
             };
             expect(universeBackend.isSystemInHumanBubble(farCoordinates)).toBe(false);
         });
+    });
+
+    it.each(["system content", "object lookup"])("passes the resolved position to generators during %s", (lookup) => {
+        const { starSystem: system, systemEntities } = getVestaModel();
+        universeBackend.registerAuthoredSystem(system);
+        const galacticPosition = { x: 17, y: -23, z: 41 };
+        vi.spyOn(universeBackend, "getSystemGalacticPosition").mockReturnValue(galacticPosition);
+        const entity = systemEntities[0];
+        if (entity === undefined) {
+            throw new Error("Vesta needs an authored entity");
+        }
+        universeBackend.registerAuthoredEntities(system.coordinates, [entity]);
+        const generated = { ...entity, id: "procedural-entity" };
+        const generator = vi.fn<SystemEntityModelGenerator>(() => [generated]);
+        universeBackend.registerProceduralEntities(generator);
+
+        if (lookup === "system content") {
+            const content = universeBackend.getSystemContentModelAt(system.coordinates);
+            expect(content?.entities).toEqual([entity, generated]);
+        } else {
+            const found = universeBackend.getObjectModel({
+                systemCoordinates: system.coordinates,
+                idInSystem: generated.id,
+            });
+            expect(found).toEqual({ type: "systemEntity", object: generated });
+        }
+
+        expect(generator).toHaveBeenCalledExactlyOnceWith({ system, galacticPosition });
+    });
+    it("resolves orbital objects without running entity generators", () => {
+        const system = getSolSystemModel();
+        universeBackend.registerAuthoredSystem(system);
+        const generator = vi.fn<SystemEntityModelGenerator>(() => []);
+        universeBackend.registerProceduralEntities(generator);
+        const star = system.stellarObjects[0];
+
+        expect(universeBackend.getObjectModel({ systemCoordinates: system.coordinates, idInSystem: star.id })).toEqual({
+            type: "orbitalObject",
+            object: star,
+        });
+        expect(generator).not.toHaveBeenCalled();
     });
 });

@@ -157,7 +157,10 @@ export class UniverseBackend {
         if (system === null) {
             return null;
         }
-        const entities = this.systemEntities.getModels(system);
+        const entities = this.systemEntities.getModels({
+            system,
+            galacticPosition: this.getSystemGalacticPosition(system.coordinates),
+        });
 
         return { system, entities };
     }
@@ -421,7 +424,10 @@ export class UniverseBackend {
             };
         }
 
-        const entities = this.systemEntities.getModels(starSystemModel);
+        const entities = this.systemEntities.getModels({
+            system: starSystemModel,
+            galacticPosition: this.getSystemGalacticPosition(starSystemModel.coordinates),
+        });
         const foundEntity = entities.find((entity) => entity.id === universeObjectId.idInSystem);
         if (foundEntity !== undefined) {
             return {
