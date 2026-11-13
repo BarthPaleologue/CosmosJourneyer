@@ -60,6 +60,7 @@ import { ScatteringSystem } from "./planets/telluricPlanet/terrain/chunks/scatte
 import type { ITerrainSystem } from "./planets/telluricPlanet/terrain/system/terrainSystem";
 import { StarFieldBox } from "./starFieldBox";
 import type { StarSystemLoader, StarSystemLoaderOutput } from "./starSystemLoader";
+import type { LandableFacility, SystemObject } from "./systemObject";
 
 /**
  * The controller of the star system manages all resources specific to a single star system.
@@ -91,6 +92,8 @@ export class StarSystemController {
 
     private readonly orbitalFacilityToParents: Map<OrbitalFacility, ReadonlyArray<OrbitalObject>> = new Map();
 
+    private readonly entityCapabilities: Pick<SystemEntityProcessors, "spatialGeometry" | "landingPadProviders">;
+
     private readonly systemEntities: ReadonlyArray<SystemEntity>;
 
     private readonly orbitalSimulation: KeplerianOrbitalSimulation;
@@ -121,6 +124,7 @@ export class StarSystemController {
      * @param orbitalSimulation - The simulation that supplies current orbital transforms.
      * @param assets - The loaded assets used to create the star system’s visual objects.
      * @param scene The scene in which the star system will be rendered
+     * @param entityCapabilities Geometry and landing pads registered by modules.
      */
     private constructor(
         model: DeepReadonly<StarSystemModel>,
@@ -129,7 +133,9 @@ export class StarSystemController {
         orbitalSimulation: KeplerianOrbitalSimulation,
         assets: RenderingAssets,
         scene: Scene,
+        entityCapabilities: Pick<SystemEntityProcessors, "spatialGeometry" | "landingPadProviders">,
     ) {
+        this.entityCapabilities = entityCapabilities;
         this.scene = scene;
         this.starFieldBox = new StarFieldBox(assets.textures.environment.milkyWay, 1000e3, scene);
         this.model = model;
@@ -187,6 +193,7 @@ export class StarSystemController {
         moduleAssets: ModuleAssets,
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
+        entityCapabilities: Pick<SystemEntityProcessors, "spatialGeometry" | "landingPadProviders">,
     ): Promise<Result<StarSystemController, Error>> {
         const result = await loader.load(model, assets, scene, progressMonitor);
         const orbitalObjects = [
@@ -214,7 +221,15 @@ export class StarSystemController {
         }
 
         return ok(
-            new StarSystemController(model, result, systemEntitiesResult.value, orbitalSimulation, assets, scene),
+            new StarSystemController(
+                model,
+                result,
+                systemEntitiesResult.value,
+                orbitalSimulation,
+                assets,
+                scene,
+                entityCapabilities,
+            ),
         );
     }
 
@@ -307,6 +322,89 @@ export class StarSystemController {
      */
     public getAnomalies(): ReadonlyArray<Anomaly> {
         return this.anomalies;
+    }
+
+    /** @returns Orbital objects and entity geometry that can anchor saved coordinates. */
+    public getSystemObjects(): Array<SystemObject> {
+        const objects: Array<SystemObject> = this.getOrbitalObjects().map((object) => ({
+            id: object.model.id,
+            name: object.model.name,
+            getTransform: () => object.getTransform(),
+            getBoundingRadius: () => object.getBoundingRadius(),
+        }));
+        for (const entity of this.systemEntities) {
+            const geometry = this.entityCapabilities.spatialGeometry.dispatch(entity);
+            if (geometry === null) {
+                continue;
+            }
+            objects.push({
+                id: entity.model.id,
+                name: entity.model.name,
+                getTransform: () => geometry.getTransform(),
+                getBoundingRadius: () => geometry.getBoundingRadius(),
+            });
+        }
+        return objects;
+    }
+
+    /**
+     * @param id Identifier within this system.
+     * @returns The matching orbital object or entity with registered spatial geometry.
+     */
+    public getSystemObjectById(id: string): SystemObject | undefined {
+        return this.getSystemObjects().find((object) => object.id === id);
+    }
+
+    /**
+     * @param position World position of the observer.
+     * @returns The object with the nearest bounding surface.
+     */
+    public getNearestSystemObject(position: Vector3): SystemObject {
+        const objects = this.getSystemObjects();
+        return objects.reduce((nearest, object) => {
+            const distance =
+                Vector3.Distance(position, object.getTransform().getAbsolutePosition()) - object.getBoundingRadius();
+            const nearestDistance =
+                Vector3.Distance(position, nearest.getTransform().getAbsolutePosition()) - nearest.getBoundingRadius();
+            return distance < nearestDistance ? object : nearest;
+        });
+    }
+
+    /** @returns Orbital facilities and module entities with geometry and landing pads. */
+    public getLandableFacilities(): Array<LandableFacility> {
+        const facilities: Array<LandableFacility> = this.getOrbitalFacilities().map((facility) => ({
+            id: facility.model.id,
+            name: facility.model.name,
+            getTransform: () => facility.getTransform(),
+            getBoundingRadius: () => facility.getBoundingRadius(),
+            getLandingPadProvider: () => facility.getLandingPadProvider(),
+        }));
+        for (const entity of this.systemEntities) {
+            const provider = this.entityCapabilities.landingPadProviders.dispatch(entity);
+            if (provider === null) {
+                continue;
+            }
+            const geometry = this.entityCapabilities.spatialGeometry.dispatch(entity);
+            if (geometry === null) {
+                continue;
+            }
+            facilities.push({
+                id: entity.model.id,
+                name: entity.model.name,
+                getTransform: () => geometry.getTransform(),
+                getBoundingRadius: () => geometry.getBoundingRadius(),
+                getLandingPadProvider: () => provider,
+            });
+        }
+        return facilities;
+    }
+
+    /**
+     * @param id Identifier within this system.
+     * @returns The orbital facility or module entity with registered geometry and landing pads.
+     */
+    public getLandableFacilityById(id: string): LandableFacility | undefined {
+        return this.getLandableFacilities().find((facility) => facility.id === id);
     }
 
     public getSystemEntities(): ReadonlyArray<SystemEntity> {
@@ -455,6 +553,7 @@ export class StarSystemController {
         }
 
         const entityContext: SystemEntityUpdateContext = {
+            camera,
             observerPosition: cameraPosition,
             deltaSeconds,
         };

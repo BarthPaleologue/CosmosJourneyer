@@ -34,6 +34,10 @@ export const RussellTeaPotModule: GameModule = {
         });
 
         const type = makeSystemContentType<RussellTeaPotModel, RussellTeaPot>("russellTeaPot");
+        systemEntities.registerSpatialGeometry(type, (entity) => ({
+            getTransform: () => entity.content.getTransform(),
+            getBoundingRadius: () => entity.content.radius,
+        }));
         systemEntities.registerContentFactory(type, (_model, context) => RussellTeaPot.New(context.moduleAssets));
 
         systemEntities.registerUpdate(type, (entity, context) => {

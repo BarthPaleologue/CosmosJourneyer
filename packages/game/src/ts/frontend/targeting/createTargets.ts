@@ -54,6 +54,16 @@ export function getSystemTargets(
     const systemEntityTargets = systemEntities.flatMap((entity) => systemEntityTargetFactory(entity));
     out.push(...systemEntityTargets);
 
+    const targetTransforms = new Set(out.map((target) => target.getTransform()));
+    for (const facility of starSystem.getLandableFacilities()) {
+        for (const pad of facility.getLandingPadProvider().getLandingPads()) {
+            if (!targetTransforms.has(pad.getTransform())) {
+                out.push(...createLandingPadTargets(pad));
+                targetTransforms.add(pad.getTransform());
+            }
+        }
+    }
+
     out.push(...starSystem.getSystemTargets().map(createSystemTarget));
 
     return out;

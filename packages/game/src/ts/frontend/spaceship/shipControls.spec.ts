@@ -36,6 +36,9 @@ import type { ITts } from "../audio/tts";
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
 import { createHavokForTests } from "../helpers/havokTest";
 import type { INotificationManager } from "../ui/notificationManager";
+import { LandingPadProvider, LandingPadSize } from "../universe/orbitalFacility/landingPadProvider";
+import type { ILandingPad } from "../universe/orbitalFacility/landingPadProvider";
+import type { LandableFacility } from "../universe/systemObject";
 import { ShipControls } from "./shipControls";
 import type { Spaceship } from "./spaceship";
 
@@ -59,6 +62,8 @@ describe("ShipControls camera transforms", () => {
         scene = new Scene(engine);
         const ship = new TransformNode("ship", scene);
         ship.rotationQuaternion = Quaternion.Identity();
+        let targetLandingPad: ILandingPad | null = null;
+        const onLandingCancelled = new Observable<void>();
         const spaceship = {
             getTransform: () => ship,
             boundingExtent: Vector3.One(),
@@ -67,7 +72,7 @@ describe("ShipControls camera transforms", () => {
             onLowFuelWarning: new Observable(),
             onLandingObservable: new Observable(),
             onPlanetaryLandingEngaged: new Observable(),
-            onLandingCancelled: new Observable(),
+            onLandingCancelled,
             onTakeOff: new Observable(),
             onAutoPilotEngaged: new Observable(),
             onWarpDriveDisabled: new Observable(),
@@ -75,6 +80,21 @@ describe("ShipControls camera transforms", () => {
             getInternals: () => ({ getWarpDrive: () => null }),
             isAutoPiloted: () => true,
             isLanded: () => true,
+            isLanding: () => false,
+            getTargetLandingPad: () => targetLandingPad,
+            engageLandingOnPad: (pad: ILandingPad) => {
+                targetLandingPad = pad;
+            },
+            spawnOnPad: (pad: ILandingPad) => {
+                targetLandingPad = pad;
+            },
+            cancelLanding: () => {
+                targetLandingPad = null;
+                onLandingCancelled.notifyObservers();
+            },
+            takeOff: () => {
+                targetLandingPad = null;
+            },
             spaceDots: { setSteering: vi.fn() },
             update: vi.fn(),
             increaseMainEngineThrottle: vi.fn(),
@@ -85,8 +105,8 @@ describe("ShipControls camera transforms", () => {
             spaceship,
             scene,
             {} as ISoundPlayer,
-            {} as ITts,
-            {} as INotificationManager,
+            { enqueueSay: vi.fn() } as unknown as ITts,
+            { create: vi.fn() } as unknown as INotificationManager,
             (() => "") as unknown as TFunction,
         );
         return ship;
@@ -402,5 +422,100 @@ describe("ShipControls camera transforms", () => {
         expect(controls.thirdPersonCameraTransform.getAbsolutePosition().asArray()).toEqual(
             ship.getAbsolutePosition().asArray(),
         );
+    });
+    /**
+     * @param id Facility identifier.
+     * @returns A facility with one reservable pad.
+     */
+    function createFacility(id: string): LandableFacility {
+        const transform = new TransformNode(id, scene);
+        const pad: ILandingPad = {
+            getTransform: () => transform,
+            getBoundingRadius: () => 10,
+            getIdentifier: () => "A",
+            getPadSize: () => LandingPadSize.SMALL,
+            getPadHeight: () => 1,
+        };
+        const provider = new LandingPadProvider([pad]);
+        return {
+            id,
+            name: id,
+            getTransform: () => transform,
+            getBoundingRadius: () => 100,
+            getLandingPadProvider: () => provider,
+        };
+    }
+
+    it("reserves a module pad once and releases it at its owning facility after the closest facility changes", () => {
+        createControls();
+        const ship = controls.getSpaceship();
+        vi.spyOn(ship, "isLanded").mockReturnValue(false);
+        const facility = createFacility("module-station");
+        const other = createFacility("other-station");
+        controls.setClosestLandableFacility(facility);
+        controls.requestLanding();
+        const pad = ship.getTargetLandingPad();
+        expect(pad).not.toBeNull();
+        expect(facility.getLandingPadProvider().getAvailableLandingPads()).toHaveLength(0);
+        expect(controls.getLandingFacility()).toBe(facility);
+        controls.setClosestLandableFacility(other);
+        controls.requestLanding();
+        expect(ship.getTargetLandingPad()).toBe(pad);
+        expect(other.getLandingPadProvider().getAvailableLandingPads()).toHaveLength(1);
+        expect(controls.getLandingFacility()).toBe(facility);
+
+        controls.takeOff();
+
+        expect(ship.getTargetLandingPad()).toBeNull();
+        expect(controls.getLandingFacility()).toBeNull();
+        expect(facility.getLandingPadProvider().getAvailableLandingPads()).toHaveLength(1);
+        expect(other.getLandingPadProvider().getLandingPads()).toHaveLength(1);
+    });
+
+    it("keeps a rejected landing request free of reservation state", () => {
+        createControls();
+        vi.spyOn(controls.getSpaceship(), "isLanded").mockReturnValue(false);
+        const facility = createFacility("full-station");
+        facility.getLandingPadProvider().handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
+        controls.setClosestLandableFacility(facility);
+
+        controls.requestLanding();
+
+        expect(controls.getSpaceship().getTargetLandingPad()).toBeNull();
+        expect(controls.getLandingFacility()).toBeNull();
+    });
+
+    it("releases a restored module reservation when the controls are reset", () => {
+        createControls();
+        const facility = createFacility("module-station");
+        const provider = facility.getLandingPadProvider();
+        const pad = provider.handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
+        if (pad === null) {
+            throw new Error("Fixture needs an available pad");
+        }
+        controls.spawnOnPad(facility, pad);
+        expect(controls.getLandingFacility()).toBe(facility);
+        expect(controls.getSpaceship().getTargetLandingPad()).toBe(pad);
+
+        controls.reset();
+
+        expect(controls.getLandingFacility()).toBeNull();
+        expect(provider.getAvailableLandingPads()).toEqual([pad]);
+    });
+
+    it("releases the reserved pad when the ship cancels landing internally", () => {
+        createControls();
+        const ship = controls.getSpaceship();
+        vi.spyOn(ship, "isLanded").mockReturnValue(false);
+        const facility = createFacility("module-station");
+        controls.setClosestLandableFacility(facility);
+        controls.requestLanding();
+        expect(facility.getLandingPadProvider().getAvailableLandingPads()).toHaveLength(0);
+
+        ship.cancelLanding();
+
+        expect(ship.getTargetLandingPad()).toBeNull();
+        expect(controls.getLandingFacility()).toBeNull();
+        expect(facility.getLandingPadProvider().getAvailableLandingPads()).toHaveLength(1);
     });
 });

@@ -89,6 +89,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         moduleAssets,
         scene,
         progressMonitor,
+        systemEntityProcessors,
     );
     if (!starSystemControllerResult.success) {
         throw starSystemControllerResult.error;
