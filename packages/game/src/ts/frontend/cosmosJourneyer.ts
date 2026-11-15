@@ -572,6 +572,7 @@ export class CosmosJourneyer {
             backend.universe,
             soundPlayer,
             notificationManager,
+            starMapSystemInfo,
             t,
         );
 
