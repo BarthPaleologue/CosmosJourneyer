@@ -98,3 +98,73 @@ export function getStellarWindDynamicPressure({ speed, protonNumberDensity }: Re
     const massDensity = protonNumberDensity * ProtonMass;
     return massDensity * speed ** 2;
 }
+
+/**
+ * Estimates the kinetic power of the stellar wind intercepted
+ * by the planetary magnetosphere (W).
+ * @param moment Planetary magnetic dipole moment (A·m²)
+ * @param stellarWind Stellar wind properties (SI units)
+ * @returns Incident kinetic power (W)
+ */
+export function getInterceptedStellarWindPower(moment: number, stellarWind: Readonly<LocalStellarWindModel>): number {
+    const { speed, protonNumberDensity } = stellarWind;
+
+    const standoffDistance = getMagnetopauseStandoffDistance(moment, getStellarWindDynamicPressure(stellarWind));
+    const crossSection = Math.PI * standoffDistance ** 2;
+
+    const massDensity = protonNumberDensity * ProtonMass;
+    const massFlowRate = massDensity * speed * crossSection;
+
+    return 0.5 * massFlowRate * speed ** 2;
+}
+
+/**
+ * Computes the combined surface area of two symmetric auroral ovals (m²).
+ * @param planetRadius Planetary radius (m)
+ * @param auroralRange Absolute equatorward and poleward magnetic latitudes in radians.
+ * @returns Total auroral area across both hemispheres (m²)
+ */
+export function getAuroralOvalArea(
+    planetRadius: number,
+    auroralRange: readonly [equatorward: number, poleward: number],
+): number {
+    const areaPerHemisphere = 2 * Math.PI * planetRadius ** 2 * (Math.sin(auroralRange[1]) - Math.sin(auroralRange[0]));
+
+    return 2 * areaPerHemisphere;
+}
+
+/**
+ * Estimates the mean visible auroral radiant energy flux (W/m²).
+ * Uses empirical terrestrial efficiencies and assumes two symmetric auroral ovals.
+ * @param planetRadius Planet radius in meters.
+ * @param planetMoment Planetary magnetic dipole moment in A·m².
+ * @param stellarWind Incident stellar wind properties.
+ * @param auroralRange Absolute equatorward and poleward magnetic latitudes in radians.
+ * @returns Mean visible auroral radiant energy flux in W/m².
+ */
+export function getAuroralVisibleEnergyFlux(
+    planetRadius: number,
+    planetMoment: number,
+    stellarWind: Readonly<LocalStellarWindModel>,
+    auroralRange: readonly [equatorward: number, poleward: number],
+): number {
+    // Empirical Earth values for HILDCAA events (Hajra et al., 2014)
+    // Adjusted for our kinetic power convention: P_ours = (π/2) * P_Hajra
+    const couplingEfficiency = (0.0097 * 2) / Math.PI;
+    const precipitationEfficiency = 0.215;
+
+    // Provisional assumption, not empirically calibrated
+    const visibleRadiativeEfficiency = 0.01;
+
+    const auroralArea = getAuroralOvalArea(planetRadius, auroralRange);
+
+    const interceptedPower = getInterceptedStellarWindPower(planetMoment, stellarWind);
+
+    const coupledPower = couplingEfficiency * interceptedPower;
+
+    const precipitationPower = precipitationEfficiency * coupledPower;
+
+    const precipitationEnergyFlux = precipitationPower / auroralArea;
+
+    return precipitationEnergyFlux * visibleRadiativeEfficiency;
+}
