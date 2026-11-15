@@ -34,6 +34,12 @@ export const EarthRadius = 6_371e3;
 export const EarthMagneticDipoleMoment = 7.8e22;
 
 /**
+ * The magnetic dipole moment of Mercury in A·m², approximated from MESSENGER observations.
+ * @see https://pubmed.ncbi.nlm.nih.gov/21960627/
+ */
+export const MercuryMagneticDipoleMoment = 2.8e19;
+
+/**
  * The mass of the Moon in kilograms.
  */
 export const MoonMass = 7.348e22;

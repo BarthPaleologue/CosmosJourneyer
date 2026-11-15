@@ -42,6 +42,7 @@ import type {
 
 import { generateCloudsModel } from "./cloudsModelGenerator";
 import { generateSeededRingsModel } from "./ringsModelGenerator";
+import { generateTelluricMagneticFieldModel } from "./telluricMagneticFieldModelGenerator";
 import { getTelluricPlanetOrbitRadius } from "./telluricPlanetOrbitGenerator";
 import { getTemperatureRange } from "./temperatureRange";
 
@@ -195,5 +196,6 @@ export function generateTelluricPlanetModel(
         clouds,
         ocean,
         atmosphere,
+        magneticField: generateTelluricMagneticFieldModel(radius, 0.5, rng),
     };
 }

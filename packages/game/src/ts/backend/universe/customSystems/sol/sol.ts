@@ -21,6 +21,8 @@ import {
     celsiusToKelvin,
     degreesToRadians,
     durationToSeconds,
+    EarthMagneticDipoleMoment,
+    MercuryMagneticDipoleMoment,
     UranusMagneticDipoleMoment,
     NeptuneMagneticDipoleMoment,
 } from "@cosmos-journeyer/physics";
@@ -45,6 +47,10 @@ export function getSolSystemModel(): StarSystemModel {
         id: "mercury",
         name: "Mercury",
         type: "telluricPlanet",
+        magneticField: {
+            north: { latitude: Math.PI / 2, longitude: 0 },
+            magnitude: MercuryMagneticDipoleMoment,
+        },
         radius: 2_439.7e3,
         mass: 3.301e23,
         spin: {
@@ -93,6 +99,7 @@ export function getSolSystemModel(): StarSystemModel {
         id: "venus",
         name: "Venus",
         type: "telluricPlanet",
+        magneticField: null,
         radius: 6_051.8e3,
         mass: 4.8e20,
         spin: {
@@ -155,6 +162,10 @@ export function getSolSystemModel(): StarSystemModel {
         id: "earth",
         name: "Earth",
         type: "telluricPlanet",
+        magneticField: {
+            north: { latitude: degreesToRadians(79), longitude: 0 },
+            magnitude: EarthMagneticDipoleMoment,
+        },
         radius: 6_371e3,
         mass: 5.972e24,
         spin: {
@@ -220,6 +231,7 @@ export function getSolSystemModel(): StarSystemModel {
         id: "moon",
         name: "Moon",
         type: "telluricSatellite",
+        magneticField: null,
         radius: 1_737.1e3,
         mass: 7.342e22,
         spin: {
@@ -267,6 +279,7 @@ export function getSolSystemModel(): StarSystemModel {
         id: "mars",
         name: "Mars",
         type: "telluricPlanet",
+        magneticField: null,
         radius: 3_389.5e3,
         mass: 6.4171e23,
         spin: {
