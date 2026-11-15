@@ -32,6 +32,7 @@ import { TtsMock } from "@/frontend/audio/tts";
 import { createGameModuleApi } from "@/frontend/createGameModuleApi";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
 import { Player } from "@/frontend/player/player";
+import { StarMapSystemInfoRegistry } from "@/frontend/starmap/starMapSystemInfoRegistry";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
 import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
@@ -82,6 +83,7 @@ export async function createCustomSystemScene(
         systemEntityLoader,
         systemEntityProcessors,
         moduleAssetRegistry,
+        new StarMapSystemInfoRegistry(),
     );
     const moduleSetupResult = setupModules(getBuiltinModules(), gameModuleApi);
     if (!moduleSetupResult.success) {

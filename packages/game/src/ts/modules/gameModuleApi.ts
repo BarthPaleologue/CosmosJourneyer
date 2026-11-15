@@ -21,6 +21,7 @@ import type { AssetsExtensionPoint } from "./assets";
 import type { LandingPadExtensionPoint } from "./landingPads";
 import type { MusicExtensionPoint } from "./music";
 import type { RenderingExtensionPoint } from "./rendering";
+import type { StarMapSystemInfoExtensionPoint } from "./starMapSystemInfo";
 import type { SystemEntitiesExtensionPoint } from "./systemEntities";
 import type { TargetingExtensionPoint } from "./targeting";
 
@@ -34,4 +35,5 @@ export type GameModuleApi = Readonly<{
     music: MusicExtensionPoint;
     rendering: RenderingExtensionPoint;
     landingPad: LandingPadExtensionPoint;
+    starMapSystemInfo: StarMapSystemInfoExtensionPoint;
 }>;
