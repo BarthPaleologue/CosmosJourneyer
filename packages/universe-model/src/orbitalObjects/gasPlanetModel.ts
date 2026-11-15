@@ -19,6 +19,7 @@ import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 import type { AtmosphereModel } from "./atmosphereModel";
 import type { HasSeed } from "./hasSeed";
+import type { MagneticFieldModel } from "./magneticFieldModel";
 import type { OrbitalObjectModelBase } from "./orbitalObjectModelBase";
 import type { RingsModel } from "./ringsModel";
 
@@ -43,6 +44,7 @@ export type GasPlanetModel = OrbitalObjectModelBase<"gasPlanet"> &
     HasSeed & {
         radius: number;
         atmosphere: AtmosphereModel;
+        magneticField: MagneticFieldModel;
         rings: RingsModel | null;
         colorPalette: GasPlanetColorPalette;
     };

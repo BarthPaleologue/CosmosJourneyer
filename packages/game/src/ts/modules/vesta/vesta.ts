@@ -27,6 +27,7 @@ import {
     getOrbitRadiusFromPeriod,
     getWaterIceFrostLine,
     JupiterMass,
+    JupiterMagneticDipoleMoment,
     JupiterRadius,
     km2ToM2,
     SolarMass,
@@ -383,6 +384,10 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         atmosphere: {
             pressure: barToPascal(1),
             greenHouseEffectFactor: 1,
+        },
+        magneticField: {
+            north: { latitude: degreesToRadians(80), longitude: 0 },
+            magnitude: JupiterMagneticDipoleMoment * 0.7 ** 3,
         },
         colorPalette: {
             type: "procedural",

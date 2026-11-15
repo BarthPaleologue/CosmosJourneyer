@@ -21,6 +21,8 @@ import {
     celsiusToKelvin,
     degreesToRadians,
     durationToSeconds,
+    UranusMagneticDipoleMoment,
+    NeptuneMagneticDipoleMoment,
 } from "@cosmos-journeyer/physics";
 import type {
     GasPlanetModel,
@@ -338,6 +340,10 @@ export function getSolSystemModel(): StarSystemModel {
             initialMeanAnomaly: 0,
             p: 2,
         },
+        magneticField: {
+            north: { latitude: degreesToRadians(31), longitude: 0 },
+            magnitude: UranusMagneticDipoleMoment,
+        },
         colorPalette: {
             type: "textured",
             textureId: "uranus",
@@ -376,6 +382,10 @@ export function getSolSystemModel(): StarSystemModel {
             argumentOfPeriapsis: degreesToRadians(265.646853),
             initialMeanAnomaly: 0,
             p: 2,
+        },
+        magneticField: {
+            north: { latitude: degreesToRadians(43), longitude: 0 },
+            magnitude: NeptuneMagneticDipoleMoment,
         },
         colorPalette: {
             type: "textured",
