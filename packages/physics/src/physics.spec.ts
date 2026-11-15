@@ -15,13 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { describe, expect, test } from "vitest";
+import { describe, expect, it, test } from "vitest";
 
+import { EarthMass, EarthRadius, SolarMass, SolarRadius } from "./constants";
 import {
     computeEffectiveTemperature,
     computeGrayAtmosphereTemperature,
     estimateStarRadiusFromMass,
     getApparentGravityOnSpaceTether,
+    getEscapeVelocity,
     getGravitationalLensFocalDistance,
     getOceanDepth,
     getRotationPeriodForArtificialGravity,
@@ -33,6 +35,16 @@ import {
     waterBoilingTemperature,
 } from "./physics";
 import { astronomicalUnitToMeters } from "./unitConversions";
+
+describe("getEscapeVelocity", () => {
+    it("estimates the solar surface escape speed", () => {
+        expect(getEscapeVelocity(SolarMass, SolarRadius) / 1e3).toBeCloseTo(617.5, 0);
+    });
+
+    it("estimates Earth's surface escape speed", () => {
+        expect(getEscapeVelocity(EarthMass, EarthRadius) / 1e3).toBeCloseTo(11.19, 2);
+    });
+});
 
 test("computeEffectiveTemperature", () => {
     const sunTemperature = 5778; // in Kelvin

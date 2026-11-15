@@ -19,6 +19,16 @@ import { C, G, SolarMass, SolarRadius } from "./constants";
 import { celsiusToKelvin } from "./unitConversions";
 
 /**
+ * Calculates the escape speed at the surface of a spherical body.
+ * @param mass Body mass in kilograms.
+ * @param radius Body radius in meters.
+ * @returns Escape speed in meters per second.
+ */
+export function getEscapeVelocity(mass: number, radius: number): number {
+    return Math.sqrt((2 * G * mass) / radius);
+}
+
+/**
  * Calculates the boiling point of water at a given pressure.
  * @param pressure The pressure of the atmosphere in pascal.
  * @returns The boiling point of water at the given pressure in Kelvin
