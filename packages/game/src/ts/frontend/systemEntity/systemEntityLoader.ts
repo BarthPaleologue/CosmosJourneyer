@@ -18,7 +18,7 @@
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
-import { err, ok } from "@cosmos-journeyer/typescript";
+import { assertUnreachable, err, ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
 import type { InOrbitPlacementModel, SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
@@ -27,7 +27,6 @@ import type { OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { KeplerianOrbitalSimulation } from "../universe/keplerianOrbitalSimulation";
 import type { ITerrainSystem } from "../universe/planets/telluricPlanet/terrain/system/terrainSystem";
 import { createOnSurfacePlacements } from "./createOnSurfacePlacements";
-import type { SurfacePlacementRequest } from "./createOnSurfacePlacements";
 import type {
     AnySystemContentType,
     ContentModelOf,
@@ -35,10 +34,17 @@ import type {
     SystemEntity,
     SystemContent,
     InOrbitPlacement,
+    OnSurfacePlacement,
+    SystemEntityPlacement,
     SystemContentFactoryContext,
 } from "./systemEntity";
 
 type ErasedSystemContentFactory = SystemContentFactoryOf<AnySystemContentType>;
+
+type EntityContent = {
+    model: DeepReadonly<SystemEntityModel>;
+    content: SystemContent;
+};
 
 export type SystemEntityLoadContext = Readonly<
     SystemContentFactoryContext & {
@@ -60,64 +66,60 @@ export class SystemEntityLoader {
     }
 
     async load(
-        models: Iterable<DeepReadonly<SystemEntityModel>>,
+        models: ReadonlyArray<DeepReadonly<SystemEntityModel>>,
         context: SystemEntityLoadContext,
     ): Promise<Result<Array<SystemEntity>, Error>> {
-        const inOrbitPlacementModels: Array<{ entityId: string; placementModel: DeepReadonly<InOrbitPlacementModel> }> =
-            [];
-        const onSurfacePlacementModels: Array<SurfacePlacementRequest> = [];
-        const entityContents = new Map<string, { model: DeepReadonly<SystemEntityModel>; content: SystemContent }>();
+        const contents: Array<EntityContent> = [];
+        const entities: Array<SystemEntity> = [];
+        let surfacePlacements = new Map<string, OnSurfacePlacement>();
+        const fail = (error: Error): Result<Array<SystemEntity>, Error> => {
+            for (const { content } of contents) {
+                content.dispose();
+            }
+            for (const { placement } of entities) {
+                if (placement.type !== "onSurface") {
+                    placement.getTransform().dispose();
+                }
+            }
+            for (const placement of surfacePlacements.values()) {
+                placement.getTransform().dispose();
+            }
+            return err(error);
+        };
+
         for (const model of models) {
-            const contentResult = this.createContent(model, context);
-            if (!contentResult.success) {
-                return contentResult;
+            const content = this.createContent(model, context);
+            if (!content.success) {
+                return fail(content.error);
             }
-
-            entityContents.set(model.id, { model, content: contentResult.value });
-
-            switch (model.placement.type) {
-                case "inOrbit":
-                    inOrbitPlacementModels.push({ entityId: model.id, placementModel: model.placement });
-                    break;
-                case "onSurface":
-                    onSurfacePlacementModels.push({ entityId: model.id, placementModel: model.placement });
-                    break;
-            }
+            contents.push({ model, content: content.value });
         }
 
-        const inOrbitPlacements = createInOrbitPlacements(inOrbitPlacementModels, context);
-        const onSurfacePlacementsResult = await createOnSurfacePlacements(
-            onSurfacePlacementModels,
+        const surfaceResult = await createOnSurfacePlacements(
+            contents.flatMap(({ model }) =>
+                model.placement.type === "onSurface" ? [{ entityId: model.id, placementModel: model.placement }] : [],
+            ),
             context.orbitalObjects,
             context.terrainSystem,
             context.scene,
         );
-        if (!onSurfacePlacementsResult.success) {
-            return onSurfacePlacementsResult;
+        if (!surfaceResult.success) {
+            return fail(surfaceResult.error);
+        }
+        surfacePlacements = surfaceResult.value;
+
+        for (const entry of contents) {
+            const entity = createEntity(entry, surfacePlacements, context.scene);
+            if (!entity.success) {
+                return fail(entity.error);
+            }
+            entities.push(entity.value);
         }
 
-        const onSurfacePlacements = onSurfacePlacementsResult.value;
-
-        const systemEntities: Array<SystemEntity> = [];
-        const entityPlacements = [...inOrbitPlacements.entries(), ...onSurfacePlacements.entries()];
-        for (const [id, placement] of entityPlacements) {
-            const partial = entityContents.get(id);
-            if (partial === undefined) {
-                return err(new Error(`Could not find content for entity ${id}`));
-            }
-
-            const { model, content } = partial;
-
-            const contentTransform = content.getTransform();
-            contentTransform.parent = placement.getTransform();
-            if (model.placement.type === "inOrbit") {
-                const { yaw, pitch, roll } = model.placement.attitude.localFrameOrientation;
-                contentTransform.rotationQuaternion = Quaternion.RotationYawPitchRoll(yaw, pitch, roll);
-            }
-            systemEntities.push({ model, content, placement });
-        }
-
-        return ok(systemEntities);
+        context.orbitalSimulation.addObjects(
+            entities.flatMap(({ placement }) => (placement.type === "inOrbit" ? [placement] : [])),
+        );
+        return ok(entities);
     }
 
     private createContent(
@@ -134,23 +136,39 @@ export class SystemEntityLoader {
 }
 
 /**
- * Creates orbital transforms and registers the corresponding simulation objects.
- * @param models Entity IDs paired with their orbital placement models.
- * @param context Scene and orbital simulation that own the created placements.
- * @returns Orbital placements keyed by entity ID.
+ * @param entry Content and the resolved placement data used to attach it.
+ * @param surfacePlacements Placements already created by the terrain batch.
+ * @param scene Scene owning newly created placement transforms.
+ * @returns The complete entity, or an error when its surface placement is unavailable.
  */
-export function createInOrbitPlacements(
-    models: Iterable<{ entityId: string; placementModel: DeepReadonly<InOrbitPlacementModel> }>,
-    context: SystemEntityLoadContext,
-): Map<string, InOrbitPlacement> {
-    const placements = new Map<string, InOrbitPlacement>();
-    for (const { entityId, placementModel } of models) {
-        const placement = createInOrbitPlacement(entityId, placementModel, context.scene);
-        placements.set(entityId, placement);
-        context.orbitalSimulation.addObjects([placement]);
+function createEntity(
+    entry: Readonly<EntityContent>,
+    surfacePlacements: ReadonlyMap<string, OnSurfacePlacement>,
+    scene: Scene,
+): Result<SystemEntity, Error> {
+    const { model, content } = entry;
+    const placementModel = model.placement;
+    let placement: SystemEntityPlacement;
+    switch (placementModel.type) {
+        case "inOrbit": {
+            placement = createInOrbitPlacement(model.id, placementModel, scene);
+            const { yaw, pitch, roll } = placementModel.attitude.localFrameOrientation;
+            content.getTransform().rotationQuaternion = Quaternion.RotationYawPitchRoll(yaw, pitch, roll);
+            break;
+        }
+        case "onSurface": {
+            const surfacePlacement = surfacePlacements.get(model.id);
+            if (surfacePlacement === undefined) {
+                return err(new Error(`Could not find surface placement for entity "${model.id}"`));
+            }
+            placement = surfacePlacement;
+            break;
+        }
+        default:
+            return assertUnreachable(placementModel);
     }
-
-    return placements;
+    content.getTransform().parent = placement.getTransform();
+    return ok({ model, content, placement });
 }
 
 /**

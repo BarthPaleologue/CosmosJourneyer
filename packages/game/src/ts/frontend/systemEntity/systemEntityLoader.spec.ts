@@ -121,6 +121,61 @@ describe("system entity content factories", () => {
         expect(context.orbitalSimulation.getObjects()).toContain(entity.placement);
     });
 
+    it("disposes previously created content when a later factory fails", async () => {
+        const error = new Error("Second content is unavailable");
+        const dispose = vi.fn();
+        loader.registerFactory(type, (entityModel) => {
+            if (entityModel.id === "second") {
+                return err(error);
+            }
+            const transform = new TransformNode("content", scene);
+            dispose.mockImplementation(() => {
+                transform.dispose();
+            });
+            return ok({ getTransform: () => transform, dispose });
+        });
+        const result = await loader.load([model, { ...model, id: "second" }], context);
+        expect(result).toEqual(err(error));
+        expect(dispose).toHaveBeenCalledExactlyOnceWith();
+        expect(scene.transformNodes).toHaveLength(0);
+        expect(Array.from(context.orbitalSimulation.getObjects())).toHaveLength(0);
+    });
+
+    it("cleans content without registering orbits when a surface placement fails", async () => {
+        const disposals: Array<ReturnType<typeof vi.fn>> = [];
+        loader.registerFactory(type, (entityModel) => {
+            const transform = new TransformNode(entityModel.id, scene);
+            const dispose = vi.fn(() => {
+                transform.dispose();
+            });
+            disposals.push(dispose);
+            return ok({ getTransform: () => transform, dispose });
+        });
+        const result = await loader.load(
+            [
+                model,
+                {
+                    ...model,
+                    id: "surface",
+                    placement: {
+                        type: "onSurface",
+                        parentId: "missing",
+                        position: { latitude: 0, longitude: 0, heightAboveGround: 0 },
+                        rotation: { heading: 0, pitch: 0, roll: 0 },
+                    },
+                },
+            ],
+            context,
+        );
+        expect(result.success).toBe(false);
+        expect(disposals).toHaveLength(2);
+        for (const dispose of disposals) {
+            expect(dispose).toHaveBeenCalledExactlyOnceWith();
+        }
+        expect(scene.transformNodes).toHaveLength(0);
+        expect(Array.from(context.orbitalSimulation.getObjects())).toHaveLength(0);
+    });
+
     it("propagates factory failures before creating orbital placements", async () => {
         const error = new Error("Content is unavailable");
         loader.registerFactory(type, () => err(error));
