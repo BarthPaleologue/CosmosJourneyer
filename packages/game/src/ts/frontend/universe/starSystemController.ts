@@ -511,6 +511,7 @@ export class StarSystemController {
         }
 
         const entityContext: SystemEntityUpdateContext = {
+            camera,
             observerPosition: cameraPosition,
             deltaSeconds,
         };

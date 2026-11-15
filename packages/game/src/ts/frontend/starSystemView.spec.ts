@@ -147,20 +147,25 @@ describe("StarSystemView", () => {
         expect(nextPlayer.serializedSpaceships).toEqual([nextSpaceshipSerialized]);
     });
 
-    it("rewires facility lights before disposing the previous star system", async () => {
+    it("removes the registered entity regions and legacy facility lights before disposing the system", async () => {
         const oldFacility = {};
         const newFacility = {};
+        const oldRegion = {};
+        const oldEntity = {};
+        const newEntity = {};
         const oldStarSystem = {
             dispose: vi.fn(),
-            getOrbitalFacilities: (): ReadonlyArray<object> => [oldFacility],
+            getOrbitalFacilities: () => [oldFacility],
+            getSystemEntities: () => [oldEntity],
         };
         const newStarSystem = {
             getOrbitalFacilities: () => [newFacility],
-            getSystemEntities: () => [],
+            getSystemEntities: () => [newEntity],
             stellarLightSystem: { addShadowCaster: vi.fn(), addShadowCasters: vi.fn() },
         } as unknown as StarSystemController;
         vi.spyOn(StarSystemController, "CreateAsync").mockResolvedValue(ok(newStarSystem));
-
+        const getRegion = vi.fn(() => ({}));
+        const registeredRegions = new Set([oldRegion]);
         const clusteredLightingSystem = {
             registerRegion: vi.fn(),
             unregisterRegion: vi.fn(),
@@ -170,6 +175,7 @@ describe("StarSystemView", () => {
             assets: {},
             characterControls: null,
             clusteredLightingSystem,
+            entityLightingRegions: registeredRegions,
             loader: {},
             postProcessManager: { reset: vi.fn() },
             progressMonitor: {},
@@ -178,18 +184,29 @@ describe("StarSystemView", () => {
             spaceshipControls: null,
             starSystem: oldStarSystem,
             systemEntityLoader: {},
+            systemEntityProcessors: {
+                lightingRegions: { dispatch: getRegion },
+                shadowCasters: { dispatch: () => [] },
+            },
             targetingSystem: { reset: vi.fn() },
             terrainSystem: { reset: vi.fn() },
         } as unknown as StarSystemView;
 
         await StarSystemView.prototype.loadStarSystem.call(context, { system: {}, entities: [] } as never);
 
-        expect(clusteredLightingSystem.unregisterRegion).toHaveBeenCalledWith(oldFacility);
+        expect(clusteredLightingSystem.unregisterRegion).toHaveBeenCalledTimes(2);
+        expect(clusteredLightingSystem.unregisterRegion.mock.calls[0]?.[0]).toBe(oldRegion);
+        expect(clusteredLightingSystem.unregisterRegion.mock.calls[1]?.[0]).toBe(oldFacility);
         expect(oldStarSystem.dispose).toHaveBeenCalledOnce();
         expect(clusteredLightingSystem.registerRegion).toHaveBeenCalledWith(newFacility);
-        expect(clusteredLightingSystem.unregisterRegion.mock.invocationCallOrder[0]).toBeLessThan(
-            oldStarSystem.dispose.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY,
-        );
+        expect(getRegion).toHaveBeenCalledExactlyOnceWith(newEntity);
+        const newRegion: unknown = getRegion.mock.results[0]?.value;
+        expect(clusteredLightingSystem.registerRegion.mock.calls[1]?.[0]).toBe(newRegion);
+        expect(registeredRegions.size).toBe(1);
+        expect([...registeredRegions][0]).toBe(newRegion);
+        for (const order of clusteredLightingSystem.unregisterRegion.mock.invocationCallOrder) {
+            expect(order).toBeLessThan(oldStarSystem.dispose.mock.invocationCallOrder[0] ?? Number.POSITIVE_INFINITY);
+        }
     });
 
     it.each([

@@ -1,3 +1,4 @@
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
@@ -16,6 +17,7 @@ import { getVestaModel } from "@/modules/vesta/vesta";
 
 import { ModuleAssetRegistry } from "./assets/moduleAssetRegistry";
 import { createGameModuleApi } from "./createGameModuleApi";
+import type { ClusteredLightingRegion } from "./helpers/clusteredLightingSystem";
 import { makeSystemContentType } from "./systemEntity/systemEntity";
 import type { SystemContent, SystemEntity } from "./systemEntity/systemEntity";
 import { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
@@ -65,12 +67,30 @@ describe("module entity capabilities", () => {
         engine.dispose();
     });
 
-    it("registers geometry for matching entities and clears registrations without disposing their content", () => {
+    it("registers geometry, lighting and camera-aware updates for the matching entity type", () => {
+        const region: ClusteredLightingRegion = { ...geometry, getLights: () => [] };
+        const update = vi.fn();
         api.systemEntities.registerSpatialGeometry(type, () => geometry);
+        api.rendering.lighting.systemEntities.registerRegion(type, () => region);
+        api.systemEntities.registerUpdate(type, update);
+        const context = {
+            camera: new FreeCamera("camera", Vector3.Zero(), scene),
+            observerPosition: new Vector3(1, 2, 3),
+            deltaSeconds: 0.5,
+        };
+
         expect(processors.spatialGeometry.dispatch(entity)).toBe(geometry);
+        expect(processors.lightingRegions.dispatch(entity)).toBe(region);
         expect(processors.spatialGeometry.dispatch(ignored)).toBeNull();
+        expect(processors.lightingRegions.dispatch(ignored)).toBeNull();
+        processors.updateEntities([entity, ignored], context);
+        expect(update).toHaveBeenCalledExactlyOnceWith(entity, context);
+
         processors.dispose();
         expect(processors.spatialGeometry.dispatch(entity)).toBeNull();
+        expect(processors.lightingRegions.dispatch(entity)).toBeNull();
+        processors.updateEntities([entity], context);
+        expect(update).toHaveBeenCalledOnce();
         expect(disposeContent).not.toHaveBeenCalled();
     });
 

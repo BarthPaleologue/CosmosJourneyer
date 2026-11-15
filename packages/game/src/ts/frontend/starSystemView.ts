@@ -56,6 +56,7 @@ import { DefaultControls } from "@/frontend/controls/defaultControls/defaultCont
 import { DefaultControlsInputs } from "@/frontend/controls/defaultControls/defaultControlsInputs";
 import { wrapVector3 } from "@/frontend/helpers/algebra";
 import { ClusteredLightingSystem } from "@/frontend/helpers/clusteredLightingSystem";
+import type { ClusteredLightingRegion } from "@/frontend/helpers/clusteredLightingSystem";
 import { getNeighborStarSystemCoordinates } from "@/frontend/helpers/getNeighborStarSystems";
 import { axisCompositeToString, dPadCompositeToString } from "@/frontend/helpers/inputControlsString";
 import { positionNearObject, positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
@@ -195,6 +196,8 @@ export class StarSystemView implements View {
      * The controller of the current star system. This controller is unique per star system and is destroyed when the star system is changed.
      */
     private starSystem: StarSystemController | null = null;
+
+    private readonly entityLightingRegions = new Set<ClusteredLightingRegion>();
 
     /**
      * The star system loader used to load the star system. It is constant for the whole game.
@@ -555,6 +558,11 @@ export class StarSystemView implements View {
         this._isLoadingSystem = true;
 
         if (this.starSystem !== null) {
+            for (const region of this.entityLightingRegions) {
+                this.clusteredLightingSystem.unregisterRegion(region);
+            }
+            this.entityLightingRegions.clear();
+
             this.spaceshipControls?.setClosestLandableFacility(null);
             this.terrainSystem.reset();
             this.postProcessManager.reset();
@@ -605,6 +613,16 @@ export class StarSystemView implements View {
             this.systemEntityProcessors.shadowCasters.dispatch(entity),
         );
         this.starSystem.stellarLightSystem.addShadowCasters(systemEntityShadowCasters);
+
+        for (const entity of systemEntities) {
+            const region = this.systemEntityProcessors.lightingRegions.dispatch(entity);
+            if (region === null) {
+                continue;
+            }
+
+            this.clusteredLightingSystem.registerRegion(region);
+            this.entityLightingRegions.add(region);
+        }
 
         return ok(this.starSystem);
     }
