@@ -1,0 +1,9 @@
+import type { HasBoundingSphere } from "./architecture/hasBoundingSphere";
+import type { Transformable } from "./architecture/transformable";
+
+export type SpatialGeometry = Transformable & HasBoundingSphere;
+
+export type SystemObject = SpatialGeometry & {
+    id: string;
+    name: string;
+};

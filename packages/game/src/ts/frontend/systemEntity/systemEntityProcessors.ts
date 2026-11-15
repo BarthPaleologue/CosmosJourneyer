@@ -23,6 +23,7 @@ import type { SystemEntityMusicContext } from "../audio/musicSystem";
 import type { Target } from "../targeting/target";
 import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
 import type { Transformable } from "../universe/architecture/transformable";
+import type { SpatialGeometry } from "../universe/systemObject";
 import type { AnySystemContentType, SystemEntity } from "./systemEntity";
 import { SystemEntityProcessorRegistry } from "./systemEntityProcessor";
 import type { SystemEntityProcessor } from "./systemEntityProcessor";
@@ -33,6 +34,7 @@ export type SystemEntityUpdateContext = {
 };
 
 export class SystemEntityProcessors {
+    readonly spatialGeometry: SystemEntityProcessorRegistry<void, SpatialGeometry | null>;
     readonly targeting: SystemEntityProcessorRegistry<void, Array<Target>>;
     readonly music: SystemEntityProcessorRegistry<SystemEntityMusicContext, Array<keyof Musics>>;
     private readonly update: SystemEntityProcessorRegistry<SystemEntityUpdateContext, void>;
@@ -40,6 +42,7 @@ export class SystemEntityProcessors {
     readonly sphereOccluders: SystemEntityProcessorRegistry<void, Array<Transformable & HasBoundingSphere>>;
 
     constructor() {
+        this.spatialGeometry = new SystemEntityProcessorRegistry(() => null);
         this.targeting = new SystemEntityProcessorRegistry(() => []);
         this.music = new SystemEntityProcessorRegistry(() => []);
         this.update = new SystemEntityProcessorRegistry(() => {});
@@ -61,6 +64,7 @@ export class SystemEntityProcessors {
     }
 
     dispose() {
+        this.spatialGeometry.dispose();
         this.targeting.dispose();
         this.music.dispose();
         this.update.dispose();

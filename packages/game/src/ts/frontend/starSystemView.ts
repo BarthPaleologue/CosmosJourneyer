@@ -576,6 +576,7 @@ export class StarSystemView implements View {
             this.moduleAssets,
             this.scene,
             this.progressMonitor,
+            this.systemEntityProcessors,
         );
 
         if (!starSystemResult.success) {
@@ -1272,7 +1273,7 @@ export class StarSystemView implements View {
 
         activeControls.update(deltaSeconds);
 
-        starSystem.update(deltaSeconds, this.terrainSystem, this.systemEntityProcessors);
+        starSystem.update(deltaSeconds, this.terrainSystem);
 
         if (activeControls === this.spaceshipControls) {
             this.spaceshipControls.syncThirdPersonCameraPosition();
