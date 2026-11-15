@@ -18,6 +18,7 @@ import { getVestaModel } from "@/modules/vesta/vesta";
 import { ModuleAssetRegistry } from "./assets/moduleAssetRegistry";
 import { createGameModuleApi } from "./createGameModuleApi";
 import type { ClusteredLightingRegion } from "./helpers/clusteredLightingSystem";
+import { StarMapSystemInfoRegistry } from "./starmap/starMapSystemInfoRegistry";
 import { makeSystemContentType } from "./systemEntity/systemEntity";
 import type { SystemContent, SystemEntity } from "./systemEntity/systemEntity";
 import { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
@@ -36,6 +37,7 @@ describe("module entity capabilities", () => {
     let scene: Scene;
     let processors: SystemEntityProcessors;
     let api: GameModuleApi;
+    let starMapSystemInfo: StarMapSystemInfoRegistry;
     let entity: SystemEntity<typeof type>;
     let ignored: SystemEntity;
     let geometry: SpatialGeometry;
@@ -44,11 +46,13 @@ describe("module entity capabilities", () => {
         engine = new NullEngine();
         scene = new Scene(engine);
         processors = new SystemEntityProcessors();
+        starMapSystemInfo = new StarMapSystemInfoRegistry();
         api = createGameModuleApi(
             new UniverseBackend(new SystemEntityBackend()),
             new SystemEntityLoader(),
             processors,
             new ModuleAssetRegistry(),
+            starMapSystemInfo,
         );
         const model = getVestaModel().systemEntities[0];
         if (model === undefined) {
@@ -209,5 +213,11 @@ describe("module entity capabilities", () => {
         expect(
             StarSystemController.prototype.getLandableFacilityById.call(controller, entity.model.id),
         ).toBeUndefined();
+    });
+
+    it("shares module information registrations with the game's star-map registry", () => {
+        api.starMapSystemInfo.register(({ system }) => system.name);
+        const content = { system: getVestaModel().starSystem, entities: [] };
+        expect(starMapSystemInfo.getInfo(content)).toEqual([content.system.name]);
     });
 });

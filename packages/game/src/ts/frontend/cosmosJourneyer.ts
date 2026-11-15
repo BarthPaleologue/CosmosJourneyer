@@ -52,6 +52,7 @@ import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 import { bytesToDataUrl, downloadPng, makeScreenshotPng } from "@/frontend/helpers/screenshot";
 import { GeneralInputs } from "@/frontend/inputs/generalInputs";
 import { Player } from "@/frontend/player/player";
+import { StarMapSystemInfoRegistry } from "@/frontend/starmap/starMapSystemInfoRegistry";
 import { StarMapView } from "@/frontend/starmap/starMapView";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { DesktopUpdateController } from "@/frontend/ui/desktopUpdateController";
@@ -511,11 +512,13 @@ export class CosmosJourneyer {
 
         const moduleAssetRegistry = new ModuleAssetRegistry();
 
+        const starMapSystemInfo = new StarMapSystemInfoRegistry();
         const gameModuleApi = createGameModuleApi(
             backend.universe,
             systemEntityLoader,
             systemEntityProcessors,
             moduleAssetRegistry,
+            starMapSystemInfo,
         );
 
         const builtinModules = getBuiltinModules();
@@ -569,6 +572,7 @@ export class CosmosJourneyer {
             backend.universe,
             soundPlayer,
             notificationManager,
+            starMapSystemInfo,
             t,
         );
 
