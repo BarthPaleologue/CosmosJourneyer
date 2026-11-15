@@ -918,12 +918,17 @@ export class CosmosJourneyer {
             spaceShipControls.getTransform(),
         );
 
-        const shipLocation: UniverseCoordinates = spaceship.isLandedAtFacility()
-            ? {
-                  type: "atStation",
-                  universeObjectId: shipUniverseCoordinates.universeObjectId,
-              }
-            : shipUniverseCoordinates;
+        const landingFacility = spaceShipControls.getLandingFacility();
+        const shipLocation: UniverseCoordinates =
+            spaceship.isLandedAtFacility() && landingFacility !== null
+                ? {
+                      type: "atStation",
+                      universeObjectId: {
+                          systemCoordinates: shipUniverseCoordinates.universeObjectId.systemCoordinates,
+                          idInSystem: landingFacility.id,
+                      },
+                  }
+                : shipUniverseCoordinates;
 
         const saveData: Save = {
             uuid: crypto.randomUUID(),
@@ -1053,7 +1058,7 @@ export class CosmosJourneyer {
 
             const targetObject = this.starSystemView
                 .getStarSystem()
-                .getNearestOrbitalObject(activeControls.getTransform().getAbsolutePosition());
+                .getNearestSystemObject(activeControls.getTransform().getAbsolutePosition());
 
             lookAt(
                 this.starSystemView.getSpaceshipControls().getTransform(),

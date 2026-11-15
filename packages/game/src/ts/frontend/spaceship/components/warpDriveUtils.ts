@@ -19,35 +19,33 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
 import type { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import type { SystemObject } from "@/frontend/universe/systemObject";
 
 import { isInsideRingRadialBounds, isPositionInsideRingVolume, projectPositionOnRingPlane } from "@/utils/ringVolume";
-
-import type { Altimeter } from "../altimeter";
 
 /**
  * Checks whether the ship has enough clearance to engage or remain in warp.
  * @param shipTransform Ship position and forward direction.
- * @param shipAltimeter Altitude above the nearest surface, when available.
+ * @param altitude Measured clearance for this object, in meters, or null when unavailable.
  * @param currentVelocity Current forward speed used to predict clearance.
- * @param nearestOrbitalObject Nearest body and its surrounding ring volume.
+ * @param nearestObject Nearest spatial object, including any rings on orbital bodies.
  * @returns Whether the predicted path clears the body and its rings.
  */
 export function canEngageWarpDrive(
     shipTransform: TransformNode,
-    shipAltimeter: Altimeter,
+    altitude: number | null,
     currentVelocity: number,
-    nearestOrbitalObject: OrbitalObject,
+    nearestObject: OrbitalObject | SystemObject,
 ): boolean {
     const shipPosition = shipTransform.getAbsolutePosition();
-    const nearestObjectPosition = nearestOrbitalObject.getTransform().getAbsolutePosition();
+    const nearestObjectPosition = nearestObject.getTransform().getAbsolutePosition();
 
     const distanceToObjectCenter = Vector3.Distance(shipPosition, nearestObjectPosition);
 
-    const altimeterDistance = shipAltimeter.getAltitude();
-    const roughDistance = distanceToObjectCenter - nearestOrbitalObject.getBoundingRadius();
-    const distanceToObject = altimeterDistance !== null ? Math.min(altimeterDistance, roughDistance) : roughDistance;
+    const roughDistance = distanceToObjectCenter - nearestObject.getBoundingRadius();
+    const distanceToObject = altitude !== null ? Math.min(altitude, roughDistance) : roughDistance;
 
-    const emergencyMargin = 0.03 * nearestOrbitalObject.getBoundingRadius();
+    const emergencyMargin = 0.03 * nearestObject.getBoundingRadius();
     if (distanceToObject <= emergencyMargin) {
         return false;
     }
@@ -65,16 +63,17 @@ export function canEngageWarpDrive(
     }
 
     if (
-        nearestOrbitalObject.type !== "gasPlanet" &&
-        nearestOrbitalObject.type !== "telluricPlanet" &&
-        nearestOrbitalObject.type !== "star" &&
-        nearestOrbitalObject.type !== "neutronStar"
+        !("type" in nearestObject) ||
+        (nearestObject.type !== "gasPlanet" &&
+            nearestObject.type !== "telluricPlanet" &&
+            nearestObject.type !== "star" &&
+            nearestObject.type !== "neutronStar")
     ) {
         return true;
     }
 
     // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
-    const asteroidField = nearestOrbitalObject.asteroidField;
+    const asteroidField = nearestObject.asteroidField;
     if (asteroidField === null) {
         return true;
     }

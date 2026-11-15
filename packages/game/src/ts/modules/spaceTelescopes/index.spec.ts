@@ -92,6 +92,9 @@ describe("space telescope module in Vesta", () => {
                 registerAuthored: vi.fn(),
                 registerProcedural,
                 registerUpdate,
+                registerSpatialGeometry: (type, getGeometry) => {
+                    processors.spatialGeometry.register(type, getGeometry);
+                },
                 registerContentFactory: (type, factory) => {
                     loader.registerFactory(type, factory);
                 },
@@ -103,8 +106,10 @@ describe("space telescope module in Vesta", () => {
                     },
                 },
             },
+            landingPad: { systemEntities: { register: vi.fn() } },
             music: { systemEntities: { register: vi.fn() } },
             rendering: {
+                lighting: { systemEntities: { registerRegion: vi.fn() } },
                 shadows: {
                     systemEntities: {
                         registerShadowCasters: (type, processor) => {

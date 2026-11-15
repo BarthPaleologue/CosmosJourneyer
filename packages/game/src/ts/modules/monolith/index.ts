@@ -29,6 +29,10 @@ export const MonolithModule: GameModule = {
     setup: ({ systemEntities, targeting, rendering }): void => {
         const type = makeSystemContentType<MonolithModel, Monolith>("monolith");
 
+        systemEntities.registerSpatialGeometry(type, (entity) => ({
+            getTransform: () => entity.content.getTransform(),
+            getBoundingRadius: () => entity.content.radius,
+        }));
         systemEntities.registerContentFactory(type, (model, context) => ok(new Monolith(context.scene)));
 
         systemEntities.registerUpdate(type, (monolith, context) => {
@@ -40,7 +44,7 @@ export const MonolithModule: GameModule = {
                 {
                     type: TargetType.ANOMALY,
                     properName: monolith.model.name,
-                    getTransform: () => monolith.placement.getTransform(),
+                    getTransform: () => monolith.content.getTransform(),
                     getBoundingRadius: () => 10e3,
                 },
             ];

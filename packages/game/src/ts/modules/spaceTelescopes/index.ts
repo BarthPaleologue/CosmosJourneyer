@@ -29,6 +29,10 @@ export const SpaceTelescopesModule: GameModule = {
     id: "space-telescopes",
     setup: ({ systemEntities, targeting, rendering }): void => {
         const type = makeSystemContentType<SpaceTelescopeModel, SpaceTelescope>("spaceTelescope");
+        systemEntities.registerSpatialGeometry(type, (entity) => ({
+            getTransform: () => entity.content.getTransform(),
+            getBoundingRadius: () => entity.content.radius,
+        }));
         systemEntities.registerContentFactory(type, (model, { scene, assets }) => {
             const parsed = SpaceTelescopeModelSchema.safeParse(model.content);
             if (!parsed.success) {

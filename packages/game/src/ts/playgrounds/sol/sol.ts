@@ -89,6 +89,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         moduleAssets,
         scene,
         progressMonitor,
+        systemEntityProcessors,
     );
     if (!starSystemControllerResult.success) {
         throw starSystemControllerResult.error;
@@ -123,7 +124,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
 
         terrainSystem.update();
         postProcessManager.update(deltaSeconds);
-        starSystemController.update(deltaSeconds, terrainSystem, systemEntityProcessors);
+        starSystemController.update(deltaSeconds, terrainSystem);
         camera.getViewMatrix();
         targetingSystem.update(camera.globalPosition);
         targetCursorLayer.update(camera, null);
