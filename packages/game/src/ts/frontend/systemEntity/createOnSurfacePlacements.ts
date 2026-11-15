@@ -192,6 +192,9 @@ function createPlacementsFromTerrainResults(
         for (const [i, { entityId, placementModel }] of placements.entries()) {
             const terrainHeight = heights[i];
             if (terrainHeight === undefined) {
+                entityIdToPlacement.forEach((placement) => {
+                    placement.getTransform().dispose();
+                });
                 return err(new Error(`ground height at index ${i} had no corresponding surface placement`));
             }
 

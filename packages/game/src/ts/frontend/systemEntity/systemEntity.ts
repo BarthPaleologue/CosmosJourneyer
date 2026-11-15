@@ -50,9 +50,11 @@ export type SystemEntity<T extends AnySystemContentType = AnySystemContentType> 
     placement: SystemEntityPlacement;
 }>;
 
-export type SystemEntityPlacement = InOrbitPlacement | OnSurfacePlacement;
+export type SystemEntityPlacement = InOrbitPlacement | OnSurfacePlacement | InFramePlacement;
 
 export type InOrbitPlacement = { type: "inOrbit" } & KeplerianObject;
+
+export type InFramePlacement = { type: "inFrame" } & Transformable;
 
 export type OnSurfacePlacement = { type: "onSurface" } & Transformable;
 

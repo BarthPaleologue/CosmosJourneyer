@@ -180,7 +180,7 @@ export class StarSystemController {
     public static async CreateAsync(
         model: DeepReadonly<StarSystemModel>,
         loader: StarSystemLoader,
-        entityModels: Iterable<DeepReadonly<SystemEntityModel>>,
+        entityModels: ReadonlyArray<DeepReadonly<SystemEntityModel>>,
         entityLoader: SystemEntityLoader,
         terrainSystem: ITerrainSystem,
         assets: RenderingAssets,
