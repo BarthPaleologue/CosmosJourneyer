@@ -1053,7 +1053,7 @@ export class CosmosJourneyer {
 
             const targetObject = this.starSystemView
                 .getStarSystem()
-                .getNearestOrbitalObject(activeControls.getTransform().getAbsolutePosition());
+                .getNearestSystemObject(activeControls.getTransform().getAbsolutePosition());
 
             lookAt(
                 this.starSystemView.getSpaceshipControls().getTransform(),

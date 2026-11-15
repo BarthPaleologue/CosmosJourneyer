@@ -46,7 +46,6 @@ import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
 import { easeInOutCubic, slerpSmoothToRef } from "../helpers/animations/interpolations";
 import type { INotificationManager } from "../ui/notificationManager";
-import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 import { SpaceShipControlsInputs } from "./spaceShipControlsInputs";
 import { thirdPersonCameraPresets } from "./thirdPersonCameraPresets";
@@ -150,12 +149,7 @@ export class ShipControls implements Controls {
                 return;
             }
 
-            const nearestOrbitalObject = spaceship.getNearestOrbitalObject();
-            if (
-                warpDrive.isDisabled() &&
-                nearestOrbitalObject !== null &&
-                !canEngageWarpDrive(spaceship.getTransform(), spaceship.getAltimeter(), 0, nearestOrbitalObject)
-            ) {
+            if (warpDrive.isDisabled() && !spaceship.canEngageWarpDrive(0)) {
                 tts.sayNow("Charlotte", "cannot_engage_warp_drive");
                 return;
             }

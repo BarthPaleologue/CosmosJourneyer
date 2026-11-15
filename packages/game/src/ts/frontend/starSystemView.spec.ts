@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
-import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { NullEngine, NullEngineOptions } from "@babylonjs/core/Engines/nullEngine";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
@@ -262,6 +262,124 @@ describe("StarSystemView", () => {
             engine.dispose();
         }
     });
+});
+
+describe("entity save locations", () => {
+    it("round-trips relative coordinates around a translated, rotating station", async () => {
+        const options = new NullEngineOptions();
+        options.useHighPrecisionMatrix = true;
+        const engine = new NullEngine(options);
+        const scene = new Scene(engine);
+        const stationTransform = new TransformNode("station", scene);
+        stationTransform.position.set(1e9, 2e8, -3e8);
+        stationTransform.rotationQuaternion = Quaternion.RotationYawPitchRoll(0.8, 0.3, -0.5);
+        stationTransform.computeWorldMatrix(true);
+        const object = {
+            id: "station",
+            name: "Station",
+            getTransform: () => stationTransform,
+            getBoundingRadius: () => 100,
+        };
+        const transform = new TransformNode("ship", scene);
+        transform.position.copyFrom(
+            Vector3.TransformCoordinates(new Vector3(0, 0, 500), stationTransform.getWorldMatrix()),
+        );
+        transform.rotationQuaternion = Quaternion.RotationYawPitchRoll(0.4, 0.2, 0.7);
+        transform.computeWorldMatrix(true);
+        const position = transform.getAbsolutePosition().clone();
+        const rotation = transform.absoluteRotationQuaternion.clone();
+        const starSystem = {
+            model: { coordinates: { starSectorX: 0, starSectorY: 0, starSectorZ: 0, localX: 0, localY: 0, localZ: 0 } },
+            getNearestSystemObject: () => object,
+            getSystemObjectById: (id: string) => (id === object.id ? object : undefined),
+        };
+        const setTarget = vi.fn();
+        const context = {
+            getStarSystem: () => starSystem,
+            getActiveControls: () => ({ getTransform: () => transform }),
+            targetingSystem: { setTarget },
+        } as unknown as StarSystemView;
+        const prototype = StarSystemView.prototype as unknown as {
+            loadRelativeLocation(
+                this: StarSystemView,
+                location: ReturnType<StarSystemView["getCurrentUniverseCoordinates"]>,
+            ): Promise<void>;
+        };
+        try {
+            const location = StarSystemView.prototype.getCurrentUniverseCoordinates.call(context, transform, null);
+            expect(location.universeObjectId.idInSystem).toBe("station");
+            transform.position.setAll(0);
+            transform.rotationQuaternion = Quaternion.Identity();
+            await prototype.loadRelativeLocation.call(context, location);
+            transform.computeWorldMatrix(true);
+            expect(transform.getAbsolutePosition().equalsWithEpsilon(position, 1e-3)).toBe(true);
+            expect(Math.abs(Quaternion.Dot(transform.absoluteRotationQuaternion, rotation))).toBeCloseTo(1);
+            expect(setTarget).toHaveBeenCalledWith(object);
+        } finally {
+            scene.dispose();
+            engine.dispose();
+        }
+    });
+    it.each([
+        { offset: 0, expectedDistance: 500 },
+        { offset: 0.00001, expectedDistance: 110 },
+        { offset: 50, expectedDistance: 200 },
+    ])(
+        "recovers a relative spawn at distance $offset from a translated entity",
+        async ({ offset, expectedDistance }) => {
+            const options = new NullEngineOptions();
+            options.useHighPrecisionMatrix = true;
+            const engine = new NullEngine(options);
+            const scene = new Scene(engine);
+            const station = new TransformNode("station", scene);
+            station.position.set(1e9, 2e8, -3e8);
+            station.rotationQuaternion = Quaternion.RotationYawPitchRoll(0.8, 0.3, -0.5);
+            station.computeWorldMatrix(true);
+            const player = new TransformNode("player", scene);
+            const object = { id: "station", getTransform: () => station, getBoundingRadius: () => 100 };
+            const context = {
+                getStarSystem: () => ({ getSystemObjectById: () => object }),
+                getActiveControls: () => ({ getTransform: () => player }),
+                targetingSystem: { setTarget: vi.fn() },
+            } as unknown as StarSystemView;
+            const prototype = StarSystemView.prototype as unknown as {
+                loadRelativeLocation(
+                    this: StarSystemView,
+                    location: ReturnType<StarSystemView["getCurrentUniverseCoordinates"]>,
+                ): Promise<void>;
+            };
+            try {
+                await prototype.loadRelativeLocation.call(context, {
+                    type: "relative",
+                    universeObjectId: {
+                        idInSystem: "station",
+                        systemCoordinates: {
+                            starSectorX: 0,
+                            starSectorY: 0,
+                            starSectorZ: 0,
+                            localX: 0,
+                            localY: 0,
+                            localZ: 0,
+                        },
+                    },
+                    position: { x: 0, y: 0, z: offset },
+                    rotation: { x: 0, y: 0, z: 0, w: 1 },
+                });
+                const worldOffset = player.getAbsolutePosition().subtract(station.getAbsolutePosition());
+                expect(worldOffset.length()).toBeCloseTo(expectedDistance, 2);
+                if (offset > 0) {
+                    const direction = Vector3.TransformNormal(
+                        new Vector3(0, 0, 1),
+                        station.getWorldMatrix(),
+                    ).normalize();
+                    expect(Vector3.Dot(worldOffset.normalize(), direction)).toBeCloseTo(1);
+                }
+            } finally {
+                scene.dispose();
+                engine.dispose();
+            }
+        },
+    );
 });
 
 describe("station save loading", () => {
