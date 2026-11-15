@@ -15,7 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { degreesToRadians, durationToSeconds, EarthSeaLevelPressure } from "@cosmos-journeyer/physics";
+import {
+    degreesToRadians,
+    durationToSeconds,
+    EarthSeaLevelPressure,
+    SaturnMagneticDipoleMoment,
+} from "@cosmos-journeyer/physics";
 import type { GasPlanetModel, OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
 /**
@@ -48,6 +53,10 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
         atmosphere: {
             pressure: EarthSeaLevelPressure,
             greenHouseEffectFactor: 0.5,
+        },
+        magneticField: {
+            north: { latitude: degreesToRadians(90), longitude: 0 },
+            magnitude: SaturnMagneticDipoleMoment,
         },
         colorPalette: {
             type: "textured",

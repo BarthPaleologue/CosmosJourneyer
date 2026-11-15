@@ -33,6 +33,7 @@ export const GenerationSteps = {
     TERRAIN: 1500,
 
     DIPOLE_TILT: 1300,
+    MAGNETIC_FIELD: 2600,
 
     SIDEREAL_DAY_SECONDS: 2500,
 

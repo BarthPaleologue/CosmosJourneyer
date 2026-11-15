@@ -92,6 +92,10 @@ describe("distanceToStellarObject", () => {
                     greenHouseEffectFactor: 1,
                     pressure: 1,
                 },
+                magneticField: {
+                    north: { latitude: Math.PI / 2, longitude: 0 },
+                    magnitude: 1e27,
+                },
                 colorPalette: {
                     type: "textured",
                     textureId: "jupiter",

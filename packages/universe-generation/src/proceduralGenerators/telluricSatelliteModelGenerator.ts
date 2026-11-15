@@ -43,6 +43,7 @@ import type {
 } from "@cosmos-journeyer/universe-model";
 
 import { generateCloudsModel } from "./cloudsModelGenerator";
+import { generateTelluricMagneticFieldModel } from "./telluricMagneticFieldModelGenerator";
 import { getTemperatureRange } from "./temperatureRange";
 
 /**
@@ -216,6 +217,7 @@ export function generateTelluricSatelliteModel(
         terrainSettings,
         temperature: temperatureRange,
         atmosphere,
+        magneticField: generateTelluricMagneticFieldModel(radius, 0.1, rng),
         ocean,
         clouds,
     };

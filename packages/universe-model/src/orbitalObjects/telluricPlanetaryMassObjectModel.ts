@@ -18,6 +18,7 @@
 import type { AtmosphereModel } from "./atmosphereModel";
 import type { CloudsModel } from "./cloudsModel";
 import type { OrbitalObjectType } from "./index";
+import type { MagneticFieldModel } from "./magneticFieldModel";
 import type { OceanModel } from "./oceanModel";
 import type { OrbitalObjectModelBase } from "./orbitalObjectModelBase";
 import type { TerrainSettings } from "./terrainSettings";
@@ -47,6 +48,8 @@ export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = 
         max: number;
     };
 
+    /** Intrinsic global dipole; excludes crustal and externally induced fields. */
+    magneticField: MagneticFieldModel | null;
     atmosphere: AtmosphereModel | null;
     clouds: CloudsModel | null;
     ocean: OceanModel | null;

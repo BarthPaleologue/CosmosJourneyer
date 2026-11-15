@@ -30,6 +30,15 @@ export const EarthMass = 5.972e24;
 /** The radius of the Earth in meters */
 export const EarthRadius = 6_371e3;
 
+/** The magnetic dipole moment of Earth in A·m². */
+export const EarthMagneticDipoleMoment = 7.8e22;
+
+/**
+ * The magnetic dipole moment of Mercury in A·m², approximated from MESSENGER observations.
+ * @see https://pubmed.ncbi.nlm.nih.gov/21960627/
+ */
+export const MercuryMagneticDipoleMoment = 2.8e19;
+
 /**
  * The mass of the Moon in kilograms.
  */
@@ -42,6 +51,18 @@ export const JupiterMass = 1.898e27;
 
 /** The radius of Jupiter in meters. */
 export const JupiterRadius = 69_911e3;
+
+/** The magnetic dipole moment of Jupiter in A·m². */
+export const JupiterMagneticDipoleMoment = 1.66e27;
+
+/** The magnetic dipole moment of Saturn in A·m². */
+export const SaturnMagneticDipoleMoment = 4.6e25;
+
+/** The magnetic dipole moment of Uranus in A·m². */
+export const UranusMagneticDipoleMoment = 3.9e24;
+
+/** The magnetic dipole moment of Neptune in A·m². */
+export const NeptuneMagneticDipoleMoment = 2.16e24;
 
 /**
  * The mass of the sun in kilograms.

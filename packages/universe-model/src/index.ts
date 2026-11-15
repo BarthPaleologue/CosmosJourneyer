@@ -29,6 +29,7 @@ export type * from "./orbitalObjects/cloudsModel";
 export type * from "./orbitalObjects/gasPlanetModel";
 export * from "./orbitalObjects/getCelestialBodyRadius";
 export type * from "./orbitalObjects/hasSeed";
+export type * from "./orbitalObjects/magneticFieldModel";
 export type * from "./orbitalObjects/index";
 export type * from "./orbitalObjects/oceanModel";
 export * from "./orbitalObjects/orbit";
