@@ -98,5 +98,12 @@ export function createGameModuleApi(
                 },
             },
         },
+        landingPad: {
+            systemEntities: {
+                register: (type, getLandingPadProvider) => {
+                    systemEntityProcessors.landingPadProviders.register(type, getLandingPadProvider);
+                },
+            },
+        },
     };
 }

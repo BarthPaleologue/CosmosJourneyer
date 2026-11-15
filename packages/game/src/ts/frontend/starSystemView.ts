@@ -563,7 +563,7 @@ export class StarSystemView implements View {
             }
             this.entityLightingRegions.clear();
 
-            this.spaceshipControls?.setClosestLandableFacility(null);
+            this.spaceshipControls?.reset();
             this.terrainSystem.reset();
             this.postProcessManager.reset();
             for (const facility of this.starSystem.getOrbitalFacilities()) {
@@ -902,12 +902,9 @@ export class StarSystemView implements View {
 
         const playerTransform = controls.getTransform();
         const starSystem = this.getStarSystem();
-        const station = starSystem.getOrbitalObjectById(location.universeObjectId.idInSystem);
+        const station = starSystem.getLandableFacilityById(location.universeObjectId.idInSystem);
 
-        const doesStationExist =
-            station !== undefined && (station.type === "spaceStation" || station.type === "spaceElevator");
-
-        if (!doesStationExist) {
+        if (station === undefined) {
             const fallbackObject = starSystem.getStellarObjects()[0];
 
             positionNearObject(
@@ -949,8 +946,7 @@ export class StarSystemView implements View {
         }
 
         const shipControls = this.getSpaceshipControls();
-        shipControls.setClosestLandableFacility(station);
-        shipControls.getSpaceship().spawnOnPad(landingPad);
+        shipControls.spawnOnPad(station, landingPad);
         shipControls.syncCameraTransform();
     }
 
@@ -1315,11 +1311,7 @@ export class StarSystemView implements View {
             nearestObject.id === nearestOrbitalObject.model.id ? nearestOrbitalObject : nearestObject,
         );
 
-        if (nearestOrbitalObject.type === "spaceStation" || nearestOrbitalObject.type === "spaceElevator") {
-            this.spaceshipControls.setClosestLandableFacility(nearestOrbitalObject);
-        } else {
-            this.spaceshipControls.setClosestLandableFacility(null);
-        }
+        this.spaceshipControls.setClosestLandableFacility(starSystem.getLandableFacilityById(nearestObject.id) ?? null);
 
         const shipDiscoveryScanner = spaceship.getInternals().getDiscoveryScanner();
         if (
@@ -1430,22 +1422,14 @@ export class StarSystemView implements View {
             this.targetingSystem.setTarget(targetLandingPad);
         }
 
-        if (spaceship.isLandedAtFacility() && this.isUiEnabled) {
+        const landingFacility = this.spaceshipControls.getLandingFacility();
+        if (spaceship.isLandedAtFacility() && this.isUiEnabled && landingFacility !== null) {
             this.spaceStationLayer.setVisibility(true);
-            const facility = this.spaceshipControls.getClosestLandableFacility();
-            this.getStarSystem()
-                .getOrbitalFacilities()
-                .find((spaceStation) => {
-                    if (spaceStation === facility) {
-                        this.spaceStationLayer.setStation(
-                            { systemCoordinates: starSystem.model.coordinates, idInSystem: spaceStation.model.id },
-                            spaceStation.model.name,
-                            this.player,
-                        );
-                        return true;
-                    }
-                    return false;
-                });
+            this.spaceStationLayer.setStation(
+                { systemCoordinates: starSystem.model.coordinates, idInSystem: landingFacility.id },
+                landingFacility.name,
+                this.player,
+            );
         } else {
             this.spaceStationLayer.setVisibility(false);
         }

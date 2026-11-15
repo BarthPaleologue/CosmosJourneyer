@@ -60,7 +60,7 @@ import { ScatteringSystem } from "./planets/telluricPlanet/terrain/chunks/scatte
 import type { ITerrainSystem } from "./planets/telluricPlanet/terrain/system/terrainSystem";
 import { StarFieldBox } from "./starFieldBox";
 import type { StarSystemLoader, StarSystemLoaderOutput } from "./starSystemLoader";
-import type { SystemObject } from "./systemObject";
+import type { LandableFacility, SystemObject } from "./systemObject";
 
 /**
  * The controller of the star system manages all resources specific to a single star system.
@@ -368,6 +368,43 @@ export class StarSystemController {
                 Vector3.Distance(position, nearest.getTransform().getAbsolutePosition()) - nearest.getBoundingRadius();
             return distance < nearestDistance ? object : nearest;
         });
+    }
+
+    /** @returns Orbital facilities and module entities with geometry and landing pads. */
+    public getLandableFacilities(): Array<LandableFacility> {
+        const facilities: Array<LandableFacility> = this.getOrbitalFacilities().map((facility) => ({
+            id: facility.model.id,
+            name: facility.model.name,
+            getTransform: () => facility.getTransform(),
+            getBoundingRadius: () => facility.getBoundingRadius(),
+            getLandingPadProvider: () => facility.getLandingPadProvider(),
+        }));
+        for (const entity of this.systemEntities) {
+            const provider = this.systemEntityProcessors.landingPadProviders.dispatch(entity);
+            if (provider === null) {
+                continue;
+            }
+            const geometry = this.systemEntityProcessors.spatialGeometry.dispatch(entity);
+            if (geometry === null) {
+                continue;
+            }
+            facilities.push({
+                id: entity.model.id,
+                name: entity.model.name,
+                getTransform: () => geometry.getTransform(),
+                getBoundingRadius: () => geometry.getBoundingRadius(),
+                getLandingPadProvider: () => provider,
+            });
+        }
+        return facilities;
+    }
+
+    /**
+     * @param id Identifier within this system.
+     * @returns The orbital facility or module entity with registered geometry and landing pads.
+     */
+    public getLandableFacilityById(id: string): LandableFacility | undefined {
+        return this.getLandableFacilities().find((facility) => facility.id === id);
     }
 
     public getSystemEntities(): ReadonlyArray<SystemEntity> {

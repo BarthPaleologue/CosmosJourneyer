@@ -34,10 +34,9 @@ import { createCameraShakeAnimation } from "@/frontend/helpers/animations/camera
 import { pressInteractionToStrings } from "@/frontend/helpers/inputControlsString";
 import { pitch, roll, yaw } from "@/frontend/helpers/transform";
 import { StarSystemInputs } from "@/frontend/inputs/starSystemInputs";
-import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
-import type { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
+import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
+import type { LandableFacility } from "@/frontend/universe/systemObject";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { lerp, lerpAngle, lerpSmooth } from "@/utils/math";
@@ -68,7 +67,8 @@ export class ShipControls implements Controls {
 
     private cameraShakeAnimation: CustomAnimation<Vector2> | null = null;
 
-    private closestLandableFacility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null = null;
+    private closestLandableFacility: LandableFacility | null = null;
+    private landingReservation: { facility: LandableFacility; pad: ILandingPad } | null = null;
 
     private targetFov = Tools.ToRadians(60);
 
@@ -227,30 +227,8 @@ export class ShipControls implements Controls {
 
         SpaceShipControlsInputs.map.landing.on("complete", this.landingHandler);
 
-        this.emitLandingRequestHandler = (): void => {
-            const spaceship = this.getSpaceship();
-            if (spaceship.isLanded() || spaceship.isLanding()) {
-                return;
-            }
-            if (this.closestLandableFacility === null) {
-                return;
-            }
-            const landingPad = this.closestLandableFacility.getLandingPadProvider().handleLandingRequest({
-                minimumPadSize: LandingPadSize.SMALL,
-            });
-            if (landingPad === null) {
-                this.notificationManager.create("space-station", "error", "Landing request rejected", 2000);
-                return;
-            }
-
-            tts.enqueueSay("Charlotte", "landing_request_granted");
-            this.notificationManager.create(
-                "space-station",
-                "success",
-                `Landing request granted. Proceed to ${landingPad.getTransform().name}`,
-                10_000,
-            );
-            spaceship.engageLandingOnPad(landingPad);
+        this.emitLandingRequestHandler = () => {
+            this.requestLanding();
         };
 
         SpaceShipControlsInputs.map.emitLandingRequest.on("complete", this.emitLandingRequestHandler);
@@ -324,7 +302,7 @@ export class ShipControls implements Controls {
         if (spaceship.isLanded()) {
             this.takeOff();
         } else if (spaceship.isLanding()) {
-            this.cancelLandingRequest(spaceship);
+            this.cancelLandingRequest();
             spaceship.cancelLanding();
         }
         if (!spaceship.isAutoPiloted()) {
@@ -335,16 +313,55 @@ export class ShipControls implements Controls {
         }
     }
 
+    public requestLanding(): void {
+        const spaceship = this.getSpaceship();
+        if (spaceship.isLanded() || spaceship.isLanding() || spaceship.getTargetLandingPad() !== null) {
+            return;
+        }
+        if (this.closestLandableFacility === null) {
+            return;
+        }
+        const landingPad = this.closestLandableFacility.getLandingPadProvider().handleLandingRequest({
+            minimumPadSize: LandingPadSize.SMALL,
+        });
+        if (landingPad === null) {
+            this.notificationManager.create("space-station", "error", "Landing request rejected", 2000);
+            return;
+        }
+
+        this.tts.enqueueSay("Charlotte", "landing_request_granted");
+        this.notificationManager.create(
+            "space-station",
+            "success",
+            `Landing request granted. Proceed to ${landingPad.getTransform().name}`,
+            10_000,
+        );
+        this.landingReservation = { facility: this.closestLandableFacility, pad: landingPad };
+        spaceship.engageLandingOnPad(landingPad);
+    }
+
+    public spawnOnPad(facility: LandableFacility, pad: ILandingPad): void {
+        this.landingReservation = { facility, pad };
+        this.closestLandableFacility = facility;
+        this.spaceship.spawnOnPad(pad);
+    }
+
+    public getLandingFacility(): LandableFacility | null {
+        return this.landingReservation?.facility ?? null;
+    }
+
     public takeOff(): void {
-        this.cancelLandingRequest(this.spaceship);
+        this.cancelLandingRequest();
         this.spaceship.takeOff();
     }
 
-    private cancelLandingRequest(spaceship: Spaceship): void {
-        const currentLandingPad = spaceship.getTargetLandingPad();
-        if (currentLandingPad !== null) {
-            this.closestLandableFacility?.getLandingPadProvider().cancelLandingRequest(currentLandingPad);
+    private cancelLandingRequest(): void {
+        if (this.landingReservation === null) {
+            return;
         }
+        const { facility, pad } = this.landingReservation;
+        facility.getLandingPadProvider().cancelLandingRequest(pad);
+        this.landingReservation = null;
     }
 
     public getTransform(): TransformNode {
@@ -371,11 +388,11 @@ export class ShipControls implements Controls {
         this.activeCamera = this.thirdPersonCamera;
     }
 
-    public setClosestLandableFacility(facility: (Transformable & HasBoundingSphere & ManagesLandingPads) | null): void {
+    public setClosestLandableFacility(facility: LandableFacility | null): void {
         this.closestLandableFacility = facility;
     }
 
-    public getClosestLandableFacility(): (Transformable & HasBoundingSphere & ManagesLandingPads) | null {
+    public getClosestLandableFacility(): LandableFacility | null {
         return this.closestLandableFacility;
     }
 
@@ -494,6 +511,7 @@ export class ShipControls implements Controls {
     }
 
     reset(): void {
+        this.cancelLandingRequest();
         this.switchToThirdPersonCamera();
         this.resetCameraHandler("behindCentered");
         this.closestLandableFacility = null;
@@ -540,6 +558,7 @@ export class ShipControls implements Controls {
         });
 
         this.spaceship.onLandingCancelled.add(() => {
+            this.cancelLandingRequest();
             this.notificationManager.create("spaceship", "info", this.t("notifications:landingCancelled"), 5000);
         });
 
@@ -590,6 +609,7 @@ export class ShipControls implements Controls {
     }
 
     dispose(soundPlayer: ISoundPlayer): void {
+        this.cancelLandingRequest();
         this.onToggleWarpDrive.clear();
         this.onCompleteLanding.clear();
 

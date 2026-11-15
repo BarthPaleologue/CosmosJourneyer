@@ -22,6 +22,10 @@ import { makeSystemContentType } from "./systemEntity/systemEntity";
 import type { SystemContent, SystemEntity } from "./systemEntity/systemEntity";
 import { SystemEntityLoader } from "./systemEntity/systemEntityLoader";
 import { SystemEntityProcessors } from "./systemEntity/systemEntityProcessors";
+import { getSystemTargets } from "./targeting/createTargets";
+import { TargetType } from "./targeting/target";
+import type { ILandingPad } from "./universe/orbitalFacility/landingPadProvider";
+import { LandingPadProvider, LandingPadSize } from "./universe/orbitalFacility/landingPadProvider";
 import { StarSystemController } from "./universe/starSystemController";
 import type { SpatialGeometry } from "./universe/systemObject";
 
@@ -67,11 +71,13 @@ describe("module entity capabilities", () => {
         engine.dispose();
     });
 
-    it("registers geometry, lighting and camera-aware updates for the matching entity type", () => {
+    it("registers geometry, lighting, landing pads and camera-aware updates for the matching entity type", () => {
         const region: ClusteredLightingRegion = { ...geometry, getLights: () => [] };
+        const provider = new LandingPadProvider([]);
         const update = vi.fn();
         api.systemEntities.registerSpatialGeometry(type, () => geometry);
         api.rendering.lighting.systemEntities.registerRegion(type, () => region);
+        api.landingPad.systemEntities.register(type, () => provider);
         api.systemEntities.registerUpdate(type, update);
         const context = {
             camera: new FreeCamera("camera", Vector3.Zero(), scene),
@@ -81,14 +87,17 @@ describe("module entity capabilities", () => {
 
         expect(processors.spatialGeometry.dispatch(entity)).toBe(geometry);
         expect(processors.lightingRegions.dispatch(entity)).toBe(region);
+        expect(processors.landingPadProviders.dispatch(entity)).toBe(provider);
         expect(processors.spatialGeometry.dispatch(ignored)).toBeNull();
         expect(processors.lightingRegions.dispatch(ignored)).toBeNull();
+        expect(processors.landingPadProviders.dispatch(ignored)).toBeNull();
         processors.updateEntities([entity, ignored], context);
         expect(update).toHaveBeenCalledExactlyOnceWith(entity, context);
 
         processors.dispose();
         expect(processors.spatialGeometry.dispatch(entity)).toBeNull();
         expect(processors.lightingRegions.dispatch(entity)).toBeNull();
+        expect(processors.landingPadProviders.dispatch(entity)).toBeNull();
         processors.updateEntities([entity], context);
         expect(update).toHaveBeenCalledOnce();
         expect(disposeContent).not.toHaveBeenCalled();
@@ -139,5 +148,66 @@ describe("module entity capabilities", () => {
         } finally {
             content.dispose();
         }
+    });
+    it("exposes registered pads for facility selection, lookup and targeting alongside legacy facilities", () => {
+        const padTransform = new TransformNode("pad", scene);
+        const pad: ILandingPad = {
+            getTransform: () => padTransform,
+            getBoundingRadius: () => 1,
+            getIdentifier: () => "A",
+            getPadSize: () => LandingPadSize.SMALL,
+            getPadHeight: () => 1,
+        };
+        const provider = new LandingPadProvider([pad]);
+        api.systemEntities.registerSpatialGeometry(type, () => geometry);
+        api.landingPad.systemEntities.register(type, () => provider);
+        const legacyTransform = new TransformNode("legacy", scene);
+        legacyTransform.position.z = 1000;
+        const legacy = {
+            model: { id: "legacy", name: "Legacy" },
+            getTransform: () => legacyTransform,
+            getBoundingRadius: () => 990,
+            getLandingPadProvider: () => new LandingPadProvider([]),
+        };
+        const controller = {
+            getOrbitalFacilities: () => [legacy],
+            getOrbitalObjects: () => [],
+            getSystemEntities: () => [entity],
+            getSystemTargets: () => [],
+            getLandableFacilities: () => StarSystemController.prototype.getLandableFacilities.call(controller),
+            systemEntityProcessors: processors,
+            systemEntities: [entity, ignored],
+        } as unknown as StarSystemController;
+        const facilities = controller.getLandableFacilities();
+        expect(facilities.map((facility) => facility.id)).toEqual(["legacy", entity.model.id]);
+        const facility = facilities.find((candidate) => candidate.id === entity.model.id);
+        expect(facility?.getLandingPadProvider()).toBe(provider);
+        expect(facility?.getTransform()).toBe(geometry.getTransform());
+        expect(
+            StarSystemController.prototype.getLandableFacilityById
+                .call(controller, entity.model.id)
+                ?.getLandingPadProvider(),
+        ).toBe(provider);
+        expect(StarSystemController.prototype.getLandableFacilityById.call(controller, "missing")).toBeUndefined();
+        const targets = getSystemTargets(controller, () => []);
+        expect(targets).toHaveLength(1);
+        expect(targets[0]?.type).toBe(TargetType.LANDING_PAD);
+        expect(targets[0]?.getTransform()).toBe(padTransform);
+        const factory = () => targets;
+        expect(getSystemTargets(controller, factory)).toHaveLength(1);
+    });
+
+    it("requires spatial geometry for a landing provider and handles a system without landable facilities", () => {
+        api.landingPad.systemEntities.register(type, () => new LandingPadProvider([]));
+        const controller = {
+            getOrbitalFacilities: () => [],
+            getLandableFacilities: () => StarSystemController.prototype.getLandableFacilities.call(controller),
+            systemEntityProcessors: processors,
+            systemEntities: [entity],
+        } as unknown as StarSystemController;
+        expect(controller.getLandableFacilities()).toEqual([]);
+        expect(
+            StarSystemController.prototype.getLandableFacilityById.call(controller, entity.model.id),
+        ).toBeUndefined();
     });
 });

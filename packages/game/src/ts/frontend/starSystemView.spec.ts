@@ -413,27 +413,24 @@ describe("station save loading", () => {
         };
         const provider = new LandingPadProvider([pad]);
         const station = {
-            type: "spaceStation" as const,
-            model: { id: "station", name: "Station" },
+            id: "station",
+            name: "Station",
             getTransform: () => transform,
             getBoundingRadius: () => 100,
             getLandingPadProvider: () => provider,
         };
-        const setClosestLandableFacility = vi.fn();
         const spawnOnPad = vi.fn(() => {
             expect(provider.getAvailableLandingPads()).toHaveLength(0);
-            expect(setClosestLandableFacility).toHaveBeenCalledExactlyOnceWith(station);
         });
         const controls = {
-            getSpaceship: () => ({ spawnOnPad }),
-            setClosestLandableFacility,
+            spawnOnPad,
             syncCameraTransform: vi.fn(),
         };
         const context = {
             getActiveControls: () => ({ getTransform: () => transform }),
             getSpaceshipControls: () => controls,
             getStarSystem: () => ({
-                getOrbitalObjectById: (id: string) => (id === station.model.id ? station : undefined),
+                getLandableFacilityById: (id: string) => (id === station.id ? station : undefined),
             }),
         } as unknown as StarSystemView;
         const prototype = StarSystemView.prototype as unknown as {
@@ -454,7 +451,7 @@ describe("station save loading", () => {
                     },
                 },
             });
-            expect(spawnOnPad).toHaveBeenCalledWith(pad);
+            expect(spawnOnPad).toHaveBeenCalledExactlyOnceWith(station, pad);
             expect(controls.syncCameraTransform).toHaveBeenCalledOnce();
         } finally {
             scene.dispose();

@@ -35,6 +35,7 @@ import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
 import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import type { INotificationManager } from "@/frontend/ui/notificationManager";
+import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { initI18n } from "@/i18n";
@@ -120,13 +121,12 @@ export async function createStarSystemViewScene(
     const spawnLocationParam = urlParams.get("spawnLocation");
     switch (spawnLocationParam) {
         case "atStation": {
-            const landingPad = starSystemView
-                .getStarSystem()
-                .getOrbitalFacilities()[0]
+            const facility = starSystemView.getStarSystem().getLandableFacilities()[0];
+            const landingPad = facility
                 ?.getLandingPadProvider()
-                .getLandingPads()[0];
-            if (landingPad !== undefined) {
-                shipControls.getSpaceship().spawnOnPad(landingPad);
+                .handleLandingRequest({ minimumPadSize: LandingPadSize.SMALL });
+            if (facility !== undefined && landingPad !== null && landingPad !== undefined) {
+                shipControls.spawnOnPad(facility, landingPad);
                 shipControls.syncCameraTransform();
             }
             break;
