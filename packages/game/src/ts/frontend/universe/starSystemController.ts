@@ -26,7 +26,7 @@ import type { DeepReadonly, NonEmptyArray, Result } from "@cosmos-journeyer/type
 import type { OrbitalObjectId, StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
-import type { UniverseBackend } from "@/backend/universe/universeBackend";
+import type { StarSystemContentModel, UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import type { ModuleAssets } from "@/frontend/assets/moduleAssets";
@@ -54,6 +54,8 @@ import type { ITerrainSystem } from "./planets/telluricPlanet/terrain/system/ter
 import { StarFieldBox } from "./starFieldBox";
 import type { StarSystemLoader, StarSystemLoaderOutput } from "./starSystemLoader";
 import type { LandableFacility, SystemObject } from "./systemObject";
+import { createSystemView } from "./systemView";
+import type { SystemView } from "./systemView";
 
 /**
  * The controller of the star system manages all resources specific to a single star system.
@@ -84,6 +86,7 @@ export class StarSystemController {
     private readonly systemEntityProcessors: SystemEntityProcessors;
 
     private readonly systemEntities: ReadonlyArray<SystemEntity>;
+    private readonly systemView: SystemView;
 
     private readonly orbitalSimulation: KeplerianOrbitalSimulation;
 
@@ -107,7 +110,7 @@ export class StarSystemController {
     /**
      * Creates a new star system controller from a given model and scene
      * Note that the star system is not loaded until the load method is called
-     * @param model The data model of the star system
+     * @param contentModel The orbital and entity models of the star system.
      * @param orbitalObjects - The ordered orbital models to add, with each parent before its children.
      * @param systemEntities - The loaded entity instances owned by this star system.
      * @param orbitalSimulation - The simulation that supplies current orbital transforms.
@@ -116,7 +119,7 @@ export class StarSystemController {
      * @param systemEntityProcessors Behaviors registered by modules for entity instances.
      */
     private constructor(
-        model: DeepReadonly<StarSystemModel>,
+        contentModel: DeepReadonly<StarSystemContentModel>,
         orbitalObjects: Readonly<StarSystemLoaderOutput>,
         systemEntities: ReadonlyArray<SystemEntity>,
         orbitalSimulation: KeplerianOrbitalSimulation,
@@ -127,7 +130,7 @@ export class StarSystemController {
         this.systemEntityProcessors = systemEntityProcessors;
         this.scene = scene;
         this.starFieldBox = new StarFieldBox(assets.textures.environment.milkyWay, 1000e3, scene);
-        this.model = model;
+        this.model = contentModel.system;
 
         this.assets = assets;
 
@@ -137,6 +140,10 @@ export class StarSystemController {
         this.anomalies = orbitalObjects.anomalies;
 
         this.systemEntities = systemEntities;
+        this.systemView = createSystemView(contentModel, [
+            ...this.systemEntities.map((entity) => [entity.model.id, entity.placement.getTransform()] as const),
+            ...this.getOrbitalObjects().map((object) => [object.model.id, object.getTransform()] as const),
+        ]);
 
         this.gravitySystem = new GravitySystem(this.scene);
         this.floatingOriginSystem = new FloatingOriginSystem(this.scene, Settings.FLOATING_ORIGIN_THRESHOLD);
@@ -193,9 +200,11 @@ export class StarSystemController {
             return systemEntitiesResult;
         }
 
+        const contentModel: StarSystemContentModel = { system: model, entities: entityModels };
+
         return ok(
             new StarSystemController(
-                model,
+                contentModel,
                 result,
                 systemEntitiesResult.value,
                 orbitalSimulation,
@@ -504,6 +513,7 @@ export class StarSystemController {
             camera,
             observerPosition: cameraPosition,
             deltaSeconds,
+            system: this.systemView,
         };
         this.systemEntityProcessors.updateEntities(this.getSystemEntities(), entityContext);
 
