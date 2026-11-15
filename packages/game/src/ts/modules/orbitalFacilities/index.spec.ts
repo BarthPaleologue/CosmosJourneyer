@@ -15,6 +15,7 @@ import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
 import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
 import { TargetType } from "@/frontend/targeting/target";
 import { LandingPadProvider } from "@/frontend/universe/orbitalFacility/landingPadProvider";
+import { createSystemView } from "@/frontend/universe/systemView";
 
 import { I18n } from "@/i18n";
 import { Settings } from "@/settings";
@@ -63,7 +64,12 @@ describe("orbital facilities module", () => {
             expect(processors.music.dispatch(entity, { distance: 1000 })).toEqual([]);
             expect(processors.lightingRegions.dispatch(entity)).toBe(content);
             expect(processors.lightingRegions.dispatch(entity)).toBe(content);
-            processors.updateEntities([entity], { observerPosition: camera.position, deltaSeconds: 1, camera });
+            processors.updateEntities([entity], {
+                observerPosition: camera.position,
+                deltaSeconds: 1,
+                camera,
+                system: createSystemView({ system: getVestaModel().starSystem, entities: [] }, []),
+            });
             expect(content.update).toHaveBeenCalledWith(camera.position, 1);
             expect(content.computeCulling).toHaveBeenCalledWith(camera);
             expect(processors.targeting.dispatch(entity)[0]?.type).toBe(

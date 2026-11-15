@@ -30,6 +30,7 @@ import type { ILandingPad } from "./universe/orbitalFacility/landingPadProvider"
 import { LandingPadProvider, LandingPadSize } from "./universe/orbitalFacility/landingPadProvider";
 import { StarSystemController } from "./universe/starSystemController";
 import type { SpatialGeometry } from "./universe/systemObject";
+import { createSystemView } from "./universe/systemView";
 
 const type = makeSystemContentType<SystemContentModel<"capabilities-test">, SystemContent>("capabilities-test");
 
@@ -86,10 +87,12 @@ describe("module entity capabilities", () => {
         api.rendering.lighting.systemEntities.registerRegion(type, () => region);
         api.landingPad.systemEntities.register(type, () => provider);
         api.systemEntities.registerUpdate(type, update);
+        const { starSystem, systemEntities } = getVestaModel();
         const context = {
             camera: new FreeCamera("camera", Vector3.Zero(), scene),
             observerPosition: new Vector3(1, 2, 3),
             deltaSeconds: 0.5,
+            system: createSystemView({ system: starSystem, entities: systemEntities }, []),
         };
 
         expect(processors.spatialGeometry.dispatch(entity)).toBe(geometry);

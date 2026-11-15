@@ -200,7 +200,7 @@ export class StarSystemController {
             return systemEntitiesResult;
         }
 
-        const contentModel: StarSystemContentModel = { system: model, entities: entityModels };
+        const contentModel: DeepReadonly<StarSystemContentModel> = { system: model, entities: entityModels };
 
         return ok(
             new StarSystemController(
