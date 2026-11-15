@@ -21,7 +21,11 @@ import type { Scene } from "@babylonjs/core/scene";
 import { assertUnreachable, err, ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
-import type { InOrbitPlacementModel, SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
+import type {
+    InOrbitPlacementModel,
+    OnSurfacePlacementModel,
+    SystemEntityModel,
+} from "@/backend/systemEntity/systemEntityModel";
 
 import type { OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { KeplerianOrbitalSimulation } from "../universe/keplerianOrbitalSimulation";
@@ -41,10 +45,16 @@ import type {
 
 type ErasedSystemContentFactory = SystemContentFactoryOf<AnySystemContentType>;
 
-type EntityContent = {
+type ResolvedPlacement =
+    | DeepReadonly<InOrbitPlacementModel | OnSurfacePlacementModel>
+    | { type: "inFrame"; parent: TransformNode };
+
+type ResolvedEntityModel = {
     model: DeepReadonly<SystemEntityModel>;
-    content: SystemContent;
+    placement: ResolvedPlacement;
 };
+
+type EntityContent = ResolvedEntityModel & { content: SystemContent };
 
 export type SystemEntityLoadContext = Readonly<
     SystemContentFactoryContext & {
@@ -69,6 +79,11 @@ export class SystemEntityLoader {
         models: ReadonlyArray<DeepReadonly<SystemEntityModel>>,
         context: SystemEntityLoadContext,
     ): Promise<Result<Array<SystemEntity>, Error>> {
+        const resolvedModels = resolvePlacementParents(models, context.orbitalObjects);
+        if (!resolvedModels.success) {
+            return resolvedModels;
+        }
+
         const contents: Array<EntityContent> = [];
         const entities: Array<SystemEntity> = [];
         let surfacePlacements = new Map<string, OnSurfacePlacement>();
@@ -87,17 +102,17 @@ export class SystemEntityLoader {
             return err(error);
         };
 
-        for (const model of models) {
-            const content = this.createContent(model, context);
+        for (const resolved of resolvedModels.value) {
+            const content = this.createContent(resolved.model, context);
             if (!content.success) {
                 return fail(content.error);
             }
-            contents.push({ model, content: content.value });
+            contents.push({ ...resolved, content: content.value });
         }
 
         const surfaceResult = await createOnSurfacePlacements(
-            contents.flatMap(({ model }) =>
-                model.placement.type === "onSurface" ? [{ entityId: model.id, placementModel: model.placement }] : [],
+            contents.flatMap(({ model, placement }) =>
+                placement.type === "onSurface" ? [{ entityId: model.id, placementModel: placement }] : [],
             ),
             context.orbitalObjects,
             context.terrainSystem,
@@ -146,14 +161,19 @@ function createEntity(
     surfacePlacements: ReadonlyMap<string, OnSurfacePlacement>,
     scene: Scene,
 ): Result<SystemEntity, Error> {
-    const { model, content } = entry;
-    const placementModel = model.placement;
+    const { model, content, placement: placementModel } = entry;
     let placement: SystemEntityPlacement;
     switch (placementModel.type) {
         case "inOrbit": {
             placement = createInOrbitPlacement(model.id, placementModel, scene);
             const { yaw, pitch, roll } = placementModel.attitude.localFrameOrientation;
             content.getTransform().rotationQuaternion = Quaternion.RotationYawPitchRoll(yaw, pitch, roll);
+            break;
+        }
+        case "inFrame": {
+            const transform = new TransformNode(`${model.id}_in_frame_placement`, scene);
+            transform.parent = placementModel.parent;
+            placement = { type: "inFrame", getTransform: () => transform };
             break;
         }
         case "onSurface": {
@@ -169,6 +189,31 @@ function createEntity(
     }
     content.getTransform().parent = placement.getTransform();
     return ok({ model, content, placement });
+}
+
+/**
+ * @param models Models whose frame references must be resolved before allocating content.
+ * @param orbitalObjects Potential placement parents.
+ * @returns Models paired with their resolved placement data, or an unknown-parent error.
+ */
+function resolvePlacementParents(
+    models: ReadonlyArray<DeepReadonly<SystemEntityModel>>,
+    orbitalObjects: ReadonlyArray<OrbitalObject>,
+): Result<Array<ResolvedEntityModel>, Error> {
+    const resolved: Array<ResolvedEntityModel> = [];
+    for (const model of models) {
+        const placement = model.placement;
+        if (placement.type !== "inFrame") {
+            resolved.push({ model, placement });
+            continue;
+        }
+        const parent = orbitalObjects.find((object) => object.model.id === placement.parentId);
+        if (parent === undefined) {
+            return err(new Error(`Could not find frame parent "${placement.parentId}" for entity "${model.id}"`));
+        }
+        resolved.push({ model, placement: { type: "inFrame", parent: parent.getTransform() } });
+    }
+    return ok(resolved);
 }
 
 /**

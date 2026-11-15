@@ -31,7 +31,7 @@ export type SystemContentModel<T extends string = string> = {
     type: T;
 };
 
-export type SystemEntityPlacementModel = InOrbitPlacementModel | OnSurfacePlacementModel;
+export type SystemEntityPlacementModel = InOrbitPlacementModel | OnSurfacePlacementModel | InFramePlacementModel;
 
 export type InOrbitPlacementModel = {
     type: "inOrbit";
@@ -68,4 +68,10 @@ export type OnSurfacePlacementRotation = {
     pitch: number;
     /** Rotation around the forward axis */
     roll: number;
+};
+
+/** Placement in the parent's rotating local frame, with a coincident origin and axes. */
+export type InFramePlacementModel = {
+    type: "inFrame";
+    parentId: OrbitalObjectId;
 };

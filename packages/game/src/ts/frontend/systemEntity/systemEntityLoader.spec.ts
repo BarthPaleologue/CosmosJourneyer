@@ -1,5 +1,5 @@
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 import { err, ok } from "@cosmos-journeyer/typescript";
@@ -13,6 +13,7 @@ import type {
 
 import { ModuleAssets } from "@/frontend/assets/moduleAssets";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
 import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbitalSimulation";
 import { makeTaskId } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystem";
 
@@ -119,6 +120,103 @@ describe("system entity content factories", () => {
             Quaternion.RotationYawPitchRoll(0.2, 0.3, 0.4).asArray(),
         );
         expect(context.orbitalSimulation.getObjects()).toContain(entity.placement);
+    });
+
+    it("follows the parent's translating and rotating frame while preserving local content transforms", async () => {
+        const parentTransform = new TransformNode("parent", scene);
+        const parent = new CustomOrbitalObject(parentTransform, {
+            type: "custom",
+            id: "parent",
+            name: "Parent",
+            mass: 1,
+            orbit: model.placement.orbit,
+            spin: model.placement.attitude.spin,
+        });
+        const transform = new TransformNode("content", scene);
+        transform.position.set(1, 2, 3);
+        const localRotation = Quaternion.RotationAxis(Vector3.UpReadOnly, 0.3);
+        transform.rotationQuaternion = localRotation.clone();
+        loader.registerFactory(type, () =>
+            ok({
+                getTransform: () => transform,
+                dispose: () => {
+                    transform.dispose();
+                },
+            }),
+        );
+        const result = await loader.load([{ ...model, placement: { type: "inFrame", parentId: "parent" } }], {
+            ...context,
+            orbitalObjects: [parent],
+        });
+        if (!result.success) {
+            throw result.error;
+        }
+        const entity = result.value[0];
+        if (entity === undefined) {
+            throw new Error("Expected the loaded entity");
+        }
+        const placement = entity.placement.getTransform();
+        expect(placement).not.toBe(parentTransform);
+        expect(placement.parent).toBe(parentTransform);
+        expect(transform.parent).toBe(placement);
+        expect(transform.rotationQuaternion.asArray()).toEqual(localRotation.asArray());
+        expect(Array.from(context.orbitalSimulation.getObjects())).toHaveLength(0);
+
+        parentTransform.position.set(10, 20, 30);
+        parentTransform.rotationQuaternion = Quaternion.RotationAxis(Vector3.UpReadOnly, Math.PI / 2);
+        parentTransform.computeWorldMatrix(true);
+        placement.computeWorldMatrix(true);
+        transform.computeWorldMatrix(true);
+        const expectedPosition = Vector3.TransformCoordinates(new Vector3(1, 2, 3), parentTransform.getWorldMatrix());
+        expect(transform.getAbsolutePosition().equalsWithEpsilon(expectedPosition)).toBe(true);
+        const localForward = Vector3.Forward().applyRotationQuaternion(localRotation);
+        const expectedForward = Vector3.TransformNormal(localForward, parentTransform.getWorldMatrix());
+        expect(transform.getDirection(Vector3.Forward()).equalsWithEpsilon(expectedForward)).toBe(true);
+
+        entity.content.dispose();
+        placement.dispose();
+        expect(parentTransform.isDisposed()).toBe(false);
+    });
+
+    it("rejects a missing frame parent before creating content or placements", async () => {
+        const factory = vi.fn<SystemContentFactoryOf<typeof type>>();
+        loader.registerFactory(type, factory);
+        const result = await loader.load([{ ...model, placement: { type: "inFrame", parentId: "missing" } }], context);
+        expect(result.success).toBe(false);
+        expect(factory).not.toHaveBeenCalled();
+        expect(scene.transformNodes).toHaveLength(0);
+        expect(Array.from(context.orbitalSimulation.getObjects())).toHaveLength(0);
+    });
+
+    it("preserves input order across placement types", async () => {
+        const parent = new CustomOrbitalObject(new TransformNode("parent", scene), {
+            type: "custom",
+            id: "parent",
+            name: "Parent",
+            mass: 1,
+            orbit: model.placement.orbit,
+            spin: model.placement.attitude.spin,
+        });
+        const models: Array<SystemEntityModel<TestModel>> = [
+            { ...model, id: "frame-first", placement: { type: "inFrame", parentId: "parent" } },
+            { ...model, id: "orbit" },
+            { ...model, id: "frame-last", placement: { type: "inFrame", parentId: "parent" } },
+        ];
+        loader.registerFactory(type, (entityModel) => {
+            const transform = new TransformNode(entityModel.id, scene);
+            return ok({
+                getTransform: () => transform,
+                dispose: () => {
+                    transform.dispose();
+                },
+            });
+        });
+        const result = await loader.load(models, { ...context, orbitalObjects: [parent] });
+        if (!result.success) {
+            throw result.error;
+        }
+        expect(result.value.map((entity) => entity.model.id)).toEqual(models.map((entityModel) => entityModel.id));
+        expect(Array.from(context.orbitalSimulation.getObjects()).map((object) => object.id)).toEqual(["orbit"]);
     });
 
     it("disposes previously created content when a later factory fails", async () => {
