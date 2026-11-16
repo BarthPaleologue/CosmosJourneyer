@@ -1,5 +1,6 @@
 import type { TSESLint } from "@typescript-eslint/utils";
 
+import noInlinePickOmitParameters from "./rules/no-inline-pick-omit-parameters.mts";
 import noPromiseReject from "./rules/no-promise-reject.mts";
 
 type RuleDefinitions = NonNullable<TSESLint.FlatConfig.Plugin["rules"]>;
@@ -12,6 +13,7 @@ type CosmosPlugin = TSESLint.FlatConfig.Plugin & {
 };
 
 const rules = {
+    "no-inline-pick-omit-parameters": noInlinePickOmitParameters,
     "no-promise-reject": noPromiseReject,
 } satisfies RuleDefinitions;
 
