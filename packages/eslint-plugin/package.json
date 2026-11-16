@@ -1,0 +1,33 @@
+{
+    "name": "@cosmos-journeyer/eslint-plugin",
+    "version": "1.11.3",
+    "private": true,
+    "description": "Project-specific ESLint rules for Cosmos Journeyer.",
+    "license": "AGPL-3.0-only",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/BarthPaleologue/CosmosJourneyer/tree/main/packages/eslint-plugin"
+    },
+    "type": "module",
+    "types": "./src/index.mts",
+    "exports": {
+        ".": "./src/index.mts"
+    },
+    "scripts": {
+        "test:unit": "node --import ./src/test/setup.mts --test",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint .",
+        "format": "oxfmt . --write",
+        "format:check": "oxfmt . --check"
+    },
+    "dependencies": {
+        "@typescript-eslint/utils": "catalog:"
+    },
+    "devDependencies": {
+        "@types/node": "catalog:",
+        "@typescript-eslint/rule-tester": "catalog:",
+        "eslint": "catalog:",
+        "oxfmt": "catalog:",
+        "typescript": "catalog:"
+    }
+}

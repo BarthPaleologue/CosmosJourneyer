@@ -61,7 +61,7 @@ const nextCoreWebVitals = {
 };
 
 const typeScriptWorkspaceRules = {
-    files: ["packages/**/*.{ts,tsx,js,jsx}"],
+    files: ["packages/**/*.{ts,tsx,js,jsx,mts}"],
     settings: {
         "import-x/resolver": {
             typescript: {
