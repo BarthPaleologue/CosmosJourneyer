@@ -38,7 +38,7 @@ import type { INotificationManager } from "@/frontend/ui/notificationManager";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
@@ -52,7 +52,7 @@ export async function createStarSystemViewScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
-    const t = await initI18n();
+    const t = (await I18n.New()).getT();
 
     const systemEntityBackend = new SystemEntityBackend();
     const authoredSystem = getAlphaTestisSystemModel();

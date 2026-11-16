@@ -26,14 +26,15 @@ import { alertModal } from "@/frontend/ui/dialogModal";
 import { decodeBase64 } from "@/utils/base64";
 import { jsonSafeParse } from "@/utils/json";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 
 import { safeParseSave } from "./backend/save/saveFileData";
 import { ConsoleDumper } from "./utils/consoleDumper";
 import { CrashReporter } from "./utils/crashReporter";
 
 const consoleDumper = new ConsoleDumper();
-const t = await initI18n();
+const i18n = await I18n.New();
+const t = i18n.getT();
 const crashReporter = new CrashReporter(consoleDumper, t);
 const soundPlayerMock = new SoundPlayerMock();
 
@@ -79,7 +80,7 @@ async function initWithSaveString(engine: CosmosJourneyer, saveString: string): 
 
 /** Prefers a URL save, then the latest saved game when requested, otherwise starts a new game. */
 async function startCosmosJourneyer(): Promise<void> {
-    const engineResult = await CosmosJourneyer.New(t);
+    const engineResult = await CosmosJourneyer.New(i18n);
     if (!engineResult.success) {
         await alertModal(engineResult.error.message, new SoundPlayerMock(), t);
         return;

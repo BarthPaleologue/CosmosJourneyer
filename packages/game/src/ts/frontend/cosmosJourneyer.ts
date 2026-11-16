@@ -70,6 +70,7 @@ import { downloadCommanderArchive } from "@/utils/downloadCommanderArchive";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
+import type { I18n } from "@/i18n";
 import { getBuiltinModules, setupModules } from "@/modules/moduleLoader";
 import { Settings } from "@/settings";
 
@@ -424,10 +425,11 @@ export class CosmosJourneyer {
 
     /**
      * Creates the engine and the scenes and loads the assets async
-     * @param t Translation function used to render player-facing text.
+     * @param i18n Translation instance owned by the game.
      * @returns A promise that resolves when the engine and the scenes are created and the assets are loaded
      */
-    public static async New(t: TFunction): Promise<Result<CosmosJourneyer, Error>> {
+    public static async New(i18n: I18n): Promise<Result<CosmosJourneyer, Error>> {
+        const t = i18n.getT();
         const canvas = document.createElement("canvas");
         document.body.prepend(canvas);
 

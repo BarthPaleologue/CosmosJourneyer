@@ -40,7 +40,7 @@ import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import type { INotificationManager } from "@/frontend/ui/notificationManager";
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 import { getChronosModel } from "@/modules/chronos/chronos";
 import { getBuiltinModules, setupModules } from "@/modules/moduleLoader";
 import { getVestaModel } from "@/modules/vesta/vesta";
@@ -57,7 +57,8 @@ export async function createCustomSystemScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
-    const t = await initI18n();
+    const i18n = await I18n.New();
+    const t = i18n.getT();
 
     const urlParams = new URLSearchParams(window.location.search);
     const systemKey = urlParams.get("system");

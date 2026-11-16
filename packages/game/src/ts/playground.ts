@@ -25,7 +25,7 @@ import { ShowInspector } from "@babylonjs/inspector";
 
 import { LoadingScreen } from "@/frontend/helpers/loadingScreen";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 
 import { LoadingProgressMonitor } from "./frontend/assets/loadingProgressMonitor";
 import { PlaygroundRegistry } from "./playgrounds/playgroundRegistry";
@@ -39,7 +39,7 @@ document.body.appendChild(canvas);
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const t = await initI18n();
+const t = (await I18n.New()).getT();
 const loadingScreen = new LoadingScreen(canvas, t);
 
 const engine = new Engine(canvas, true, { useHighPrecisionMatrix: true });

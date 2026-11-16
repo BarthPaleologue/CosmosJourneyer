@@ -24,7 +24,7 @@ import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { decryptFunction } from "@/frontend/helpers/cipher";
 import { alertModal, promptModalString } from "@/frontend/ui/dialogModal";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 
 import { addToWindow } from "./utils";
 
@@ -93,7 +93,7 @@ export async function createCryptographicSecretScene(
 
     const soundPlayerMock = new SoundPlayerMock();
 
-    const t = await initI18n();
+    const t = (await I18n.New()).getT();
 
     void promptModalString(
         "Enter the decryption passphrase to reveal the secret function:",

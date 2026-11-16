@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { createInstance } from "i18next";
-import type { Resource, ResourceKey, ResourceLanguage, TFunction } from "i18next";
+import type { Resource, ResourceKey, ResourceLanguage, TFunction, i18n } from "i18next";
 import { z } from "zod";
 
 import { renderMarkdownInline } from "./utils/markdown";
@@ -72,32 +72,46 @@ function loadResources(): Resource {
     return resources;
 }
 
-/**
- * Uses the URL language override, falling back to the browser language.
- * @returns Translator after applying static page translations.
- */
-export async function initI18n(): Promise<TFunction> {
-    // init language to url parameter if defined, otherwise use the browser language
-    const urlParams = new URLSearchParams(window.location.search);
-    const language = urlParams.get("lang") ?? navigator.language;
+export class I18n {
+    private readonly instance: i18n;
 
-    const i18n = createInstance();
-    const t = await i18n.init({
-        lng: language, // change this if you want to test a specific language
-        debug: import.meta.env.DEV,
-        fallbackLng: "en-US",
-        resources: loadResources(),
-    });
+    private constructor(instance: i18n) {
+        this.instance = instance;
+    }
 
-    // perform all static translations
-    document.querySelectorAll("*[data-i18n]").forEach((element) => {
-        const key = element.getAttribute("data-i18n");
-        if (key === null) {
-            throw new Error("data-i18n attribute is null");
-        }
+    /**
+     * Uses the URL language override, falling back to the browser language.
+     * @returns Initialized translation service after applying static page translations.
+     */
+    public static async New(): Promise<I18n> {
+        const urlParams = new URLSearchParams(window.location.search);
+        const language = urlParams.get("lang") ?? navigator.language;
+        const instance = createInstance();
+        await instance.init({
+            lng: language,
+            debug: import.meta.env.DEV,
+            fallbackLng: "en-US",
+            resources: loadResources(),
+        });
+        const service = new I18n(instance);
+        const t = service.getT();
+        document.querySelectorAll("*[data-i18n]").forEach((element) => {
+            const key = element.getAttribute("data-i18n");
+            if (key === null) {
+                throw new Error("data-i18n attribute is null");
+            }
+            element.innerHTML = renderMarkdownInline(t(key));
+        });
+        return service;
+    }
 
-        element.innerHTML = renderMarkdownInline(t(key));
-    });
+    /** @returns Translator for the game's core namespaces and current language. */
+    public getT(): TFunction {
+        return this.instance.t;
+    }
 
-    return t;
+    /** @param language Language code, with fallback to the bundled English resources. */
+    public async changeLanguage(language: string): Promise<void> {
+        await this.instance.changeLanguage(language);
+    }
 }

@@ -28,7 +28,7 @@ import { PlanetaryLandingTutorial } from "@/frontend/ui/tutorial/tutorials/plane
 import { StarMapTutorial } from "@/frontend/ui/tutorial/tutorials/starMapTutorial";
 import { StationLandingTutorial } from "@/frontend/ui/tutorial/tutorials/stationLandingTutorial";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 
 /**
  * @param engine - Rendering engine.
@@ -51,7 +51,7 @@ export async function createTutorialScene(
     // This attaches the camera to the canvas
     camera.attachControl();
 
-    const t = await initI18n();
+    const t = (await I18n.New()).getT();
 
     const tutorialLayer = new TutorialLayer(new SoundPlayerMock(), t);
     document.body.appendChild(tutorialLayer.root);
