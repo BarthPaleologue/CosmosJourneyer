@@ -19,8 +19,8 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { getStellarTypeFromTemperature } from "@cosmos-journeyer/physics";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 
-import type { SpaceElevatorClimber } from "../assets/procedural/spaceStation/climber/spaceElevatorClimber";
-import type { LandingBay } from "../assets/procedural/spaceStation/landingBay/landingBay";
+import type { SpaceElevatorClimber } from "../../modules/orbitalFacilities/assets/climber/spaceElevatorClimber";
+import type { LandingBay } from "../../modules/orbitalFacilities/assets/landingBay/landingBay";
 import type { Mission } from "../missions/mission";
 import type { Spaceship } from "../spaceship/spaceship";
 import type { SystemEntity } from "../systemEntity/systemEntity";

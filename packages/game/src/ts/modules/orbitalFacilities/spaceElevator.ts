@@ -17,41 +17,57 @@
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import type { Light } from "@babylonjs/core/Lights/light";
-import { Quaternion } from "@babylonjs/core/Maths/math.vector";
-import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import type { Mesh } from "@babylonjs/core/Meshes/mesh";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { SpaceStationModel } from "@cosmos-journeyer/universe-model";
+import type { SpaceElevatorModel } from "@cosmos-journeyer/universe-model";
 
-import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay/landingBay";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 import { LandingPadProvider } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
+import { clamp, remap, triangleWave } from "@/utils/math";
+
+import { SpaceElevatorClimber } from "@/modules/orbitalFacilities/assets/climber/spaceElevatorClimber";
+import { LandingBay } from "@/modules/orbitalFacilities/assets/landingBay/landingBay";
+import { MetalSectionMaterial } from "@/modules/orbitalFacilities/assets/metalSectionMaterial";
+
+import type { OrbitalFacilityBase } from "../../frontend/universe/orbitalFacility/orbitalFacility";
 import { createFacilitySections } from "./createFacilitySections";
-import type { OrbitalFacilityBase } from "./orbitalFacility";
 import type { StationSection } from "./stationSection";
 
-export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
+export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
     readonly name: string;
 
-    readonly model: DeepReadonly<SpaceStationModel>;
+    readonly model: DeepReadonly<SpaceElevatorModel>;
 
-    readonly type = "spaceStation";
+    readonly type = "spaceElevator";
 
-    readonly sections: Array<StationSection>;
+    private readonly sections: Array<StationSection>;
     readonly landingBays: Array<LandingBay>;
+
+    private readonly tether: Mesh;
+    private readonly tetherLength: number;
+    private readonly tetherMaterial: MetalSectionMaterial;
+
+    private readonly climber: SpaceElevatorClimber;
 
     private readonly root: TransformNode;
 
+    private readonly scene: Scene;
+
     private readonly boundingRadius: number;
+
+    private elapsedSeconds = 0;
 
     private readonly landingPadProvider: LandingPadProvider;
 
-    constructor(model: DeepReadonly<SpaceStationModel>, assets: RenderingAssets, scene: Scene) {
+    constructor(model: DeepReadonly<SpaceElevatorModel>, assets: RenderingAssets, scene: Scene) {
         this.model = model;
 
         this.name = this.model.name;
@@ -59,7 +75,41 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         this.root = new TransformNode(this.name, scene);
         this.root.rotationQuaternion = Quaternion.Identity();
 
-        this.sections = createFacilitySections(this.root, model.sections, model.name, assets, scene);
+        this.scene = scene;
+
+        const tetherThickness = 10;
+        this.tetherLength = this.model.tetherLength;
+
+        this.tether = MeshBuilder.CreateCylinder(
+            `${this.name} Tether`,
+            {
+                height: this.tetherLength,
+                diameter: tetherThickness,
+                tessellation: 6,
+            },
+            this.scene,
+        );
+        this.tether.convertToFlatShadedMesh();
+
+        this.tetherMaterial = new MetalSectionMaterial("TetherMaterial", assets.textures.materials.metalPanels, scene);
+        this.tether.material = this.tetherMaterial;
+
+        this.climber = new SpaceElevatorClimber(
+            assets.materials.solarPanel,
+            {
+                albedo: assets.textures.materials.crate.albedo,
+                normal: assets.textures.materials.crate.normalHeight,
+                ambientOcclusion: assets.textures.materials.crate.ambientOcclusion,
+                metallicRoughness: assets.textures.materials.crate.metallicRoughness,
+            },
+            assets.textures.materials.metalPanels,
+            scene,
+        );
+        this.climber.getTransform().parent = this.tether;
+
+        this.climber.getTransform().position.y = this.tetherLength / 2;
+
+        this.sections = createFacilitySections(this.root, model.sections, model.name, assets, scene, this.tether);
         this.landingBays = this.sections.filter((section): section is LandingBay => section instanceof LandingBay);
 
         const allLandingPads: Array<ILandingPad> = [];
@@ -86,6 +136,8 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         const centerWorld = boundingVectors.max.add(boundingVectors.min).scale(0.5);
         const deltaPosition = this.getTransform().getAbsolutePosition().subtract(centerWorld);
 
+        this.tether.parent = this.getTransform();
+
         this.getTransform()
             .getChildTransformNodes(true)
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
@@ -102,6 +154,10 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         return this.landingPadProvider;
     }
 
+    getClimber(): SpaceElevatorClimber {
+        return this.climber;
+    }
+
     getLandingBays(): Array<LandingBay> {
         return this.landingBays;
     }
@@ -115,9 +171,38 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
     }
 
     update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number): void {
+        const parent = parents[0];
+        if (parent === undefined) {
+            throw new Error("Space Elevator should have exactly one parent");
+        }
+
+        const newUp = this.getTransform().position.subtract(parent.getTransform().position).normalize();
+        if (newUp.lengthSquared() < 1e-6) {
+            newUp.set(0, 1, 0);
+        }
+        const currentRotation = this.getTransform().rotationQuaternion ?? Quaternion.Identity();
+        this.getTransform().rotationQuaternion = Quaternion.FromUnitVectorsToRef(
+            Vector3.UpReadOnly,
+            newUp,
+            currentRotation,
+        );
+
+        this.elapsedSeconds += deltaSeconds;
+
         for (const section of this.sections) {
             section.update(cameraWorldPosition, deltaSeconds);
         }
+
+        const climberSpeed = 300 / 3.6; // 300 km/h in m/s
+        const roundTripDuration = (2 * this.tetherLength) / climberSpeed;
+
+        this.climber.getTransform().position.y = remap(
+            clamp(1.05 * triangleWave(this.elapsedSeconds / roundTripDuration), 0, 1),
+            0,
+            1,
+            this.tetherLength / 2,
+            -this.tetherLength / 2,
+        );
     }
 
     getTransform(): TransformNode {
@@ -128,6 +213,12 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         for (const section of this.sections) {
             section.dispose();
         }
+
+        this.tether.dispose();
+        this.tetherMaterial.dispose();
+
+        this.climber.dispose();
+
         this.root.dispose();
     }
 }

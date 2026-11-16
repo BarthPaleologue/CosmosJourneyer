@@ -33,8 +33,8 @@ import { toKeplerian } from "@/frontend/helpers/orbitalObject";
 import { lookAt } from "@/frontend/helpers/transform";
 import { CustomOrbitalObject } from "@/frontend/universe/customOrbitalObject";
 import { KeplerianOrbitalSimulation } from "@/frontend/universe/keplerianOrbitalSimulation";
-import { SpaceElevator } from "@/frontend/universe/orbitalFacility/spaceElevator";
 
+import { SpaceElevator } from "@/modules/orbitalFacilities/spaceElevator";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";

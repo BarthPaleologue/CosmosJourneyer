@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Scene } from "@babylonjs/core/scene";
 import {
@@ -41,17 +42,12 @@ import {
     vec2,
 } from "babylonjs-shading-language";
 
-import type { PBRTextures } from "@/frontend/assets/textures/materials";
+import type { PBRTextures } from "@/frontend/assets/textures/materials/index";
 
-export class HelixHabitatMaterial extends NodeMaterial {
-    constructor(
-        meanRadius: number,
-        deltaRadius: number,
-        thicknessMultiplier: number,
-        textures: PBRTextures,
-        scene: Scene,
-    ) {
-        super("HelixHabitatMaterial", scene);
+export class RingHabitatMaterial extends NodeMaterial {
+    constructor(meanRadius: number, deltaRadius: number, height: number, textures: PBRTextures, scene: Scene) {
+        super("RingHabitatMaterial", scene);
+        this.mode = NodeMaterialModes.Material;
 
         const position = builtinAttribute("position");
         const normal = builtinAttribute("normal");
@@ -66,7 +62,7 @@ export class HelixHabitatMaterial extends NodeMaterial {
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
         const mask = sub(1, step(0.02, abs(splitVec(normal).y)));
-        const scaledUvY = mul(splitUV.y, mix(1.0, thicknessMultiplier, mask));
+        const scaledUvY = mul(splitUV.y, mix(1.0, height / deltaRadius, mask));
         const proceduralUV = vec2(scaledUvX, scaledUvY);
 
         const viewProjection = uniformViewProjection();
@@ -93,14 +89,14 @@ export class HelixHabitatMaterial extends NodeMaterial {
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+        const pbrLighting = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
             reflection: reflection(position, world),
             albedoRgb: albedo.rgb,
             ambientOcclusion: occlusion.r,
             perturbedNormal: perturbedNormal.output,
         });
 
-        const fragOutput = outputFragColor(pbrColor.lighting);
+        const fragOutput = outputFragColor(pbrLighting.lighting);
 
         this.addOutputNode(fragOutput);
 

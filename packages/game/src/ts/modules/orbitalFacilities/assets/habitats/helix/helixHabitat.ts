@@ -32,7 +32,7 @@ import { EarthG, getRotationPeriodForArtificialGravity } from "@cosmos-journeyer
 import type { HelixHabitatModel } from "@cosmos-journeyer/universe-model";
 
 import { createHelix } from "@/frontend/assets/procedural/helpers/helixBuilder";
-import type { Textures } from "@/frontend/assets/textures";
+import type { Textures } from "@/frontend/assets/textures/index";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 

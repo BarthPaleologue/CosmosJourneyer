@@ -31,11 +31,11 @@ import type { SolarSectionModel } from "@cosmos-journeyer/universe-model";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
 
+import type { StationSection } from "@/modules/orbitalFacilities/stationSection";
 import { Settings } from "@/settings";
 
-import type { SolarPanelMaterial } from "../solarPanel/solarPanelMaterial";
+import type { SolarPanelMaterial } from "../../../frontend/assets/procedural/solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class SolarSection implements StationSection {

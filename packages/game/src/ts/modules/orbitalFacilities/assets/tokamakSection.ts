@@ -30,11 +30,12 @@ import type { FusionSectionModel } from "@cosmos-journeyer/universe-model";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
-import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 
-import { createRing } from "../helpers/ringBuilder";
+import type { StationSection } from "@/modules/orbitalFacilities/stationSection";
+
+import { createRing } from "../../../frontend/assets/procedural/helpers/ringBuilder";
 import { RingHabitatMaterial } from "./habitats/ring/ringHabitatMaterial";
 
 export class TokamakSection implements StationSection {

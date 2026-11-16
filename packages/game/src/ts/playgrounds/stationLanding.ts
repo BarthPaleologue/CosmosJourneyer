@@ -34,9 +34,9 @@ import { lookAt } from "@/frontend/helpers/transform";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsInputs";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
-import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 
 import { I18n } from "@/i18n";
+import { SpaceStation } from "@/modules/orbitalFacilities/spaceStation";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";

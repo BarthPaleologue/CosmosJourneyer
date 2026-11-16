@@ -40,8 +40,8 @@ import { LandingPadSize, LandingPadStatus } from "@/frontend/universe/orbitalFac
 
 import { Settings } from "@/settings";
 
-import { ProceduralSpotLightInstances } from "../../spotLight";
-import type { ProceduralSpotLightInstanceData } from "../../spotLight";
+import { ProceduralSpotLightInstances } from "../../../../frontend/assets/procedural/spotLight";
+import type { ProceduralSpotLightInstanceData } from "../../../../frontend/assets/procedural/spotLight";
 import { LandingPad } from "../landingPad/landingPad";
 import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { LandingBayMaterial } from "./landingBayMaterial";

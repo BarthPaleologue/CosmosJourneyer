@@ -17,11 +17,13 @@
 
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
+import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import type { Scene } from "@babylonjs/core/scene";
 import {
     abs,
     atan2,
     builtinAttribute,
+    fract,
     length,
     mix,
     mul,
@@ -46,16 +48,54 @@ import {
     vec2,
 } from "babylonjs-shading-language";
 
-import type { PBRTextures } from "@/frontend/assets/textures/materials";
+import type { PBRTextures } from "@/frontend/assets/textures/materials/index";
 
-export class CylinderHabitatMaterial extends NodeMaterial {
-    constructor(radius: number, height: number, tesselation: number, textures: PBRTextures, scene: Scene) {
-        super("CylinderHabitatMaterial", scene);
+import { Settings } from "@/settings";
+
+export class LandingBayMaterial extends NodeMaterial {
+    constructor(
+        displayName: string,
+        meanRadius: number,
+        deltaRadius: number,
+        height: number,
+        textures: PBRTextures,
+        scene: Scene,
+    ) {
+        super("LandingBayMaterial", scene);
         this.mode = NodeMaterialModes.Material;
 
-        const circumference = 2 * Math.PI * radius;
-        const nbSectors = tesselation;
-        const sectorSize = circumference / nbSectors;
+        const circumference = 2 * Math.PI * meanRadius;
+
+        const aspectRatio = (0.5 * circumference) / deltaRadius;
+
+        const textureResolution = 256;
+        const namePlateTexture = new DynamicTexture(
+            `NamePlateTexture`,
+            {
+                width: textureResolution * aspectRatio,
+                height: textureResolution,
+            },
+            scene,
+            true,
+        );
+
+        const font_size = 128;
+
+        //Add text to dynamic texture
+        namePlateTexture.drawText(
+            displayName.toUpperCase(),
+            null,
+            null,
+            `${font_size}px ${Settings.MAIN_FONT}`,
+            "white",
+            null,
+            true,
+            true,
+        );
+
+        this.onDisposeObservable.addOnce(() => {
+            namePlateTexture.dispose();
+        });
 
         const position = builtinAttribute("position");
         const normal = builtinAttribute("normal");
@@ -70,7 +110,7 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         // float mask = 1.0 - step(0.02, abs(normal.y));
         // vUV.y *= mix(1.0, height, mask);
         const mask = sub(1, step(0.02, abs(splitVec(normal).y)));
-        const scaledUvY = mul(splitVec(uv).y, mix(1.0, height / sectorSize, mask));
+        const scaledUvY = mul(splitVec(uv).y, mix(1.0, height, mask));
 
         const viewProjection = uniformViewProjection();
         const positionClipSpace = transformPosition(viewProjection, positionW);
@@ -81,16 +121,22 @@ export class CylinderHabitatMaterial extends NodeMaterial {
 
         const theta = atan2(splitPosition.z, splitPosition.x, { target: Target.FRAG });
         const positionXZ = vec2(splitPosition.x, splitPosition.z);
-        const distanceToCenter = mul(length(positionXZ, { target: Target.FRAG }), 1.0 / sectorSize);
+        const distanceToCenter = length(positionXZ, { target: Target.FRAG });
 
-        const proceduralUvX = remap(theta, [0, 2 * Math.PI], [0, nbSectors]);
-        const proceduralUvY = mix(distanceToCenter, scaledUvY, mask);
-        const proceduralUV = vec2(proceduralUvX, proceduralUvY);
+        const distanceToCenter01 = remap(
+            distanceToCenter,
+            [meanRadius - deltaRadius / 2.0, meanRadius + deltaRadius / 2.0],
+            [0.0, 1.0],
+        );
+
+        const proceduralUvX = mul(theta, meanRadius / deltaRadius);
+        const proceduralUV = vec2(proceduralUvX, scaledUvY);
 
         const albedoTexture = uniformTexture2d(textures.albedo).source;
         const normalTexture = uniformTexture2d(textures.normal).source;
         const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
         const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
+        const namePlate = uniformTexture2d(namePlateTexture).source;
 
         const albedo = textureSample(albedoTexture, proceduralUV, {
             convertToLinearSpace: true,
@@ -99,15 +145,38 @@ export class CylinderHabitatMaterial extends NodeMaterial {
         const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
         const occlusion = textureSample(occlusionTexture, proceduralUV);
 
-        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, 1);
+        const namePlateUvX = mul(theta, 1.0 / Math.PI);
+        const namePlateUvY = distanceToCenter01;
+
+        /* if (vNormal.y < 1.0) {
+            namePlateUV *= 0.0;
+        } */
+        const namePlateUvMask = step(1.0, splitVec(normal).y);
+        const namePlateUV = mix(vec2(0.0, 0.0), vec2(namePlateUvX, namePlateUvY), namePlateUvMask);
+
+        const namePlateColor = textureSample(namePlate, fract(namePlateUV));
+        const paintWeight = namePlateColor.a;
+
+        const finalAlbedo = mix(albedo.rgb, namePlateColor.rgb, paintWeight);
+        const finalMetallic = mix(metallicRoughness.r, 0.0, paintWeight);
+        const finalRoughness = mix(metallicRoughness.g, 0.7, paintWeight);
+        const finalAo = mix(occlusion.r, 1.0, paintWeight);
+
+        const perturbedNormal = perturbNormal(
+            proceduralUV,
+            positionW,
+            normalW,
+            normalMap.rgb,
+            sub(1, mul(paintWeight, 0.7)),
+        );
 
         const view = uniformView();
         const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+        const pbrColor = pbr(finalMetallic, finalRoughness, normalW, view, cameraPosition, positionW, {
             reflection: reflection(position, world),
-            albedoRgb: albedo.rgb,
-            ambientOcclusion: occlusion.r,
+            albedoRgb: finalAlbedo,
+            ambientOcclusion: finalAo,
             perturbedNormal: perturbedNormal.output,
         });
 

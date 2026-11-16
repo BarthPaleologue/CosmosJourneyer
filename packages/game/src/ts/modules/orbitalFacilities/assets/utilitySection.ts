@@ -33,8 +33,8 @@ import type { Scene } from "@babylonjs/core/scene";
 import type { UtilitySectionModel } from "@cosmos-journeyer/universe-model";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
 
+import type { StationSection } from "@/modules/orbitalFacilities/stationSection";
 import { CollisionMask, Settings } from "@/settings";
 
 import { MetalSectionMaterial } from "./metalSectionMaterial";

@@ -29,7 +29,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { EarthG, getRotationPeriodForArtificialGravity } from "@cosmos-journeyer/physics";
 import type { CylinderHabitatModel } from "@cosmos-journeyer/universe-model";
 
-import type { Textures } from "@/frontend/assets/textures";
+import type { Textures } from "@/frontend/assets/textures/index";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 

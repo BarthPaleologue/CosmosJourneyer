@@ -37,10 +37,10 @@ import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { wait } from "@/utils/wait";
 
+import { SpaceElevator } from "../../modules/orbitalFacilities/spaceElevator";
+import { SpaceStation } from "../../modules/orbitalFacilities/spaceStation";
 import type { Anomaly, OrbitalFacility, Planet, StellarObject } from "./architecture/orbitalObject";
 import { EmptyCelestialBody } from "./emptyCelestialBody";
-import { SpaceElevator } from "./orbitalFacility/spaceElevator";
-import { SpaceStation } from "./orbitalFacility/spaceStation";
 
 export type StarSystemLoaderOutput = {
     stellarObjects: NonEmptyArray<StellarObject>;

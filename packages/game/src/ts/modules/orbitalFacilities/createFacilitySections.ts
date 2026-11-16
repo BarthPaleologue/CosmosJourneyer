@@ -22,16 +22,17 @@ import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { StationSectionModel } from "@cosmos-journeyer/universe-model";
 
-import { EngineBay } from "@/frontend/assets/procedural/spaceStation/engineBay";
-import { CylinderHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/cylinder/cylinderHabitat";
-import { HelixHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/helix/helixHabitat";
-import { RingHabitat } from "@/frontend/assets/procedural/spaceStation/habitats/ring/ringHabitat";
-import { LandingBay } from "@/frontend/assets/procedural/spaceStation/landingBay/landingBay";
-import { SolarSection } from "@/frontend/assets/procedural/spaceStation/solarSection";
-import { TokamakSection } from "@/frontend/assets/procedural/spaceStation/tokamakSection";
-import { UtilitySection } from "@/frontend/assets/procedural/spaceStation/utilitySection";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
-import type { StationSection } from "@/frontend/universe/orbitalFacility/stationSection";
+
+import { EngineBay } from "@/modules/orbitalFacilities/assets/engineBay";
+import { CylinderHabitat } from "@/modules/orbitalFacilities/assets/habitats/cylinder/cylinderHabitat";
+import { HelixHabitat } from "@/modules/orbitalFacilities/assets/habitats/helix/helixHabitat";
+import { RingHabitat } from "@/modules/orbitalFacilities/assets/habitats/ring/ringHabitat";
+import { LandingBay } from "@/modules/orbitalFacilities/assets/landingBay/landingBay";
+import { SolarSection } from "@/modules/orbitalFacilities/assets/solarSection";
+import { TokamakSection } from "@/modules/orbitalFacilities/assets/tokamakSection";
+import { UtilitySection } from "@/modules/orbitalFacilities/assets/utilitySection";
+import type { StationSection } from "@/modules/orbitalFacilities/stationSection";
 
 /**
  * Instantiates the ordered station sections and attaches each one to the facility hierarchy.

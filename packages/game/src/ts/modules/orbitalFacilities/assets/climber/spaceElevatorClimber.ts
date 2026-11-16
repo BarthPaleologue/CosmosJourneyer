@@ -22,9 +22,9 @@ import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { PBRTextures } from "@/frontend/assets/textures/materials";
+import type { PBRTextures } from "@/frontend/assets/textures/materials/index";
 
-import type { SolarPanelMaterial } from "../../solarPanel/solarPanelMaterial";
+import type { SolarPanelMaterial } from "../../../../frontend/assets/procedural/solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "../metalSectionMaterial";
 import { ClimberRingMaterial } from "./climberRingMaterial";
 

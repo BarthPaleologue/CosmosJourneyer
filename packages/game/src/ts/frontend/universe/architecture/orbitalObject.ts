@@ -20,9 +20,9 @@ import type { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/bla
 import type { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 import type { Star } from "@/frontend/universe/stellarObjects/star/star";
 
+import type { SpaceElevator } from "../../../modules/orbitalFacilities/spaceElevator";
+import type { SpaceStation } from "../../../modules/orbitalFacilities/spaceStation";
 import type { EmptyCelestialBody } from "../emptyCelestialBody";
-import type { SpaceElevator } from "../orbitalFacility/spaceElevator";
-import type { SpaceStation } from "../orbitalFacility/spaceStation";
 import type { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import type { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
 
