@@ -53,6 +53,7 @@
         "prepare": "husky"
     },
     "devDependencies": {
+        "@cosmos-journeyer/eslint-plugin": "workspace:*",
         "@eslint/js": "catalog:",
         "@next/eslint-plugin-next": "catalog:",
         "eslint": "catalog:",
@@ -60,6 +61,7 @@
         "eslint-plugin-import-x": "catalog:",
         "eslint-plugin-jsdoc": "catalog:",
         "husky": "9.1.7",
+        "jiti": "catalog:",
         "lint-staged": "17.6.0",
         "oxfmt": "catalog:",
         "typescript": "catalog:",

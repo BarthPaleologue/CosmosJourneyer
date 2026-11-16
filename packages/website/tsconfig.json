@@ -1,9 +1,9 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "noEmit": true,
         "jsx": "preserve",
         "lib": ["ES2025", "DOM"],
+        "incremental": true,
         "tsBuildInfoFile": "./.tsbuildinfo",
         "plugins": [
             {

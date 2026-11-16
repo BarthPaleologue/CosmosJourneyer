@@ -31,7 +31,7 @@ import { getOrbitalObjectTypeToI18nString } from "@/frontend/helpers/orbitalObje
 
 import type { Player } from "../player/player";
 import { StarMapBookmarkButton } from "./starMapBookmarkButton";
-import type { StarMapSystemInfoRegistry } from "./starMapSystemInfoRegistry";
+import type { StarMapSystemInfoLookup } from "./starMapSystemInfoRegistry";
 import { SystemIcons } from "./systemIcons";
 
 export class StarMapUI {
@@ -67,7 +67,7 @@ export class StarMapUI {
 
     private readonly universeBackend: UniverseBackend;
     private readonly t: TFunction;
-    private readonly starMapSystemInfo: Pick<StarMapSystemInfoRegistry, "getInfo">;
+    private readonly starMapSystemInfo: StarMapSystemInfoLookup;
 
     readonly onSystemFocusObservable = new Observable<StarSystemCoordinates>();
 
@@ -83,7 +83,7 @@ export class StarMapUI {
         player: Player,
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
-        starMapSystemInfo: Pick<StarMapSystemInfoRegistry, "getInfo">,
+        starMapSystemInfo: StarMapSystemInfoLookup,
         t: TFunction,
     ) {
         this.scene = scene;

@@ -34,6 +34,12 @@ import type { PadTarget, Target } from "./target";
 
 export type SystemEntityTargetFactory = (entity: SystemEntity) => Array<Target>;
 
+type MissionGuidanceSource = Pick<Mission, "getGuidanceTargetObjectIds">;
+
+type MissionGuidanceStarSystem = Pick<StarSystemController, "getOrbitalObjectById" | "getSystemEntities"> & {
+    readonly model: Pick<StarSystemController["model"], "coordinates">;
+};
+
 /**
  * Collects targetable bodies, entities, and system-defined targets.
  * @param starSystem System whose objects are converted into targets.
@@ -266,10 +272,8 @@ function createClimberTargets(climber: SpaceElevatorClimber): Array<Target> {
  * @returns Guidance targets available in the current system.
  */
 export function getMissionKnownTargets(
-    missions: ReadonlyArray<Pick<Mission, "getGuidanceTargetObjectIds">>,
-    starSystem: Pick<StarSystemController, "getOrbitalObjectById" | "getSystemEntities"> & {
-        readonly model: Pick<StarSystemController["model"], "coordinates">;
-    },
+    missions: ReadonlyArray<MissionGuidanceSource>,
+    starSystem: MissionGuidanceStarSystem,
     systemEntityTargetFactory: SystemEntityTargetFactory,
 ): Array<Target> {
     const relevantObjectIds = missions

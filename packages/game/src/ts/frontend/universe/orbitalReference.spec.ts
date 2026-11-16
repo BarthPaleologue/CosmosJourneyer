@@ -38,6 +38,8 @@ import { KeplerianOrbitalSimulation } from "./keplerianOrbitalSimulation";
 import type { KeplerianObject } from "./keplerianOrbitalSimulation";
 import { getMostInfluentialObject, getNavigationReferenceFrame } from "./orbitalReference";
 
+type KeplerianObjectSummary = Pick<KeplerianObject, "id" | "mass" | "orbit" | "spin">;
+
 describe("orbital reference selection", () => {
     let engine: NullEngine;
     let scene: Scene;
@@ -84,10 +86,7 @@ describe("orbital reference selection", () => {
      * @param time - Simulation time in seconds.
      * @returns A simulation updated to the requested time.
      */
-    function placeModels(
-        models: ReadonlyArray<Pick<KeplerianObject, "id" | "mass" | "orbit" | "spin">>,
-        time = 0,
-    ): KeplerianOrbitalSimulation {
+    function placeModels(models: ReadonlyArray<KeplerianObjectSummary>, time = 0): KeplerianOrbitalSimulation {
         const objects = models.map((model) => ({ ...object(model.id, model.mass, Vector3.Zero()), ...model }));
         const simulation = new KeplerianOrbitalSimulation(objects);
         simulation.update(time);

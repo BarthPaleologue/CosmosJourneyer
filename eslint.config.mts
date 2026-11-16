@@ -1,3 +1,4 @@
+import cosmosPlugin from "@cosmos-journeyer/eslint-plugin";
 import eslint from "@eslint/js";
 import nextPlugin from "@next/eslint-plugin-next";
 import { importX } from "eslint-plugin-import-x";
@@ -9,6 +10,7 @@ const projectConfigs = [
     "./packages/babylonjs-shading-language/tsconfig.json",
     "./packages/channel-packer/tsconfig.json",
     "./packages/desktop-electron/tsconfig.json",
+    "./packages/eslint-plugin/tsconfig.json",
     "./packages/game/tsconfig.json",
     "./packages/gaia-explorer/tsconfig.json",
     "./packages/physics/tsconfig.json",
@@ -36,7 +38,7 @@ const withProjectService = (config) => ({
 
 const strictTypeChecked = tseslint.configs.strictTypeChecked.map(withProjectService);
 
-const nextConfigFiles = ["packages/website/**/*.{js,jsx,ts,tsx}", "eslint.config.mjs"];
+const nextConfigFiles = ["packages/website/**/*.{js,jsx,ts,tsx,mts}", "eslint.config.mts"];
 const nextCoreWebVitalsSource = nextPlugin.flatConfig?.coreWebVitals ?? {
     plugins: {
         "@next/next": nextPlugin,
@@ -61,7 +63,8 @@ const nextCoreWebVitals = {
 };
 
 const typeScriptWorkspaceRules = {
-    files: ["packages/**/*.{ts,tsx,js,jsx}"],
+    files: ["packages/**/*.{ts,tsx,js,jsx,mts}"],
+    extends: [cosmosPlugin.configs.all],
     settings: {
         "import-x/resolver": {
             typescript: {
@@ -160,15 +163,6 @@ const typeScriptWorkspaceRules = {
 
         // maximum cyclomatic complexity
         complexity: ["warn", { max: 15, variant: "modified" }],
-
-        // no Promise.reject()
-        "no-restricted-syntax": [
-            "error",
-            {
-                selector: "CallExpression[callee.object.name='Promise'][callee.property.name='reject']",
-                message: "Using Promise.reject() is not allowed. Consider using Promise<Result> instead.",
-            },
-        ],
 
         // naming conventions
         "@typescript-eslint/naming-convention": [

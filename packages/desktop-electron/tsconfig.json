@@ -2,6 +2,9 @@
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
         "composite": true,
+        "noEmit": false,
+        "incremental": true,
+        "sourceMap": true,
         "rootDir": "./src",
         "outDir": "./dist",
         "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",

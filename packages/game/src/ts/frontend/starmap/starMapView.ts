@@ -58,7 +58,7 @@ import type { StarMapTextures } from "./starMap";
 import { StarMapControls } from "./starMapControls";
 import { StarMapInputs } from "./starMapInputs";
 import { getGreasedLinePathFromSystemSegments } from "./starMapPath";
-import type { StarMapSystemInfoRegistry } from "./starMapSystemInfoRegistry";
+import type { StarMapSystemInfoLookup } from "./starMapSystemInfoRegistry";
 import { StarMapUI } from "./starMapUI";
 import { StellarPathfinder } from "./stellarPathfinder";
 
@@ -110,7 +110,7 @@ export class StarMapView implements View {
         universeBackend: UniverseBackend,
         soundPlayer: ISoundPlayer,
         notificationManager: INotificationManager,
-        starMapSystemInfo: Pick<StarMapSystemInfoRegistry, "getInfo">,
+        starMapSystemInfo: StarMapSystemInfoLookup,
         t: TFunction,
     ) {
         this.scene = scene;

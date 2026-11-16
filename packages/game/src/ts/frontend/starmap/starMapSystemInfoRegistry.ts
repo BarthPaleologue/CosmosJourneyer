@@ -21,6 +21,9 @@ import type { StarSystemContentModel } from "@/backend/universe/universeBackend"
 
 import type { StarMapSystemInfoExtensionPoint, StarMapSystemInfoProvider } from "@/modules/starMapSystemInfo";
 
+/** Read-only contract for looking up information about the selected star system. */
+export type StarMapSystemInfoLookup = Pick<StarMapSystemInfoRegistry, "getInfo">;
+
 export class StarMapSystemInfoRegistry implements StarMapSystemInfoExtensionPoint {
     private readonly providers: Array<StarMapSystemInfoProvider> = [];
 
