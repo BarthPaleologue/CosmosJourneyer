@@ -9,6 +9,8 @@ const mockDownloadStepIntervalMs = 250;
 const mockDownloadStepCount = 20;
 const mockDownloadSizeBytes = 125_000_000;
 
+type DevelopmentUpdaterApp = Pick<App, "getVersion" | "isPackaged" | "quit">;
+
 /**
  * Creates the simulated updater only when explicitly enabled in an unpackaged development app.
  * @param app - Desktop application lifecycle and version access.
@@ -16,7 +18,7 @@ const mockDownloadSizeBytes = 125_000_000;
  * @returns The simulated updater, or null when disabled.
  */
 export function createDevelopmentAutoUpdater(
-    app: Pick<App, "getVersion" | "isPackaged" | "quit">,
+    app: DevelopmentUpdaterApp,
     isDevelopment: boolean,
 ): MockAutoUpdaterClient | null {
     if (app.isPackaged || !isDevelopment || process.env["COSMOS_DESKTOP_MOCK_UPDATE"] !== "1") {
