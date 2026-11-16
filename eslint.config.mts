@@ -164,15 +164,6 @@ const typeScriptWorkspaceRules = {
         // maximum cyclomatic complexity
         complexity: ["warn", { max: 15, variant: "modified" }],
 
-        // no Promise.reject()
-        "no-restricted-syntax": [
-            "error",
-            {
-                selector: "CallExpression[callee.object.name='Promise'][callee.property.name='reject']",
-                message: "Using Promise.reject() is not allowed. Consider using Promise<Result> instead.",
-            },
-        ],
-
         // naming conventions
         "@typescript-eslint/naming-convention": [
             "error",

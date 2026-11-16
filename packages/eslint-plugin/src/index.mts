@@ -1,5 +1,7 @@
 import type { TSESLint } from "@typescript-eslint/utils";
 
+import noPromiseReject from "./rules/no-promise-reject.mts";
+
 type RuleDefinitions = NonNullable<TSESLint.FlatConfig.Plugin["rules"]>;
 
 type CosmosPlugin = TSESLint.FlatConfig.Plugin & {
@@ -9,7 +11,9 @@ type CosmosPlugin = TSESLint.FlatConfig.Plugin & {
     };
 };
 
-const rules = {} satisfies RuleDefinitions;
+const rules = {
+    "no-promise-reject": noPromiseReject,
+} satisfies RuleDefinitions;
 
 const allPlugins: TSESLint.FlatConfig.Plugins = {};
 
