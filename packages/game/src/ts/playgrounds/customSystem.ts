@@ -102,7 +102,9 @@ export async function createCustomSystemScene(
     } else if (systemKey === "eclipseTest") {
         systemModel = getEclipseTestSystemModel();
     } else {
-        systemModel = getLoneStarSystem();
+        const loneStar = getLoneStarSystem();
+        systemModel = loneStar.system;
+        backend.universe.registerAuthoredEntities(systemModel.coordinates, loneStar.entities);
     }
 
     backend.universe.registerAuthoredSystem(systemModel);

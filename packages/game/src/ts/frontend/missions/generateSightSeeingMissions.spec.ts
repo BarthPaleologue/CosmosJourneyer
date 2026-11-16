@@ -23,7 +23,7 @@ describe("station mission generation by universe ID", () => {
     beforeEach(() => {
         backend = new UniverseBackend(new SystemEntityBackend());
         const system = getSolSystemModel();
-        const neighbor = getLoneStarSystem();
+        const neighbor = getLoneStarSystem().system;
         neighbor.coordinates = { ...system.coordinates, localX: 0.05 };
         neighbor.anomalies = Array.from({ length: 32 }, (_, index) =>
             generateMandelbulbModel(`anomaly-${index}`, index, `Anomaly ${index}`, neighbor.stellarObjects),

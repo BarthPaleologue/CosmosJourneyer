@@ -16,16 +16,25 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getRngFromSeed } from "@cosmos-journeyer/random";
-import type { UtilitySectionModel } from "@cosmos-journeyer/universe-model";
+
+import type { RingHabitatModel } from "@/modules/orbitalFacilities/sections/habitats/ring";
 
 /**
  * @param seed Seed for reproducible procedural choices.
- * @returns A utility section model.
+ * @param surface Surface geometry on which to place the habitat.
+ * @returns A ring habitat section fitted to the surface.
  */
-export function generateUtilitySectionModel(seed: number): UtilitySectionModel {
+export function generateRingHabitatModel(
+    seed: number,
+    surface: Readonly<RingHabitatModel["surface"]>,
+): RingHabitatModel {
     const rng = getRngFromSeed(seed);
+    const baseRadius = 5e3 + rng(0) * 10e3;
+    const attachmentTessellation = 4 + 2 * Math.floor(rng(1) * 2);
     return {
-        type: "utility",
-        hasTanks: rng(0) < 0.3,
+        type: "ringHabitat",
+        surface,
+        baseRadius,
+        attachmentTessellation,
     };
 }

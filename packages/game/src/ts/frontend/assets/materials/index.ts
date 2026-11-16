@@ -24,8 +24,9 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import { TireMaterial } from "@/frontend/vehicle/tireMaterial";
 
-import { LandingPadMaterial } from "../../../modules/orbitalFacilities/assets/landingPad/landingPadMaterial";
-import { MetalSectionMaterial } from "../../../modules/orbitalFacilities/assets/metalSectionMaterial";
+import { LandingPadMaterial } from "@/modules/orbitalFacilities/assets/landingPad/landingPadMaterial";
+import { MetalSectionMaterial } from "@/modules/orbitalFacilities/assets/metalSectionMaterial";
+
 import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
 import { GrassMaterial } from "../procedural/grass/grassMaterial";
 import { RockMaterial } from "../procedural/rock/rockMaterial";

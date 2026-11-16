@@ -256,21 +256,23 @@ export class CosmosJourneyer {
             });
             await this.starSystemView.switchToSpaceshipControls();
             const spaceshipPosition = this.starSystemView.getSpaceshipControls().getTransform().getAbsolutePosition();
-            const closestSpaceStation = this.starSystemView
+            const closestStation = this.starSystemView
                 .getStarSystem()
-                .getOrbitalFacilities()
-                .reduce((closest, current) => {
-                    const currentDistance = Vector3.DistanceSquared(
+                .getLandableFacilities()
+                .toSorted((a, b) => {
+                    const distanceA = Vector3.DistanceSquared(
                         spaceshipPosition,
-                        current.getTransform().getAbsolutePosition(),
+                        a.getTransform().getAbsolutePosition(),
                     );
-                    const closestDistance = Vector3.DistanceSquared(
+                    const distanceB = Vector3.DistanceSquared(
                         spaceshipPosition,
-                        closest.getTransform().getAbsolutePosition(),
+                        b.getTransform().getAbsolutePosition(),
                     );
-                    return currentDistance < closestDistance ? current : closest;
-                });
-            this.starSystemView.setTarget(closestSpaceStation);
+                    return distanceA - distanceB;
+                })[0];
+            if (closestStation !== undefined) {
+                this.starSystemView.setTarget(closestStation);
+            }
             await this.createAutoSave();
         });
 

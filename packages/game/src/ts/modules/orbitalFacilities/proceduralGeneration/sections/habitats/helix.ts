@@ -15,23 +15,34 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getRngFromSeed } from "@cosmos-journeyer/random";
-import type { CylinderHabitatModel } from "@cosmos-journeyer/universe-model";
+import { getRngFromSeed, randRangeInt } from "@cosmos-journeyer/random";
+
+import type { HelixHabitatModel } from "@/modules/orbitalFacilities/sections/habitats/helix";
 
 /**
  * @param seed Seed for reproducible procedural choices.
  * @param surface Surface geometry on which to place the habitat.
- * @returns A cylindrical habitat section fitted to the surface.
+ * @returns A helical habitat section fitted to the surface.
  */
-export function generateCylinderHabitatModel(
+export function generateHelixHabitatModel(
     seed: number,
-    surface: Readonly<CylinderHabitatModel["surface"]>,
-): CylinderHabitatModel {
+    surface: Readonly<HelixHabitatModel["surface"]>,
+): HelixHabitatModel {
     const rng = getRngFromSeed(seed);
-    const radius = 4e3 + rng(0) * 2e3;
+    const baseRadius = 10e3 + rng(0) * 10e3;
+    const deltaRadius = 700 + rng(1) * 200;
+    const helixCount = randRangeInt(2, 4, rng, 654);
+    const thicknessFactor = randRangeInt(1, 5 - helixCount, rng, 150);
+    const helixPitchMultiplier = 1 + 0.3 * (rng(2) * 2 - 1);
+    const attachmentTessellation = 6 + 2 * Math.floor(rng(4) * 2);
     return {
-        type: "cylinderHabitat",
+        type: "helixHabitat",
         surface,
-        radius,
+        baseRadius,
+        deltaRadius,
+        helixCount,
+        thicknessFactor,
+        helixPitchMultiplier,
+        attachmentTessellation,
     };
 }

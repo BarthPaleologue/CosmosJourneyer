@@ -15,25 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getRngFromSeed } from "@cosmos-journeyer/random";
-import type { RingHabitatModel } from "@cosmos-journeyer/universe-model";
+import type { EngineBayModel } from "../../sections/engineBay";
 
 /**
- * @param seed Seed for reproducible procedural choices.
- * @param surface Surface geometry on which to place the habitat.
- * @returns A ring habitat section fitted to the surface.
+ * @returns An engine bay section model.
  */
-export function generateRingHabitatModel(
-    seed: number,
-    surface: Readonly<RingHabitatModel["surface"]>,
-): RingHabitatModel {
-    const rng = getRngFromSeed(seed);
-    const baseRadius = 5e3 + rng(0) * 10e3;
-    const attachmentTessellation = 4 + 2 * Math.floor(rng(1) * 2);
+export function generateEngineBayModel(): EngineBayModel {
     return {
-        type: "ringHabitat",
-        surface,
-        baseRadius,
-        attachmentTessellation,
+        type: "engineBay",
     };
 }

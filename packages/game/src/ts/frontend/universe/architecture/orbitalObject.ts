@@ -20,8 +20,6 @@ import type { BlackHole } from "@/frontend/universe/stellarObjects/blackHole/bla
 import type { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 import type { Star } from "@/frontend/universe/stellarObjects/star/star";
 
-import type { SpaceElevator } from "../../../modules/orbitalFacilities/spaceElevator";
-import type { SpaceStation } from "../../../modules/orbitalFacilities/spaceStation";
 import type { EmptyCelestialBody } from "../emptyCelestialBody";
 import type { GasPlanet } from "../planets/gasPlanet/gasPlanet";
 import type { TelluricPlanet } from "../planets/telluricPlanet/telluricPlanet";
@@ -37,11 +35,9 @@ export type Anomaly =
     | EmptyCelestialBody<"sierpinskiPyramid">
     | EmptyCelestialBody<"mandelbox">;
 
-export type OrbitalFacility = SpaceStation | SpaceElevator;
-
 export type CelestialBody = StellarObject | Planet | Anomaly;
 
 /**
  * Describes all objects that can have an orbital trajectory and rotate on themselves
  */
-export type OrbitalObject = CelestialBody | OrbitalFacility | CustomOrbitalObject;
+export type OrbitalObject = CelestialBody | CustomOrbitalObject;

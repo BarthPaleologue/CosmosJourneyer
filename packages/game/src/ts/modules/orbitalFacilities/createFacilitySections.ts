@@ -20,7 +20,6 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { StationSectionModel } from "@cosmos-journeyer/universe-model";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 
@@ -32,7 +31,9 @@ import { LandingBay } from "@/modules/orbitalFacilities/assets/landingBay/landin
 import { SolarSection } from "@/modules/orbitalFacilities/assets/solarSection";
 import { TokamakSection } from "@/modules/orbitalFacilities/assets/tokamakSection";
 import { UtilitySection } from "@/modules/orbitalFacilities/assets/utilitySection";
-import type { StationSection } from "@/modules/orbitalFacilities/stationSection";
+import type { StationSectionModel } from "@/modules/orbitalFacilities/sections";
+
+import type { StationSection } from "./stationSection";
 
 /**
  * Instantiates the ordered station sections and attaches each one to the facility hierarchy.

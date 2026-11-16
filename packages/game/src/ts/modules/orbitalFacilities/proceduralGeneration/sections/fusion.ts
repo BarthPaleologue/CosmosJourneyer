@@ -15,16 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { OrbitalObjectType } from "@cosmos-journeyer/universe-model";
+import type { FusionSectionModel } from "../../sections/fusion";
 
-import type { ClusteredLightingRegion } from "@/frontend/helpers/clusteredLightingSystem";
-import type { Cullable } from "@/frontend/helpers/cullable";
-import type { OrbitalObjectBase } from "@/frontend/universe/architecture/orbitalObjectBase";
-import type { ManagesLandingPads } from "@/frontend/universe/orbitalFacility/managesLandingPads";
-
-import type { LandingBay } from "@/modules/orbitalFacilities/assets/landingBay/landingBay";
-
-export interface OrbitalFacilityBase<T extends OrbitalObjectType>
-    extends OrbitalObjectBase<T>, ManagesLandingPads, Cullable, ClusteredLightingRegion {
-    getLandingBays(): Array<LandingBay>;
+/**
+ * @param netPowerOutput Net electrical power available to the fusion section, in watts.
+ * @returns A fusion section model sized for the available power.
+ */
+export function generateFusionSectionModel(netPowerOutput: number): FusionSectionModel {
+    return {
+        type: "fusion",
+        netPowerOutput,
+    };
 }

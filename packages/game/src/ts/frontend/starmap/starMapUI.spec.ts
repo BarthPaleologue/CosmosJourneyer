@@ -48,7 +48,7 @@ describe("star-map module information", () => {
         expect(ui.shortHandUISystemInfo.querySelector("strong")).toBeNull();
         expect(ui.shortHandUISystemInfo.hidden).toBe(false);
 
-        const emptySystem = getLoneStarSystem();
+        const emptySystem = getLoneStarSystem().system;
         ui.setSelectedSystem({ system: emptySystem, entities: [] }, null);
 
         expect(ui.shortHandUISystemInfo.children).toHaveLength(1);
@@ -58,7 +58,7 @@ describe("star-map module information", () => {
 
     it("hides the information container before selection and whenever the selected system has no contribution", () => {
         expect(ui.shortHandUISystemInfo.hidden).toBe(true);
-        const emptyContent = { system: getLoneStarSystem(), entities: [] };
+        const emptyContent = { system: getLoneStarSystem().system, entities: [] };
         ui.setSelectedSystem(emptyContent, null);
         expect(ui.shortHandUISystemInfo.hidden).toBe(true);
         info.register(({ entities }) => (entities.length > 0 ? "Has entities" : null));

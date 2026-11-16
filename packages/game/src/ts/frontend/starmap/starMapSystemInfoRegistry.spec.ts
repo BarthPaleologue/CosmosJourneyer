@@ -26,13 +26,13 @@ describe("star-map system information registry", () => {
         info.register(({ entities }) => (entities.length > 0 ? "Has entities" : null));
         const { starSystem, systemEntities } = getVestaModel();
         expect(info.getInfo({ system: starSystem, entities: systemEntities })).toEqual(["Has entities"]);
-        expect(info.getInfo({ system: getLoneStarSystem(), entities: [] })).toEqual([]);
+        expect(info.getInfo({ system: getLoneStarSystem().system, entities: [] })).toEqual([]);
     });
 
     it("keeps contributions within the game instance that registered them", () => {
         const first = new StarMapSystemInfoRegistry();
         const second = new StarMapSystemInfoRegistry();
-        const content = { system: getLoneStarSystem(), entities: [] };
+        const content = { system: getLoneStarSystem().system, entities: [] };
         first.register(() => "Only the first game");
         expect(first.getInfo(content)).toEqual(["Only the first game"]);
         expect(second.getInfo(content)).toEqual([]);

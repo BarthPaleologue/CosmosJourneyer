@@ -17,17 +17,16 @@
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import type { Light } from "@babylonjs/core/Lights/light";
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { SpaceElevatorModel } from "@cosmos-journeyer/universe-model";
 
-import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { SystemContent, SystemContentFactoryContext } from "@/frontend/systemEntity/systemEntity";
 import { LandingPadProvider } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
@@ -37,16 +36,12 @@ import { SpaceElevatorClimber } from "@/modules/orbitalFacilities/assets/climber
 import { LandingBay } from "@/modules/orbitalFacilities/assets/landingBay/landingBay";
 import { MetalSectionMaterial } from "@/modules/orbitalFacilities/assets/metalSectionMaterial";
 
-import type { OrbitalFacilityBase } from "../../frontend/universe/orbitalFacility/orbitalFacility";
 import { createFacilitySections } from "./createFacilitySections";
+import type { SpaceElevatorModel } from "./spaceElevatorModel";
 import type { StationSection } from "./stationSection";
 
-export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
+export class SpaceElevator implements SystemContent {
     readonly name: string;
-
-    readonly model: DeepReadonly<SpaceElevatorModel>;
-
-    readonly type = "spaceElevator";
 
     private readonly sections: Array<StationSection>;
     readonly landingBays: Array<LandingBay>;
@@ -67,10 +62,8 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
 
     private readonly landingPadProvider: LandingPadProvider;
 
-    constructor(model: DeepReadonly<SpaceElevatorModel>, assets: RenderingAssets, scene: Scene) {
-        this.model = model;
-
-        this.name = this.model.name;
+    constructor(name: string, model: DeepReadonly<SpaceElevatorModel>, { assets, scene }: SystemContentFactoryContext) {
+        this.name = name;
 
         this.root = new TransformNode(this.name, scene);
         this.root.rotationQuaternion = Quaternion.Identity();
@@ -78,7 +71,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         this.scene = scene;
 
         const tetherThickness = 10;
-        this.tetherLength = this.model.tetherLength;
+        this.tetherLength = model.tetherLength;
 
         this.tether = MeshBuilder.CreateCylinder(
             `${this.name} Tether`,
@@ -109,7 +102,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
 
         this.climber.getTransform().position.y = this.tetherLength / 2;
 
-        this.sections = createFacilitySections(this.root, model.sections, model.name, assets, scene, this.tether);
+        this.sections = createFacilitySections(this.root, model.sections, this.name, assets, scene, this.tether);
         this.landingBays = this.sections.filter((section): section is LandingBay => section instanceof LandingBay);
 
         const allLandingPads: Array<ILandingPad> = [];
@@ -170,23 +163,7 @@ export class SpaceElevator implements OrbitalFacilityBase<"spaceElevator"> {
         this.getTransform().setEnabled(isSizeOnScreenEnough(this, camera));
     }
 
-    update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number): void {
-        const parent = parents[0];
-        if (parent === undefined) {
-            throw new Error("Space Elevator should have exactly one parent");
-        }
-
-        const newUp = this.getTransform().position.subtract(parent.getTransform().position).normalize();
-        if (newUp.lengthSquared() < 1e-6) {
-            newUp.set(0, 1, 0);
-        }
-        const currentRotation = this.getTransform().rotationQuaternion ?? Quaternion.Identity();
-        this.getTransform().rotationQuaternion = Quaternion.FromUnitVectorsToRef(
-            Vector3.UpReadOnly,
-            newUp,
-            currentRotation,
-        );
-
+    update(cameraWorldPosition: Vector3, deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
 
         for (const section of this.sections) {

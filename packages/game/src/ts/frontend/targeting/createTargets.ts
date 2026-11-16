@@ -19,18 +19,16 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { getStellarTypeFromTemperature } from "@cosmos-journeyer/physics";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 
-import type { SpaceElevatorClimber } from "../../modules/orbitalFacilities/assets/climber/spaceElevatorClimber";
-import type { LandingBay } from "../../modules/orbitalFacilities/assets/landingBay/landingBay";
 import type { Mission } from "../missions/mission";
 import type { Spaceship } from "../spaceship/spaceship";
 import type { SystemEntity } from "../systemEntity/systemEntity";
-import type { Anomaly, OrbitalFacility, OrbitalObject } from "../universe/architecture/orbitalObject";
+import type { Anomaly, OrbitalObject } from "../universe/architecture/orbitalObject";
 import type { ILandingPad } from "../universe/orbitalFacility/landingPadProvider";
 import type { StarSystemController } from "../universe/starSystemController";
 import type { SystemTarget } from "../universe/systemTarget";
 import type { Vehicle } from "../vehicle/vehicle";
 import { TargetType } from "./target";
-import type { PadTarget, Target } from "./target";
+import type { Target, PadTarget } from "./target";
 
 export type SystemEntityTargetFactory = (entity: SystemEntity) => Array<Target>;
 
@@ -53,7 +51,7 @@ export function getSystemTargets(
     const out: Array<Target> = [];
 
     const orbitalObjects = starSystem.getOrbitalObjects();
-    const orbitalObjectTargets = orbitalObjects.flatMap((object) => createOrbitalObjectTargets(object));
+    const orbitalObjectTargets = orbitalObjects.flatMap((object) => createOrbitalObjectTarget(object));
     out.push(...orbitalObjectTargets);
 
     const systemEntities = starSystem.getSystemEntities();
@@ -76,21 +74,8 @@ export function getSystemTargets(
 }
 
 /**
- * Creates target representations for a body, including facility subtargets.
- * @param orbitalObject Orbital object to expose as a target.
- * @returns The object's target and any facility targets it contains.
- */
-function createOrbitalObjectTargets(orbitalObject: OrbitalObject): Array<Target> {
-    if (orbitalObject.type === "spaceElevator" || orbitalObject.type === "spaceStation") {
-        return createOrbitalFacilityTargets(orbitalObject);
-    }
-    return [createOrbitalObjectTarget(orbitalObject)];
-}
-
-/**
- * Converts an orbital object model into its target type and display data.
- * @param orbitalObject Orbital object to represent.
- * @returns Target data backed by the object's transform and bounds.
+ * @param orbitalObject Body to represent.
+ * @returns Target with the body’s display type and geometry.
  */
 export function createOrbitalObjectTarget(orbitalObject: OrbitalObject): Target {
     switch (orbitalObject.type) {
@@ -106,8 +91,6 @@ export function createOrbitalObjectTarget(orbitalObject: OrbitalObject): Target 
         case "telluricPlanet":
         case "gasPlanet":
         case "telluricSatellite":
-        case "spaceStation":
-        case "spaceElevator":
         case "custom":
             break;
     }
@@ -196,76 +179,6 @@ export function createVehicleTarget(vehicle: Vehicle): Target {
 }
 
 /**
- * Collects a facility target and targets for its pads, bays, and climber.
- * @param orbitalFacility Orbital facility whose parts can be targeted.
- * @returns Targets for the facility and its targetable components.
- */
-function createOrbitalFacilityTargets(orbitalFacility: OrbitalFacility): Array<Target> {
-    const out: Array<Target> = [createOrbitalObjectTarget(orbitalFacility)];
-
-    const landingPads = orbitalFacility.getLandingPadProvider().getLandingPads();
-    const landingPadTargets = landingPads.flatMap((pad) => createLandingPadTargets(pad));
-    out.push(...landingPadTargets);
-
-    const landingBays = orbitalFacility.getLandingBays();
-    const landingBayTargets = landingBays.flatMap((bay) => createLandingBayTargets(bay));
-    out.push(...landingBayTargets);
-
-    if (orbitalFacility.type === "spaceElevator") {
-        const climberTargets = createClimberTargets(orbitalFacility.getClimber());
-        out.push(...climberTargets);
-    }
-
-    return out;
-}
-
-/**
- * Creates a target for a landing pad while preserving its identifier.
- * @param landingPad Landing pad to represent.
- * @returns Target data used to select the pad for landing.
- */
-export function createLandingPadTargets(landingPad: ILandingPad): Array<PadTarget> {
-    return [
-        {
-            getTransform: () => landingPad.getTransform(),
-            getBoundingRadius: () => landingPad.getBoundingRadius(),
-            type: TargetType.LANDING_PAD,
-            padIdentifier: landingPad.getIdentifier(),
-        },
-    ];
-}
-
-/**
- * Creates the target representation for a facility landing bay.
- * @param landingBay Landing bay to represent.
- * @returns Target data backed by the bay's transform and bounds.
- */
-function createLandingBayTargets(landingBay: LandingBay): Array<Target> {
-    return [
-        {
-            getTransform: () => landingBay.getTransform(),
-            getBoundingRadius: () => landingBay.getBoundingRadius(),
-            type: TargetType.LANDING_BAY,
-        },
-    ];
-}
-
-/**
- * Creates the target representation for a space-elevator climber.
- * @param climber Climber to represent.
- * @returns Target data backed by the climber's transform and bounds.
- */
-function createClimberTargets(climber: SpaceElevatorClimber): Array<Target> {
-    return [
-        {
-            getTransform: () => climber.getTransform(),
-            getBoundingRadius: () => climber.getBoundingRadius(),
-            type: TargetType.SPACE_ELEVATOR_CLIMBER,
-        },
-    ];
-}
-
-/**
  * @param missions Active missions supplying guidance identifiers.
  * @param starSystem Current system containing the guidance objects.
  * @param systemEntityTargetFactory Module targets for an entity.
@@ -288,4 +201,20 @@ export function getMissionKnownTargets(
         const entity = starSystem.getSystemEntities().find((candidate) => candidate.model.id === objectId.idInSystem);
         return entity === undefined ? [] : systemEntityTargetFactory(entity);
     });
+}
+
+/**
+ * Creates a target for a landing pad while preserving its identifier.
+ * @param landingPad Landing pad to represent.
+ * @returns Target data used to select the pad for landing.
+ */
+export function createLandingPadTargets(landingPad: ILandingPad): Array<PadTarget> {
+    return [
+        {
+            getTransform: () => landingPad.getTransform(),
+            getBoundingRadius: () => landingPad.getBoundingRadius(),
+            type: TargetType.LANDING_PAD,
+            padIdentifier: landingPad.getIdentifier(),
+        },
+    ];
 }

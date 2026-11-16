@@ -426,6 +426,5 @@ export function getSolSystemModel(): StarSystemModel {
         planets: [mercury, venus, earth, mars, jupiter, saturn, uranus, neptune],
         satellites: [moon],
         anomalies: [],
-        orbitalFacilities: [],
     };
 }

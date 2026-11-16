@@ -15,15 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { FusionSectionModel } from "@cosmos-journeyer/universe-model";
+import { getRngFromSeed } from "@cosmos-journeyer/random";
+
+import type { LandingBayModel } from "../../sections/landingBay";
 
 /**
- * @param netPowerOutput Net electrical power available to the fusion section, in watts.
- * @returns A fusion section model sized for the available power.
+ * @param seed Seed for reproducible procedural choices.
+ * @returns A landing bay section model.
  */
-export function generateFusionSectionModel(netPowerOutput: number): FusionSectionModel {
+export function generateLandingBayModel(seed: number): LandingBayModel {
+    const rng = getRngFromSeed(seed);
     return {
-        type: "fusion",
-        netPowerOutput,
+        type: "landingBay",
+        heightFactor: 1 + Math.floor(rng(0) * 3),
     };
 }

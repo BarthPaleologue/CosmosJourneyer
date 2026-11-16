@@ -42,7 +42,7 @@ import {
     vec2,
 } from "babylonjs-shading-language";
 
-import type { PBRTextures } from "@/frontend/assets/textures/materials/index";
+import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
 export class RingHabitatMaterial extends NodeMaterial {
     constructor(meanRadius: number, deltaRadius: number, height: number, textures: PBRTextures, scene: Scene) {

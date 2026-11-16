@@ -15,4 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export type CropType = "potato" | "yam" | "sweet_potato" | "rice" | "peanut" | "wheat" | "lentil" | "cassava";
+import { getRngFromSeed } from "@cosmos-journeyer/random";
+
+import type { UtilitySectionModel } from "../../sections/utility";
+
+/**
+ * @param seed Seed for reproducible procedural choices.
+ * @returns A utility section model.
+ */
+export function generateUtilitySectionModel(seed: number): UtilitySectionModel {
+    const rng = getRngFromSeed(seed);
+    return {
+        type: "utility",
+        hasTanks: rng(0) < 0.3,
+    };
+}

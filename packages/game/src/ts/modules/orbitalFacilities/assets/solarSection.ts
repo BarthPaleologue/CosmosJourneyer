@@ -27,15 +27,15 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import type { SolarSectionModel } from "@cosmos-journeyer/universe-model";
 
+import type { SolarPanelMaterial } from "@/frontend/assets/procedural/solarPanel/solarPanelMaterial";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 
+import type { SolarSectionModel } from "@/modules/orbitalFacilities/sections/solar";
 import type { StationSection } from "@/modules/orbitalFacilities/stationSection";
 import { Settings } from "@/settings";
 
-import type { SolarPanelMaterial } from "../../../frontend/assets/procedural/solarPanel/solarPanelMaterial";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class SolarSection implements StationSection {

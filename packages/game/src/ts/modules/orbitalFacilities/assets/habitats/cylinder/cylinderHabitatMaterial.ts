@@ -46,7 +46,7 @@ import {
     vec2,
 } from "babylonjs-shading-language";
 
-import type { PBRTextures } from "@/frontend/assets/textures/materials/index";
+import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
 export class CylinderHabitatMaterial extends NodeMaterial {
     constructor(radius: number, height: number, tesselation: number, textures: PBRTextures, scene: Scene) {

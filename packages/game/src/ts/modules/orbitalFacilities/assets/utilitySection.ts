@@ -30,13 +30,13 @@ import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
-import type { UtilitySectionModel } from "@cosmos-journeyer/universe-model";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 
-import type { StationSection } from "@/modules/orbitalFacilities/stationSection";
 import { CollisionMask, Settings } from "@/settings";
 
+import type { UtilitySectionModel } from "../sections/utility";
+import type { StationSection } from "../stationSection";
 import { MetalSectionMaterial } from "./metalSectionMaterial";
 
 export class UtilitySection implements StationSection {

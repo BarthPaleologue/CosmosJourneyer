@@ -259,9 +259,10 @@ describe("Player", () => {
         it("should handle mission serialization/deserialization", () => {
             const player = Player.Default(universeBackend);
 
-            const system = getLoneStarSystem();
+            const { system, entities } = getLoneStarSystem();
             universeBackend.registerAuthoredSystem(system);
-            const spaceStation = system.orbitalFacilities[0];
+            universeBackend.registerAuthoredEntities(system.coordinates, entities);
+            const spaceStation = entities[0];
             if (!spaceStation) {
                 throw new Error("No space station found in authored system for test");
             }

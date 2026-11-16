@@ -1,6 +1,6 @@
 //  This file is part of Cosmos Journeyer
 //
-//  Copyright (C) 2024 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
+//  Copyright (C) 2026 Barthélemy Paléologue <barth.paleologue@cosmosjourneyer.com>
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU Affero General Public License as published by
@@ -15,12 +15,32 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { HasSeed } from "../hasSeed";
-import type { OrbitalFacilityModelBase } from "./orbitalFacilityModelBase";
+import type { SystemContentModel } from "@/backend/systemEntity/systemEntityModel";
+
+import type { CropType } from "@/utils/agriculture";
+
 import type { ElevatorSectionModel } from "./sections";
 
-export type SpaceElevatorModel = OrbitalFacilityModelBase<"spaceElevator"> &
-    HasSeed & {
-        tetherLength: number;
-        sections: Array<ElevatorSectionModel>;
-    };
+export type SpaceElevatorModel = SystemContentModel<"spaceElevator"> & {
+    population: number;
+
+    /**
+     * The average yearly energy consumption of a citizen of the habitat in kWh.
+     */
+    annualEnergyPerCapitaKWh: number;
+
+    /**
+     * The number of inhabitants per square kilometer in the habitat
+     */
+    populationDensity: number;
+
+    agricultureMix: [number, CropType][];
+
+    nbHydroponicLayers: number;
+
+    solarPanelEfficiency: number;
+
+    sections: Array<ElevatorSectionModel>;
+
+    tetherLength: number;
+};

@@ -15,33 +15,32 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getRngFromSeed, randRangeInt } from "@cosmos-journeyer/random";
-import type { HelixHabitatModel } from "@cosmos-journeyer/universe-model";
+import { getRngFromSeed, wheelOfFortune, randRangeInt } from "@cosmos-journeyer/random";
+
+import type { SolarSectionModel } from "../../sections/solar";
 
 /**
  * @param seed Seed for reproducible procedural choices.
- * @param surface Surface geometry on which to place the habitat.
- * @returns A helical habitat section fitted to the surface.
+ * @param surface Surface geometry on which to place the solar section.
+ * @returns A solar section fitted to the surface.
  */
-export function generateHelixHabitatModel(
-    seed: number,
-    surface: Readonly<HelixHabitatModel["surface"]>,
-): HelixHabitatModel {
+export function generateSolarSectionModel(seed: number, surface: number): SolarSectionModel {
     const rng = getRngFromSeed(seed);
-    const baseRadius = 10e3 + rng(0) * 10e3;
-    const deltaRadius = 700 + rng(1) * 200;
-    const helixCount = randRangeInt(2, 4, rng, 654);
-    const thicknessFactor = randRangeInt(1, 5 - helixCount, rng, 150);
-    const helixPitchMultiplier = 1 + 0.3 * (rng(2) * 2 - 1);
-    const attachmentTessellation = 6 + 2 * Math.floor(rng(4) * 2);
+    const axisCount = wheelOfFortune(
+        [
+            [1, 0.1],
+            [2, 0.3],
+            [3, 0.3],
+            [4, 0.2],
+            [5, 0.1],
+        ],
+        rng(0),
+    );
+    const secondaryArmCount = axisCount === 2 ? randRangeInt(2, 4, rng, 777) : undefined;
     return {
-        type: "helixHabitat",
+        type: "solar",
         surface,
-        baseRadius,
-        deltaRadius,
-        helixCount,
-        thicknessFactor,
-        helixPitchMultiplier,
-        attachmentTessellation,
+        axisCount,
+        secondaryArmCount,
     };
 }

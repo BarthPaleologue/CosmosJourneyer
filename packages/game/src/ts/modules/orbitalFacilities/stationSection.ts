@@ -18,7 +18,7 @@
 import type { Light } from "@babylonjs/core/Lights/light";
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 
-import type { Transformable } from "../../frontend/universe/architecture/transformable";
+import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
 export interface StationSection extends Transformable {
     update(cameraWorldPosition: Vector3, deltaSeconds: number): void;

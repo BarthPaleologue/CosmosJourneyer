@@ -37,7 +37,7 @@ import {
     uniformWorld,
 } from "babylonjs-shading-language";
 
-import type { PBRTextures } from "@/frontend/assets/textures/materials/index";
+import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
 export class ClimberRingMaterial extends NodeMaterial {
     constructor(name: string, textures: PBRTextures, scene: Scene) {

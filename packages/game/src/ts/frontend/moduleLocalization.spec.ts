@@ -57,7 +57,7 @@ describe("module localization", () => {
         for (const entry of initialized) {
             expect(entry.api).toBe(api);
         }
-        expect(info.getInfo({ system: getLoneStarSystem(), entities: [] })).toEqual(["mainMenu", "beta"]);
+        expect(info.getInfo({ system: getLoneStarSystem().system, entities: [] })).toEqual(["mainMenu", "beta"]);
         expect(translations.getT()("mainMenu:newJourney")).toBe("New Journey");
     });
 
@@ -94,7 +94,7 @@ describe("module localization", () => {
                 },
             },
         ];
-        const content = { system: getLoneStarSystem(), entities: [] };
+        const content = { system: getLoneStarSystem().system, entities: [] };
         expect(setupModules(modules, api).success).toBe(true);
         expect(info.getInfo(content)).toEqual([
             `Alpha: 2 stations in ${content.system.name}`,
@@ -143,7 +143,7 @@ describe("module localization", () => {
             expect(setupModules([firstModule], api).success).toBe(true);
             expect(setupModules([secondModule], secondApi).success).toBe(true);
 
-            const content = { system: getLoneStarSystem(), entities: [] };
+            const content = { system: getLoneStarSystem().system, entities: [] };
             expect(info.getInfo(content)).toEqual(["First game"]);
             expect(secondInfo.getInfo(content)).toEqual(["Second game"]);
         } finally {

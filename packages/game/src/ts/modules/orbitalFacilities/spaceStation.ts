@@ -20,28 +20,23 @@ import type { Light } from "@babylonjs/core/Lights/light";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
-import type { Scene } from "@babylonjs/core/scene";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { SpaceStationModel } from "@cosmos-journeyer/universe-model";
 
-import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
+import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
+
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
-import type { Transformable } from "@/frontend/universe/architecture/transformable";
+import type { SystemContent, SystemContentFactoryContext } from "@/frontend/systemEntity/systemEntity";
 import { LandingPadProvider } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
 import { LandingBay } from "@/modules/orbitalFacilities/assets/landingBay/landingBay";
 
-import type { OrbitalFacilityBase } from "../../frontend/universe/orbitalFacility/orbitalFacility";
 import { createFacilitySections } from "./createFacilitySections";
+import type { SpaceStationModel } from "./spaceStationModel";
 import type { StationSection } from "./stationSection";
 
-export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
+export class SpaceStation implements SystemContent {
     readonly name: string;
-
-    readonly model: DeepReadonly<SpaceStationModel>;
-
-    readonly type = "spaceStation";
 
     readonly sections: Array<StationSection>;
     readonly landingBays: Array<LandingBay>;
@@ -52,16 +47,17 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
 
     private readonly landingPadProvider: LandingPadProvider;
 
-    constructor(model: DeepReadonly<SpaceStationModel>, assets: RenderingAssets, scene: Scene) {
-        this.model = model;
-
-        this.name = this.model.name;
+    constructor(
+        model: DeepReadonly<SystemEntityModel<SpaceStationModel>>,
+        { assets, scene }: SystemContentFactoryContext,
+    ) {
+        this.name = model.name;
 
         this.root = new TransformNode(this.name, scene);
         this.root.rotationQuaternion = Quaternion.Identity();
 
-        this.sections = createFacilitySections(this.root, model.sections, model.name, assets, scene);
-        this.landingBays = this.sections.filter((section): section is LandingBay => section instanceof LandingBay);
+        this.sections = createFacilitySections(this.root, model.content.sections, model.name, assets, scene);
+        this.landingBays = this.sections.filter((section) => section instanceof LandingBay);
 
         const allLandingPads: Array<ILandingPad> = [];
         const landingPadToLandingBay: Map<ILandingPad, { bay: LandingBay; index: number }> = new Map();
@@ -115,9 +111,9 @@ export class SpaceStation implements OrbitalFacilityBase<"spaceStation"> {
         this.getTransform().setEnabled(isSizeOnScreenEnough(this, camera));
     }
 
-    update(parents: ReadonlyArray<Transformable>, cameraWorldPosition: Vector3, deltaSeconds: number): void {
+    update(observerPosition: Vector3, deltaSeconds: number): void {
         for (const section of this.sections) {
-            section.update(cameraWorldPosition, deltaSeconds);
+            section.update(observerPosition, deltaSeconds);
         }
     }
 

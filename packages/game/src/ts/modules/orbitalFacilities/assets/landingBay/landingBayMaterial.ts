@@ -48,7 +48,7 @@ import {
     vec2,
 } from "babylonjs-shading-language";
 
-import type { PBRTextures } from "@/frontend/assets/textures/materials/index";
+import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
 import { Settings } from "@/settings";
 

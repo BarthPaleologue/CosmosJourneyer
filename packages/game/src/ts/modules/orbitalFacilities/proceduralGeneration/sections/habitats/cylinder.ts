@@ -15,31 +15,24 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getRngFromSeed, wheelOfFortune, randRangeInt } from "@cosmos-journeyer/random";
-import type { SolarSectionModel } from "@cosmos-journeyer/universe-model";
+import { getRngFromSeed } from "@cosmos-journeyer/random";
+
+import type { CylinderHabitatModel } from "@/modules/orbitalFacilities/sections/habitats/cylinder";
 
 /**
  * @param seed Seed for reproducible procedural choices.
- * @param surface Surface geometry on which to place the solar section.
- * @returns A solar section fitted to the surface.
+ * @param surface Surface geometry on which to place the habitat.
+ * @returns A cylindrical habitat section fitted to the surface.
  */
-export function generateSolarSectionModel(seed: number, surface: number): SolarSectionModel {
+export function generateCylinderHabitatModel(
+    seed: number,
+    surface: Readonly<CylinderHabitatModel["surface"]>,
+): CylinderHabitatModel {
     const rng = getRngFromSeed(seed);
-    const axisCount = wheelOfFortune(
-        [
-            [1, 0.1],
-            [2, 0.3],
-            [3, 0.3],
-            [4, 0.2],
-            [5, 0.1],
-        ],
-        rng(0),
-    );
-    const secondaryArmCount = axisCount === 2 ? randRangeInt(2, 4, rng, 777) : undefined;
+    const radius = 4e3 + rng(0) * 2e3;
     return {
-        type: "solar",
+        type: "cylinderHabitat",
         surface,
-        axisCount,
-        secondaryArmCount,
+        radius,
     };
 }

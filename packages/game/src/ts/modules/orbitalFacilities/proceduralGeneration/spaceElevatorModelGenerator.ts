@@ -15,34 +15,33 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { HydroponicToConventionalRatio, IndividualAverageDailyIntake, SeedHalfRange } from "#/constants";
-import { CropTypes, getEdibleEnergyPerAreaPerDay } from "#/utils/agriculture";
-import type { CropType } from "#/utils/agriculture";
-import { getDistancesToStellarObjects } from "#/utils/distanceToStellarObject";
-import { GenerationSteps } from "#/utils/generationSteps";
-import { clamp } from "#/utils/math";
-import { generateSpaceStationName } from "#/utils/strings/spaceStationNameGenerator";
 import {
-    degreesToRadians,
+    getOrbitRadiusFromPeriod,
     getSolarPanelSurfaceFromEnergyRequirement,
     getSphereIrradianceAtDistance,
     km2ToM2,
     kwhPerYearToWatts,
 } from "@cosmos-journeyer/physics";
-import { getRngFromSeed, randomPieChart, wheelOfFortune, normalRandom } from "@cosmos-journeyer/random";
+import { getRngFromSeed, randomPieChart, wheelOfFortune } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
-import type { DeepPartial, DeepReadonly } from "@cosmos-journeyer/typescript";
-import { DefaultOrbitalFacilityMass, getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
-import type {
-    CelestialBodyModel,
-    Orbit,
-    SpaceStationModel,
-    StationSectionModel,
-    StarSystemModel,
-    SpinModel,
-} from "@cosmos-journeyer/universe-model";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import { getDistancesToStellarObjects, SeedHalfRange } from "@cosmos-journeyer/universe-generation";
+import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
+import type { PlanetModel, Orbit, StarSystemModel, SpinModel } from "@cosmos-journeyer/universe-model";
 
-import { generateEngineBayModel } from "./sections/engineBay";
+import type { InOrbitPlacementModel, SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
+
+import {
+    CropTypes,
+    getEdibleEnergyPerAreaPerDay,
+    HydroponicToConventionalRatio,
+    IndividualAverageDailyIntake,
+} from "@/utils/agriculture";
+import type { CropType } from "@/utils/agriculture";
+
+import { DefaultOrbitalFacilityMass } from "../constants";
+import type { ElevatorSectionModel } from "../sections";
+import type { SpaceElevatorModel } from "../spaceElevatorModel";
 import { generateFusionSectionModel } from "./sections/fusion";
 import { generateCylinderHabitatModel } from "./sections/habitats/cylinder";
 import { generateHelixHabitatModel } from "./sections/habitats/helix";
@@ -50,63 +49,52 @@ import { generateRingHabitatModel } from "./sections/habitats/ring";
 import { generateLandingBayModel } from "./sections/landingBay";
 import { generateSolarSectionModel } from "./sections/solar";
 import { generateUtilitySectionModel } from "./sections/utility";
+import { generateSpaceElevatorName } from "./spaceStationNameGenerator";
 
 /**
  * @param id Identifier assigned to the generated facility.
  * @param seed Seed for reproducible procedural choices.
  * @param parentBody Body orbited by the facility.
  * @param systemModel Containing star system used to resolve placement.
- * @param overrides Optional values that replace generated defaults.
- * @returns A space station model with generated sections and orbital data.
+ * @returns A space elevator model with generated sections and orbital data.
  */
-export function generateSpaceStationModel(
+export function generateSpaceElevatorModel(
     id: string,
     seed: number,
-    parentBody: DeepReadonly<CelestialBodyModel>,
+    parentBody: DeepReadonly<PlanetModel>,
     systemModel: DeepReadonly<StarSystemModel>,
-    overrides?: DeepReadonly<DeepPartial<SpaceStationModel>>,
-): SpaceStationModel {
+): SystemEntityModel<SpaceElevatorModel, InOrbitPlacementModel> {
     const rng = getRngFromSeed(seed);
 
-    const name = overrides?.name ?? generateSpaceStationName(rng, 2756);
+    const name = generateSpaceElevatorName(rng, 2756);
 
-    let parentMaxRadius = getCelestialBodyRadius(parentBody);
-    if (parentBody.type === "blackHole") {
-        parentMaxRadius += parentBody.accretionDiskRadius;
-    }
+    const parentSiderealDayDuration = parentBody.spin.siderealPeriod;
 
-    if (
-        parentBody.type === "gasPlanet" ||
-        parentBody.type === "telluricPlanet" ||
-        parentBody.type === "star" ||
-        parentBody.type === "neutronStar"
-    ) {
-        parentMaxRadius = parentBody.rings?.outerRadius ?? parentMaxRadius;
-    }
-
-    const orbitRadius = (2 + clamp(normalRandom(2, 1, rng, GenerationSteps.ORBIT), 0, 10)) * parentMaxRadius;
+    const orbitRadius = getOrbitRadiusFromPeriod(parentSiderealDayDuration, parentBody.mass);
 
     const orbit: Orbit = {
         parentIds: [parentBody.id],
-        semiMajorAxis: overrides?.orbit?.semiMajorAxis ?? orbitRadius,
+        semiMajorAxis: orbitRadius,
         p: 2,
-        inclination: degreesToRadians(normalRandom(0, 10, rng, GenerationSteps.ORBIT + 10)),
+        inclination: parentBody.orbit.inclination + parentBody.spin.axialTilt,
         eccentricity: 0,
         longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
         initialMeanAnomaly: 0,
     };
 
+    const tetherLength = orbitRadius - parentBody.radius;
+
     const mass = DefaultOrbitalFacilityMass;
 
     const spin: SpinModel = {
-        siderealPeriod: 0,
-        axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI,
+        siderealPeriod: parentSiderealDayDuration,
+        axialTilt: 0,
         axisAzimuth: 0,
         initialRotationAngle: 0,
     };
 
-    const population = 250_000 + Math.floor(rng(GenerationSteps.POPULATION) * 500_000);
+    const population = 2_000_000;
     const annualEnergyPerCapitaKWh = 200_000; // US average is at 80k KWh https://www.eia.gov/tools/faqs/faq.php?id=85&t=1
 
     const targetPopulationDensity = 4_000;
@@ -124,51 +112,10 @@ export function generateSpaceStationModel(
 
     const solarPanelEfficiency = 0.4;
 
-    const sections: Array<StationSectionModel> = [];
-
-    sections.push(generateEngineBayModel());
+    const sections: Array<ElevatorSectionModel> = [];
 
     const utilitySectionCount1 = 5 + Math.floor(rng(564) * 5);
     for (let i = 0; i < utilitySectionCount1; i++) {
-        sections.push(generateUtilitySectionModel(SeedHalfRange * rng(132 + 10 * sections.length)));
-    }
-
-    let totalIrradiance = 0;
-    if (parentBody.type === "star" || parentBody.type === "neutronStar" || parentBody.type === "blackHole") {
-        totalIrradiance = getSphereIrradianceAtDistance(
-            parentBody.blackBodyTemperature,
-            getCelestialBodyRadius(parentBody),
-            orbit.semiMajorAxis,
-        );
-    } else {
-        const distancesToStellarObjects = getDistancesToStellarObjects(parentBody, systemModel);
-
-        for (const [model, distance] of distancesToStellarObjects) {
-            totalIrradiance += getSphereIrradianceAtDistance(
-                model.blackBodyTemperature,
-                getCelestialBodyRadius(model),
-                distance,
-            );
-        }
-    }
-
-    const totalEnergyRequirementKWhPerYear = population * annualEnergyPerCapitaKWh;
-    const totalPowerRequirementW = kwhPerYearToWatts(totalEnergyRequirementKWhPerYear);
-    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
-        solarPanelEfficiency,
-        totalPowerRequirementW,
-        totalIrradiance,
-    );
-
-    const maxSolarPanelSurfaceM2 = km2ToM2(150);
-    if (solarPanelSurfaceM2 <= maxSolarPanelSurfaceM2) {
-        sections.push(generateSolarSectionModel(SeedHalfRange * rng(31), solarPanelSurfaceM2));
-    } else {
-        sections.push(generateFusionSectionModel(totalPowerRequirementW));
-    }
-
-    const utilitySectionCount2 = 5 + Math.floor(rng(23) * 5);
-    for (let i = 0; i < utilitySectionCount2; i++) {
         sections.push(generateUtilitySectionModel(SeedHalfRange * rng(132 + 10 * sections.length)));
     }
 
@@ -193,6 +140,7 @@ export function generateSpaceStationModel(
         ] as const,
         rng(17),
     );
+
     switch (habitatType) {
         case "ring":
             sections.push(
@@ -222,6 +170,37 @@ export function generateSpaceStationModel(
             return assertUnreachable(habitatType);
     }
 
+    const utilitySectionCount2 = 5 + Math.floor(rng(23) * 5);
+    for (let i = 0; i < utilitySectionCount2; i++) {
+        sections.push(generateUtilitySectionModel(SeedHalfRange * rng(132 + 10 * sections.length)));
+    }
+
+    const distancesToStellarObjects = getDistancesToStellarObjects(parentBody, systemModel);
+
+    let totalIrradiance = 0;
+    for (const [model, distance] of distancesToStellarObjects) {
+        totalIrradiance += getSphereIrradianceAtDistance(
+            model.blackBodyTemperature,
+            getCelestialBodyRadius(model),
+            distance,
+        );
+    }
+
+    const totalEnergyRequirementKWhPerYear = population * annualEnergyPerCapitaKWh;
+    const totalPowerRequirementW = kwhPerYearToWatts(totalEnergyRequirementKWhPerYear);
+    const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
+        solarPanelEfficiency,
+        totalPowerRequirementW,
+        totalIrradiance,
+    );
+
+    const maxSolarPanelSurfaceM2 = km2ToM2(150);
+    if (solarPanelSurfaceM2 <= maxSolarPanelSurfaceM2) {
+        sections.push(generateSolarSectionModel(SeedHalfRange * rng(31), solarPanelSurfaceM2));
+    } else {
+        sections.push(generateFusionSectionModel(totalPowerRequirementW));
+    }
+
     const utilitySectionCount3 = 5 + Math.floor(rng(23) * 5);
     for (let i = 0; i < utilitySectionCount3; i++) {
         sections.push(generateUtilitySectionModel(SeedHalfRange * rng(132 + 10 * sections.length)));
@@ -230,20 +209,27 @@ export function generateSpaceStationModel(
     sections.push(generateLandingBayModel(SeedHalfRange * rng(37)));
 
     return {
-        type: "spaceStation",
-        seed,
-        starSystemCoordinates: systemModel.coordinates,
-        id: id,
+        id,
         name,
-        orbit,
-        mass,
-        spin,
-        population,
-        annualEnergyPerCapitaKWh,
-        populationDensity: targetPopulationDensity,
-        agricultureMix,
-        nbHydroponicLayers,
-        solarPanelEfficiency,
-        sections,
+        content: {
+            type: "spaceElevator",
+            tetherLength,
+            population,
+            annualEnergyPerCapitaKWh,
+            populationDensity: targetPopulationDensity,
+            agricultureMix,
+            nbHydroponicLayers,
+            solarPanelEfficiency,
+            sections,
+        },
+        placement: {
+            type: "inOrbit",
+            orbit,
+            mass,
+            attitude: {
+                spin,
+                localFrameOrientation: { yaw: 0, pitch: 0, roll: -Math.PI / 2 },
+            },
+        },
     };
 }

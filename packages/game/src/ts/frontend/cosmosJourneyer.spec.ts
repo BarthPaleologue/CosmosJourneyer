@@ -40,7 +40,7 @@ describe("CosmosJourneyer", () => {
     it.each([false, true])(
         "snapshots the player and docking location before thumbnail creation (docked: %s)",
         async (docked) => {
-            const systemModel = getLoneStarSystem();
+            const systemModel = getLoneStarSystem().system;
             const universeBackend = new UniverseBackend(new SystemEntityBackend());
             const player = Player.Default(universeBackend);
             const serializedSpaceship = player.serializedSpaceships[0];
