@@ -15,10 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { createInstance } from "i18next";
 import type { Resource, ResourceKey, ResourceLanguage, TFunction, i18n } from "i18next";
 import { z } from "zod";
 
+import type { I18nExtensionPoint, ModuleLocales } from "./modules/i18n";
 import { renderMarkdownInline } from "./utils/markdown";
 
 /**
@@ -72,7 +74,7 @@ function loadResources(): Resource {
     return resources;
 }
 
-export class I18n {
+export class I18n implements I18nExtensionPoint {
     private readonly instance: i18n;
 
     private constructor(instance: i18n) {
@@ -108,6 +110,14 @@ export class I18n {
     /** @returns Translator for the game's core namespaces and current language. */
     public getT(): TFunction {
         return this.instance.t;
+    }
+
+    public registerLocales(moduleId: string, locales: DeepReadonly<ModuleLocales>): TFunction {
+        const namespace = `module/${moduleId}`;
+        for (const [language, translations] of Object.entries(locales)) {
+            this.instance.addResourceBundle(language, namespace, translations);
+        }
+        return this.instance.getFixedT(null, namespace);
     }
 
     /** @param language Language code, with fallback to the bundled English resources. */

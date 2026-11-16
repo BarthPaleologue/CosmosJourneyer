@@ -85,6 +85,7 @@ export async function createCustomSystemScene(
         systemEntityProcessors,
         moduleAssetRegistry,
         new StarMapSystemInfoRegistry(),
+        i18n,
     );
     const moduleSetupResult = setupModules(getBuiltinModules(), gameModuleApi);
     if (!moduleSetupResult.success) {

@@ -10,6 +10,7 @@ import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend"
 import type { SystemContentModel } from "@/backend/systemEntity/systemEntityModel";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
+import { I18n } from "@/i18n";
 import type { GameModuleApi } from "@/modules/gameModuleApi";
 import { MonolithModule } from "@/modules/monolith";
 import { Monolith } from "@/modules/monolith/entity";
@@ -42,7 +43,8 @@ describe("module entity capabilities", () => {
     let ignored: SystemEntity;
     let geometry: SpatialGeometry;
     let disposeContent: Mock<() => void>;
-    beforeEach(() => {
+    beforeEach(async () => {
+        const i18n = await I18n.New();
         engine = new NullEngine();
         scene = new Scene(engine);
         processors = new SystemEntityProcessors();
@@ -53,6 +55,7 @@ describe("module entity capabilities", () => {
             processors,
             new ModuleAssetRegistry(),
             starMapSystemInfo,
+            i18n,
         );
         const model = getVestaModel().systemEntities[0];
         if (model === undefined) {

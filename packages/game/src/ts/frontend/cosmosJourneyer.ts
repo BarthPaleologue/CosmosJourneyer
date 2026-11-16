@@ -521,6 +521,7 @@ export class CosmosJourneyer {
             systemEntityProcessors,
             moduleAssetRegistry,
             starMapSystemInfo,
+            i18n,
         );
 
         const builtinModules = getBuiltinModules();
