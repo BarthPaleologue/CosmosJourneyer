@@ -21,22 +21,21 @@ import { Settings } from "@/settings";
 
 import { OrbitalFacilitiesModule } from ".";
 import { getVestaModel } from "../vesta/vesta";
+import { generateSpaceElevatorModel } from "./proceduralGeneration/spaceElevatorModelGenerator";
+import { generateSpaceStationModel } from "./proceduralGeneration/spaceStationModelGenerator";
 
 describe("orbital facilities module", () => {
     let backend: UniverseBackend;
     let processors: SystemEntityProcessors;
+    let info: StarMapSystemInfoRegistry;
+    let i18n: I18n;
     beforeEach(async () => {
         backend = new UniverseBackend(new SystemEntityBackend());
         processors = new SystemEntityProcessors();
+        info = new StarMapSystemInfoRegistry();
+        i18n = await I18n.New();
         OrbitalFacilitiesModule.setup(
-            createGameModuleApi(
-                backend,
-                new SystemEntityLoader(),
-                processors,
-                new ModuleAssetRegistry(),
-                new StarMapSystemInfoRegistry(),
-                await I18n.New(),
-            ),
+            createGameModuleApi(backend, new SystemEntityLoader(), processors, new ModuleAssetRegistry(), info, i18n),
         );
     });
     afterEach(() => {
@@ -119,4 +118,31 @@ describe("orbital facilities module", () => {
         }
         expect(facilities[0]).not.toEqual(facilities[1]);
     });
+    it.each(["spaceStation", "spaceElevator"] as const)(
+        "contributes localized population information from %s models",
+        async (type) => {
+            const { starSystem: system } = getVestaModel();
+            const planet = system.planets.find((body) => body.type === "telluricPlanet");
+            if (planet === undefined) {
+                throw new Error("Expected a telluric planet");
+            }
+            const facility =
+                type === "spaceStation"
+                    ? generateSpaceStationModel("facility", 42, planet, system)
+                    : generateSpaceElevatorModel("facility", 42, planet, system);
+            const content = { system, entities: [facility] };
+            await i18n.changeLanguage("en-US");
+            expect(info.getInfo({ system, entities: [] })).toEqual(["Uninhabited system"]);
+            expect(info.getInfo(content)).toEqual(["Inhabited system"]);
+            facility.content.population = 0;
+            expect(info.getInfo(content)).toEqual(["Uninhabited system"]);
+            const unrelated = { ...facility, content: { type: "another-module", population: 100 } };
+            expect(info.getInfo({ system, entities: [unrelated] })).toEqual(["Uninhabited system"]);
+
+            await i18n.changeLanguage("fr-FR");
+            expect(info.getInfo(content)).toEqual(["Système inhabité"]);
+            facility.content.population = 100;
+            expect(info.getInfo(content)).toEqual(["Système habité"]);
+        },
+    );
 });
