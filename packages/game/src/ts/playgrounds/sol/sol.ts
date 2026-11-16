@@ -37,7 +37,7 @@ import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/ter
 import { StarSystemController } from "@/frontend/universe/starSystemController";
 import { StarSystemLoader } from "@/frontend/universe/starSystemLoader";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "../utils";
@@ -54,7 +54,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
 
     await enablePhysics(scene);
 
-    const t = await initI18n();
+    const t = (await I18n.New()).getT();
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
     const moduleAssets = new ModuleAssets([]);

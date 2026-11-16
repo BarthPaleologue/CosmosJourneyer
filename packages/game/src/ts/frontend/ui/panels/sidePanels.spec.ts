@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import { MusicSystem } from "@/frontend/audio/musicSystem";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 
 import { AboutPanel } from "./aboutPanel";
 import { ContributePanel } from "./contributePanel";
@@ -17,7 +17,7 @@ describe("translated side panels", () => {
     let t: TFunction;
 
     beforeAll(async () => {
-        t = await initI18n();
+        t = (await I18n.New()).getT();
     });
 
     it("builds each panel with its translated title", () => {

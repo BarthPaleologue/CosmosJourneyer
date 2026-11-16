@@ -59,7 +59,7 @@ import { createWolfMk2 } from "@/frontend/vehicle/wolfMk2";
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics } from "./utils";
@@ -73,7 +73,7 @@ export async function createOnFootScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
-    const t = await initI18n();
+    const t = (await I18n.New()).getT();
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 

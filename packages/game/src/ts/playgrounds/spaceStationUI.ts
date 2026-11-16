@@ -36,7 +36,7 @@ import { SpaceStationLayer } from "@/frontend/ui/spaceStation/spaceStationLayer"
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 
 import { addToWindow, enablePhysics } from "./utils";
 
@@ -54,7 +54,7 @@ export async function createSpaceStationUIScene(
 
     await enablePhysics(scene);
 
-    const t = await initI18n();
+    const t = (await I18n.New()).getT();
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 

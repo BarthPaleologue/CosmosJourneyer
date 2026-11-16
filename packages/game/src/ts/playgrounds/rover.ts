@@ -49,7 +49,7 @@ import { createWolfMk2 } from "@/frontend/vehicle/wolfMk2";
 
 import { getGlobalKeyboardLayoutMap } from "@/utils/keyboardAPI";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics, enableShadows } from "./utils";
@@ -66,7 +66,7 @@ export async function createRoverScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    const t = await initI18n();
+    const t = (await I18n.New()).getT();
 
     const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
 

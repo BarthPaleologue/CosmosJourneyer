@@ -30,7 +30,7 @@ import { alertModal } from "@/frontend/ui/dialogModal";
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import { SaveLoadingPanelContent } from "@/frontend/ui/saveLoadingPanelContent";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 
 /**
  * @param engine - Rendering engine.
@@ -47,7 +47,7 @@ export async function createSaveLoadingPanelContentScene(
     const camera = new FreeCamera("camera", Vector3.Zero(), scene);
     camera.attachControl();
 
-    const t = await initI18n();
+    const t = (await I18n.New()).getT();
 
     const systemEntityBackend = new SystemEntityBackend();
     const universeBackend = new UniverseBackend(systemEntityBackend);

@@ -36,7 +36,7 @@ import { SpaceShipControlsInputs } from "@/frontend/spaceship/spaceShipControlsI
 import { NotificationManagerMock } from "@/frontend/ui/notificationManager";
 import { SpaceStation } from "@/frontend/universe/orbitalFacility/spaceStation";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
@@ -55,7 +55,7 @@ export async function createStationLandingScene(
     });
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
-    const t = await initI18n();
+    const t = (await I18n.New()).getT();
 
     await enablePhysics(scene);
 

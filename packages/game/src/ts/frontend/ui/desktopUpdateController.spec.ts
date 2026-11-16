@@ -7,7 +7,7 @@ import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 
 import type { DesktopUpdateApi, DesktopUpdateState } from "@/utils/desktopUpdateApi";
 
-import { initI18n } from "@/i18n";
+import { I18n } from "@/i18n";
 
 import { DesktopUpdateController } from "./desktopUpdateController";
 import type { DesktopUpdatePlayerActions, UpdatePresentationContext } from "./desktopUpdateController";
@@ -45,7 +45,7 @@ describe("DesktopUpdateController", () => {
     let t: TFunction;
 
     beforeAll(async () => {
-        t = await initI18n();
+        t = (await I18n.New()).getT();
     });
 
     beforeEach(() => {
