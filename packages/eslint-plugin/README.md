@@ -16,6 +16,7 @@ The package has no build step and no generated `dist/` directory.
 
 | Rule                                                                               | Description                                                           |
 | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [`no-class-inheritance`](./docs/rules/no-class-inheritance.md)                     | Disallow class inheritance via `extends`; prefer composition.         |
 | [`no-promise-reject`](./docs/rules/no-promise-reject.md)                           | Disallow direct calls to `Promise.reject()`.                          |
 | [`no-inline-pick-omit-parameters`](./docs/rules/no-inline-pick-omit-parameters.md) | Disallow inline `Pick`/`Omit` utility types in parameter annotations. |
 
