@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { DesktopAutoUpdateService } from "./autoUpdate.js";
 import type { DesktopUpdateState } from "./updateContract.js";
 
+// eslint-disable-next-line cosmos/no-class-inheritance -- test mock must satisfy the EventEmitter-based updater contract
 class MockUpdater extends EventEmitter {
     public autoDownload = true;
     public autoInstallOnAppQuit = true;

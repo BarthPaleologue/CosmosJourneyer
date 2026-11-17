@@ -37,6 +37,7 @@ export function createDevelopmentAutoUpdater(
     );
 }
 
+// eslint-disable-next-line cosmos/no-class-inheritance -- dev mock must satisfy the EventEmitter-based AutoUpdaterClient contract
 export class MockAutoUpdaterClient extends EventEmitter implements AutoUpdaterClient {
     public autoDownload = false;
     public autoInstallOnAppQuit = false;
