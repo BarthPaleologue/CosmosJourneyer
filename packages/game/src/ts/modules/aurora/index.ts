@@ -20,8 +20,8 @@ import { ok } from "@cosmos-journeyer/typescript";
 import { makeSystemContentType } from "@/frontend/systemEntity/systemEntity";
 
 import type { GameModule } from "../gameModule";
+import { getStellarWindSources } from "../stellarWindSources";
 import { Aurora } from "./aurora";
-import type { StellarWindSource } from "./aurora";
 import { generateAuroraModels } from "./auroraModel";
 import type { AuroraModel } from "./auroraModel";
 
@@ -34,18 +34,7 @@ export const AuroraModule: GameModule = {
             return ok(new Aurora(content.radius, content.magneticField, content.seed, scene));
         });
         systemEntities.registerUpdate(type, (entity, { system }) => {
-            const sources: Array<StellarWindSource> = [];
-            for (const star of system.model.system.stellarObjects) {
-                if (star.type !== "star") {
-                    continue;
-                }
-                const position = system.getPosition(star.id);
-                if (position === undefined) {
-                    continue;
-                }
-                sources.push({ mass: star.mass, radius: star.radius, position });
-            }
-            entity.content.update(sources);
+            entity.content.update(getStellarWindSources(system));
         });
     },
 };

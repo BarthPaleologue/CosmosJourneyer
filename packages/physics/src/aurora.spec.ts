@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
     getDipoleFieldLineLatitude,
+    getDipoleFieldLineRadius,
     getMagnetopauseStandoffDistance,
     getPolarCapLatitude,
     getStellarWind,
@@ -94,5 +95,28 @@ describe("getPolarCapLatitude", () => {
     it("estimates Earth's polar cap boundary latitude", () => {
         const latitude = getPolarCapLatitude(earthRadius, EarthMagneticDipoleMoment, solarWind);
         expect(latitude).toBeCloseTo(degreesToRadians(71.69));
+    });
+});
+
+describe("getDipoleFieldLineRadius", () => {
+    it("reaches L at the magnetic equator and vanishes at the poles", () => {
+        expect(getDipoleFieldLineRadius(4 * earthRadius, Math.PI / 2)).toBeCloseTo(4 * earthRadius, 6);
+        expect(getDipoleFieldLineRadius(4 * earthRadius, 0)).toBe(0);
+        expect(getDipoleFieldLineRadius(4 * earthRadius, Math.PI)).toBeCloseTo(0, 6);
+    });
+
+    it("is symmetric about the equator", () => {
+        const theta = 0.7;
+        expect(getDipoleFieldLineRadius(10 * earthRadius, theta)).toBeCloseTo(
+            getDipoleFieldLineRadius(10 * earthRadius, Math.PI - theta),
+            6,
+        );
+    });
+
+    it("scales linearly with L", () => {
+        expect(getDipoleFieldLineRadius(2 * earthRadius, 1)).toBeCloseTo(
+            2 * getDipoleFieldLineRadius(earthRadius, 1),
+            6,
+        );
     });
 });

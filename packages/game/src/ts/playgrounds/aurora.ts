@@ -31,6 +31,7 @@ import { ColorCorrection } from "@/frontend/postProcesses/colorCorrection";
 import { StarFieldBox } from "@/frontend/universe/starFieldBox";
 
 import { Aurora } from "@/modules/aurora/aurora";
+import { MagnetosphereGizmo } from "@/modules/magnetosphereGizmo/magnetosphereGizmo";
 
 import { enablePointerLock } from "./utils";
 
@@ -113,14 +114,19 @@ export async function createAuroraScene(
     const aurora = new Aurora(planetRadius, magneticField, auroraSeed, scene);
     aurora.getTransform().parent = planet;
 
+    const gizmo = new MagnetosphereGizmo(planetRadius, magneticField, scene);
+    gizmo.getTransform().parent = planet;
+
     // Sun one astronomical unit away, matching the reference stellar wind.
-    aurora.update([
+    const windSources = [
         {
             mass: SolarMass,
             radius: SolarRadius,
             position: new Vector3(astronomicalUnitToMeters(1), 0, 0),
         },
-    ]);
+    ];
+    aurora.update(windSources);
+    gizmo.update(windSources);
 
     const colorCorrection = new ColorCorrection("colorCorrection", scene);
     camera.attachPostProcess(colorCorrection.get());

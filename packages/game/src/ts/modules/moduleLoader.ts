@@ -35,6 +35,7 @@ export function getBuiltinModules(): Array<GameModule> {
         OrbitalFacilitiesModule,
         DarkKnightModule,
         AuroraModule,
+        // MagnetosphereGizmoModule,
         MonolithModule,
         SpaceTelescopesModule,
         RussellTeaPotModule,

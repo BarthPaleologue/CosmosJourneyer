@@ -69,6 +69,18 @@ export function getDipoleFieldLineLatitude(lineMaxDistance: number, planetRadius
 }
 
 /**
+ * Radius of a dipole magnetic field line at a given magnetic colatitude.
+ * The line follows r = L·sin²(θ), reaching L at the magnetic equator (θ = π/2).
+ * @param lineMaxDistance The line's L parameter: its equatorial distance from the center in meters.
+ * @param theta Magnetic colatitude in radians, 0 at the north pole, π/2 at the equator.
+ * @returns The distance from the dipole center in meters.
+ */
+export function getDipoleFieldLineRadius(lineMaxDistance: number, theta: number): number {
+    const sinTheta = Math.sin(theta);
+    return lineMaxDistance * sinTheta * sinTheta;
+}
+
+/**
  * Limitation: supposes star belongs to dipole equatorial plane
  * @param moment The planet's magnetic dipole moment in A·m².
  * @param stellarWindPressure The incident stellar wind dynamic pressure in pascals.

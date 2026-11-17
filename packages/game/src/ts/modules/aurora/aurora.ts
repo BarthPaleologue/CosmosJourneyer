@@ -37,22 +37,10 @@ import type { MagneticFieldModel } from "@cosmos-journeyer/universe-model";
 
 import type { SystemContent } from "@/frontend/systemEntity/systemEntity";
 
+import type { StellarWindSource } from "../stellarWindSources";
 import { AuroraMaterial } from "./auroraMaterial";
 
 const maxRibbonCountPerHemisphere = 500;
-
-/**
- * A star that emits a stellar wind, described by the properties needed to
- * estimate the wind at the planet's location.
- */
-export type StellarWindSource = {
-    /** Stellar mass in kilograms. */
-    mass: number;
-    /** Stellar radius in meters. */
-    radius: number;
-    /** Current world-space position of the star in meters. */
-    position: Readonly<Vector3>;
-};
 
 /**
  * Auroras from the interaction between a magnetosphere and the stellar wind.
