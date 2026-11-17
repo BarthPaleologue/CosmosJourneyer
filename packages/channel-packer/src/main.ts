@@ -161,16 +161,7 @@ async function refreshPreview(statusPrefix?: string): Promise<void> {
     const activeInputs = getAssignedInputCount(state);
 
     if (activeInputs === 0) {
-        try {
-            synchronizeCache(request, imageCache);
-        } catch (error: unknown) {
-            if (revision !== previewRevision) {
-                return;
-            }
-
-            setStatus(formatError(error), "error");
-            return;
-        }
+        synchronizeCache(request, imageCache);
 
         if (revision !== previewRevision) {
             return;
@@ -185,22 +176,21 @@ async function refreshPreview(statusPrefix?: string): Promise<void> {
     await waitForNextPaint();
 
     try {
-        const response = await generatePreview(request, state.filesByKey, imageCache, MaxPreviewEdge);
+        const result = await generatePreview(request, state.filesByKey, imageCache, MaxPreviewEdge);
 
         if (revision !== previewRevision) {
             return;
         }
 
-        applyPreviewResponse(state, response);
-        const message = `Packed preview ready using ${response.activeInputs} source texture${response.activeInputs === 1 ? "" : "s"}.`;
+        if (!result.success) {
+            clearPreview(state);
+            setStatus(formatError(result.error), "error");
+            return;
+        }
+
+        applyPreviewResponse(state, result.value);
+        const message = `Packed preview ready using ${result.value.activeInputs} source texture${result.value.activeInputs === 1 ? "" : "s"}.`;
         setStatus(statusPrefix === undefined ? message : `${statusPrefix} ${message}`);
-    } catch (error: unknown) {
-        if (revision !== previewRevision) {
-            return;
-        }
-
-        clearPreview(state);
-        setStatus(formatError(error), "error");
     } finally {
         if (revision === previewRevision) {
             setBusyState(false);
@@ -220,16 +210,14 @@ async function savePackedTexture(): Promise<void> {
     await waitForNextPaint();
 
     try {
-        const response = await savePackedPng(
-            buildPackRequest(state),
-            state.filesByKey,
-            imageCache,
-            "packed-texture.png",
-        );
-        downloadBlob(response.blob, response.fileName);
-        setStatus(`Saved ${response.width} x ${response.height} PNG as ${response.fileName}.`);
-    } catch (error: unknown) {
-        setStatus(formatError(error), "error");
+        const result = await savePackedPng(buildPackRequest(state), state.filesByKey, imageCache, "packed-texture.png");
+        if (!result.success) {
+            setStatus(formatError(result.error), "error");
+            return;
+        }
+
+        downloadBlob(result.value.blob, result.value.fileName);
+        setStatus(`Saved ${result.value.width} x ${result.value.height} PNG as ${result.value.fileName}.`);
     } finally {
         setBusyState(false);
     }

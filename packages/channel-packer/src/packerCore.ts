@@ -1,3 +1,6 @@
+import type { Result } from "@cosmos-journeyer/typescript";
+import { err, ok, promiseToResult } from "@cosmos-journeyer/typescript";
+
 import type { ChannelAssignment, PackRequest, PackedTexture, PreviewResponse } from "./types";
 
 interface LoadedImage {
@@ -25,13 +28,13 @@ export interface DecodedImage {
 
 export interface PackerFileAdapter<TInput> {
     readSignature(input: TInput): Promise<FileSignature>;
-    decodeImage(input: TInput): Promise<DecodedImage>;
+    decodeImage(input: TInput): Promise<Result<DecodedImage, Error>>;
     getDisplayName(input: TInput): string;
 }
 
 export interface PackerImageAdapter<TEncodedPng> {
-    buildPreviewTexture(packed: PackedTexture, maxEdge: number): PackedTexture;
-    encodePng(packed: PackedTexture): Promise<TEncodedPng>;
+    buildPreviewTexture(packed: PackedTexture, maxEdge: number): Result<PackedTexture, Error>;
+    encodePng(packed: PackedTexture): Promise<Result<TEncodedPng, Error>>;
 }
 
 export interface SaveResponse<TEncodedPng> {
@@ -39,13 +42,6 @@ export interface SaveResponse<TEncodedPng> {
     readonly height: number;
     readonly payload: TEncodedPng;
     readonly fileName: string;
-}
-
-export class PackerError extends Error {
-    public constructor(message: string) {
-        super(message);
-        this.name = "PackerError";
-    }
 }
 
 export class ImageCache {
@@ -74,13 +70,13 @@ export interface PackerEngine<TInput, TEncodedPng> {
         inputsByKey: ReadonlyMap<string, TInput>,
         cache: ImageCache,
         maxPreviewEdge: number,
-    ): Promise<PreviewResponse>;
+    ): Promise<Result<PreviewResponse, Error>>;
     savePacked(
         request: PackRequest,
         inputsByKey: ReadonlyMap<string, TInput>,
         cache: ImageCache,
         fileName: string,
-    ): Promise<SaveResponse<TEncodedPng>>;
+    ): Promise<Result<SaveResponse<TEncodedPng>, Error>>;
     synchronizeCache(request: PackRequest, cache: ImageCache): void;
 }
 
@@ -100,18 +96,25 @@ export function createPackerEngine<TInput, TEncodedPng>(
             inputsByKey: ReadonlyMap<string, TInput>,
             cache: ImageCache,
             maxPreviewEdge: number,
-        ): Promise<PreviewResponse> {
+        ): Promise<Result<PreviewResponse, Error>> {
             const packed = await packTexture(request, inputsByKey, cache, fileAdapter);
-            const preview = imageAdapter.buildPreviewTexture(packed, maxPreviewEdge);
+            if (!packed.success) {
+                return packed;
+            }
 
-            return {
-                pixelBytes: preview.pixels,
-                width: packed.width,
-                height: packed.height,
-                previewWidth: preview.width,
-                previewHeight: preview.height,
-                activeInputs: packed.activeInputs,
-            };
+            const preview = imageAdapter.buildPreviewTexture(packed.value, maxPreviewEdge);
+            if (!preview.success) {
+                return preview;
+            }
+
+            return ok({
+                pixelBytes: preview.value.pixels,
+                width: packed.value.width,
+                height: packed.value.height,
+                previewWidth: preview.value.width,
+                previewHeight: preview.value.height,
+                activeInputs: packed.value.activeInputs,
+            });
         },
 
         async savePacked(
@@ -119,16 +122,23 @@ export function createPackerEngine<TInput, TEncodedPng>(
             inputsByKey: ReadonlyMap<string, TInput>,
             cache: ImageCache,
             fileName: string,
-        ): Promise<SaveResponse<TEncodedPng>> {
+        ): Promise<Result<SaveResponse<TEncodedPng>, Error>> {
             const packed = await packTexture(request, inputsByKey, cache, fileAdapter);
-            const payload = await imageAdapter.encodePng(packed);
+            if (!packed.success) {
+                return packed;
+            }
 
-            return {
-                width: packed.width,
-                height: packed.height,
-                payload,
+            const payload = await imageAdapter.encodePng(packed.value);
+            if (!payload.success) {
+                return payload;
+            }
+
+            return ok({
+                width: packed.value.width,
+                height: packed.value.height,
+                payload: payload.value,
                 fileName,
-            };
+            });
         },
 
         synchronizeCache(request: PackRequest, cache: ImageCache): void {
@@ -167,12 +177,16 @@ async function packTexture<TInput>(
     inputsByKey: ReadonlyMap<string, TInput>,
     cache: ImageCache,
     fileAdapter: PackerFileAdapter<TInput>,
-): Promise<PackedTexture> {
+): Promise<Result<PackedTexture, Error>> {
     synchronizeCache(request, cache);
     const loadedImages = await loadImages(request, inputsByKey, cache, fileAdapter);
-    const reference = loadedImages.at(0);
+    if (!loadedImages.success) {
+        return loadedImages;
+    }
+
+    const reference = loadedImages.value.at(0);
     if (reference === undefined) {
-        throw new PackerError("Select at least one texture before packing.");
+        return err(new Error("Select at least one texture before packing."));
     }
 
     const uniqueInputs = new Set<string>();
@@ -189,7 +203,9 @@ async function packTexture<TInput>(
 
     for (const row of request.rows) {
         const destinationOffset = channelByteOffset(row.outputChannel);
-        const matched = loadedImages.find((candidate) => candidate.assignment.outputChannel === row.outputChannel);
+        const matched = loadedImages.value.find(
+            (candidate) => candidate.assignment.outputChannel === row.outputChannel,
+        );
 
         if (matched !== undefined) {
             const sourceOffset = channelByteOffset(row.sourceChannel);
@@ -206,12 +222,12 @@ async function packTexture<TInput>(
         }
     }
 
-    return {
+    return ok({
         width,
         height,
         activeInputs,
         pixels,
-    };
+    });
 }
 
 /**
@@ -227,7 +243,7 @@ async function loadImages<TInput>(
     inputsByKey: ReadonlyMap<string, TInput>,
     cache: ImageCache,
     fileAdapter: PackerFileAdapter<TInput>,
-): Promise<readonly LoadedImage[]> {
+): Promise<Result<readonly LoadedImage[], Error>> {
     const loadedImages: LoadedImage[] = [];
     const requestImages = new Map<string, DecodedImage>();
     let expectedDimensions: readonly [number, number] | null = null;
@@ -240,35 +256,45 @@ async function loadImages<TInput>(
 
         const input = inputsByKey.get(inputKey);
         if (input === undefined) {
-            throw new PackerError("Missing source texture data. Re-select the input texture and try again.");
+            return err(new Error("Missing source texture data. Re-select the input texture and try again."));
         }
 
-        const image = await (async (): Promise<DecodedImage> => {
+        const image = await (async (): Promise<Result<DecodedImage, Error>> => {
             const existing = requestImages.get(inputKey);
             if (existing !== undefined) {
-                return existing;
+                return ok(existing);
             }
 
             const cached = await loadCachedImage(inputKey, input, cache, fileAdapter);
-            requestImages.set(inputKey, cached);
+            if (!cached.success) {
+                return cached;
+            }
+
+            requestImages.set(inputKey, cached.value);
             return cached;
         })();
+        if (!image.success) {
+            return image;
+        }
 
+        const decodedImage = image.value;
         if (expectedDimensions === null) {
-            expectedDimensions = [image.width, image.height];
-        } else if (image.width !== expectedDimensions[0] || image.height !== expectedDimensions[1]) {
-            throw new PackerError(
-                `Image dimensions must match. ${fileAdapter.getDisplayName(input)} is ${image.width}x${image.height}, expected ${expectedDimensions[0]}x${expectedDimensions[1]}.`,
+            expectedDimensions = [decodedImage.width, decodedImage.height];
+        } else if (decodedImage.width !== expectedDimensions[0] || decodedImage.height !== expectedDimensions[1]) {
+            return err(
+                new Error(
+                    `Image dimensions must match. ${fileAdapter.getDisplayName(input)} is ${decodedImage.width}x${decodedImage.height}, expected ${expectedDimensions[0]}x${expectedDimensions[1]}.`,
+                ),
             );
         }
 
         loadedImages.push({
             assignment: row,
-            image,
+            image: decodedImage,
         });
     }
 
-    return loadedImages;
+    return ok(loadedImages);
 }
 
 /**
@@ -284,29 +310,42 @@ async function loadCachedImage<TInput>(
     input: TInput,
     cache: ImageCache,
     fileAdapter: PackerFileAdapter<TInput>,
-): Promise<DecodedImage> {
+): Promise<Result<DecodedImage, Error>> {
     const cached = cache.get(key);
     // Repeated preview refreshes keep the same input object, so we can bypass
     // signature reads (and browser-side hashing) for an immediate cache hit.
     if (cached !== undefined && Object.is(cached.inputRef, input)) {
-        return cached.image;
+        return ok(cached.image);
     }
 
-    const signature = await fileAdapter.readSignature(input);
+    const signatureResult = await promiseToResult(fileAdapter.readSignature(input));
+    if (!signatureResult.success) {
+        return err(
+            signatureResult.error instanceof Error
+                ? signatureResult.error
+                : new Error(`Could not read ${fileAdapter.getDisplayName(input)}.`),
+        );
+    }
+    const signature = signatureResult.value;
+
     if (cached !== undefined && areSignaturesEqual(cached.signature, signature)) {
         cache.set(key, {
             inputRef: input,
             signature: cached.signature,
             image: cached.image,
         });
-        return cached.image;
+        return ok(cached.image);
     }
 
     const decoded = await fileAdapter.decodeImage(input);
+    if (!decoded.success) {
+        return decoded;
+    }
+
     cache.set(key, {
         inputRef: input,
         signature,
-        image: decoded,
+        image: decoded.value,
     });
 
     return decoded;

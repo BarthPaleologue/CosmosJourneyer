@@ -1,8 +1,10 @@
+import type { Result } from "@cosmos-journeyer/typescript";
+import { ok } from "@cosmos-journeyer/typescript";
 import { describe, expect, it, vi } from "vitest";
 
 import { createPackerEngine, ImageCache } from "./packerCore";
-import type { DecodedImage, FileSignature } from "./packerCore";
-import type { ChannelAssignment, ColorChannel, PackRequest, PackedTexture } from "./types";
+import type { DecodedImage, FileSignature, SaveResponse } from "./packerCore";
+import type { ChannelAssignment, ColorChannel, PackRequest, PackedTexture, PreviewResponse } from "./types";
 
 interface TestInput {
     readonly name: string;
@@ -10,8 +12,10 @@ interface TestInput {
     readonly image: DecodedImage;
 }
 
-const decodeImage = vi.fn(async (input: TestInput): Promise<DecodedImage> => Promise.resolve(input.image));
-const readSignature = vi.fn(async (input: TestInput): Promise<FileSignature> => Promise.resolve(input.signature));
+const decodeImage = vi.fn(
+    async (input: TestInput): Promise<Result<DecodedImage, Error>> => await Promise.resolve(ok(input.image)),
+);
+const readSignature = vi.fn(async (input: TestInput): Promise<FileSignature> => await Promise.resolve(input.signature));
 
 const engine = createPackerEngine<TestInput, Uint8Array>(
     {
@@ -27,21 +31,63 @@ const engine = createPackerEngine<TestInput, Uint8Array>(
     },
     {
         buildPreviewTexture(packed, maxEdge) {
-            return resizePreview(packed, maxEdge);
+            return ok(resizePreview(packed, maxEdge));
         },
         async encodePng(packed) {
             const bytes = new Uint8Array(packed.pixels.length);
             bytes.set(packed.pixels);
-            return Promise.resolve(bytes);
+            return await Promise.resolve(ok(bytes));
         },
     },
 );
+
+/**
+ * Unwraps a successful preview result, rethrowing the error value otherwise.
+ * @param request - Channel assignments and constant fills.
+ * @param inputsByKey - Source inputs indexed by their routing keys.
+ * @param cache - Decoded image cache retained between operations.
+ * @param maxPreviewEdge - Maximum preview width or height in pixels.
+ * @returns The preview response on success.
+ */
+async function unwrapPreview(
+    request: PackRequest,
+    inputsByKey: ReadonlyMap<string, TestInput>,
+    cache: ImageCache,
+    maxPreviewEdge: number,
+): Promise<PreviewResponse> {
+    const result = await engine.generatePreview(request, inputsByKey, cache, maxPreviewEdge);
+    if (!result.success) {
+        throw result.error;
+    }
+    return result.value;
+}
+
+/**
+ * Unwraps a successful save result, rethrowing the error value otherwise.
+ * @param request - Channel assignments and constant fills.
+ * @param inputsByKey - Source inputs indexed by their routing keys.
+ * @param cache - Decoded image cache retained between operations.
+ * @param fileName - Download filename.
+ * @returns The save response on success.
+ */
+async function unwrapSave(
+    request: PackRequest,
+    inputsByKey: ReadonlyMap<string, TestInput>,
+    cache: ImageCache,
+    fileName: string,
+): Promise<SaveResponse<Uint8Array>> {
+    const result = await engine.savePacked(request, inputsByKey, cache, fileName);
+    if (!result.success) {
+        throw result.error;
+    }
+    return result.value;
+}
 
 describe("packer core", () => {
     it("applies default constants for unassigned channels", async () => {
         const source = createInput("red.png", 1, 1, [10, 20, 30, 40]);
 
-        const preview = await engine.generatePreview(
+        const preview = await unwrapPreview(
             createPackRequest([
                 assignment("r", "source", "g", 0),
                 assignment("g", null, "g", 0),
@@ -62,7 +108,7 @@ describe("packer core", () => {
     it("counts unique input files for preview metadata", async () => {
         const source = createInput("source.png", 1, 1, [9, 19, 29, 39]);
 
-        const preview = await engine.generatePreview(
+        const preview = await unwrapPreview(
             createPackRequest([
                 assignment("r", "source", "r", 0),
                 assignment("g", "source", "g", 0),
@@ -83,7 +129,7 @@ describe("packer core", () => {
         const blue = createInput("blue.png", 1, 1, [90, 100, 110, 120]);
         const alpha = createInput("alpha.png", 1, 1, [130, 140, 150, 160]);
 
-        const preview = await engine.generatePreview(
+        const preview = await unwrapPreview(
             createPackRequest([
                 assignment("r", "red", "b", 0),
                 assignment("g", "green", "a", 0),
@@ -103,32 +149,35 @@ describe("packer core", () => {
         expect(Array.from(preview.pixelBytes)).toEqual([25, 80, 90, 140]);
     });
 
-    it("rejects dimension mismatches", async () => {
+    it("reports dimension mismatches as a failure result", async () => {
         const first = createInput("first.png", 1, 1, [1, 2, 3, 4]);
         const second = createInput("second.png", 2, 1, [5, 6, 7, 8, 9, 10, 11, 12]);
 
-        await expect(
-            engine.generatePreview(
-                createPackRequest([
-                    assignment("r", "first", "r", 0),
-                    assignment("g", "second", "g", 0),
-                    assignment("b", null, "b", 0),
-                    assignment("a", null, "a", 255),
-                ]),
-                new Map([
-                    ["first", first],
-                    ["second", second],
-                ]),
-                new ImageCache(),
-                1024,
-            ),
-        ).rejects.toThrow("Image dimensions must match");
+        const result = await engine.generatePreview(
+            createPackRequest([
+                assignment("r", "first", "r", 0),
+                assignment("g", "second", "g", 0),
+                assignment("b", null, "b", 0),
+                assignment("a", null, "a", 255),
+            ]),
+            new Map([
+                ["first", first],
+                ["second", second],
+            ]),
+            new ImageCache(),
+            1024,
+        );
+
+        expect(result.success).toBe(false);
+        if (!result.success) {
+            expect(result.error.message).toContain("Image dimensions must match");
+        }
     });
 
     it("encodes and returns PNG output", async () => {
         const source = createInput("source.png", 1, 1, [9, 19, 29, 39]);
 
-        const saved = await engine.savePacked(
+        const saved = await unwrapSave(
             createPackRequest([
                 assignment("r", "source", "r", 0),
                 assignment("g", "source", "g", 0),
@@ -185,7 +234,7 @@ describe("packer core", () => {
     it("downscales large preview payloads", async () => {
         const source = createInput("large.png", 2048, 1024, [9, 19, 29, 39]);
 
-        const preview = await engine.generatePreview(
+        const preview = await unwrapPreview(
             createPackRequest([
                 assignment("r", "source", "r", 0),
                 assignment("g", "source", "g", 0),

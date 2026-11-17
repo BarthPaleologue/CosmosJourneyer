@@ -1,8 +1,11 @@
-import { createPackerEngine, ImageCache, PackerError } from "./packerCore";
+import type { Result } from "@cosmos-journeyer/typescript";
+import { err, ok } from "@cosmos-journeyer/typescript";
+
+import { createPackerEngine, ImageCache } from "./packerCore";
 import type { DecodedImage, FileSignature } from "./packerCore";
 import type { PackRequest, PackedTexture, PreviewResponse } from "./types";
 
-export { ImageCache, PackerError };
+export { ImageCache };
 
 export interface SaveResponse {
     readonly width: number;
@@ -53,7 +56,7 @@ export async function generatePreview(
     filesByKey: ReadonlyMap<string, File>,
     cache: ImageCache,
     maxPreviewEdge: number,
-): Promise<PreviewResponse> {
+): Promise<Result<PreviewResponse, Error>> {
     return BrowserPackerEngine.generatePreview(request, filesByKey, cache, maxPreviewEdge);
 }
 
@@ -69,9 +72,13 @@ export async function savePackedPng(
     filesByKey: ReadonlyMap<string, File>,
     cache: ImageCache,
     fileName: string,
-): Promise<SaveResponse> {
-    const response = await BrowserPackerEngine.savePacked(request, filesByKey, cache, fileName);
-    return mapSaveResponse(response);
+): Promise<Result<SaveResponse, Error>> {
+    const result = await BrowserPackerEngine.savePacked(request, filesByKey, cache, fileName);
+    if (!result.success) {
+        return result;
+    }
+
+    return ok(mapSaveResponse(result.value));
 }
 
 /**
@@ -116,9 +123,9 @@ async function hashFileContents(bytes: ArrayBuffer): Promise<string> {
 /**
  * Decodes a browser file into RGBA pixels and closes the temporary bitmap.
  * @param file - Selected source file.
- * @returns Decoded image dimensions and RGBA pixels.
+ * @returns Decoded image dimensions and RGBA pixels, or the failure cause.
  */
-async function decodeImage(file: File): Promise<DecodedImage> {
+async function decodeImage(file: File): Promise<Result<DecodedImage, Error>> {
     let bitmap: ImageBitmap | null = null;
 
     try {
@@ -129,24 +136,20 @@ async function decodeImage(file: File): Promise<DecodedImage> {
 
         const context = canvas.getContext("2d");
         if (context === null) {
-            throw new PackerError("Could not create an image decoding context.");
+            return err(new Error("Could not create an image decoding context."));
         }
 
         context.drawImage(bitmap, 0, 0);
         const imageData = context.getImageData(0, 0, bitmap.width, bitmap.height);
 
-        return {
+        return ok({
             width: bitmap.width,
             height: bitmap.height,
             pixels: imageData.data,
-        };
+        });
     } catch (error: unknown) {
-        if (error instanceof PackerError) {
-            throw error;
-        }
-
         const message = error instanceof Error ? error.message : "Unknown image decode error.";
-        throw new PackerError(`Failed to open image ${file.name}. ${message}`);
+        return err(new Error(`Failed to open image ${file.name}. ${message}`));
     } finally {
         bitmap?.close();
     }
@@ -158,9 +161,9 @@ async function decodeImage(file: File): Promise<DecodedImage> {
  * @param maxEdge - Maximum preview width or height in pixels.
  * @returns The original texture if it fits, otherwise a downscaled preview.
  */
-function buildPreviewTexture(packed: PackedTexture, maxEdge: number): PackedTexture {
+function buildPreviewTexture(packed: PackedTexture, maxEdge: number): Result<PackedTexture, Error> {
     if (packed.width <= maxEdge && packed.height <= maxEdge) {
-        return packed;
+        return ok(packed);
     }
 
     const scale = Math.min(maxEdge / packed.width, maxEdge / packed.height);
@@ -172,7 +175,7 @@ function buildPreviewTexture(packed: PackedTexture, maxEdge: number): PackedText
     sourceCanvas.height = packed.height;
     const sourceContext = sourceCanvas.getContext("2d");
     if (sourceContext === null) {
-        throw new PackerError("Could not create a preview rendering context.");
+        return err(new Error("Could not create a preview rendering context."));
     }
 
     const sourceImageData = sourceContext.createImageData(packed.width, packed.height);
@@ -184,36 +187,36 @@ function buildPreviewTexture(packed: PackedTexture, maxEdge: number): PackedText
     targetCanvas.height = resizedHeight;
     const targetContext = targetCanvas.getContext("2d");
     if (targetContext === null) {
-        throw new PackerError("Could not create a preview rendering context.");
+        return err(new Error("Could not create a preview rendering context."));
     }
 
     targetContext.imageSmoothingEnabled = true;
     targetContext.imageSmoothingQuality = "high";
     targetContext.drawImage(sourceCanvas, 0, 0, resizedWidth, resizedHeight);
 
-    return {
+    return ok({
         width: resizedWidth,
         height: resizedHeight,
         activeInputs: packed.activeInputs,
         pixels: targetContext.getImageData(0, 0, resizedWidth, resizedHeight).data,
-    };
+    });
 }
 
 /**
- * Encodes RGBA pixels through a browser canvas, rejecting if PNG encoding fails.
+ * Encodes RGBA pixels through a browser canvas into a PNG blob.
  * @param width - Image width in pixels.
  * @param height - Image height in pixels.
  * @param pixels - Interleaved RGBA pixel bytes.
- * @returns The encoded PNG blob.
+ * @returns The encoded PNG blob, or the failure cause.
  */
-async function encodePng(width: number, height: number, pixels: Uint8ClampedArray): Promise<Blob> {
+async function encodePng(width: number, height: number, pixels: Uint8ClampedArray): Promise<Result<Blob, Error>> {
     const canvas = document.createElement("canvas");
     canvas.width = width;
     canvas.height = height;
 
     const context = canvas.getContext("2d");
     if (context === null) {
-        throw new PackerError("Could not create a PNG encoding context.");
+        return err(new Error("Could not create a PNG encoding context."));
     }
 
     const imageData = context.createImageData(width, height);
@@ -227,8 +230,8 @@ async function encodePng(width: number, height: number, pixels: Uint8ClampedArra
     });
 
     if (blob === null) {
-        throw new PackerError("Failed to encode the packed PNG.");
+        return err(new Error("Failed to encode the packed PNG."));
     }
 
-    return blob;
+    return ok(blob);
 }
