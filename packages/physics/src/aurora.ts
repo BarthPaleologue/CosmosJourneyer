@@ -15,12 +15,32 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { ProtonMass, VacuumPermeability } from "./constants";
+import { ProtonMass, SolarRadius, VacuumPermeability } from "./constants";
+import { getEscapeVelocity } from "./physics";
+import { astronomicalUnitToMeters } from "./unitConversions";
 
 export type LocalStellarWindModel = {
     speed: number;
     protonNumberDensity: number;
 };
+
+/**
+ * Estimates a steady, spherical proton wind with constant surface escape speed.
+ * Assumes the same mass loss per unit stellar surface as the Sun, calibrated from
+ * 5e6 protons/m³ at 1 AU flowing at 400 km/s (about 9.46e8 kg/s in total).
+ * Ignores acceleration, stellar activity, and differences in wind driving mechanisms.
+ * @param mass Stellar mass in kilograms.
+ * @param radius Stellar radius in meters.
+ * @param distance Distance from the stellar center in meters, outside the star.
+ * @returns Wind speed in m/s and proton number density in m^-3.
+ */
+export function getStellarWind(mass: number, radius: number, distance: number): LocalStellarWindModel {
+    const solarMassLossRate = 4 * Math.PI * astronomicalUnitToMeters(1) ** 2 * ProtonMass * 5e6 * 400_000;
+    const massLossRate = solarMassLossRate * (radius / SolarRadius) ** 2;
+    const speed = getEscapeVelocity(mass, radius);
+    const protonNumberDensity = massLossRate / (4 * Math.PI * distance ** 2 * ProtonMass * speed);
+    return { speed, protonNumberDensity };
+}
 
 /**
  * Estimates the polar cap boundary latitude from the magnetopause standoff distance.
