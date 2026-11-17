@@ -43,67 +43,76 @@ import {
 
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
-export class HelixHabitatMaterial extends NodeMaterial {
-    constructor(
-        meanRadius: number,
-        deltaRadius: number,
-        thicknessMultiplier: number,
-        textures: PBRTextures,
-        scene: Scene,
-    ) {
-        super("HelixHabitatMaterial", scene);
+/**
+ * Creates the node material for helix habitats.
+ * @param meanRadius Mean radius of the helix, in metres.
+ * @param deltaRadius Radial thickness of the helix, in metres.
+ * @param thicknessMultiplier Vertical scale of the helix texture.
+ * @param textures PBR texture set to sample.
+ * @param scene Scene that owns the material.
+ * @returns The built node material.
+ */
+export function createHelixHabitatMaterial(
+    meanRadius: number,
+    deltaRadius: number,
+    thicknessMultiplier: number,
+    textures: PBRTextures,
+    scene: Scene,
+): NodeMaterial {
+    const material = new NodeMaterial("HelixHabitatMaterial", scene);
 
-        const position = builtinAttribute("position");
-        const normal = builtinAttribute("normal");
-        const uv = builtinAttribute("uv");
+    const position = builtinAttribute("position");
+    const normal = builtinAttribute("normal");
+    const uv = builtinAttribute("uv");
 
-        const world = uniformWorld();
-        const positionW = transformPosition(world, position);
-        const normalW = transformDirection(world, normal);
+    const world = uniformWorld();
+    const positionW = transformPosition(world, position);
+    const normalW = transformDirection(world, normal);
 
-        const splitUV = splitVec(uv);
-        const scaledUvX = mul(splitUV.x, (2.0 * Math.PI * meanRadius) / deltaRadius);
-        // float mask = 1.0 - step(0.02, abs(normal.y));
-        // vUV.y *= mix(1.0, height, mask);
-        const mask = sub(1, step(0.02, abs(splitVec(normal).y)));
-        const scaledUvY = mul(splitUV.y, mix(1.0, thicknessMultiplier, mask));
-        const proceduralUV = vec2(scaledUvX, scaledUvY);
+    const splitUV = splitVec(uv);
+    const scaledUvX = mul(splitUV.x, (2.0 * Math.PI * meanRadius) / deltaRadius);
+    // float mask = 1.0 - step(0.02, abs(normal.y));
+    // vUV.y *= mix(1.0, height, mask);
+    const mask = sub(1, step(0.02, abs(splitVec(normal).y)));
+    const scaledUvY = mul(splitUV.y, mix(1.0, thicknessMultiplier, mask));
+    const proceduralUV = vec2(scaledUvX, scaledUvY);
 
-        const viewProjection = uniformViewProjection();
-        const positionClipSpace = transformPosition(viewProjection, positionW);
+    const viewProjection = uniformViewProjection();
+    const positionClipSpace = transformPosition(viewProjection, positionW);
 
-        const vertexOutput = outputVertexPosition(positionClipSpace);
+    const vertexOutput = outputVertexPosition(positionClipSpace);
 
-        this.addOutputNode(vertexOutput);
+    material.addOutputNode(vertexOutput);
 
-        const albedoTexture = uniformTexture2d(textures.albedo).source;
-        const normalTexture = uniformTexture2d(textures.normal).source;
-        const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
-        const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
+    const albedoTexture = uniformTexture2d(textures.albedo).source;
+    const normalTexture = uniformTexture2d(textures.normal).source;
+    const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
+    const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
 
-        const albedo = textureSample(albedoTexture, proceduralUV, {
-            convertToLinearSpace: true,
-        });
-        const normalMap = textureSample(normalTexture, proceduralUV);
-        const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
-        const occlusion = textureSample(occlusionTexture, proceduralUV);
+    const albedo = textureSample(albedoTexture, proceduralUV, {
+        convertToLinearSpace: true,
+    });
+    const normalMap = textureSample(normalTexture, proceduralUV);
+    const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
+    const occlusion = textureSample(occlusionTexture, proceduralUV);
 
-        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, 1);
+    const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, 1);
 
-        const view = uniformView();
-        const cameraPosition = uniformCameraPosition();
+    const view = uniformView();
+    const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
-            reflection: reflection(position, world),
-            albedoRgb: albedo.rgb,
-            ambientOcclusion: occlusion.r,
-            perturbedNormal: perturbedNormal.output,
-        });
+    const pbrColor = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+        reflection: reflection(position, world),
+        albedoRgb: albedo.rgb,
+        ambientOcclusion: occlusion.r,
+        perturbedNormal: perturbedNormal.output,
+    });
 
-        const fragOutput = outputFragColor(pbrColor.lighting);
+    const fragOutput = outputFragColor(pbrColor.lighting);
 
-        this.addOutputNode(fragOutput);
+    material.addOutputNode(fragOutput);
 
-        this.build();
-    }
+    material.build();
+
+    return material;
 }

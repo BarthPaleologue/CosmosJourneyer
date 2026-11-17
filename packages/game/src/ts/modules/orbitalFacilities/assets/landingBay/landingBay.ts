@@ -17,6 +17,7 @@
 
 import type { Light } from "@babylonjs/core/Lights/light";
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
@@ -43,16 +44,16 @@ import type { LandingBayModel } from "@/modules/orbitalFacilities/sections/landi
 import { Settings } from "@/settings";
 
 import { LandingPad } from "../landingPad/landingPad";
-import { MetalSectionMaterial } from "../metalSectionMaterial";
-import { LandingBayMaterial } from "./landingBayMaterial";
+import { createMetalSectionMaterial } from "../metalSectionMaterial";
+import { createLandingBayMaterial } from "./landingBayMaterial";
 
 export class LandingBay {
     private readonly root: TransformNode;
 
     private readonly radius: number;
 
-    private readonly landingBayMaterial: LandingBayMaterial;
-    private readonly metalSectionMaterial: MetalSectionMaterial;
+    private readonly landingBayMaterial: Material;
+    private readonly metalSectionMaterial: Material;
 
     private readonly ring: Mesh;
     private ringAggregate: PhysicsAggregate | null = null;
@@ -74,7 +75,7 @@ export class LandingBay {
         this.radius = 500;
         const deltaRadius = this.radius / 3;
 
-        this.metalSectionMaterial = new MetalSectionMaterial(
+        this.metalSectionMaterial = createMetalSectionMaterial(
             "LandingBayMetalSectionMaterial",
             assets.textures.materials.metalPanels,
             scene,
@@ -152,7 +153,7 @@ export class LandingBay {
             this.lights.push(light);
         }
 
-        this.landingBayMaterial = new LandingBayMaterial(
+        this.landingBayMaterial = createLandingBayMaterial(
             displayName,
             this.radius,
             deltaRadius,

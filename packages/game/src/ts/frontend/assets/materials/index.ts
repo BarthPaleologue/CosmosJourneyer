@@ -24,13 +24,13 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import { TireMaterial } from "@/frontend/vehicle/tireMaterial";
 
-import { LandingPadMaterial } from "@/modules/orbitalFacilities/assets/landingPad/landingPadMaterial";
-import { MetalSectionMaterial } from "@/modules/orbitalFacilities/assets/metalSectionMaterial";
+import { createLandingPadMaterial } from "@/modules/orbitalFacilities/assets/landingPad/landingPadMaterial";
+import { createMetalSectionMaterial } from "@/modules/orbitalFacilities/assets/metalSectionMaterial";
 
 import { ButterflyMaterial } from "../procedural/butterfly/butterflyMaterial";
 import { GrassMaterial } from "../procedural/grass/grassMaterial";
 import { RockMaterial } from "../procedural/rock/rockMaterial";
-import { SolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
+import { createSolarPanelMaterial } from "../procedural/solarPanel/solarPanelMaterial";
 import type { Textures } from "../textures";
 import { CrateMaterial } from "./crate";
 import { FoilMaterial } from "./foil";
@@ -41,7 +41,7 @@ export type Materials = {
     readonly grass: Material;
     readonly rock: Material;
     readonly crate: CrateMaterial;
-    readonly solarPanel: SolarPanelMaterial;
+    readonly solarPanel: Material;
     readonly tree: PBRMetallicRoughnessMaterial;
     readonly tank: Material;
     readonly landingPad: Material;
@@ -70,12 +70,6 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
     tankMaterial.roughness = 0.4;
     tankMaterial.usePhysicalLightFalloff = false;
 
-    const metalSectionMaterial = new MetalSectionMaterial(
-        "metalSectionMaterial",
-        textures.materials.metalPanels,
-        scene,
-    );
-
     const tireMaterial = new TireMaterial(textures.materials.tire, scene);
 
     const glass = new PBRMaterial("glass", scene);
@@ -94,11 +88,11 @@ export function initMaterials(textures: Textures, scene: Scene): Materials {
         grass: new GrassMaterial(textures.noises.seamlessPerlin, scene).get(),
         rock: new RockMaterial(textures.terrains.rock, scene).get(),
         crate: crateMaterial,
-        solarPanel: new SolarPanelMaterial(textures.materials.solarPanel, scene),
+        solarPanel: createSolarPanelMaterial(textures.materials.solarPanel, scene),
         tree: treeMaterial,
         tank: tankMaterial,
-        landingPad: new LandingPadMaterial(textures.materials.concrete, scene),
-        metalSection: metalSectionMaterial,
+        landingPad: createLandingPadMaterial(textures.materials.concrete, scene),
+        metalSection: createMetalSectionMaterial("metalSectionMaterial", textures.materials.metalPanels, scene),
         tire: tireMaterial,
         glass: glass,
     };

@@ -97,7 +97,7 @@ export async function createGasPlanetScene(
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(celestialBodyUberShader);
+    camera.attachPostProcess(celestialBodyUberShader.get());
 
     if (planet.ringsUniforms) {
         await new Promise<void>((resolve) => {

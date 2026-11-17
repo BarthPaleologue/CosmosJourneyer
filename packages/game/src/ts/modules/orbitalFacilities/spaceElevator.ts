@@ -17,6 +17,7 @@
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import type { Light } from "@babylonjs/core/Lights/light";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -34,7 +35,7 @@ import { clamp, remap, triangleWave } from "@/utils/math";
 
 import { SpaceElevatorClimber } from "@/modules/orbitalFacilities/assets/climber/spaceElevatorClimber";
 import { LandingBay } from "@/modules/orbitalFacilities/assets/landingBay/landingBay";
-import { MetalSectionMaterial } from "@/modules/orbitalFacilities/assets/metalSectionMaterial";
+import { createMetalSectionMaterial } from "@/modules/orbitalFacilities/assets/metalSectionMaterial";
 
 import { createFacilitySections } from "./createFacilitySections";
 import type { SpaceElevatorModel } from "./spaceElevatorModel";
@@ -48,7 +49,7 @@ export class SpaceElevator implements SystemContent {
 
     private readonly tether: Mesh;
     private readonly tetherLength: number;
-    private readonly tetherMaterial: MetalSectionMaterial;
+    private readonly tetherMaterial: Material;
 
     private readonly climber: SpaceElevatorClimber;
 
@@ -84,7 +85,11 @@ export class SpaceElevator implements SystemContent {
         );
         this.tether.convertToFlatShadedMesh();
 
-        this.tetherMaterial = new MetalSectionMaterial("TetherMaterial", assets.textures.materials.metalPanels, scene);
+        this.tetherMaterial = createMetalSectionMaterial(
+            "TetherMaterial",
+            assets.textures.materials.metalPanels,
+            scene,
+        );
         this.tether.material = this.tetherMaterial;
 
         this.climber = new SpaceElevatorClimber(

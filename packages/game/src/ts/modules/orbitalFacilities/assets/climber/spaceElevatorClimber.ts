@@ -22,11 +22,10 @@ import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { SolarPanelMaterial } from "@/frontend/assets/procedural/solarPanel/solarPanelMaterial";
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
-import { MetalSectionMaterial } from "../metalSectionMaterial";
-import { ClimberRingMaterial } from "./climberRingMaterial";
+import { createMetalSectionMaterial } from "../metalSectionMaterial";
+import { createClimberRingMaterial } from "./climberRingMaterial";
 
 export class SpaceElevatorClimber {
     private readonly transform: TransformNode;
@@ -36,16 +35,11 @@ export class SpaceElevatorClimber {
 
     private readonly boundingRadius: number;
 
-    constructor(
-        solarPanelMaterial: SolarPanelMaterial,
-        climberTextures: PBRTextures,
-        metalTextures: PBRTextures,
-        scene: Scene,
-    ) {
+    constructor(solarPanelMaterial: Material, climberTextures: PBRTextures, metalTextures: PBRTextures, scene: Scene) {
         this.transform = new TransformNode("SpaceElevatorClimber", scene);
 
         this.solarPanelMaterial = solarPanelMaterial;
-        this.metalSectionMaterial = new MetalSectionMaterial(
+        this.metalSectionMaterial = createMetalSectionMaterial(
             "SpaceElevatorClimberMetalSectionMaterial",
             metalTextures,
             scene,
@@ -80,7 +74,7 @@ export class SpaceElevatorClimber {
         rightRing.scaling.y = yThickness;
         rightRing.parent = this.transform;
 
-        rightRing.material = new ClimberRingMaterial("ClimberRingMaterial", climberTextures, scene);
+        rightRing.material = createClimberRingMaterial("ClimberRingMaterial", climberTextures, scene);
 
         const leftRing = rightRing.clone("ClimberLeftRing");
         leftRing.rotate(Axis.Y, Math.PI);

@@ -42,7 +42,8 @@ const StarMaterialSamplerNames = {
     LUT: "lut",
 };
 
-export class StarMaterial extends ShaderMaterial {
+export class StarMaterial {
+    private readonly material: ShaderMaterial;
     private readonly starSeed: number;
 
     private readonly starColor: LinearSrgbColor;
@@ -54,7 +55,7 @@ export class StarMaterial extends ShaderMaterial {
         Effect.ShadersStore[`${shaderName}FragmentShader`] ??= starMaterialFragment;
         Effect.ShadersStore[`${shaderName}VertexShader`] ??= starMaterialVertex;
 
-        super("starColor", scene, shaderName, {
+        this.material = new ShaderMaterial("starColor", scene, shaderName, {
             attributes: ["position"],
             uniforms: [...Object.values(StarMaterialUniformNames)],
             samplers: [...Object.values(StarMaterialSamplerNames)],
@@ -62,14 +63,14 @@ export class StarMaterial extends ShaderMaterial {
 
         const emptyTexture = createEmptyTexture(scene);
 
-        this.setTexture("lut", emptyTexture);
+        this.material.setTexture("lut", emptyTexture);
         const lut = starLutPool.get();
         if (lut.canBeSampled()) {
-            this.setTexture(StarMaterialSamplerNames.LUT, lut.getTexture());
+            this.material.setTexture(StarMaterialSamplerNames.LUT, lut.getTexture());
             emptyTexture.dispose();
         } else {
             lut.getTexture().onGeneratedObservable.addOnce(() => {
-                this.setTexture(StarMaterialSamplerNames.LUT, lut.getTexture());
+                this.material.setTexture(StarMaterialSamplerNames.LUT, lut.getTexture());
                 emptyTexture.dispose();
             });
         }
@@ -78,19 +79,27 @@ export class StarMaterial extends ShaderMaterial {
 
         this.starColor = getRgbFromTemperature(temperature);
 
-        this.onBindObservable.add(() => {
-            this.getEffect().setFloat(StarMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
-            this.getEffect().setColor3(StarMaterialUniformNames.STAR_COLOR, this.starColor);
-            this.getEffect().setFloat(StarMaterialUniformNames.SEED, this.starSeed);
+        this.material.onBindObservable.add(() => {
+            this.material.getEffect().setFloat(StarMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
+            this.material.getEffect().setColor3(StarMaterialUniformNames.STAR_COLOR, this.starColor);
+            this.material.getEffect().setFloat(StarMaterialUniformNames.SEED, this.starSeed);
         });
 
-        this.onDisposeObservable.addOnce(() => {
+        this.material.onDisposeObservable.addOnce(() => {
             starLutPool.release(lut);
             emptyTexture.dispose();
         });
     }
 
+    get(): ShaderMaterial {
+        return this.material;
+    }
+
     public update(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
+    }
+
+    dispose(): void {
+        this.material.dispose();
     }
 }

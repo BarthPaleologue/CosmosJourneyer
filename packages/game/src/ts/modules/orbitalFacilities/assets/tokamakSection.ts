@@ -36,7 +36,7 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 import type { FusionSectionModel } from "@/modules/orbitalFacilities/sections/fusion";
 import type { StationSection } from "@/modules/orbitalFacilities/stationSection";
 
-import { RingHabitatMaterial } from "./habitats/ring/ringHabitatMaterial";
+import { createRingHabitatMaterial } from "./habitats/ring/ringHabitatMaterial";
 
 export class TokamakSection implements StationSection {
     private readonly attachment: Mesh;
@@ -94,7 +94,7 @@ export class TokamakSection implements StationSection {
         this.tokamak = createRing(majorRadius, 2 * minorRadius, 2 * minorRadius * elongation, 32, scene);
         this.tokamak.convertToFlatShadedMesh();
         this.tokamak.parent = this.getTransform();
-        this.tokamak.material = new RingHabitatMaterial(
+        this.tokamak.material = createRingHabitatMaterial(
             majorRadius - minorRadius,
             2 * minorRadius,
             2 * minorRadius * elongation,

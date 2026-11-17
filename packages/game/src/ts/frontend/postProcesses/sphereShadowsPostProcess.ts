@@ -33,7 +33,9 @@ import { setStellarObjectUniforms, StellarObjectUniformNames } from "./uniforms/
 
 import sphereShadowsFragment from "@shaders/sphereShadows.glsl";
 
-export class SphereShadowsPostProcess extends PostProcess {
+export class SphereShadowsPostProcess {
+    private readonly postProcess: PostProcess;
+
     private activeCamera: Camera | null = null;
 
     private readonly sphereShadowCasters: Array<Transformable & HasBoundingSphere> = [];
@@ -53,7 +55,7 @@ export class SphereShadowsPostProcess extends PostProcess {
 
         const samplers: string[] = [...Object.values(SamplerUniformNames)];
 
-        super(
+        this.postProcess = new PostProcess(
             "SphereShadowsPostProcess",
             shaderName,
             uniforms,
@@ -67,11 +69,11 @@ export class SphereShadowsPostProcess extends PostProcess {
             Constants.TEXTURETYPE_HALF_FLOAT,
         );
 
-        this.onActivateObservable.add((camera) => {
+        this.postProcess.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
         });
 
-        this.onApplyObservable.add((effect) => {
+        this.postProcess.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
                 console.warn("Camera is null");
                 return;
@@ -99,5 +101,13 @@ export class SphereShadowsPostProcess extends PostProcess {
     public reset(): void {
         this.sphereShadowCasters.length = 0;
         this.stellarLights.length = 0;
+    }
+
+    get(): PostProcess {
+        return this.postProcess;
+    }
+
+    dispose(camera: Camera): void {
+        this.postProcess.dispose(camera);
     }
 }

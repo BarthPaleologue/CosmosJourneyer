@@ -39,65 +39,72 @@ import {
 
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
-export class ClimberRingMaterial extends NodeMaterial {
-    constructor(name: string, textures: PBRTextures, scene: Scene) {
-        super(name, scene);
-        this.mode = NodeMaterialModes.Material;
+/**
+ * Creates the node material for space elevator climber rings.
+ * @param name Name assigned to the material.
+ * @param textures PBR texture set to sample.
+ * @param scene Scene that owns the material.
+ * @returns The built node material.
+ */
+export function createClimberRingMaterial(name: string, textures: PBRTextures, scene: Scene): NodeMaterial {
+    const material = new NodeMaterial(name, scene);
+    material.mode = NodeMaterialModes.Material;
 
-        // Vertex
+    // Vertex
 
-        const position = builtinAttribute("position");
-        const normal = builtinAttribute("normal");
-        const uv = builtinAttribute("uv");
+    const position = builtinAttribute("position");
+    const normal = builtinAttribute("normal");
+    const uv = builtinAttribute("uv");
 
-        const meshUVScaleFactor = new Vector2(2, 10);
-        const proceduralUV = mul(uv, meshUVScaleFactor);
+    const meshUVScaleFactor = new Vector2(2, 10);
+    const proceduralUV = mul(uv, meshUVScaleFactor);
 
-        const world = uniformWorld();
-        const positionW = transformPosition(world, position);
-        const normalW = transformDirection(world, normal);
+    const world = uniformWorld();
+    const positionW = transformPosition(world, position);
+    const normalW = transformDirection(world, normal);
 
-        const viewProjection = uniformViewProjection();
-        const positionClipSpace = transformPosition(viewProjection, positionW);
+    const viewProjection = uniformViewProjection();
+    const positionClipSpace = transformPosition(viewProjection, positionW);
 
-        const vertexOutput = outputVertexPosition(positionClipSpace);
+    const vertexOutput = outputVertexPosition(positionClipSpace);
 
-        // Fragment
+    // Fragment
 
-        const albedoTexture = uniformTexture2d(textures.albedo).source;
-        const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
-        const aoTexture = uniformTexture2d(textures.ambientOcclusion).source;
-        const normalTexture = uniformTexture2d(textures.normal).source;
+    const albedoTexture = uniformTexture2d(textures.albedo).source;
+    const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
+    const aoTexture = uniformTexture2d(textures.ambientOcclusion).source;
+    const normalTexture = uniformTexture2d(textures.normal).source;
 
-        const albedo = textureSample(albedoTexture, proceduralUV, { convertToLinearSpace: true });
-        const metallicRoughnesstexture = textureSample(metallicRoughnessTexture, proceduralUV);
-        const aoTextureValue = textureSample(aoTexture, proceduralUV);
-        const normalTextureValue = textureSample(normalTexture, proceduralUV);
+    const albedo = textureSample(albedoTexture, proceduralUV, { convertToLinearSpace: true });
+    const metallicRoughnesstexture = textureSample(metallicRoughnessTexture, proceduralUV);
+    const aoTextureValue = textureSample(aoTexture, proceduralUV);
+    const normalTextureValue = textureSample(normalTexture, proceduralUV);
 
-        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalTextureValue.rgb, 1);
+    const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalTextureValue.rgb, 1);
 
-        const view = uniformView();
-        const cameraPosition = uniformCameraPosition();
+    const view = uniformView();
+    const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = pbr(
-            metallicRoughnesstexture.r,
-            metallicRoughnesstexture.g,
-            normalW,
-            view,
-            cameraPosition,
-            positionW,
-            {
-                reflection: reflection(position, world),
-                albedoRgb: albedo.rgb,
-                ambientOcclusion: aoTextureValue.r,
-                perturbedNormal: perturbedNormal.output,
-            },
-        );
+    const pbrColor = pbr(
+        metallicRoughnesstexture.r,
+        metallicRoughnesstexture.g,
+        normalW,
+        view,
+        cameraPosition,
+        positionW,
+        {
+            reflection: reflection(position, world),
+            albedoRgb: albedo.rgb,
+            ambientOcclusion: aoTextureValue.r,
+            perturbedNormal: perturbedNormal.output,
+        },
+    );
 
-        const fragmentOutput = outputFragColor(pbrColor.lighting);
+    const fragmentOutput = outputFragColor(pbrColor.lighting);
 
-        this.addOutputNode(vertexOutput);
-        this.addOutputNode(fragmentOutput);
-        this.build();
-    }
+    material.addOutputNode(vertexOutput);
+    material.addOutputNode(fragmentOutput);
+    material.build();
+
+    return material;
 }

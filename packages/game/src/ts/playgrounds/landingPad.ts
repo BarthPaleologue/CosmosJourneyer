@@ -28,7 +28,7 @@ import { lookAt } from "@/frontend/helpers/transform";
 import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
 import { LandingPad } from "@/modules/orbitalFacilities/assets/landingPad/landingPad";
-import { LandingPadMaterial } from "@/modules/orbitalFacilities/assets/landingPad/landingPadMaterial";
+import { createLandingPadMaterial } from "@/modules/orbitalFacilities/assets/landingPad/landingPadMaterial";
 
 import { enablePhysics } from "./utils";
 
@@ -57,7 +57,7 @@ export async function createLandingPadScene(
     lookAt(controls.getTransform(), Vector3.Zero(), scene.useRightHandedSystem);
 
     const textures = await loadConcreteTextures(engine, progressMonitor);
-    const landingPadMaterial = new LandingPadMaterial(textures, scene);
+    const landingPadMaterial = createLandingPadMaterial(textures, scene);
 
     const decalTexture = createSquareTextDecalTexture("LandingPadCenterDecal", "A1", scene);
 

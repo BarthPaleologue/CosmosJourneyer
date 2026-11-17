@@ -87,7 +87,7 @@ export class NeutronStar implements CelestialBodyBase<"neutronStar">, Cullable, 
             textures.pools.starMaterialLut,
             scene,
         );
-        this.mesh.material = this.material;
+        this.mesh.material = this.material.get();
 
         if (this.model.rings !== null) {
             this.ringsUniforms = RingsUniforms.New(this.model.rings, textures, Settings.RINGS_FADE_OUT_DISTANCE, scene);

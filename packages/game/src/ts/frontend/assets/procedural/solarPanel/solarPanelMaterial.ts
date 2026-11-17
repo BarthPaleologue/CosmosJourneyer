@@ -39,54 +39,60 @@ import {
 
 import type { SolarPanelTextures } from "../../textures/materials/solarPanel";
 
-export class SolarPanelMaterial extends NodeMaterial {
-    constructor(textures: SolarPanelTextures, scene: Scene) {
-        super("SolarPanelNodeMaterial", scene);
-        this.mode = NodeMaterialModes.Material;
+/**
+ * Creates the node material for solar panels.
+ * @param textures Solar panel texture set to sample.
+ * @param scene Scene that owns the material.
+ * @returns The built node material.
+ */
+export function createSolarPanelMaterial(textures: SolarPanelTextures, scene: Scene): NodeMaterial {
+    const material = new NodeMaterial("SolarPanelNodeMaterial", scene);
+    material.mode = NodeMaterialModes.Material;
 
-        const position = builtinAttribute("position");
-        const normal = builtinAttribute("normal");
+    const position = builtinAttribute("position");
+    const normal = builtinAttribute("normal");
 
-        const positionXZ = swizzle(position, "xz");
-        const uv = mul(positionXZ, 0.1);
+    const positionXZ = swizzle(position, "xz");
+    const uv = mul(positionXZ, 0.1);
 
-        const world = uniformWorld();
-        const positionW = transformPosition(world, position);
-        const normalW = transformDirection(world, normal);
+    const world = uniformWorld();
+    const positionW = transformPosition(world, position);
+    const normalW = transformDirection(world, normal);
 
-        const viewProjection = uniformViewProjection();
-        const positionClipSpace = transformPosition(viewProjection, positionW);
+    const viewProjection = uniformViewProjection();
+    const positionClipSpace = transformPosition(viewProjection, positionW);
 
-        const vertexOutput = outputVertexPosition(positionClipSpace);
+    const vertexOutput = outputVertexPosition(positionClipSpace);
 
-        const cameraPosition = uniformCameraPosition();
+    const cameraPosition = uniformCameraPosition();
 
-        const normalHeightTexture = uniformTexture2d(textures.normal).source;
-        const normalHeightMapValue = textureSample(normalHeightTexture, uv);
-        const { output: perturbedNormal } = perturbNormal(uv, positionW, normalW, normalHeightMapValue.rgb, 1);
+    const normalHeightTexture = uniformTexture2d(textures.normal).source;
+    const normalHeightMapValue = textureSample(normalHeightTexture, uv);
+    const { output: perturbedNormal } = perturbNormal(uv, positionW, normalW, normalHeightMapValue.rgb, 1);
 
-        const albedoTexture = uniformTexture2d(textures.albedo).source;
-        const metallicTexture = uniformTexture2d(textures.metallic).source;
-        const roughnessTexture = uniformTexture2d(textures.roughness).source;
+    const albedoTexture = uniformTexture2d(textures.albedo).source;
+    const metallicTexture = uniformTexture2d(textures.metallic).source;
+    const roughnessTexture = uniformTexture2d(textures.roughness).source;
 
-        const albedo = textureSample(albedoTexture, uv, {
-            convertToLinearSpace: true,
-        });
-        const metallic = textureSample(metallicTexture, uv);
-        const roughness = textureSample(roughnessTexture, uv);
+    const albedo = textureSample(albedoTexture, uv, {
+        convertToLinearSpace: true,
+    });
+    const metallic = textureSample(metallicTexture, uv);
+    const roughness = textureSample(roughnessTexture, uv);
 
-        const view = uniformView();
+    const view = uniformView();
 
-        const pbrLighting = pbr(metallic.r, roughness.r, normalW, view, cameraPosition, positionW, {
-            reflection: reflection(position, world),
-            albedoRgb: albedo.rgb,
-            perturbedNormal,
-        });
+    const pbrLighting = pbr(metallic.r, roughness.r, normalW, view, cameraPosition, positionW, {
+        reflection: reflection(position, world),
+        albedoRgb: albedo.rgb,
+        perturbedNormal,
+    });
 
-        const fragOutput = outputFragColor(pbrLighting.lighting);
+    const fragOutput = outputFragColor(pbrLighting.lighting);
 
-        this.addOutputNode(vertexOutput);
-        this.addOutputNode(fragOutput);
-        this.build();
-    }
+    material.addOutputNode(vertexOutput);
+    material.addOutputNode(fragOutput);
+    material.build();
+
+    return material;
 }

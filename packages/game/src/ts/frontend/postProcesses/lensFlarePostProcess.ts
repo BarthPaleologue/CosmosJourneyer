@@ -34,7 +34,9 @@ import { SamplerUniformNames, setSamplerUniforms } from "./uniforms/samplerUnifo
 
 import lensFlareFragment from "@shaders/lensflare.glsl";
 
-export class LensFlarePostProcess extends PostProcess {
+export class LensFlarePostProcess {
+    private readonly postProcess: PostProcess;
+
     private activeCamera: Camera | null = null;
 
     private readonly clipPosition = Vector3.Zero();
@@ -78,7 +80,7 @@ export class LensFlarePostProcess extends PostProcess {
 
         const samplers: string[] = Object.values(SamplerUniformNames);
 
-        super(
+        this.postProcess = new PostProcess(
             stellarTransform.name + "LensFlare",
             shaderName,
             uniforms,
@@ -94,7 +96,7 @@ export class LensFlarePostProcess extends PostProcess {
 
         this.color = color;
 
-        this.onActivateObservable.add((camera) => {
+        this.postProcess.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
         });
 
@@ -108,7 +110,7 @@ export class LensFlarePostProcess extends PostProcess {
         const tempRightPosition = new Vector3();
         const tempClipSpacePosition = new Vector4();
 
-        this.onApplyObservable.add((effect) => {
+        this.postProcess.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
                 console.warn("Camera is null");
                 return;
@@ -210,5 +212,13 @@ export class LensFlarePostProcess extends PostProcess {
 
             setSamplerUniforms(effect, this.activeCamera, depthRendererManager);
         });
+    }
+
+    get(): PostProcess {
+        return this.postProcess;
+    }
+
+    dispose(camera: Camera): void {
+        this.postProcess.dispose(camera);
     }
 }

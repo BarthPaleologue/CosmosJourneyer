@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Constants } from "@babylonjs/core/Engines/constants";
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { Texture } from "@babylonjs/core/Materials/Textures/texture";
@@ -26,13 +27,15 @@ import colorCorrectionFragment from "@shaders/colorCorrection.glsl";
 const shaderName = "colorCorrection";
 Effect.ShadersStore[`${shaderName}FragmentShader`] = colorCorrectionFragment;
 
-export class ColorCorrection extends PostProcess {
+export class ColorCorrection {
+    private readonly postProcess: PostProcess;
+
     contrast = 1;
     exposure = 1.5;
     saturation = 1.2;
 
     constructor(name: string, scene: Scene) {
-        super(
+        this.postProcess = new PostProcess(
             name,
             shaderName,
             ["contrast", "exposure", "saturation"],
@@ -50,13 +53,18 @@ export class ColorCorrection extends PostProcess {
         scene.imageProcessingConfiguration.applyByPostProcess = true;
         scene.imageProcessingConfiguration.skipFinalColorClamp = true;
 
-        // This is necessary because BabylonJS post process sets the scene using the camera. However, I don't pass a camera to the constructor as I use a PostProcessRenderPipeline.
-        this._scene = scene;
-
-        this.onApplyObservable.add((effect: Effect) => {
+        this.postProcess.onApplyObservable.add((effect: Effect) => {
             effect.setFloat("contrast", this.contrast);
             effect.setFloat("exposure", this.exposure);
             effect.setFloat("saturation", this.saturation);
         });
+    }
+
+    get(): PostProcess {
+        return this.postProcess;
+    }
+
+    dispose(camera: Camera): void {
+        this.postProcess.dispose(camera);
     }
 }

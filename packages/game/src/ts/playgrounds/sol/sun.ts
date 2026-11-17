@@ -83,7 +83,7 @@ export async function createSunScene(engine: AbstractEngine, progressMonitor: IL
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(lensFlare);
+    camera.attachPostProcess(lensFlare.get());
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;

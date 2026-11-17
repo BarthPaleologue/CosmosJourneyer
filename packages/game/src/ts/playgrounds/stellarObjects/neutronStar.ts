@@ -84,7 +84,7 @@ export async function createNeutronStarScene(
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(celestialBodyUberShader);
+    camera.attachPostProcess(celestialBodyUberShader.get());
 
     const lensFlare = new LensFlarePostProcess(
         neutronStar.getTransform(),
@@ -93,10 +93,10 @@ export async function createNeutronStarScene(
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(lensFlare);
+    camera.attachPostProcess(lensFlare.get());
 
     const colorCorrection = new ColorCorrection("colorCorrection", scene);
-    camera.attachPostProcess(colorCorrection);
+    camera.attachPostProcess(colorCorrection.get());
 
     camera.maxZ = 1e12;
     lookAt(defaultControls.getTransform(), neutronStar.getTransform().position, scene.useRightHandedSystem);

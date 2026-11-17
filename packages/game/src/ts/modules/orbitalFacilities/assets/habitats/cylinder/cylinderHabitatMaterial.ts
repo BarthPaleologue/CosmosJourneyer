@@ -48,73 +48,88 @@ import {
 
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
-export class CylinderHabitatMaterial extends NodeMaterial {
-    constructor(radius: number, height: number, tesselation: number, textures: PBRTextures, scene: Scene) {
-        super("CylinderHabitatMaterial", scene);
-        this.mode = NodeMaterialModes.Material;
+/**
+ * Creates the node material for cylinder habitats.
+ * @param radius Radius of the cylinder, in metres.
+ * @param height Height of the cylinder, in metres.
+ * @param tesselation Number of sectors around the cylinder.
+ * @param textures PBR texture set to sample.
+ * @param scene Scene that owns the material.
+ * @returns The built node material.
+ */
+export function createCylinderHabitatMaterial(
+    radius: number,
+    height: number,
+    tesselation: number,
+    textures: PBRTextures,
+    scene: Scene,
+): NodeMaterial {
+    const material = new NodeMaterial("CylinderHabitatMaterial", scene);
+    material.mode = NodeMaterialModes.Material;
 
-        const circumference = 2 * Math.PI * radius;
-        const nbSectors = tesselation;
-        const sectorSize = circumference / nbSectors;
+    const circumference = 2 * Math.PI * radius;
+    const nbSectors = tesselation;
+    const sectorSize = circumference / nbSectors;
 
-        const position = builtinAttribute("position");
-        const normal = builtinAttribute("normal");
-        const uv = builtinAttribute("uv");
+    const position = builtinAttribute("position");
+    const normal = builtinAttribute("normal");
+    const uv = builtinAttribute("uv");
 
-        const splitPosition = splitVec(position);
+    const splitPosition = splitVec(position);
 
-        const world = uniformWorld();
-        const positionW = transformPosition(world, position);
-        const normalW = transformDirection(world, normal);
+    const world = uniformWorld();
+    const positionW = transformPosition(world, position);
+    const normalW = transformDirection(world, normal);
 
-        // float mask = 1.0 - step(0.02, abs(normal.y));
-        // vUV.y *= mix(1.0, height, mask);
-        const mask = sub(1, step(0.02, abs(splitVec(normal).y)));
-        const scaledUvY = mul(splitVec(uv).y, mix(1.0, height / sectorSize, mask));
+    // float mask = 1.0 - step(0.02, abs(normal.y));
+    // vUV.y *= mix(1.0, height, mask);
+    const mask = sub(1, step(0.02, abs(splitVec(normal).y)));
+    const scaledUvY = mul(splitVec(uv).y, mix(1.0, height / sectorSize, mask));
 
-        const viewProjection = uniformViewProjection();
-        const positionClipSpace = transformPosition(viewProjection, positionW);
+    const viewProjection = uniformViewProjection();
+    const positionClipSpace = transformPosition(viewProjection, positionW);
 
-        const vertexOutput = outputVertexPosition(positionClipSpace);
+    const vertexOutput = outputVertexPosition(positionClipSpace);
 
-        this.addOutputNode(vertexOutput);
+    material.addOutputNode(vertexOutput);
 
-        const theta = atan2(splitPosition.z, splitPosition.x, { target: Target.FRAG });
-        const positionXZ = vec2(splitPosition.x, splitPosition.z);
-        const distanceToCenter = mul(length(positionXZ, { target: Target.FRAG }), 1.0 / sectorSize);
+    const theta = atan2(splitPosition.z, splitPosition.x, { target: Target.FRAG });
+    const positionXZ = vec2(splitPosition.x, splitPosition.z);
+    const distanceToCenter = mul(length(positionXZ, { target: Target.FRAG }), 1.0 / sectorSize);
 
-        const proceduralUvX = remap(theta, [0, 2 * Math.PI], [0, nbSectors]);
-        const proceduralUvY = mix(distanceToCenter, scaledUvY, mask);
-        const proceduralUV = vec2(proceduralUvX, proceduralUvY);
+    const proceduralUvX = remap(theta, [0, 2 * Math.PI], [0, nbSectors]);
+    const proceduralUvY = mix(distanceToCenter, scaledUvY, mask);
+    const proceduralUV = vec2(proceduralUvX, proceduralUvY);
 
-        const albedoTexture = uniformTexture2d(textures.albedo).source;
-        const normalTexture = uniformTexture2d(textures.normal).source;
-        const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
-        const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
+    const albedoTexture = uniformTexture2d(textures.albedo).source;
+    const normalTexture = uniformTexture2d(textures.normal).source;
+    const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
+    const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
 
-        const albedo = textureSample(albedoTexture, proceduralUV, {
-            convertToLinearSpace: true,
-        });
-        const normalMap = textureSample(normalTexture, proceduralUV);
-        const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
-        const occlusion = textureSample(occlusionTexture, proceduralUV);
+    const albedo = textureSample(albedoTexture, proceduralUV, {
+        convertToLinearSpace: true,
+    });
+    const normalMap = textureSample(normalTexture, proceduralUV);
+    const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
+    const occlusion = textureSample(occlusionTexture, proceduralUV);
 
-        const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, 1);
+    const perturbedNormal = perturbNormal(proceduralUV, positionW, normalW, normalMap.rgb, 1);
 
-        const view = uniformView();
-        const cameraPosition = uniformCameraPosition();
+    const view = uniformView();
+    const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
-            reflection: reflection(position, world),
-            albedoRgb: albedo.rgb,
-            ambientOcclusion: occlusion.r,
-            perturbedNormal: perturbedNormal.output,
-        });
+    const pbrColor = pbr(metallicRoughness.r, metallicRoughness.g, normalW, view, cameraPosition, positionW, {
+        reflection: reflection(position, world),
+        albedoRgb: albedo.rgb,
+        ambientOcclusion: occlusion.r,
+        perturbedNormal: perturbedNormal.output,
+    });
 
-        const fragOutput = outputFragColor(pbrColor.lighting);
+    const fragOutput = outputFragColor(pbrColor.lighting);
 
-        this.addOutputNode(fragOutput);
+    material.addOutputNode(fragOutput);
 
-        this.build();
-    }
+    material.build();
+
+    return material;
 }

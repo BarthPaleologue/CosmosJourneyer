@@ -37,7 +37,7 @@ import { CollisionMask, Settings } from "@/settings";
 
 import type { UtilitySectionModel } from "../sections/utility";
 import type { StationSection } from "../stationSection";
-import { MetalSectionMaterial } from "./metalSectionMaterial";
+import { createMetalSectionMaterial } from "./metalSectionMaterial";
 
 export class UtilitySection implements StationSection {
     private readonly attachment: Mesh;
@@ -53,7 +53,7 @@ export class UtilitySection implements StationSection {
     private readonly lights: Array<PointLight> = [];
 
     constructor(model: UtilitySectionModel, assets: RenderingAssets, scene: Scene) {
-        this.metalSectionMaterial = new MetalSectionMaterial(
+        this.metalSectionMaterial = createMetalSectionMaterial(
             "UtilitySectionMetalMaterial",
             assets.textures.materials.metalPanels,
             scene,

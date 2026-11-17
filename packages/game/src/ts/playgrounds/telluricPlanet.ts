@@ -120,7 +120,7 @@ export async function createTelluricPlanetScene(
             : null;
 
     if (celestialBodyUberShader !== null) {
-        camera.attachPostProcess(celestialBodyUberShader);
+        camera.attachPostProcess(celestialBodyUberShader.get());
     }
 
     if (planet.cloudsUniforms !== null) {

@@ -15,9 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { PostProcess } from "@babylonjs/core/PostProcesses/postProcess";
-
-export interface UpdatablePostProcess extends PostProcess {
+export interface UpdatablePostProcess {
     /**
      * Updates the post process internal clock so that time-dependent effects can be updated.
      * @param deltaTime The time in seconds since the last update

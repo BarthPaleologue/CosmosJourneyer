@@ -43,13 +43,17 @@ import type { CelestialBodyBase } from "../../architecture/celestialBody";
 import { GasPlanetProceduralMaterial } from "./gasPlanetProceduralMaterial";
 import { createGasPlanetTextureMaterial } from "./gasPlanetTextureMaterial";
 
+type GasPlanetSurface =
+    | { readonly type: "procedural"; readonly proceduralMaterial: GasPlanetProceduralMaterial }
+    | { readonly type: "texture"; readonly textureMaterial: Material };
+
 export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
     readonly model: DeepReadonly<GasPlanetModel>;
 
     readonly type = "gasPlanet";
 
     private readonly mesh: Mesh;
-    readonly material: GasPlanetProceduralMaterial | Material;
+    private readonly surface: GasPlanetSurface;
 
     readonly atmosphereUniforms: AtmosphereUniforms;
 
@@ -82,21 +86,27 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
         this.mesh.rotationQuaternion = Quaternion.Identity();
 
         if (this.model.colorPalette.type === "procedural") {
-            this.material = new GasPlanetProceduralMaterial(
-                this.model.name,
-                this.model.seed,
-                this.model.colorPalette,
-                scene,
-            );
+            this.surface = {
+                type: "procedural",
+                proceduralMaterial: new GasPlanetProceduralMaterial(
+                    this.model.name,
+                    this.model.seed,
+                    this.model.colorPalette,
+                    scene,
+                ),
+            };
         } else {
-            this.material = createGasPlanetTextureMaterial(
-                this.model.colorPalette.textureId,
-                textures.gasPlanet,
-                scene,
-            );
+            this.surface = {
+                type: "texture",
+                textureMaterial: createGasPlanetTextureMaterial(
+                    this.model.colorPalette.textureId,
+                    textures.gasPlanet,
+                    scene,
+                ),
+            };
         }
 
-        this.mesh.material = this.material;
+        this.mesh.material = this.getMaterial();
 
         const atmosphereThickness = Settings.EARTH_ATMOSPHERE_THICKNESS * Math.max(1, this.model.radius / EarthRadius);
         this.atmosphereUniforms = new AtmosphereUniforms(this.getBoundingRadius(), atmosphereThickness);
@@ -117,9 +127,19 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
         }
     }
 
+    /**
+     * Gets the surface material of the planet, procedural or texture-based.
+     * @returns The Babylon material applied to the planet mesh.
+     */
+    getMaterial(): Material {
+        return this.surface.type === "procedural"
+            ? this.surface.proceduralMaterial.get()
+            : this.surface.textureMaterial;
+    }
+
     updateMaterial(stellarObjects: ReadonlyArray<DirectionalLight>, deltaSeconds: number): void {
-        if (this.material instanceof GasPlanetProceduralMaterial) {
-            this.material.update(stellarObjects, deltaSeconds);
+        if (this.surface.type === "procedural") {
+            this.surface.proceduralMaterial.update(stellarObjects, deltaSeconds);
         }
     }
 
@@ -137,7 +157,7 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
 
     public dispose(ringsLutPool: ItemPool<RingsProceduralPatternLut>): void {
         this.mesh.dispose();
-        this.material.dispose();
+        this.getMaterial().dispose();
         this.asteroidField?.dispose();
         this.ringsUniforms?.dispose(ringsLutPool);
     }

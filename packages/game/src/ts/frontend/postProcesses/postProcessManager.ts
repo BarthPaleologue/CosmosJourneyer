@@ -101,17 +101,11 @@ export class PostProcessManager {
 
     private readonly bodyPostProcessesInRenderOrder: Array<PostProcess> = [];
 
-    readonly volumetricLights: VolumetricLight[] = [];
-    readonly celestialBodyUberShaders: CelestialBodyUberShaderPass[] = [];
-    readonly blackHoles: BlackHolePostProcess[] = [];
-    readonly lensFlares: LensFlarePostProcess[] = [];
+    readonly volumetricLights: PostProcess[] = [];
+    readonly lensFlares: PostProcess[] = [];
 
-    private readonly objectPostProcesses: PostProcess[][] = [
-        this.volumetricLights,
-        this.celestialBodyUberShaders,
-        this.blackHoles,
-        this.lensFlares,
-    ];
+    private readonly celestialBodyUberShaders: CelestialBodyUberShaderPass[] = [];
+    private readonly blackHoles: BlackHolePostProcess[] = [];
 
     /**
      * All post processes that are updated every frame.
@@ -179,7 +173,7 @@ export class PostProcessManager {
             scene.getEngine(),
             "colorCorrectionRenderEffect",
             () => {
-                return [this.colorCorrection];
+                return [this.colorCorrection.get()];
             },
         );
         this.fxaaRenderEffect = new PostProcessRenderEffect(scene.getEngine(), "fxaaRenderEffect", () => {
@@ -196,7 +190,7 @@ export class PostProcessManager {
         this.sphereShadowsRenderEffect = new PostProcessRenderEffect(
             scene.getEngine(),
             "sphereShadowsRenderEffect",
-            () => [this.sphereShadows],
+            () => [this.sphereShadows.get()],
         );
 
         this.bodyRenderEffect = new PostProcessRenderEffect(
@@ -234,8 +228,7 @@ export class PostProcessManager {
     }
 
     private getBodyRenderPostProcesses(body: Transformable): PostProcess[] {
-        const postProcesses = this.celestialBodyToPostProcesses.get(body) ?? [];
-        return postProcesses.filter((postProcess) => !(postProcess instanceof LensFlarePostProcess));
+        return this.celestialBodyToPostProcesses.get(body) ?? [];
     }
 
     private updateBodyPostProcessesInRenderOrder(): void {
@@ -292,8 +285,7 @@ export class PostProcessManager {
             this.depthRendererManager,
             this.scene,
         );
-        this.lensFlares.push(lensFlare);
-        postProcesses.push(lensFlare);
+        this.lensFlares.push(lensFlare.get());
 
         if (star.ringsUniforms !== null) {
             const celestialBodyUberShader = new CelestialBodyUberShaderPass(
@@ -308,7 +300,7 @@ export class PostProcessManager {
                 this.scene,
             );
             this.celestialBodyUberShaders.push(celestialBodyUberShader);
-            postProcesses.push(celestialBodyUberShader);
+            postProcesses.push(celestialBodyUberShader.get());
         }
 
         this.registerBodyPostProcesses(
@@ -340,8 +332,7 @@ export class PostProcessManager {
             this.depthRendererManager,
             this.scene,
         );
-        this.lensFlares.push(lensFlare);
-        postProcesses.push(lensFlare);
+        this.lensFlares.push(lensFlare.get());
 
         const celestialBodyUberShader = new CelestialBodyUberShaderPass(
             {
@@ -358,7 +349,7 @@ export class PostProcessManager {
             this.scene,
         );
         this.celestialBodyUberShaders.push(celestialBodyUberShader);
-        postProcesses.push(celestialBodyUberShader);
+        postProcesses.push(celestialBodyUberShader.get());
 
         this.registerBodyPostProcesses(
             neutronStar,
@@ -384,7 +375,7 @@ export class PostProcessManager {
         );
         this.blackHoles.push(blackHolePostProcess);
 
-        this.registerBodyPostProcesses(blackHole, [blackHolePostProcess], blackHole.getBoundingRadius());
+        this.registerBodyPostProcesses(blackHole, [blackHolePostProcess.get()], blackHole.getBoundingRadius());
     }
 
     public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: ReadonlyArray<DirectionalLight>): void {
@@ -413,7 +404,7 @@ export class PostProcessManager {
                 this.scene,
             );
             this.celestialBodyUberShaders.push(celestialBodyUberShader);
-            postProcesses.push(celestialBodyUberShader);
+            postProcesses.push(celestialBodyUberShader.get());
         }
         this.sphereShadows.addShadowCaster(planet);
 
@@ -448,7 +439,7 @@ export class PostProcessManager {
             this.scene,
         );
         this.celestialBodyUberShaders.push(celestialBodyUberShader);
-        postProcesses.push(celestialBodyUberShader);
+        postProcesses.push(celestialBodyUberShader.get());
 
         this.sphereShadows.addShadowCaster(planet);
 
@@ -489,7 +480,7 @@ export class PostProcessManager {
 
         this.registerBodyPostProcesses(
             body,
-            [raymarchedBodyPass],
+            [raymarchedBodyPass.get()],
             Math.max(body.getBoundingRadius(), this.getRingsPostProcessRadius(ringsUniforms)),
         );
     }
@@ -607,16 +598,15 @@ export class PostProcessManager {
 
         // disposing on every camera is necessary because BabylonJS only detaches the post-processes from a single camera at a time
         this.scene.cameras.forEach((camera) => {
-            this.objectPostProcesses.forEach((postProcessList) => {
-                postProcessList.forEach((postProcess) => {
-                    postProcess.dispose(camera);
-                });
-            });
+            for (const postProcess of this.getDisposablePostProcesses()) {
+                postProcess.dispose(camera);
+            }
         });
 
-        this.objectPostProcesses.forEach((postProcessList) => {
-            postProcessList.length = 0;
-        });
+        this.volumetricLights.length = 0;
+        this.lensFlares.length = 0;
+        this.celestialBodyUberShaders.length = 0;
+        this.blackHoles.length = 0;
         this.bodyPostProcessesInRenderOrder.length = 0;
 
         this.sphereShadows.reset();
@@ -624,5 +614,18 @@ export class PostProcessManager {
         this.celestialBodyToPostProcesses.clear();
         this.bodyEntries.length = 0;
         this.sortedBodies = [];
+    }
+
+    /**
+     * Collects every Babylon post-process owned by this manager, including the ones behind wrappers.
+     * @returns All disposable post-processes.
+     */
+    private getDisposablePostProcesses(): PostProcess[] {
+        return [
+            ...this.volumetricLights,
+            ...this.lensFlares,
+            ...this.celestialBodyUberShaders.map((shader) => shader.get()),
+            ...this.blackHoles.map((blackHole) => blackHole.get()),
+        ];
     }
 }

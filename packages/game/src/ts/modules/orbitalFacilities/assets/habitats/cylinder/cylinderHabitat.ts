@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -35,14 +36,14 @@ import type { Transformable } from "@/frontend/universe/architecture/transformab
 import type { CylinderHabitatModel } from "@/modules/orbitalFacilities/sections/habitats/cylinder";
 import { Settings } from "@/settings";
 
-import { CylinderHabitatMaterial } from "./cylinderHabitatMaterial";
+import { createCylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 
 export class CylinderHabitat implements Transformable {
     private readonly root: TransformNode;
 
     private readonly radius: number;
 
-    private readonly cylinderMaterial: CylinderHabitatMaterial;
+    private readonly cylinderMaterial: Material;
 
     private readonly cylinder: Mesh;
     private cylinderAggregate: PhysicsAggregate | null = null;
@@ -79,7 +80,7 @@ export class CylinderHabitat implements Transformable {
         );
         this.cylinder.convertToFlatShadedMesh();
 
-        this.cylinderMaterial = new CylinderHabitatMaterial(
+        this.cylinderMaterial = createCylinderHabitatMaterial(
             this.radius,
             height,
             tessellation,

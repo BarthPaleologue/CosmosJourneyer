@@ -85,7 +85,7 @@ export async function createLensFlareOcclusionScene(
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(lensFlare);
+    camera.attachPostProcess(lensFlare.get());
 
     let frameCounter = 0;
     scene.onAfterRenderObservable.add(() => {
