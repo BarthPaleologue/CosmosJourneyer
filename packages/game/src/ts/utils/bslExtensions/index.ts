@@ -18,3 +18,4 @@
 export * from "./random";
 export * from "./utils";
 export * from "./triPlanar";
+export * from "./noise1d";
