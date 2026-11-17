@@ -18,7 +18,13 @@
 import { CreateIcoSphere, DirectionalLight, Quaternion, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-import { astronomicalUnitToMeters, EarthMagneticDipoleMoment, SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
+import {
+    astronomicalUnitToMeters,
+    degreesToRadians,
+    EarthMagneticDipoleMoment,
+    SolarMass,
+    SolarRadius,
+} from "@cosmos-journeyer/physics";
 import type { MagneticFieldModel } from "@cosmos-journeyer/universe-model";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
@@ -77,7 +83,7 @@ export async function createAuroraScene(
 
     const camera = controls.getActiveCamera();
     camera.minZ = 1e3;
-    camera.maxZ = 40_000e3;
+    camera.maxZ = 100e6;
     camera.attachControl();
 
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
@@ -114,9 +120,6 @@ export async function createAuroraScene(
     const aurora = new Aurora(planetRadius, magneticField, auroraSeed, scene);
     aurora.getTransform().parent = planet;
 
-    const gizmo = new MagnetosphereGizmo(planetRadius, magneticField, scene);
-    gizmo.getTransform().parent = planet;
-
     // Sun one astronomical unit away, matching the reference stellar wind.
     const windSources = [
         {
@@ -126,7 +129,13 @@ export async function createAuroraScene(
         },
     ];
     aurora.update(windSources);
-    gizmo.update(windSources);
+
+    // Debug view, only created with ?magnetosphere.
+    if (showMagnetosphere) {
+        const gizmo = new MagnetosphereGizmo(planetRadius, magneticField, scene);
+        gizmo.getTransform().parent = planet;
+        gizmo.update(windSources);
+    }
 
     const colorCorrection = new ColorCorrection("colorCorrection", scene);
     camera.attachPostProcess(colorCorrection.get());
