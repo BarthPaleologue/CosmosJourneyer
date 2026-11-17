@@ -16,20 +16,47 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { createInstance } from "i18next";
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
+import { ModuleAssetRegistry } from "@/frontend/assets/moduleAssetRegistry";
+import { createGameModuleApi } from "@/frontend/createGameModuleApi";
 import { Mission } from "@/frontend/missions/mission";
+import { StarMapSystemInfoRegistry } from "@/frontend/starmap/starMapSystemInfoRegistry";
+import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
+import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
+
+import { I18n } from "@/i18n";
+import { OrbitalFacilitiesModule } from "@/modules/orbitalFacilities";
 
 import { StarMapTutorial } from "./starMapTutorial";
 
 const t = createInstance().getFixedT("en-US");
 
 describe("StarMapTutorial", () => {
+    let universeBackend: UniverseBackend;
+    let processors: SystemEntityProcessors;
+    beforeEach(async () => {
+        processors = new SystemEntityProcessors();
+        const i18n = await I18n.New();
+        universeBackend = new UniverseBackend(new SystemEntityBackend());
+        OrbitalFacilitiesModule.setup(
+            createGameModuleApi(
+                universeBackend,
+                new SystemEntityLoader(),
+                processors,
+                new ModuleAssetRegistry(),
+                new StarMapSystemInfoRegistry(),
+                i18n,
+            ),
+        );
+    });
+    afterEach(() => {
+        processors.dispose();
+    });
     it("spawns near a space station", () => {
-        const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const tutorial = new StarMapTutorial(t);
 
         const saveDataResult = tutorial.getSaveData();
@@ -59,14 +86,13 @@ describe("StarMapTutorial", () => {
         }
 
         const targetModel = universeBackend.getObjectModel(shipLocation.universeObjectId);
-        expect(targetModel?.type).toBe("orbitalObject");
-        const stationModel = targetModel?.type === "orbitalObject" ? targetModel.object : null;
+        expect(targetModel?.type).toBe("systemEntity");
+        const stationModel = targetModel?.type === "systemEntity" ? targetModel.object.content : null;
 
         expect(stationModel?.type).toBe("spaceStation");
     });
 
     it("has correct mission objectives", () => {
-        const universeBackend = new UniverseBackend(new SystemEntityBackend());
         const tutorial = new StarMapTutorial(t);
 
         const saveDataResult = tutorial.getSaveData();

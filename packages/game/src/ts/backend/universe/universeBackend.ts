@@ -36,7 +36,11 @@ import type { Vector3Like } from "@/utils/types";
 
 import { Settings } from "@/settings";
 
-import type { SystemEntityBackend, SystemEntityModelGenerator } from "../systemEntity/systemEntityBackend";
+import type {
+    SystemEntityBackend,
+    SystemEntityModelGenerator,
+    SystemEntityModelContext,
+} from "../systemEntity/systemEntityBackend";
 import type { SystemEntityModel } from "../systemEntity/systemEntityModel";
 
 export type StarSystemContentModel = {
@@ -140,40 +144,27 @@ export class UniverseBackend {
         return this.coordinatesToCustomSystems.get(serializeStarSystemCoordinates(coordinates));
     }
 
-    /**
-     * Check if a system is in the human bubble.
-     * @param systemCoordinates - The coordinates of the system to check.
-     * @returns true if the system is in the human bubble, false otherwise.
-     */
-    public isSystemInHumanBubble(systemCoordinates: StarSystemCoordinates): boolean {
-        const systemPosition = this.getSystemGalacticPosition(systemCoordinates);
-        const distanceToSolLy = Math.hypot(systemPosition.x, systemPosition.y, systemPosition.z);
-
-        return distanceToSolLy < Settings.HUMAN_BUBBLE_RADIUS_LY;
-    }
-
     public getSystemContentModelAt(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemContentModel> | null {
-        const system = this.getSystemModelAt(coordinates);
-        if (system === null) {
+        const context = this.getSystemModelContextAt(coordinates);
+        if (context === null) {
             return null;
         }
-        const entities = this.systemEntities.getModels({
-            system,
-            galacticPosition: this.getSystemGalacticPosition(system.coordinates),
-        });
-
-        return { system, entities };
+        return { system: context.system, entities: this.systemEntities.getModels(context) };
     }
 
     /**
-     * Looks up an authored or generated system model.
+     * Resolves an authored or generated system and its entity generation context.
      * @param coordinates - Sector and local coordinates identifying the star system.
-     * @returns Read-only model when the coordinates are known, or `null` when no model exists.
+     * @returns Generation context when the coordinates are known, or `null` when no model exists.
      */
-    private getSystemModelAt(coordinates: StarSystemCoordinates): DeepReadonly<StarSystemModel> | null {
+    private getSystemModelContextAt(coordinates: StarSystemCoordinates): SystemEntityModelContext | null {
         const customSystem = this.getCustomSystemFromCoordinates(coordinates);
         if (customSystem !== undefined) {
-            return customSystem;
+            return {
+                system: customSystem,
+                origin: "authored",
+                galacticPosition: this.getSystemGalacticPosition(coordinates),
+            };
         }
 
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(
@@ -195,7 +186,11 @@ export class UniverseBackend {
         const hash = centeredRand(cellRNG, 1 + index) * Settings.SEED_HALF_RANGE;
         const systemRng = getRngFromSeed(hash);
 
-        return generateStarSystemModel(systemRng, coordinates, this.isSystemInHumanBubble(coordinates));
+        return {
+            system: generateStarSystemModel(systemRng, coordinates),
+            origin: "procedural",
+            galacticPosition: this.getSystemGalacticPosition(coordinates),
+        };
     }
 
     private getGeneratedSystemCoordinatesInStarSector(
@@ -266,8 +261,8 @@ export class UniverseBackend {
         const generatedSystemCoordinates = this.getGeneratedSystemCoordinatesInStarSector(sectorX, sectorY, sectorZ);
 
         for (const systemCoordinates of generatedSystemCoordinates) {
-            const systemModel = this.getSystemModelAt(systemCoordinates);
-            if (systemModel === null) {
+            const systemModel = this.getSystemModelContextAt(systemCoordinates)?.system;
+            if (systemModel === undefined) {
                 throw new Error("Generated system not found in the database!");
             }
             generatedModels.push(systemModel);
@@ -411,12 +406,12 @@ export class UniverseBackend {
      */
     public getObjectModel(universeObjectId: UniverseObjectId): DeepReadonly<UniverseObjectModel> | null {
         const starSystemCoordinates = universeObjectId.systemCoordinates;
-        const starSystemModel = this.getSystemModelAt(starSystemCoordinates);
-        if (starSystemModel === null) {
+        const context = this.getSystemModelContextAt(starSystemCoordinates);
+        if (context === null) {
             return null;
         }
 
-        const objectModel = getObjectModelById(universeObjectId.idInSystem, starSystemModel);
+        const objectModel = getObjectModelById(universeObjectId.idInSystem, context.system);
         if (objectModel !== null) {
             return {
                 type: "orbitalObject",
@@ -424,10 +419,7 @@ export class UniverseBackend {
             };
         }
 
-        const entities = this.systemEntities.getModels({
-            system: starSystemModel,
-            galacticPosition: this.getSystemGalacticPosition(starSystemModel.coordinates),
-        });
+        const entities = this.systemEntities.getModels(context);
         const foundEntity = entities.find((entity) => entity.id === universeObjectId.idInSystem);
         if (foundEntity !== undefined) {
             return {

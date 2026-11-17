@@ -156,7 +156,7 @@ describe("module entity capabilities", () => {
             content.dispose();
         }
     });
-    it("exposes registered pads for facility selection, lookup and targeting alongside legacy facilities", () => {
+    it("exposes registered pads for facility selection, lookup and targeting", () => {
         const padTransform = new TransformNode("pad", scene);
         const pad: ILandingPad = {
             getTransform: () => padTransform,
@@ -168,16 +168,7 @@ describe("module entity capabilities", () => {
         const provider = new LandingPadProvider([pad]);
         api.systemEntities.registerSpatialGeometry(type, () => geometry);
         api.landingPad.systemEntities.register(type, () => provider);
-        const legacyTransform = new TransformNode("legacy", scene);
-        legacyTransform.position.z = 1000;
-        const legacy = {
-            model: { id: "legacy", name: "Legacy" },
-            getTransform: () => legacyTransform,
-            getBoundingRadius: () => 990,
-            getLandingPadProvider: () => new LandingPadProvider([]),
-        };
         const controller = {
-            getOrbitalFacilities: () => [legacy],
             getOrbitalObjects: () => [],
             getSystemEntities: () => [entity],
             getSystemTargets: () => [],
@@ -186,7 +177,7 @@ describe("module entity capabilities", () => {
             systemEntities: [entity, ignored],
         } as unknown as StarSystemController;
         const facilities = controller.getLandableFacilities();
-        expect(facilities.map((facility) => facility.id)).toEqual(["legacy", entity.model.id]);
+        expect(facilities.map((facility) => facility.id)).toEqual([entity.model.id]);
         const facility = facilities.find((candidate) => candidate.id === entity.model.id);
         expect(facility?.getLandingPadProvider()).toBe(provider);
         expect(facility?.getTransform()).toBe(geometry.getTransform());
@@ -207,7 +198,6 @@ describe("module entity capabilities", () => {
     it("requires spatial geometry for a landing provider and handles a system without landable facilities", () => {
         api.landingPad.systemEntities.register(type, () => new LandingPadProvider([]));
         const controller = {
-            getOrbitalFacilities: () => [],
             getLandableFacilities: () => StarSystemController.prototype.getLandableFacilities.call(controller),
             systemEntityProcessors: processors,
             systemEntities: [entity],

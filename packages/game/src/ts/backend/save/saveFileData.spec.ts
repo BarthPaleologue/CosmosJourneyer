@@ -7,9 +7,10 @@ import { safeParseSave } from "./saveFileData";
 import type { Save } from "./saveFileData";
 
 test("Loading a correct save file", () => {
-    const authoredSystem = getLoneStarSystem();
+    const systemContent = getLoneStarSystem();
+    const authoredSystem = systemContent.system;
     const shipId = crypto.randomUUID();
-    const station = authoredSystem.orbitalFacilities[0];
+    const station = systemContent.entities[0];
     if (station === undefined) {
         throw new Error("Station is undefined!");
     }
@@ -145,7 +146,8 @@ test("Loading a correct save file", () => {
 });
 
 test("Loading a minimal save file", () => {
-    const authoredSystem = getLoneStarSystem();
+    const systemContent = getLoneStarSystem();
+    const authoredSystem = systemContent.system;
     const shipId = crypto.randomUUID();
     const saveFileString: DeepPartial<Save> = {
         player: {
@@ -193,9 +195,10 @@ test("Loading a minimal save file", () => {
 });
 
 test("Loading a save file with legacy numeric mission node types", () => {
-    const authoredSystem = getLoneStarSystem();
+    const systemContent = getLoneStarSystem();
+    const authoredSystem = systemContent.system;
     const shipId = crypto.randomUUID();
-    const station = authoredSystem.orbitalFacilities[0];
+    const station = systemContent.entities[0];
     if (station === undefined) {
         throw new Error("Station is undefined!");
     }

@@ -24,12 +24,15 @@ import { getAlphaTestisSystemModel } from "@/backend/universe/customSystems/alph
 import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
+import { ModuleAssetRegistry } from "@/frontend/assets/moduleAssetRegistry";
 import { ModuleAssets } from "@/frontend/assets/moduleAssets";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { TtsMock } from "@/frontend/audio/tts";
+import { createGameModuleApi } from "@/frontend/createGameModuleApi";
 import { positionNearObjectBrightSide } from "@/frontend/helpers/positionNearObject";
 import { Player } from "@/frontend/player/player";
+import { StarMapSystemInfoRegistry } from "@/frontend/starmap/starMapSystemInfoRegistry";
 import { StarSystemView } from "@/frontend/starSystemView";
 import { SystemEntityLoader } from "@/frontend/systemEntity/systemEntityLoader";
 import { SystemEntityProcessors } from "@/frontend/systemEntity/systemEntityProcessors";
@@ -39,6 +42,7 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadPr
 import { TerrainSystemCpu } from "@/frontend/universe/planets/telluricPlanet/terrain/system/terrainSystemCpu";
 
 import { I18n } from "@/i18n";
+import { OrbitalFacilitiesModule } from "@/modules/orbitalFacilities";
 import { Settings } from "@/settings";
 
 import { enablePhysics } from "./utils";
@@ -52,15 +56,27 @@ export async function createStarSystemViewScene(
     engine: AbstractEngine,
     progressMonitor: ILoadingProgressMonitor,
 ): Promise<Scene> {
-    const t = (await I18n.New()).getT();
+    const i18n = await I18n.New();
+    const t = i18n.getT();
 
     const systemEntityBackend = new SystemEntityBackend();
-    const authoredSystem = getAlphaTestisSystemModel();
     const universeBackend = new UniverseBackend(systemEntityBackend);
-    universeBackend.registerAuthoredSystem(authoredSystem);
 
     const systemEntityLoader = new SystemEntityLoader();
     const systemEntityProcessors = new SystemEntityProcessors();
+    OrbitalFacilitiesModule.setup(
+        createGameModuleApi(
+            universeBackend,
+            systemEntityLoader,
+            systemEntityProcessors,
+            new ModuleAssetRegistry(),
+            new StarMapSystemInfoRegistry(),
+            i18n,
+        ),
+    );
+    const authoredSystem = getAlphaTestisSystemModel();
+    universeBackend.registerAuthoredSystem(authoredSystem.system);
+    universeBackend.registerAuthoredEntities(authoredSystem.system.coordinates, authoredSystem.entities);
 
     const player = Player.Default(universeBackend);
 
@@ -108,7 +124,7 @@ export async function createStarSystemViewScene(
 
     await starSystemView.switchToSpaceshipControls();
 
-    const loadResult = await starSystemView.loadStarSystem({ system: authoredSystem, entities: [] });
+    const loadResult = await starSystemView.loadStarSystem(authoredSystem);
     if (!loadResult.success) {
         throw loadResult.error;
     }

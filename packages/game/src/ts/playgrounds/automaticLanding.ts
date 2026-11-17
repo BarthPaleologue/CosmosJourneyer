@@ -30,7 +30,6 @@ import { Scene } from "@babylonjs/core/scene";
 import { randRange } from "@cosmos-journeyer/random";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
-import { LandingPad } from "@/frontend/assets/procedural/spaceStation/landingPad/landingPad";
 import { loadRenderingAssets } from "@/frontend/assets/renderingAssets";
 import { SoundPlayerMock } from "@/frontend/audio/soundPlayer";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
@@ -41,6 +40,7 @@ import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadPr
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
+import { LandingPad } from "@/modules/orbitalFacilities/assets/landingPad/landingPad";
 import { CollisionMask } from "@/settings";
 
 import { createSky, enablePhysics, enablePointerLock, enableShadows } from "./utils";

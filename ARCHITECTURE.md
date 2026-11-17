@@ -14,7 +14,9 @@ Data model production belongs to the `backend` part of the project: the part tha
 
 On the other hand, 3d objects and other presentations belong to the `frontend` part of the project. The frontend uses the backend to create the data models it needs to create a visual presentation.
 
-All the frontend code lives inside the `game` package under the `frontend` source folder. The entrypoint for the backend lives inside the `backend` folder from the same package, but its dependencies live in the `universe-model` and `universe-generation` packages which provide the definitions and generators for the procedural universe.
+The frontend infrastructure lives inside the `game` package under the `frontend` source folder. Modules keep their content models, procedural generators and presentations together under `modules`. For example, `modules/orbitalFacilities` owns stations, elevators and their sections.
+
+The entrypoint for the backend lives inside the `backend` folder from the same package. The `universe-model` and `universe-generation` packages provide the shared celestial models and generators, independently of game modules.
 
 ### Isolate systems
 
@@ -66,3 +68,11 @@ The game can be extended using modules loaded by `CosmosJourneyer` at startup.
 Following the separation between data models and presentation, modules are expected to provide data models for the new content, and instructions on how to create presentations for these data models.
 
 For example, a module may register a system entity model inside a star system. This means a module must register a factory to turn this data model into an object that can be placed inside the 3d scene.
+
+Entity placement and content have separate owners: the core simulates the placement, while the module creates and updates its content. Geometry, landing pads, targeting, lighting and music are registered capabilities consumed by the core.
+
+Entity generators receive the system, its backend-resolved galactic position and an `origin` of `"authored"` or `"procedural"`. Generators run for both origins; each module decides where to contribute. The orbital facilities module generates installations only in procedural systems and creates its own indexed RNG from the module ID and system coordinates. Authored systems keep their declared installations.
+
+This module-owned random stream changes the previous procedural facility layout. Existing save-loading fallbacks handle references to missing objects or stations by placing the player near the system's first stellar object.
+
+Modules register their own locales through `api.i18n.registerLocales(moduleId, locales)`. The returned translator can be retained by contributions such as star-map system information.

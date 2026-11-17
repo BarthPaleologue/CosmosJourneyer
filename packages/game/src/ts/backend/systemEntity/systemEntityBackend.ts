@@ -27,6 +27,7 @@ export type SystemEntityModelGenerator = (context: SystemEntityModelContext) => 
 
 export type SystemEntityModelContext = DeepReadonly<{
     system: StarSystemModel;
+    origin: "authored" | "procedural";
     /** Galactic position resolved by the universe backend, in light-years. */
     galacticPosition: Vector3Like;
 }>;

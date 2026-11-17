@@ -566,9 +566,6 @@ export class StarSystemView implements View {
             this.spaceshipControls?.reset();
             this.terrainSystem.reset();
             this.postProcessManager.reset();
-            for (const facility of this.starSystem.getOrbitalFacilities()) {
-                this.clusteredLightingSystem.unregisterRegion(facility);
-            }
             this.starSystem.dispose();
             this.targetingSystem.reset();
             this.spaceStationLayer.reset();
@@ -593,10 +590,6 @@ export class StarSystemView implements View {
         }
 
         this.starSystem = starSystemResult.value;
-
-        for (const facility of this.starSystem.getOrbitalFacilities()) {
-            this.clusteredLightingSystem.registerRegion(facility);
-        }
 
         const shipMesh = this.spaceshipControls?.getSpaceship();
         if (shipMesh !== undefined) {

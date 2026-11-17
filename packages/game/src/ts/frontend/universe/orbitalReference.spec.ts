@@ -26,12 +26,12 @@ import {
     generateMandelbulbModel,
     generateMengerSpongeModel,
     generateSierpinskiPyramidModel,
-    generateSpaceStationModel,
-    generateSpaceElevatorModel,
 } from "@cosmos-journeyer/universe-generation";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { getChronosModel } from "@/modules/chronos/chronos";
+import { generateSpaceElevatorModel } from "@/modules/orbitalFacilities/proceduralGeneration/spaceElevatorModelGenerator";
+import { generateSpaceStationModel } from "@/modules/orbitalFacilities/proceduralGeneration/spaceStationModelGenerator";
 import { getVestaModel } from "@/modules/vesta/vesta";
 
 import { KeplerianOrbitalSimulation } from "./keplerianOrbitalSimulation";
@@ -160,7 +160,6 @@ describe("orbital reference selection", () => {
                 ...starSystem.stellarObjects,
                 ...starSystem.planets,
                 ...starSystem.satellites,
-                ...starSystem.orbitalFacilities,
                 ...systemEntities.flatMap((entity) =>
                     entity.placement.type === "inOrbit"
                         ? [{ id: entity.id, ...entity.placement, spin: entity.placement.attitude.spin }]
@@ -199,7 +198,11 @@ describe("orbital reference selection", () => {
             generateSpaceElevatorModel("elevator", 42, planet, starSystem),
         ];
         for (const facility of facilities) {
-            const simulation = placeModels([...starSystem.stellarObjects, ...starSystem.planets, facility]);
+            const simulation = placeModels([
+                ...starSystem.stellarObjects,
+                ...starSystem.planets,
+                { id: facility.id, ...facility.placement, spin: facility.placement.attitude.spin },
+            ]);
             const position = simulation.getTransform(facility.id)?.position;
             expect(position).toBeDefined();
             if (position === undefined) {
@@ -241,7 +244,6 @@ describe("orbital reference selection", () => {
                     ? [{ id: entity.id, ...entity.placement, spin: entity.placement.attitude.spin }]
                     : [],
             ),
-            ...systemModel.orbitalFacilities,
         ];
         const simulation = placeModels(models);
         const lab = simulation.getTransform("chronosResearchLab");

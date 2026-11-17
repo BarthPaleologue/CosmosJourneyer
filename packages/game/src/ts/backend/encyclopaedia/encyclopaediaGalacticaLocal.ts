@@ -124,8 +124,6 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
             case "mengerSponge":
                 objectTypeMultiplier = 2;
                 break;
-            case "spaceStation":
-            case "spaceElevator":
             case "custom":
                 objectTypeMultiplier = 0;
                 break;

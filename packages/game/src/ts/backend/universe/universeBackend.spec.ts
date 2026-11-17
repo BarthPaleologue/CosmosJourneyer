@@ -15,7 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SystemEntityModelGenerator } from "@/backend/systemEntity/systemEntityBackend";
@@ -50,32 +49,6 @@ describe("UniverseBackend", () => {
         });
     });
 
-    describe("isSystemInHumanBubble", () => {
-        it("should return true for systems near origin", () => {
-            const closeCoordinates: StarSystemCoordinates = {
-                starSectorX: 0,
-                starSectorY: 0,
-                starSectorZ: 0,
-                localX: 0,
-                localY: 0,
-                localZ: 0,
-            };
-            expect(universeBackend.isSystemInHumanBubble(closeCoordinates)).toBe(true);
-        });
-
-        it("should return false for distant systems", () => {
-            const farCoordinates = {
-                starSectorX: 1000,
-                starSectorY: 1000,
-                starSectorZ: 1000,
-                localX: 0,
-                localY: 0,
-                localZ: 0,
-            };
-            expect(universeBackend.isSystemInHumanBubble(farCoordinates)).toBe(false);
-        });
-    });
-
     it.each(["system content", "object lookup"])("passes the resolved position to generators during %s", (lookup) => {
         const { starSystem: system, systemEntities } = getVestaModel();
         universeBackend.registerAuthoredSystem(system);
@@ -101,8 +74,41 @@ describe("UniverseBackend", () => {
             expect(found).toEqual({ type: "systemEntity", object: generated });
         }
 
-        expect(generator).toHaveBeenCalledExactlyOnceWith({ system, galacticPosition });
+        expect(generator).toHaveBeenCalledExactlyOnceWith({ system, galacticPosition, origin: "authored" });
     });
+
+    it.each(["system content", "object lookup"])("marks generated systems as procedural during %s", (lookup) => {
+        const coordinates = universeBackend.getSystemCoordinatesInStarSector(0, 0, 0)[0];
+        if (coordinates === undefined) {
+            throw new Error("Expected a generated system");
+        }
+        const system = universeBackend.getSystemContentModelAt(coordinates)?.system;
+        if (system === undefined) {
+            throw new Error("Expected a generated model");
+        }
+        const entity = {
+            id: "generated-content",
+            name: "Generated content",
+            content: { type: "fixture" },
+            placement: { type: "inFrame" as const, parentId: system.stellarObjects[0].id },
+        };
+        const generator = vi.fn<SystemEntityModelGenerator>(() => [entity]);
+        universeBackend.registerProceduralEntities(generator);
+        if (lookup === "system content") {
+            expect(universeBackend.getSystemContentModelAt(coordinates)?.entities).toEqual([entity]);
+        } else {
+            expect(universeBackend.getObjectModel({ systemCoordinates: coordinates, idInSystem: entity.id })).toEqual({
+                type: "systemEntity",
+                object: entity,
+            });
+        }
+        expect(generator).toHaveBeenCalledExactlyOnceWith({
+            system,
+            galacticPosition: universeBackend.getSystemGalacticPosition(coordinates),
+            origin: "procedural",
+        });
+    });
+
     it("resolves orbital objects without running entity generators", () => {
         const system = getSolSystemModel();
         universeBackend.registerAuthoredSystem(system);
