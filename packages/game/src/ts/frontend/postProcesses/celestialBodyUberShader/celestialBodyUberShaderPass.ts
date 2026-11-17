@@ -93,7 +93,9 @@ export type CelestialBodyUberShaderLighting = {
     readonly shadowCasters: ReadonlyArray<SphereShadowCaster>;
 };
 
-export class CelestialBodyUberShaderPass extends PostProcess implements UpdatablePostProcess {
+export class CelestialBodyUberShaderPass implements UpdatablePostProcess {
+    private readonly postProcess: PostProcess;
+
     private activeCamera: Camera | null = null;
 
     private elapsedSeconds = 0;
@@ -175,7 +177,7 @@ export class CelestialBodyUberShaderPass extends PostProcess implements Updatabl
             defines.push("#define HAS_RINGS");
         }
 
-        super(
+        this.postProcess = new PostProcess(
             `${bodyTransform.name}CelestialBodyUberShaderPass`,
             shaderName,
             uniforms,
@@ -191,11 +193,11 @@ export class CelestialBodyUberShaderPass extends PostProcess implements Updatabl
 
         this.features = enabledFeatures;
 
-        this.onActivateObservable.add((camera) => {
+        this.postProcess.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
         });
 
-        this.onApplyObservable.add((effect) => {
+        this.postProcess.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
                 console.warn("Camera is null");
                 return;
@@ -251,6 +253,14 @@ export class CelestialBodyUberShaderPass extends PostProcess implements Updatabl
     public update(deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
         this.elapsedSeconds %= 24 * 60 * 60;
+    }
+
+    get(): PostProcess {
+        return this.postProcess;
+    }
+
+    dispose(camera: Camera): void {
+        this.postProcess.dispose(camera);
     }
 }
 

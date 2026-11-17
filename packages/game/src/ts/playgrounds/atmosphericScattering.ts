@@ -75,7 +75,7 @@ export async function createAtmosphericScatteringScene(
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(atmosphere);
+    camera.attachPostProcess(atmosphere.get());
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;

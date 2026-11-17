@@ -52,138 +52,148 @@ import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
 import { Settings } from "@/settings";
 
-export class LandingBayMaterial extends NodeMaterial {
-    constructor(
-        displayName: string,
-        meanRadius: number,
-        deltaRadius: number,
-        height: number,
-        textures: PBRTextures,
-        scene: Scene,
-    ) {
-        super("LandingBayMaterial", scene);
-        this.mode = NodeMaterialModes.Material;
+/**
+ * Creates the node material for landing bay rings, including a dynamic name plate texture.
+ * @param displayName Name drawn on the bay name plate.
+ * @param meanRadius Mean radius of the bay ring, in metres.
+ * @param deltaRadius Radial thickness of the bay ring, in metres.
+ * @param height Height of the bay ring, in metres.
+ * @param textures PBR texture set to sample.
+ * @param scene Scene that owns the material.
+ * @returns The built node material.
+ */
+export function createLandingBayMaterial(
+    displayName: string,
+    meanRadius: number,
+    deltaRadius: number,
+    height: number,
+    textures: PBRTextures,
+    scene: Scene,
+): NodeMaterial {
+    const material = new NodeMaterial("LandingBayMaterial", scene);
+    material.mode = NodeMaterialModes.Material;
 
-        const circumference = 2 * Math.PI * meanRadius;
+    const circumference = 2 * Math.PI * meanRadius;
 
-        const aspectRatio = (0.5 * circumference) / deltaRadius;
+    const aspectRatio = (0.5 * circumference) / deltaRadius;
 
-        const textureResolution = 256;
-        const namePlateTexture = new DynamicTexture(
-            `NamePlateTexture`,
-            {
-                width: textureResolution * aspectRatio,
-                height: textureResolution,
-            },
-            scene,
-            true,
-        );
+    const textureResolution = 256;
+    const namePlateTexture = new DynamicTexture(
+        `NamePlateTexture`,
+        {
+            width: textureResolution * aspectRatio,
+            height: textureResolution,
+        },
+        scene,
+        true,
+    );
 
-        const font_size = 128;
+    const font_size = 128;
 
-        //Add text to dynamic texture
-        namePlateTexture.drawText(
-            displayName.toUpperCase(),
-            null,
-            null,
-            `${font_size}px ${Settings.MAIN_FONT}`,
-            "white",
-            null,
-            true,
-            true,
-        );
+    //Add text to dynamic texture
+    namePlateTexture.drawText(
+        displayName.toUpperCase(),
+        null,
+        null,
+        `${font_size}px ${Settings.MAIN_FONT}`,
+        "white",
+        null,
+        true,
+        true,
+    );
 
-        this.onDisposeObservable.addOnce(() => {
-            namePlateTexture.dispose();
-        });
+    material.onDisposeObservable.addOnce(() => {
+        namePlateTexture.dispose();
+    });
 
-        const position = builtinAttribute("position");
-        const normal = builtinAttribute("normal");
-        const uv = builtinAttribute("uv");
+    const position = builtinAttribute("position");
+    const normal = builtinAttribute("normal");
+    const uv = builtinAttribute("uv");
 
-        const splitPosition = splitVec(position);
+    const splitPosition = splitVec(position);
 
-        const world = uniformWorld();
-        const positionW = transformPosition(world, position);
-        const normalW = transformDirection(world, normal);
+    const world = uniformWorld();
+    const positionW = transformPosition(world, position);
+    const normalW = transformDirection(world, normal);
 
-        // float mask = 1.0 - step(0.02, abs(normal.y));
-        // vUV.y *= mix(1.0, height, mask);
-        const mask = sub(1, step(0.02, abs(splitVec(normal).y)));
-        const scaledUvY = mul(splitVec(uv).y, mix(1.0, height, mask));
+    // float mask = 1.0 - step(0.02, abs(normal.y));
+    // vUV.y *= mix(1.0, height, mask);
+    const mask = sub(1, step(0.02, abs(splitVec(normal).y)));
+    const scaledUvY = mul(splitVec(uv).y, mix(1.0, height, mask));
 
-        const viewProjection = uniformViewProjection();
-        const positionClipSpace = transformPosition(viewProjection, positionW);
+    const viewProjection = uniformViewProjection();
+    const positionClipSpace = transformPosition(viewProjection, positionW);
 
-        const vertexOutput = outputVertexPosition(positionClipSpace);
+    const vertexOutput = outputVertexPosition(positionClipSpace);
 
-        this.addOutputNode(vertexOutput);
+    material.addOutputNode(vertexOutput);
 
-        const theta = atan2(splitPosition.z, splitPosition.x, { target: Target.FRAG });
-        const positionXZ = vec2(splitPosition.x, splitPosition.z);
-        const distanceToCenter = length(positionXZ, { target: Target.FRAG });
+    const theta = atan2(splitPosition.z, splitPosition.x, { target: Target.FRAG });
+    const positionXZ = vec2(splitPosition.x, splitPosition.z);
+    const distanceToCenter = length(positionXZ, { target: Target.FRAG });
 
-        const distanceToCenter01 = remap(
-            distanceToCenter,
-            [meanRadius - deltaRadius / 2.0, meanRadius + deltaRadius / 2.0],
-            [0.0, 1.0],
-        );
+    const distanceToCenter01 = remap(
+        distanceToCenter,
+        [meanRadius - deltaRadius / 2.0, meanRadius + deltaRadius / 2.0],
+        [0.0, 1.0],
+    );
 
-        const proceduralUvX = mul(theta, meanRadius / deltaRadius);
-        const proceduralUV = vec2(proceduralUvX, scaledUvY);
+    const proceduralUvX = mul(theta, meanRadius / deltaRadius);
+    const proceduralUV = vec2(proceduralUvX, scaledUvY);
 
-        const albedoTexture = uniformTexture2d(textures.albedo).source;
-        const normalTexture = uniformTexture2d(textures.normal).source;
-        const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
-        const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
-        const namePlate = uniformTexture2d(namePlateTexture).source;
+    const albedoTexture = uniformTexture2d(textures.albedo).source;
+    const normalTexture = uniformTexture2d(textures.normal).source;
+    const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
+    const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
+    const namePlate = uniformTexture2d(namePlateTexture).source;
 
-        const albedo = textureSample(albedoTexture, proceduralUV, {
-            convertToLinearSpace: true,
-        });
-        const normalMap = textureSample(normalTexture, proceduralUV);
-        const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
-        const occlusion = textureSample(occlusionTexture, proceduralUV);
+    const albedo = textureSample(albedoTexture, proceduralUV, {
+        convertToLinearSpace: true,
+    });
+    const normalMap = textureSample(normalTexture, proceduralUV);
+    const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
+    const occlusion = textureSample(occlusionTexture, proceduralUV);
 
-        const namePlateUvX = mul(theta, 1.0 / Math.PI);
-        const namePlateUvY = distanceToCenter01;
+    const namePlateUvX = mul(theta, 1.0 / Math.PI);
+    const namePlateUvY = distanceToCenter01;
 
-        /* if (vNormal.y < 1.0) {
+    /* if (vNormal.y < 1.0) {
             namePlateUV *= 0.0;
         } */
-        const namePlateUvMask = step(1.0, splitVec(normal).y);
-        const namePlateUV = mix(vec2(0.0, 0.0), vec2(namePlateUvX, namePlateUvY), namePlateUvMask);
+    const namePlateUvMask = step(1.0, splitVec(normal).y);
+    const namePlateUV = mix(vec2(0.0, 0.0), vec2(namePlateUvX, namePlateUvY), namePlateUvMask);
 
-        const namePlateColor = textureSample(namePlate, fract(namePlateUV));
-        const paintWeight = namePlateColor.a;
+    const namePlateColor = textureSample(namePlate, fract(namePlateUV));
+    const paintWeight = namePlateColor.a;
 
-        const finalAlbedo = mix(albedo.rgb, namePlateColor.rgb, paintWeight);
-        const finalMetallic = mix(metallicRoughness.r, 0.0, paintWeight);
-        const finalRoughness = mix(metallicRoughness.g, 0.7, paintWeight);
-        const finalAo = mix(occlusion.r, 1.0, paintWeight);
+    const finalAlbedo = mix(albedo.rgb, namePlateColor.rgb, paintWeight);
+    const finalMetallic = mix(metallicRoughness.r, 0.0, paintWeight);
+    const finalRoughness = mix(metallicRoughness.g, 0.7, paintWeight);
+    const finalAo = mix(occlusion.r, 1.0, paintWeight);
 
-        const perturbedNormal = perturbNormal(
-            proceduralUV,
-            positionW,
-            normalW,
-            normalMap.rgb,
-            sub(1, mul(paintWeight, 0.7)),
-        );
+    const perturbedNormal = perturbNormal(
+        proceduralUV,
+        positionW,
+        normalW,
+        normalMap.rgb,
+        sub(1, mul(paintWeight, 0.7)),
+    );
 
-        const view = uniformView();
-        const cameraPosition = uniformCameraPosition();
+    const view = uniformView();
+    const cameraPosition = uniformCameraPosition();
 
-        const pbrColor = pbr(finalMetallic, finalRoughness, normalW, view, cameraPosition, positionW, {
-            reflection: reflection(position, world),
-            albedoRgb: finalAlbedo,
-            ambientOcclusion: finalAo,
-            perturbedNormal: perturbedNormal.output,
-        });
+    const pbrColor = pbr(finalMetallic, finalRoughness, normalW, view, cameraPosition, positionW, {
+        reflection: reflection(position, world),
+        albedoRgb: finalAlbedo,
+        ambientOcclusion: finalAo,
+        perturbedNormal: perturbedNormal.output,
+    });
 
-        const fragOutput = outputFragColor(pbrColor.lighting);
+    const fragOutput = outputFragColor(pbrColor.lighting);
 
-        this.addOutputNode(fragOutput);
+    material.addOutputNode(fragOutput);
 
-        this.build();
-    }
+    material.build();
+
+    return material;
 }

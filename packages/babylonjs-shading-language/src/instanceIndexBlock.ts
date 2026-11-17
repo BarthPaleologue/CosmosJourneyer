@@ -34,6 +34,7 @@ import { RegisterClass } from "@babylonjs/core/Misc/typeStore";
 /**
  * Reads the instance index within the current draw without requiring instance matrix attributes.
  */
+// eslint-disable-next-line cosmos/no-class-inheritance -- Babylon RegisterClass requires a real NodeMaterialBlock subclass
 export class InstanceIndexBlock extends NodeMaterialBlock {
     public readonly output: NodeMaterialConnectionPoint;
 

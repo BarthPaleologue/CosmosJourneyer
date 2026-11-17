@@ -100,7 +100,7 @@ export async function createSaturnScene(
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(celestialBodyUberShader);
+    camera.attachPostProcess(celestialBodyUberShader.get());
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;

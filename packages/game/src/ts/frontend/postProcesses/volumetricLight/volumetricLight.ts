@@ -25,6 +25,7 @@ import type { Scene } from "@babylonjs/core/scene";
 
 import type { VolumetricLightUniforms } from "./volumetricLightUniforms";
 
+// eslint-disable-next-line cosmos/no-class-inheritance -- Babylon render pipeline drives the subclass instance (protected members, observables)
 export class VolumetricLight extends VolumetricLightScatteringPostProcess {
     constructor(
         starMesh: Mesh,

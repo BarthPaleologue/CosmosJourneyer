@@ -232,9 +232,9 @@ export async function createXrScene(
      * @param pp - Post-process to attach and update.
      */
     function setupPP(pp: CelestialBodyUberShaderPass): void {
-        scene.cameras.forEach((cam) => cam.attachPostProcess(pp));
+        scene.cameras.forEach((cam) => cam.attachPostProcess(pp.get()));
         scene.onNewCameraAddedObservable.add((cam) => {
-            cam.attachPostProcess(pp);
+            cam.attachPostProcess(pp.get());
         });
 
         scene.onBeforeRenderObservable.add(() => {

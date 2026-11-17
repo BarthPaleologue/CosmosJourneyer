@@ -111,7 +111,7 @@ export async function createRingsScene(
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(rings);
+    camera.attachPostProcess(rings.get());
 
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = scene.getEngine().getDeltaTime() / 1000;

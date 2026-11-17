@@ -68,10 +68,10 @@ export async function createBlackHoleScene(
         depthRendererManager,
         scene,
     );
-    camera.attachPostProcess(blackHolePostProcess);
+    camera.attachPostProcess(blackHolePostProcess.get());
 
     const colorCorrection = new ColorCorrection("colorCorrection", scene);
-    camera.attachPostProcess(colorCorrection);
+    camera.attachPostProcess(colorCorrection.get());
 
     camera.maxZ = 1e12;
     lookAt(defaultControls.getTransform(), blackHole.getTransform().position, scene.useRightHandedSystem);

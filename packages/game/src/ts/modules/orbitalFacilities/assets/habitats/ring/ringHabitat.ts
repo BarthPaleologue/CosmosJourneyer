@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { PointLight } from "@babylonjs/core/Lights/pointLight";
+import type { Material } from "@babylonjs/core/Materials/material";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
@@ -36,16 +37,16 @@ import type { Transformable } from "@/frontend/universe/architecture/transformab
 import type { RingHabitatModel } from "@/modules/orbitalFacilities/sections/habitats/ring";
 import { Settings } from "@/settings";
 
-import { MetalSectionMaterial } from "../../metalSectionMaterial";
-import { RingHabitatMaterial } from "./ringHabitatMaterial";
+import { createMetalSectionMaterial } from "../../metalSectionMaterial";
+import { createRingHabitatMaterial } from "./ringHabitatMaterial";
 
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
 
     private readonly radius: number;
 
-    private readonly ringMaterial: RingHabitatMaterial;
-    private readonly metalSectionMaterial: MetalSectionMaterial;
+    private readonly ringMaterial: Material;
+    private readonly metalSectionMaterial: Material;
 
     private readonly ring: Mesh;
     private ringAggregate: PhysicsAggregate | null = null;
@@ -78,7 +79,7 @@ export class RingHabitat implements Transformable {
 
         const attachmentTessellation = model.attachmentTessellation;
 
-        this.metalSectionMaterial = new MetalSectionMaterial(
+        this.metalSectionMaterial = createMetalSectionMaterial(
             "RingHabitatMetalSectionMaterial",
             textures.materials.metalPanels,
             scene,
@@ -136,7 +137,7 @@ export class RingHabitat implements Transformable {
         const tesselation = Math.ceil(circumference / deltaRadius);
         this.ring = createRing(this.radius, deltaRadius, height, tesselation, scene);
 
-        this.ringMaterial = new RingHabitatMaterial(
+        this.ringMaterial = createRingHabitatMaterial(
             this.radius,
             deltaRadius,
             yScaling * deltaRadius,

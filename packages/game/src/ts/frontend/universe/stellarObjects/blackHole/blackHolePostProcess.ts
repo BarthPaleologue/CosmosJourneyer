@@ -34,7 +34,9 @@ import type { BlackHoleUniforms } from "./blackHoleUniforms";
 
 import blackHoleFragment from "@shaders/blackhole.glsl";
 
-export class BlackHolePostProcess extends PostProcess implements UpdatablePostProcess {
+export class BlackHolePostProcess implements UpdatablePostProcess {
+    private readonly postProcess: PostProcess;
+
     private activeCamera: Camera | null = null;
 
     private readonly blackHoleUniforms: BlackHoleUniforms;
@@ -58,7 +60,7 @@ export class BlackHolePostProcess extends PostProcess implements UpdatablePostPr
 
         const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(BlackHoleSamplerNames)];
 
-        super(
+        this.postProcess = new PostProcess(
             blackHoleTransform.name,
             shaderName,
             uniforms,
@@ -74,11 +76,11 @@ export class BlackHolePostProcess extends PostProcess implements UpdatablePostPr
 
         this.blackHoleUniforms = blackHoleUniforms;
 
-        this.onActivateObservable.add((camera) => {
+        this.postProcess.onActivateObservable.add((camera) => {
             this.activeCamera = camera;
         });
 
-        this.onApplyObservable.add((effect) => {
+        this.postProcess.onApplyObservable.add((effect) => {
             if (this.activeCamera === null) {
                 throw new Error("Camera is null");
             }
@@ -98,5 +100,13 @@ export class BlackHolePostProcess extends PostProcess implements UpdatablePostPr
     public update(deltaSeconds: number): void {
         this.blackHoleUniforms.elapsedSeconds += deltaSeconds;
         this.blackHoleUniforms.elapsedSeconds %= 60 * 60;
+    }
+
+    get(): PostProcess {
+        return this.postProcess;
+    }
+
+    dispose(camera: Camera): void {
+        this.postProcess.dispose(camera);
     }
 }

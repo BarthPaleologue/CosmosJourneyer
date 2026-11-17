@@ -38,8 +38,8 @@ import type { Transformable } from "@/frontend/universe/architecture/transformab
 import type { HelixHabitatModel } from "@/modules/orbitalFacilities/sections/habitats/helix";
 import { Settings } from "@/settings";
 
-import { MetalSectionMaterial } from "../../metalSectionMaterial";
-import { HelixHabitatMaterial } from "./helixHabitatMaterial";
+import { createMetalSectionMaterial } from "../../metalSectionMaterial";
+import { createHelixHabitatMaterial } from "./helixHabitatMaterial";
 
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
@@ -53,7 +53,7 @@ export class HelixHabitat implements Transformable {
     private readonly helices: Array<AbstractMesh> = [];
     private readonly helixAggregates: Map<AbstractMesh, PhysicsAggregate> = new Map();
 
-    private readonly helixMaterial: HelixHabitatMaterial;
+    private readonly helixMaterial: Material;
     private readonly metalSectionMaterial: Material;
 
     private readonly arms: Array<Mesh> = [];
@@ -87,7 +87,7 @@ export class HelixHabitat implements Transformable {
 
         const attachmentTessellation = model.attachmentTessellation;
 
-        this.metalSectionMaterial = new MetalSectionMaterial(
+        this.metalSectionMaterial = createMetalSectionMaterial(
             "HelixHabitatMetalSectionMaterial",
             textures.materials.metalPanels,
             scene,
@@ -138,7 +138,7 @@ export class HelixHabitat implements Transformable {
             }
         }
 
-        this.helixMaterial = new HelixHabitatMaterial(
+        this.helixMaterial = createHelixHabitatMaterial(
             this.radius,
             this.deltaRadius,
             thicknessFactor,

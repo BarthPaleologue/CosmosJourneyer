@@ -51,108 +51,114 @@ import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
 import { Settings } from "@/settings";
 
-export class LandingPadMaterial extends NodeMaterial {
-    constructor(textures: PBRTextures, scene: Scene) {
-        super(`LandingPadMaterial`, scene);
-        this.mode = NodeMaterialModes.Material;
+/**
+ * Creates the node material for landing pads, with painted border and center circle.
+ * @param textures PBR texture set to sample.
+ * @param scene Scene that owns the material.
+ * @returns The built node material.
+ */
+export function createLandingPadMaterial(textures: PBRTextures, scene: Scene): NodeMaterial {
+    const material = new NodeMaterial(`LandingPadMaterial`, scene);
+    material.mode = NodeMaterialModes.Material;
 
-        // Vertex Shader
+    // Vertex Shader
 
-        const position = builtinAttribute("position");
-        const normal = builtinAttribute("normal");
-        const uv = builtinAttribute("uv");
-        const uvSplit = splitVec(uv);
+    const position = builtinAttribute("position");
+    const normal = builtinAttribute("normal");
+    const uv = builtinAttribute("uv");
+    const uvSplit = splitVec(uv);
 
-        const centeredUV = splitVec(sub(uv, 0.5));
-        const centeredUVScaled = vec2(mul(centeredUV.x, Settings.LANDING_PAD_ASPECT_RATIO), centeredUV.y);
+    const centeredUV = splitVec(sub(uv, 0.5));
+    const centeredUVScaled = vec2(mul(centeredUV.x, Settings.LANDING_PAD_ASPECT_RATIO), centeredUV.y);
 
-        const positionXZ = swizzle(position, "xz");
-        const proceduralUV = mul(positionXZ, 0.1);
+    const positionXZ = swizzle(position, "xz");
+    const proceduralUV = mul(positionXZ, 0.1);
 
-        const world = uniformWorld();
-        const positionW = transformPosition(world, position);
-        const normalW = transformDirection(world, normal);
+    const world = uniformWorld();
+    const positionW = transformPosition(world, position);
+    const normalW = transformDirection(world, normal);
 
-        const viewProjection = uniformViewProjection();
-        const positionClipSpace = transformPosition(viewProjection, positionW);
+    const viewProjection = uniformViewProjection();
+    const positionClipSpace = transformPosition(viewProjection, positionW);
 
-        const vertexOutput = outputVertexPosition(positionClipSpace);
+    const vertexOutput = outputVertexPosition(positionClipSpace);
 
-        // Fragment Shader
+    // Fragment Shader
 
-        const paintAlbedo = Vector3.One();
-        const paintMetallic = 0;
-        const paintRoughness = 0.2;
-        const paintAmbientOcclusion = 1;
+    const paintAlbedo = Vector3.One();
+    const paintMetallic = 0;
+    const paintRoughness = 0.2;
+    const paintAmbientOcclusion = 1;
 
-        const borderThickness = 0.03;
+    const borderThickness = 0.03;
 
-        const borderLeftMask = step(uvSplit.x, borderThickness);
-        const borderRightMask = step(sub(1, uvSplit.x), borderThickness);
+    const borderLeftMask = step(uvSplit.x, borderThickness);
+    const borderRightMask = step(sub(1, uvSplit.x), borderThickness);
 
-        const borderX = add(borderLeftMask, borderRightMask);
+    const borderX = add(borderLeftMask, borderRightMask);
 
-        const borderTopMask = step(uvSplit.y, borderThickness);
-        const borderBottomMask = step(sub(1, uvSplit.y), borderThickness);
+    const borderTopMask = step(uvSplit.y, borderThickness);
+    const borderBottomMask = step(sub(1, uvSplit.y), borderThickness);
 
-        const borderY = add(borderTopMask, borderBottomMask);
+    const borderY = add(borderTopMask, borderBottomMask);
 
-        const borderWeight = min(add(borderX, borderY), 1);
+    const borderWeight = min(add(borderX, borderY), 1);
 
-        const circleRadius = 0.25;
-        const circleThickness = 0.01;
-        const distToCenter = length(centeredUVScaled);
+    const circleRadius = 0.25;
+    const circleThickness = 0.01;
+    const distToCenter = length(centeredUVScaled);
 
-        const circleMinRadius = sub(circleRadius, circleThickness);
-        const circleMaxRadius = add(circleRadius, circleThickness);
-        const smoothness = 0.005;
+    const circleMinRadius = sub(circleRadius, circleThickness);
+    const circleMaxRadius = add(circleRadius, circleThickness);
+    const smoothness = 0.005;
 
-        const circleMask = mul(
-            smoothstep(circleMinRadius, add(circleMinRadius, smoothness), distToCenter),
-            sub(1, smoothstep(sub(circleMaxRadius, smoothness), circleMaxRadius, distToCenter)),
-        );
+    const circleMask = mul(
+        smoothstep(circleMinRadius, add(circleMinRadius, smoothness), distToCenter),
+        sub(1, smoothstep(sub(circleMaxRadius, smoothness), circleMaxRadius, distToCenter)),
+    );
 
-        const fullPaintWeight = add(borderWeight, circleMask);
+    const fullPaintWeight = add(borderWeight, circleMask);
 
-        const albedoTexture = uniformTexture2d(textures.albedo).source;
-        const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
-        const normalTexture = uniformTexture2d(textures.normal).source;
-        const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
+    const albedoTexture = uniformTexture2d(textures.albedo).source;
+    const metallicRoughnessTexture = uniformTexture2d(textures.metallicRoughness).source;
+    const normalTexture = uniformTexture2d(textures.normal).source;
+    const occlusionTexture = uniformTexture2d(textures.ambientOcclusion).source;
 
-        const albedo = textureSample(albedoTexture, proceduralUV, {
-            convertToLinearSpace: true,
-        });
-        const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
-        const normalMapValue = textureSample(normalTexture, proceduralUV);
-        const ambientOcclusion = textureSample(occlusionTexture, proceduralUV);
+    const albedo = textureSample(albedoTexture, proceduralUV, {
+        convertToLinearSpace: true,
+    });
+    const metallicRoughness = textureSample(metallicRoughnessTexture, proceduralUV);
+    const normalMapValue = textureSample(normalTexture, proceduralUV);
+    const ambientOcclusion = textureSample(occlusionTexture, proceduralUV);
 
-        const finalAlbedo = mix(albedo.rgb, paintAlbedo, fullPaintWeight);
-        const finalMetallic = mix(metallicRoughness.r, paintMetallic, fullPaintWeight);
-        const finalRoughness = mix(metallicRoughness.g, paintRoughness, fullPaintWeight);
-        const finalAmbientOcclusion = mix(ambientOcclusion.r, paintAmbientOcclusion, fullPaintWeight);
+    const finalAlbedo = mix(albedo.rgb, paintAlbedo, fullPaintWeight);
+    const finalMetallic = mix(metallicRoughness.r, paintMetallic, fullPaintWeight);
+    const finalRoughness = mix(metallicRoughness.g, paintRoughness, fullPaintWeight);
+    const finalAmbientOcclusion = mix(ambientOcclusion.r, paintAmbientOcclusion, fullPaintWeight);
 
-        const perturbedNormal = perturbNormal(
-            proceduralUV,
-            positionW,
-            normalW,
-            normalMapValue.rgb,
-            sub(1, mul(fullPaintWeight, 0.8)),
-        );
+    const perturbedNormal = perturbNormal(
+        proceduralUV,
+        positionW,
+        normalW,
+        normalMapValue.rgb,
+        sub(1, mul(fullPaintWeight, 0.8)),
+    );
 
-        const view = uniformView();
-        const cameraPosition = uniformCameraPosition();
+    const view = uniformView();
+    const cameraPosition = uniformCameraPosition();
 
-        const pbrLighting = pbr(finalMetallic, finalRoughness, normalW, view, cameraPosition, positionW, {
-            reflection: reflection(position, world),
-            albedoRgb: finalAlbedo,
-            ambientOcclusion: finalAmbientOcclusion,
-            perturbedNormal: perturbedNormal.output,
-        });
+    const pbrLighting = pbr(finalMetallic, finalRoughness, normalW, view, cameraPosition, positionW, {
+        reflection: reflection(position, world),
+        albedoRgb: finalAlbedo,
+        ambientOcclusion: finalAmbientOcclusion,
+        perturbedNormal: perturbedNormal.output,
+    });
 
-        const fragOutput = outputFragColor(pbrLighting.lighting);
+    const fragOutput = outputFragColor(pbrLighting.lighting);
 
-        this.addOutputNode(vertexOutput);
-        this.addOutputNode(fragOutput);
-        this.build();
-    }
+    material.addOutputNode(vertexOutput);
+    material.addOutputNode(fragOutput);
+    material.build();
+
+    return material;
 }

@@ -43,7 +43,8 @@ const GasPlanetMaterialUniformNames = {
     COLOR_SHARPNESS: "colorSharpness",
 } as const;
 
-export class GasPlanetProceduralMaterial extends ShaderMaterial {
+export class GasPlanetProceduralMaterial {
+    private readonly material: ShaderMaterial;
     private elapsedSeconds = 0;
 
     constructor(
@@ -60,21 +61,21 @@ export class GasPlanetProceduralMaterial extends ShaderMaterial {
             Effect.ShadersStore[`${shaderName}VertexShader`] = surfaceMaterialVertex;
         }
 
-        super(`${planetName}GasSurfaceColor`, scene, shaderName, {
+        this.material = new ShaderMaterial(`${planetName}GasSurfaceColor`, scene, shaderName, {
             attributes: ["position", "normal"],
             uniforms: [...Object.values(GasPlanetMaterialUniformNames), ...Object.values(StellarObjectUniformNames)],
         });
 
-        this.setFloat(GasPlanetMaterialUniformNames.SEED, seed);
+        this.material.setFloat(GasPlanetMaterialUniformNames.SEED, seed);
 
-        this.setColor3(GasPlanetMaterialUniformNames.COLOR1, colorPalette.color1);
-        this.setColor3(GasPlanetMaterialUniformNames.COLOR2, colorPalette.color2);
-        this.setColor3(GasPlanetMaterialUniformNames.COLOR3, colorPalette.color3);
+        this.material.setColor3(GasPlanetMaterialUniformNames.COLOR1, colorPalette.color1);
+        this.material.setColor3(GasPlanetMaterialUniformNames.COLOR2, colorPalette.color2);
+        this.material.setColor3(GasPlanetMaterialUniformNames.COLOR3, colorPalette.color3);
 
-        this.setFloat(GasPlanetMaterialUniformNames.COLOR_SHARPNESS, colorPalette.colorSharpness);
+        this.material.setFloat(GasPlanetMaterialUniformNames.COLOR_SHARPNESS, colorPalette.colorSharpness);
 
         const tempCameraPosition = new Vector3();
-        this.onBindObservable.add((mesh) => {
+        this.material.onBindObservable.add((mesh) => {
             const activeCamera = mesh.getScene().activeCamera;
             if (activeCamera === null) {
                 console.warn("No active camera in the scene");
@@ -82,29 +83,31 @@ export class GasPlanetProceduralMaterial extends ShaderMaterial {
             }
 
             const floatingOriginEnabled = scene.floatingOriginMode;
-            this.getEffect().setVector3(
-                GasPlanetMaterialUniformNames.CAMERA_POSITION,
-                floatingOriginEnabled
-                    ? Vector3.ZeroReadOnly
-                    : activeCamera.getWorldMatrix().getTranslationToRef(tempCameraPosition),
-            );
+            this.material
+                .getEffect()
+                .setVector3(
+                    GasPlanetMaterialUniformNames.CAMERA_POSITION,
+                    floatingOriginEnabled
+                        ? Vector3.ZeroReadOnly
+                        : activeCamera.getWorldMatrix().getTranslationToRef(tempCameraPosition),
+                );
         });
     }
 
     public update(stellarObjects: ReadonlyArray<DirectionalLight>, deltaSeconds: number): void {
         this.elapsedSeconds += deltaSeconds;
 
-        this.onBindObservable.addOnce(() => {
-            setStellarObjectUniforms(this.getEffect(), stellarObjects);
-            this.getEffect().setFloat(GasPlanetMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
+        this.material.onBindObservable.addOnce(() => {
+            setStellarObjectUniforms(this.material.getEffect(), stellarObjects);
+            this.material.getEffect().setFloat(GasPlanetMaterialUniformNames.TIME, this.elapsedSeconds % 100000);
         });
     }
 
-    public override dispose(
-        forceDisposeEffect?: boolean,
-        forceDisposeTextures?: boolean,
-        notBoundToMesh?: boolean,
-    ): void {
-        super.dispose(forceDisposeEffect, forceDisposeTextures, notBoundToMesh);
+    get(): ShaderMaterial {
+        return this.material;
+    }
+
+    dispose(): void {
+        this.material.dispose();
     }
 }

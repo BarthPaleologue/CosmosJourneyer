@@ -28,7 +28,6 @@ import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugi
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
 
-import type { SolarPanelMaterial } from "@/frontend/assets/procedural/solarPanel/solarPanelMaterial";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 
@@ -36,7 +35,7 @@ import type { SolarSectionModel } from "@/modules/orbitalFacilities/sections/sol
 import type { StationSection } from "@/modules/orbitalFacilities/stationSection";
 import { Settings } from "@/settings";
 
-import { MetalSectionMaterial } from "./metalSectionMaterial";
+import { createMetalSectionMaterial } from "./metalSectionMaterial";
 
 export class SolarSection implements StationSection {
     private readonly attachment: Mesh;
@@ -83,7 +82,7 @@ export class SolarSection implements StationSection {
         );
         this.attachment.convertToFlatShadedMesh();
 
-        this.metalSectionMaterial = new MetalSectionMaterial(
+        this.metalSectionMaterial = createMetalSectionMaterial(
             "SolarSectionMetalMaterial",
             assets.textures.materials.metalPanels,
             scene,
@@ -238,7 +237,7 @@ export class SolarSection implements StationSection {
         armRadius: number,
         armTessellation: number,
         requiredSurface: number,
-        solarPanelMaterial: SolarPanelMaterial,
+        solarPanelMaterial: Material,
     ): void {
         const scene = this.getTransform().getScene();
         const halfRequiredSurface = requiredSurface / 2;
@@ -276,7 +275,7 @@ export class SolarSection implements StationSection {
     private generateStarPattern(
         armCount: number,
         requiredSurface: number,
-        solarPanelMaterial: SolarPanelMaterial,
+        solarPanelMaterial: Material,
     ): { position: Vector3; rotation: Quaternion }[] {
         const scene = this.getTransform().getScene();
 

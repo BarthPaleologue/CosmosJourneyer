@@ -34,7 +34,7 @@ import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
 
 import type { StationSection } from "@/modules/orbitalFacilities/stationSection";
 
-import { MetalSectionMaterial } from "./metalSectionMaterial";
+import { createMetalSectionMaterial } from "./metalSectionMaterial";
 
 export class EngineBay implements StationSection {
     private readonly root: TransformNode;
@@ -67,7 +67,7 @@ export class EngineBay implements StationSection {
         );
         this.skirt.convertToFlatShadedMesh();
 
-        this.skirtMaterial = new MetalSectionMaterial(
+        this.skirtMaterial = createMetalSectionMaterial(
             "EngineBayMetalSectionMaterial",
             assets.textures.materials.metalPanels,
             scene,

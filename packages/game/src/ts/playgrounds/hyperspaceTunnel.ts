@@ -52,7 +52,7 @@ export async function createHyperspaceTunnelDemo(
     const hyperSpaceTunnel = new HyperSpaceTunnel(Axis.Z, scene, textures);
 
     const colorCorrection = new ColorCorrection("colorCorrection", scene);
-    camera.attachPostProcess(colorCorrection);
+    camera.attachPostProcess(colorCorrection.get());
 
     scene.onBeforeRenderObservable.add(() => {
         defaultControls.update(engine.getDeltaTime() / 1000);
