@@ -18,11 +18,6 @@
 import { getBlackBodyLuminosity } from "../thermodynamics";
 
 /**
- * The astronomical unit in meters.
- */
-export const AU = 150e9;
-
-/**
  * The mass of the Earth in kilograms.
  */
 export const EarthMass = 5.972e24;
