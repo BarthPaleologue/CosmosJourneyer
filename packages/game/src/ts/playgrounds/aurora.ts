@@ -18,13 +18,7 @@
 import { CreateIcoSphere, DirectionalLight, Quaternion, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-import {
-    astronomicalUnitToMeters,
-    degreesToRadians,
-    EarthMagneticDipoleMoment,
-    SolarMass,
-    SolarRadius,
-} from "@cosmos-journeyer/physics";
+import { astronomicalUnitToMeters, EarthMagneticDipoleMoment, SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
 import type { MagneticFieldModel } from "@cosmos-journeyer/universe-model";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
