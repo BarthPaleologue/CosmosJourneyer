@@ -21,6 +21,7 @@ import { Animation } from "@babylonjs/core/Animations/animation";
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Material } from "@babylonjs/core/Materials/material";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import type { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
@@ -37,11 +38,14 @@ import { getRgbFromTemperature } from "@/utils/specrend";
 
 import { Settings } from "@/settings";
 
-import type { ParticleTextures } from "../assets/textures/particles";
 import { StarSectorView, vector3ToString } from "./starSectorView";
 import type { BuildData } from "./starSectorView";
 
-export type StarMapTextures = Pick<ParticleTextures, "starSprite" | "blackHoleSprite">;
+/** Sprite textures required to render star systems and black holes on the star map. */
+export type StarMapTextures = {
+    starSprite: Texture;
+    blackHoleSprite: Texture;
+};
 
 export class StarMap {
     private readonly scene: Scene;
