@@ -141,7 +141,7 @@ export function generateSpaceStationModel(
             orbit.semiMajorAxis,
         );
     } else {
-        const distancesToStellarObjects = getDistancesToStellarObjects(parentBody, systemModel);
+        const distancesToStellarObjects = getDistancesToStellarObjects(parentBody.orbit, systemModel);
 
         for (const [model, distance] of distancesToStellarObjects) {
             totalIrradiance += getSphereIrradianceAtDistance(

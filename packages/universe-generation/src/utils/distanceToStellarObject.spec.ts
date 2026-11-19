@@ -110,8 +110,8 @@ describe("distanceToStellarObject", () => {
         if (planet === undefined) {
             throw new Error("Planet is undefined");
         }
-        const object = { orbit: { ...planet.orbit, parentIds: [planet.id], semiMajorAxis: ScaledEarthRadius * 30 } };
-        const distances = getDistancesToStellarObjects(object, systemModel);
+        const orbit = { ...planet.orbit, parentIds: [planet.id], semiMajorAxis: ScaledEarthRadius * 30 };
+        const distances = getDistancesToStellarObjects(orbit, systemModel);
         expect(distances.size).toBe(1);
         expect(distances.get(systemModel.stellarObjects[0])).toBe(planet.orbit.semiMajorAxis);
     });

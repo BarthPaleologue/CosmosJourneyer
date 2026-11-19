@@ -175,7 +175,7 @@ export function generateSpaceElevatorModel(
         sections.push(generateUtilitySectionModel(SeedHalfRange * rng(132 + 10 * sections.length)));
     }
 
-    const distancesToStellarObjects = getDistancesToStellarObjects(parentBody, systemModel);
+    const distancesToStellarObjects = getDistancesToStellarObjects(parentBody.orbit, systemModel);
 
     let totalIrradiance = 0;
     for (const [model, distance] of distancesToStellarObjects) {
