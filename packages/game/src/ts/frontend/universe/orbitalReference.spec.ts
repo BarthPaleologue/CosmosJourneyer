@@ -20,6 +20,7 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 import { astronomicalUnitToMeters, SolarMass } from "@cosmos-journeyer/physics";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     generateJuliaSetModel,
     generateMandelboxModel,
@@ -27,6 +28,7 @@ import {
     generateMengerSpongeModel,
     generateSierpinskiPyramidModel,
 } from "@cosmos-journeyer/universe-generation";
+import type { Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { getChronosModel } from "@/modules/chronos/chronos";
@@ -38,7 +40,12 @@ import { KeplerianOrbitalSimulation } from "./keplerianOrbitalSimulation";
 import type { KeplerianObject } from "./keplerianOrbitalSimulation";
 import { getMostInfluentialObject, getNavigationReferenceFrame } from "./orbitalReference";
 
-type KeplerianObjectSummary = Pick<KeplerianObject, "id" | "mass" | "orbit" | "spin">;
+type KeplerianObjectSummary = {
+    readonly id: string;
+    readonly mass: number;
+    readonly orbit: DeepReadonly<Orbit>;
+    readonly spin: DeepReadonly<SpinModel>;
+};
 
 describe("orbital reference selection", () => {
     let engine: NullEngine;
