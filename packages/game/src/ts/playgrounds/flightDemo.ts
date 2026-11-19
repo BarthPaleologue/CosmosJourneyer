@@ -82,7 +82,11 @@ export async function createFlightDemoScene(
     const matrixBuffer = new Float32Array(instanceCount * 16);
     for (let i = 0; i < instanceCount; i++) {
         matrixBuffer.set(
-            Matrix.Translation(randRange(-range, range), randRange(-range, range), randRange(-range, range)).m,
+            Matrix.Translation(
+                randRange(-range, range, Math.random, 0),
+                randRange(-range, range, Math.random, 0),
+                randRange(-range, range, Math.random, 0),
+            ).m,
             i * 16,
         );
     }
