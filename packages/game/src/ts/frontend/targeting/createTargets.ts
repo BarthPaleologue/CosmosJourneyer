@@ -17,9 +17,10 @@
 
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { getStellarTypeFromTemperature } from "@cosmos-journeyer/physics";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
+import type { OrbitalObjectId, StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
 
-import type { Mission } from "../missions/mission";
 import type { Spaceship } from "../spaceship/spaceship";
 import type { SystemEntity } from "../systemEntity/systemEntity";
 import type { Anomaly, OrbitalObject } from "../universe/architecture/orbitalObject";
@@ -32,11 +33,17 @@ import type { Target, PadTarget } from "./target";
 
 export type SystemEntityTargetFactory = (entity: SystemEntity) => Array<Target>;
 
-type MissionGuidanceSource = Pick<Mission, "getGuidanceTargetObjectIds">;
+/** Consumer-side contract for missions supplying guidance target identifiers; `Mission` implements it. */
+interface MissionGuidanceSource {
+    getGuidanceTargetObjectIds(): Array<UniverseObjectId>;
+}
 
-type MissionGuidanceStarSystem = Pick<StarSystemController, "getOrbitalObjectById" | "getSystemEntities"> & {
-    readonly model: Pick<StarSystemController["model"], "coordinates">;
-};
+/** Consumer-side contract for the star system used to resolve guidance targets; callers adapt `StarSystemController` to it. */
+interface MissionGuidanceStarSystem {
+    readonly coordinates: DeepReadonly<StarSystemCoordinates>;
+    getOrbitalObjectById(id: OrbitalObjectId): OrbitalObject | undefined;
+    getSystemEntities(): ReadonlyArray<SystemEntity>;
+}
 
 /**
  * Collects targetable bodies, entities, and system-defined targets.
@@ -191,7 +198,7 @@ export function getMissionKnownTargets(
 ): Array<Target> {
     const relevantObjectIds = missions
         .flatMap((mission) => mission.getGuidanceTargetObjectIds())
-        .filter((objectId) => starSystemCoordinatesEquals(objectId.systemCoordinates, starSystem.model.coordinates));
+        .filter((objectId) => starSystemCoordinatesEquals(objectId.systemCoordinates, starSystem.coordinates));
 
     return relevantObjectIds.flatMap((objectId) => {
         const body = starSystem.getOrbitalObjectById(objectId.idInSystem);
