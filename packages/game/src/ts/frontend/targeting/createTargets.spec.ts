@@ -56,7 +56,7 @@ describe("mission guidance targets", () => {
         ];
         const factory = vi.fn(() => targets);
         const system = {
-            model: starSystem,
+            coordinates: starSystem.coordinates,
             getOrbitalObjectById: vi.fn<() => OrbitalObject | undefined>(() => undefined),
             getSystemEntities: () => [entity],
         };

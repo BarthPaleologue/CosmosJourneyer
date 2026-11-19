@@ -90,9 +90,11 @@ export function generateSpaceStationModel(
         parentIds: [parentBody.id],
         semiMajorAxis: orbitRadius,
         p: 2,
-        inclination: degreesToRadians(normalRandom(0, 10, rng, GenerationSteps.ORBIT + 10)),
+        plane: {
+            inclination: degreesToRadians(normalRandom(0, 10, rng, GenerationSteps.ORBIT + 10)),
+            longitudeOfAscendingNode: 0,
+        },
         eccentricity: 0,
-        longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
         initialMeanAnomaly: 0,
     };
@@ -141,7 +143,7 @@ export function generateSpaceStationModel(
             orbit.semiMajorAxis,
         );
     } else {
-        const distancesToStellarObjects = getDistancesToStellarObjects(parentBody, systemModel);
+        const distancesToStellarObjects = getDistancesToStellarObjects(parentBody.orbit, systemModel);
 
         for (const [model, distance] of distancesToStellarObjects) {
             totalIrradiance += getSphereIrradianceAtDistance(

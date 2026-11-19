@@ -19,7 +19,20 @@ import type { TFunction } from "i18next";
 
 import { renderMarkdownInline } from "@/utils/markdown";
 
-type OriginLocation = Pick<Location, "hostname" | "protocol">;
+/** Origin identifying data, decoupled from the DOM's Location. */
+type OriginLocation = {
+    readonly hostname: string;
+    readonly protocol: string;
+};
+
+/**
+ * Casts the DOM location to the origin contract used by the official-origin checks.
+ * @param location - Browser location to convert.
+ * @returns The origin data extracted from the location.
+ */
+function toOriginLocation(location: Location): OriginLocation {
+    return { hostname: location.hostname, protocol: location.protocol };
+}
 
 /**
  * Checks whether the game is running from its official host or a local app origin.
@@ -44,7 +57,7 @@ export function isOfficialGameLocation(location: OriginLocation): boolean {
  */
 export function createOfficialOriginNotice(
     t: TFunction,
-    location: OriginLocation = window.location,
+    location: OriginLocation = toOriginLocation(window.location),
 ): HTMLElement | null {
     if (isOfficialGameLocation(location)) {
         return null;

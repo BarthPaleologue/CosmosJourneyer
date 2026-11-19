@@ -17,34 +17,32 @@
 
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getObjectModelById } from "@cosmos-journeyer/universe-model";
-import type { OrbitalObjectModel, StellarObjectModel, StarSystemModel } from "@cosmos-journeyer/universe-model";
-
-type OrbitingObject = Pick<OrbitalObjectModel, "orbit">;
+import type { Orbit, StellarObjectModel, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 /**
- * Collects distances from an orbital object to each stellar ancestor in its parent chain.
- * @param object Orbital object whose ancestor distances are requested.
- * @param systemModel Star system containing the object and its parent hierarchy.
- * @returns Distances keyed by the stellar objects that parent the orbital object.
+ * Collects distances from an orbit to each stellar ancestor in its parent chain.
+ * @param orbit Orbit whose ancestor distances are requested.
+ * @param systemModel Star system containing the parent hierarchy.
+ * @returns Distances keyed by the stellar objects that parent the orbit.
  */
 export function getDistancesToStellarObjects(
-    object: DeepReadonly<OrbitingObject>,
+    orbit: DeepReadonly<Orbit>,
     systemModel: DeepReadonly<StarSystemModel>,
 ): DeepReadonly<Map<StellarObjectModel, number>> {
     const distances: Map<DeepReadonly<StellarObjectModel>, number> = new Map();
 
-    for (const parentId of object.orbit.parentIds) {
+    for (const parentId of orbit.parentIds) {
         const parent = getObjectModelById(parentId, systemModel);
         if (parent === null) {
             continue;
         }
 
         if (parent.type === "star" || parent.type === "neutronStar" || parent.type === "blackHole") {
-            distances.set(parent, object.orbit.semiMajorAxis);
+            distances.set(parent, orbit.semiMajorAxis);
             continue;
         }
 
-        const parentDistances = getDistancesToStellarObjects(parent, systemModel);
+        const parentDistances = getDistancesToStellarObjects(parent.orbit, systemModel);
         for (const [stellarObject, distance] of parentDistances) {
             distances.set(stellarObject, distance);
         }

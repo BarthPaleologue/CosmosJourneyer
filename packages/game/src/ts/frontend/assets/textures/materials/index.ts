@@ -49,6 +49,10 @@ export type PBRTextures = {
     ambientOcclusion: Texture;
 };
 
+export type TreeTextures = {
+    albedo: Texture;
+};
+
 export type AllMaterialTextures = {
     foil: FoilTextures;
     solarPanel: SolarPanelTextures;
@@ -58,7 +62,7 @@ export type AllMaterialTextures = {
     crate: CrateTextures;
     tire: TireTextures;
     styroFoam: StyroFoamTextures;
-    tree: Pick<PBRTextures, "albedo">;
+    tree: TreeTextures;
 };
 
 /**

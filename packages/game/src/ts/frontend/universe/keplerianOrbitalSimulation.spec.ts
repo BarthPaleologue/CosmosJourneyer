@@ -62,8 +62,10 @@ function createTestOrbitalObject(
             argumentOfPeriapsis: 0,
             semiMajorAxis,
             initialMeanAnomaly: 0,
-            longitudeOfAscendingNode: 0,
-            inclination: 0,
+            plane: {
+                inclination: 0,
+                longitudeOfAscendingNode: 0,
+            },
             eccentricity: 0,
             p: 2,
         },

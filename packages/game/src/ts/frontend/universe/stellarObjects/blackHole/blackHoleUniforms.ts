@@ -71,7 +71,7 @@ export class BlackHoleUniforms {
         this.innerDiskColor = new Color3(2.0, 1.2, 0.6);
         this.outerDiskColor = this.innerDiskColor.scale(0.7);
 
-        computeSpinAxisOrientation(blackHoleModel.orbit, blackHoleModel.spin).toRotationMatrix(this.diskRotation);
+        computeSpinAxisOrientation(blackHoleModel.orbit.plane, blackHoleModel.spin).toRotationMatrix(this.diskRotation);
         this.diskRotation.transposeToRef(this.inverseDiskRotation);
     }
 

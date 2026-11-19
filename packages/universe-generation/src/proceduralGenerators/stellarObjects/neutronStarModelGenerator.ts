@@ -63,8 +63,10 @@ export function generateNeutronStarModel(
         semiMajorAxis: parentBodies.length > 0 ? orbitRadius : 0,
         eccentricity: 0,
         p: 2,
-        inclination: 0,
-        longitudeOfAscendingNode: 0,
+        plane: {
+            inclination: 0,
+            longitudeOfAscendingNode: 0,
+        },
         argumentOfPeriapsis: 0,
         initialMeanAnomaly: 0,
     };

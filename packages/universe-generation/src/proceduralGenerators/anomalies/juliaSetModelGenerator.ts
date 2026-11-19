@@ -57,9 +57,11 @@ export function generateJuliaSetModel(
         parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: orbitalP,
-        inclination: degreesToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
+        plane: {
+            inclination: degreesToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
+            longitudeOfAscendingNode: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 320),
+        },
         eccentricity: randRange(0.1, 0.9, rng, GenerationSteps.ORBIT + 240),
-        longitudeOfAscendingNode: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 320),
         argumentOfPeriapsis: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400),
         initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480),
     };

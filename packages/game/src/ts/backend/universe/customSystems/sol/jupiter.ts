@@ -44,8 +44,10 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
             parentIds: [...parentIds],
             semiMajorAxis: 778_547_200e3,
             eccentricity: 0.0934,
-            inclination: degreesToRadians(1.85),
-            longitudeOfAscendingNode: degreesToRadians(49.558),
+            plane: {
+                inclination: degreesToRadians(1.85),
+                longitudeOfAscendingNode: degreesToRadians(49.558),
+            },
             argumentOfPeriapsis: degreesToRadians(286.502),
             initialMeanAnomaly: 0,
             p: 2,

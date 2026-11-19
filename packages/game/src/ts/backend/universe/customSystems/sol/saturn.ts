@@ -44,8 +44,10 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
             parentIds: [...parentIds],
             semiMajorAxis: 1_433_449_370e3,
             eccentricity: 0.0565,
-            inclination: degreesToRadians(2.49),
-            longitudeOfAscendingNode: degreesToRadians(113.715),
+            plane: {
+                inclination: degreesToRadians(2.49),
+                longitudeOfAscendingNode: degreesToRadians(113.715),
+            },
             argumentOfPeriapsis: degreesToRadians(336.092),
             initialMeanAnomaly: 0,
             p: 2,

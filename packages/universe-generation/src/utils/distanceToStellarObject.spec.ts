@@ -44,9 +44,11 @@ describe("distanceToStellarObject", () => {
                     semiMajorAxis: 0,
                     parentIds: [],
                     argumentOfPeriapsis: 0,
-                    inclination: 0,
+                    plane: {
+                        inclination: 0,
+                        longitudeOfAscendingNode: 0,
+                    },
                     initialMeanAnomaly: 0,
-                    longitudeOfAscendingNode: 0,
                     eccentricity: 0,
                 },
                 spin: {
@@ -72,9 +74,11 @@ describe("distanceToStellarObject", () => {
                     semiMajorAxis: astronomicalUnitToMeters(1),
                     parentIds: ["star"],
                     argumentOfPeriapsis: 0,
-                    inclination: 0,
+                    plane: {
+                        inclination: 0,
+                        longitudeOfAscendingNode: 0,
+                    },
                     initialMeanAnomaly: 0,
-                    longitudeOfAscendingNode: 0,
                     eccentricity: 0,
                 },
                 spin: {
@@ -110,8 +114,8 @@ describe("distanceToStellarObject", () => {
         if (planet === undefined) {
             throw new Error("Planet is undefined");
         }
-        const object = { orbit: { ...planet.orbit, parentIds: [planet.id], semiMajorAxis: ScaledEarthRadius * 30 } };
-        const distances = getDistancesToStellarObjects(object, systemModel);
+        const orbit = { ...planet.orbit, parentIds: [planet.id], semiMajorAxis: ScaledEarthRadius * 30 };
+        const distances = getDistancesToStellarObjects(orbit, systemModel);
         expect(distances.size).toBe(1);
         expect(distances.get(systemModel.stellarObjects[0])).toBe(planet.orbit.semiMajorAxis);
     });

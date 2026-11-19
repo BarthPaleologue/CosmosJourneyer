@@ -16,9 +16,13 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import type { PhysicsMassProperties } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 
-export type AngularMassProperties = Required<Omit<PhysicsMassProperties, "centerOfMass">>;
+/** Mass and principal inertia properties required to compute attitude torque, without center of mass. */
+export type AngularMassProperties = {
+    mass: number;
+    inertia: Vector3;
+    inertiaOrientation: Quaternion;
+};
 
 export class AttitudePDController {
     /**

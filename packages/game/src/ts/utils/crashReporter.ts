@@ -24,14 +24,6 @@ import packageJson from "../../../package.json";
 import type { ConsoleDumper, LogEntry } from "./consoleDumper";
 import { downloadTextFile } from "./download";
 
-type CrashReport = {
-    version: string;
-    timestamp: string;
-    source: CrashSourceType;
-    error: SerializedError;
-    logs: Array<LogEntry>;
-};
-
 type CrashSourceType = "startup" | "window-error" | "unhandled-rejection";
 
 type SerializedError = {
@@ -42,6 +34,19 @@ type SerializedError = {
     filename?: string;
     lineno?: number;
     colno?: number;
+};
+
+/** Serialized origin and error of a crash, as embedded in a crash report. */
+type SerializedCrashSource = {
+    source: CrashSourceType;
+    error: SerializedError;
+};
+
+type CrashReport = {
+    version: string;
+    timestamp: string;
+    logs: Array<LogEntry>;
+    crashSource: SerializedCrashSource;
 };
 
 type CrashSource =
@@ -96,15 +101,14 @@ export class CrashReporter {
         const report: CrashReport = {
             version: packageJson.version,
             timestamp: new Date().toISOString(),
-            source: serializedCrashSource.source,
-            error: serializedCrashSource.error,
             logs,
+            crashSource: serializedCrashSource,
         };
 
         await this.downloadReport(report);
     }
 
-    private serializeCrashSource(crashSource: CrashSource): Pick<CrashReport, "source" | "error"> {
+    private serializeCrashSource(crashSource: CrashSource): SerializedCrashSource {
         switch (crashSource.type) {
             case "startup":
                 return {

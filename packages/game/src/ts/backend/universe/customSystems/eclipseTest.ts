@@ -39,11 +39,11 @@ export function getEclipseTestSystemModel(): StarSystemModel {
     const star = generateStarModel("star0", 420, "Star", []);
 
     const planet = generateTelluricPlanetModel("planet", 12, "Planet", [star]);
-    planet.orbit.inclination = 0;
+    planet.orbit.plane.inclination = 0;
     planet.orbit.initialMeanAnomaly = 0;
 
     const moon = generateTelluricSatelliteModel("moon", 6, "Moon", [planet], [star]);
-    moon.orbit.inclination = 0;
+    moon.orbit.plane.inclination = 0;
     moon.orbit.initialMeanAnomaly = Math.PI;
 
     return {
