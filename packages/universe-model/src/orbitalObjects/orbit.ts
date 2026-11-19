@@ -20,6 +20,25 @@ import { z } from "zod";
 import { OrbitalObjectIdSchema } from "./orbitalObjectId";
 
 /**
+ * Orientation of the orbital plane with respect to the reference plane.
+ * @see https://en.wikipedia.org/wiki/Orbital_elements
+ */
+export const OrbitalPlaneSchema = z.object({
+    /**
+     * Vertical tilt of the ellipse with respect to the reference plane, measured at the ascending node
+     */
+    inclination: z.number().default(0),
+
+    /**
+     * horizontally orients the ascending node of the ellipse (where the orbit passes from south to north through the reference plane)
+     * with respect to the reference frame's vernal point.
+     */
+    longitudeOfAscendingNode: z.number().default(0),
+});
+
+export type OrbitalPlane = z.infer<typeof OrbitalPlaneSchema>;
+
+/**
  * Represents an orbit in the p-norm space. (Euclidean space for p=2)
  * @see https://en.wikipedia.org/wiki/Orbital_elements
  */
@@ -40,15 +59,9 @@ export const OrbitSchema = z.object({
     eccentricity: z.number().default(0),
 
     /**
-     * Vertical tilt of the ellipse with respect to the reference plane, measured at the ascending node
+     * Orientation of the orbital plane with respect to the reference plane
      */
-    inclination: z.number().default(0),
-
-    /**
-     * horizontally orients the ascending node of the ellipse (where the orbit passes from south to north through the reference plane)
-     * with respect to the reference frame's vernal point.
-     */
-    longitudeOfAscendingNode: z.number().default(0),
+    plane: OrbitalPlaneSchema,
 
     /**
      * Defines the orientation of the ellipse in the orbital plane, as an angle measured from the ascending node to the periapsis

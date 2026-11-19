@@ -2,11 +2,9 @@ import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { computeLpFactor, getOrbitalPeriod, keplerEquation } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
-import type { Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
+import type { Orbit, OrbitalPlane, SpinModel } from "@cosmos-journeyer/universe-model";
 
 import { findMinimumNewtonRaphson } from "@/utils/math";
-
-type OrbitalPlane = DeepReadonly<Pick<Orbit, "inclination" | "longitudeOfAscendingNode">>;
 
 /**
  * Evaluates an Lp-shaped Keplerian orbit in its parent-centered frame at the given time.
@@ -38,8 +36,8 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
     point.scaleInPlace(LpFactor);
 
     const argumentOfPeriapsisTransform = Matrix.RotationAxis(Axis.Y, orbit.argumentOfPeriapsis);
-    const inclinationTransform = Matrix.RotationAxis(Axis.Z, orbit.inclination);
-    const longitudeOfAscendingNodeTransform = Matrix.RotationAxis(Axis.Y, orbit.longitudeOfAscendingNode);
+    const inclinationTransform = Matrix.RotationAxis(Axis.Z, orbit.plane.inclination);
+    const longitudeOfAscendingNodeTransform = Matrix.RotationAxis(Axis.Y, orbit.plane.longitudeOfAscendingNode);
 
     Vector3.TransformCoordinatesToRef(point, argumentOfPeriapsisTransform, point);
 
@@ -58,7 +56,7 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
  * @returns The absolute body orientation quaternion.
  */
 export function computeAbsoluteOrientation(
-    orbitalPlane: OrbitalPlane,
+    orbitalPlane: DeepReadonly<OrbitalPlane>,
     spin: DeepReadonly<SpinModel>,
     elapsedSeconds: number,
 ): Quaternion {
@@ -78,7 +76,10 @@ export function computeAbsoluteOrientation(
  * @param spin - Axial tilt, axis azimuth, and sidereal rotation parameters.
  * @returns The absolute spin-axis orientation quaternion.
  */
-export function computeSpinAxisOrientation(orbitalPlane: OrbitalPlane, spin: DeepReadonly<SpinModel>): Quaternion {
+export function computeSpinAxisOrientation(
+    orbitalPlane: DeepReadonly<OrbitalPlane>,
+    spin: DeepReadonly<SpinModel>,
+): Quaternion {
     const orbitOrientation = Quaternion.RotationAxis(Axis.Y, orbitalPlane.longitudeOfAscendingNode).multiply(
         Quaternion.RotationAxis(Axis.Z, orbitalPlane.inclination),
     );

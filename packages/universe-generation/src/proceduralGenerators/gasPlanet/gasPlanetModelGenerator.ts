@@ -61,7 +61,7 @@ export function generateGasPlanetModel(
     let parentAverageAxialTilt = 0;
     if (parentBodies.length > 0) {
         for (const parent of parentBodies) {
-            parentAverageInclination += parent.orbit.inclination;
+            parentAverageInclination += parent.orbit.plane.inclination;
             parentAverageAxialTilt += parent.spin.axialTilt;
         }
         parentAverageInclination /= parentBodies.length;
@@ -74,12 +74,14 @@ export function generateGasPlanetModel(
         parentIds: parentIds,
         semiMajorAxis: orbitRadius,
         p: 2,
-        inclination:
-            parentAverageInclination +
-            parentAverageAxialTilt +
-            degreesToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
+        plane: {
+            inclination:
+                parentAverageInclination +
+                parentAverageAxialTilt +
+                degreesToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
+            longitudeOfAscendingNode: 0,
+        },
         eccentricity: 0,
-        longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
         initialMeanAnomaly: 0,
     };

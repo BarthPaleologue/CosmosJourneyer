@@ -35,8 +35,10 @@ export function createDarkKnightOrbitalPlacementModel(parentIds: Iterable<Orbita
             argumentOfPeriapsis: 0,
             eccentricity: 0,
             p: 1,
-            inclination: 0,
-            longitudeOfAscendingNode: 0,
+            plane: {
+                inclination: 0,
+                longitudeOfAscendingNode: 0,
+            },
             semiMajorAxis: astronomicalUnitToMeters(100),
             initialMeanAnomaly: 0,
         },

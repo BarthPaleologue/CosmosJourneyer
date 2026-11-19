@@ -203,6 +203,6 @@ export class KeplerianOrbitalSimulation {
     }
 
     private computeAbsoluteOrientation(object: KeplerianObject): Quaternion {
-        return computeAbsoluteOrientation(object.orbit, object.spin, this.elapsedSeconds);
+        return computeAbsoluteOrientation(object.orbit.plane, object.spin, this.elapsedSeconds);
     }
 }

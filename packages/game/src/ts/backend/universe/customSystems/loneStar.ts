@@ -54,8 +54,10 @@ export function getLoneStarSystem(): StarSystemContentModel {
                     parentIds: [],
                     semiMajorAxis: 0,
                     eccentricity: 0,
-                    inclination: 0,
-                    longitudeOfAscendingNode: 0,
+                    plane: {
+                        inclination: 0,
+                        longitudeOfAscendingNode: 0,
+                    },
                     argumentOfPeriapsis: 0,
                     initialMeanAnomaly: 0,
                     p: 2,

@@ -14,7 +14,7 @@ describe("space elevator synchronous attitude", () => {
         if (planet === undefined) {
             throw new Error("Expected a telluric planet");
         }
-        planet.orbit.inclination = inclination;
+        planet.orbit.plane.inclination = inclination;
         planet.spin.axialTilt = 0.3;
         const model = generateSpaceElevatorModel("elevator", 42, planet, starSystem);
         const { orbit, attitude } = model.placement;
@@ -24,7 +24,7 @@ describe("space elevator synchronous attitude", () => {
         for (const phase of [-1, 0, 0.125, 0.25, 0.5, 0.75, 1, 10]) {
             const time = phase * period;
             const position = getPointOnOrbitLocal(orbit, planet.mass, time);
-            const orientation = computeAbsoluteOrientation(orbit, attitude.spin, time).multiply(modelOrientation);
+            const orientation = computeAbsoluteOrientation(orbit.plane, attitude.spin, time).multiply(modelOrientation);
             const tetherUp = Vector3.Up().applyRotationQuaternion(orientation);
             expect(Vector3.Dot(tetherUp, position.normalize())).toBeCloseTo(1, 6);
         }

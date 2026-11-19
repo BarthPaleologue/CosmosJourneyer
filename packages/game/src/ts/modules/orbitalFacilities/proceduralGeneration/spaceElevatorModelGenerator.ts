@@ -76,9 +76,11 @@ export function generateSpaceElevatorModel(
         parentIds: [parentBody.id],
         semiMajorAxis: orbitRadius,
         p: 2,
-        inclination: parentBody.orbit.inclination + parentBody.spin.axialTilt,
+        plane: {
+            inclination: parentBody.orbit.plane.inclination + parentBody.spin.axialTilt,
+            longitudeOfAscendingNode: 0,
+        },
         eccentricity: 0,
-        longitudeOfAscendingNode: 0,
         argumentOfPeriapsis: 0,
         initialMeanAnomaly: 0,
     };
