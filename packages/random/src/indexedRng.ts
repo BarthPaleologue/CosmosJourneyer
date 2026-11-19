@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // Adapted from squirrel-noise@1.0.0 by Barthélemy Paléologue.
+// Modern variant is SquirrelNoise5 by Squirrel Eiserloh: https://gist.github.com/kevinmoran/0198d8e9de0da7057abe8b8b34d50f86
 
 export type IndexedRng = (index: number) => number;
 
@@ -59,4 +60,44 @@ export function seededLegacySquirrelNoise(seed: number): IndexedRng {
  */
 export function getRngFromSeed(seed: number): IndexedRng {
     return seededLegacySquirrelNoise(seed);
+}
+
+/**
+ * SquirrelNoise5 (Squirrel Eiserloh, GDC) as an indexed hash: 32-bit integer
+ * mixing via Math.imul and unsigned shifts, returning a value in [0, 1).
+ * Unlike the legacy variant, the result never leaves the unit interval.
+ * @see https://gist.github.com/kevinmoran/0198d8e9de0da7057abe8b8b34d50f86
+ * @param seed Seed mixed into the deterministic noise value.
+ * @param index Integer index to hash into a noise value.
+ * @returns Deterministic noise in [0, 1).
+ */
+export function squirrelNoise(seed: number, index: number): number {
+    const BIT_NOISE1 = 0xd2a80a3f;
+    const BIT_NOISE2 = 0xa884f197;
+    const BIT_NOISE3 = 0x6c736f4b;
+    const BIT_NOISE4 = 0xb79f3abb;
+    const BIT_NOISE5 = 0x1b56c4e9;
+
+    let mangled = Math.imul(index, BIT_NOISE1);
+    mangled = (mangled + seed) | 0;
+    mangled ^= mangled >>> 9;
+    mangled = (mangled + BIT_NOISE2) | 0;
+    mangled ^= mangled >>> 11;
+    mangled = Math.imul(mangled, BIT_NOISE3);
+    mangled ^= mangled >>> 13;
+    mangled = (mangled + BIT_NOISE4) | 0;
+    mangled ^= mangled >>> 15;
+    mangled = Math.imul(mangled, BIT_NOISE5);
+    mangled ^= mangled >>> 17;
+
+    return (mangled >>> 0) / 2 ** 32;
+}
+
+/**
+ * Creates an indexed noise function using the modern squirrel noise algorithm.
+ * @param seed Seed shared by all generated indexed values.
+ * @returns A deterministic random source in [0, 1) indexed by integer position.
+ */
+export function seededSquirrelNoise(seed: number): IndexedRng {
+    return (index) => squirrelNoise(seed, index);
 }

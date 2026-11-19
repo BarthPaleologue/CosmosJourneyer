@@ -15,7 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export { getRngFromSeed, seededLegacySquirrelNoise, legacySquirrelNoise } from "./indexedRng";
+export {
+    getRngFromSeed,
+    seededLegacySquirrelNoise,
+    legacySquirrelNoise,
+    seededSquirrelNoise,
+    squirrelNoise,
+} from "./indexedRng";
 export type { IndexedRng } from "./indexedRng";
 export {
     centeredRand,

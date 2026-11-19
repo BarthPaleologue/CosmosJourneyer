@@ -18,6 +18,7 @@
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { Result } from "@cosmos-journeyer/typescript";
 
+import { AuroraModule } from "./aurora";
 import { ChronosModule } from "./chronos";
 import { DarkKnightModule } from "./darkKnight";
 import type { GameModule } from "./gameModule";
@@ -33,6 +34,8 @@ export function getBuiltinModules(): Array<GameModule> {
     return [
         OrbitalFacilitiesModule,
         DarkKnightModule,
+        AuroraModule,
+        // MagnetosphereGizmoModule,
         MonolithModule,
         SpaceTelescopesModule,
         RussellTeaPotModule,

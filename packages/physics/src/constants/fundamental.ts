@@ -32,3 +32,9 @@ export const PlanckConstant = 6.626_070_15e-34;
 
 /** Boltzmann constant in J/K. */
 export const BoltzmannConstant = 1.380_649e-23;
+
+/** Mass of a proton in kg */
+export const ProtonMass = 1.672_621_925_95e-27;
+
+/** mu0 in H/m */
+export const VacuumPermeability = 1.256_637_061_27e-6;

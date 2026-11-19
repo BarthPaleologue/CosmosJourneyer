@@ -27,6 +27,7 @@ import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphe
 import type { Transformable } from "../universe/architecture/transformable";
 import type { LandingPadProvider } from "../universe/orbitalFacility/landingPadProvider";
 import type { SpatialGeometry } from "../universe/systemObject";
+import type { SystemView } from "../universe/systemView";
 import type { AnySystemContentType, SystemEntity } from "./systemEntity";
 import { SystemEntityProcessorRegistry } from "./systemEntityProcessor";
 import type { SystemEntityProcessor } from "./systemEntityProcessor";
@@ -35,6 +36,7 @@ export type SystemEntityUpdateContext = {
     camera: Camera;
     observerPosition: Vector3;
     deltaSeconds: number;
+    system: SystemView;
 };
 
 export class SystemEntityProcessors {

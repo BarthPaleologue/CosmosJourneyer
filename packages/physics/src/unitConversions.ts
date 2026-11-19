@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { AU, C, LightYearInMeters, SolarMass } from "./constants";
+import { C, LightYearInMeters, SolarMass } from "./constants";
 
 export type Duration = Partial<{
     days: number;
@@ -90,7 +90,7 @@ export function kelvinToCelsius(kelvin: number): number {
  * @returns Distance in meters.
  */
 export function astronomicalUnitToMeters(distanceAU: number): number {
-    return distanceAU * AU;
+    return distanceAU * 150e9;
 }
 
 /**

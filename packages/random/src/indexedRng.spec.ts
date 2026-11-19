@@ -17,7 +17,13 @@
 
 import { describe, expect, it } from "vitest";
 
-import { seededLegacySquirrelNoise, legacySquirrelNoise, getRngFromSeed } from "./index";
+import {
+    seededLegacySquirrelNoise,
+    legacySquirrelNoise,
+    getRngFromSeed,
+    seededSquirrelNoise,
+    squirrelNoise,
+} from "./index";
 
 // Captured from the installed squirrel-noise@1.0.0 on main before extraction.
 const indices = [-100, -1, 0, 1, 2, 100, 1000000];
@@ -65,5 +71,53 @@ describe("indexed RNG compatibility", () => {
         expect(indices.map(getRngFromSeed(seed))).toEqual(expected);
         // Indexed samples do not depend on call order.
         expect(indices.toReversed().map(getRngFromSeed(seed))).toEqual(expected.toReversed());
+    });
+});
+
+describe("modern squirrel noise", () => {
+    it("returns deterministic values in [0, 1)", () => {
+        for (const seed of [0, 42, -42, 123456789, -987654321]) {
+            for (const index of indices) {
+                const value = squirrelNoise(seed, index);
+                expect(value).toBeGreaterThanOrEqual(0);
+                expect(value).toBeLessThan(1);
+                expect(squirrelNoise(seed, index)).toBe(value);
+            }
+        }
+    });
+
+    it("is order-independent through the seeded wrapper", () => {
+        const rng = seededSquirrelNoise(42);
+        const forward = indices.map(rng);
+        expect(indices.toReversed().map(seededSquirrelNoise(42))).toEqual(forward.toReversed());
+    });
+
+    it("depends on both seed and index", () => {
+        expect(squirrelNoise(0, 1)).not.toBe(squirrelNoise(1, 1));
+        expect(squirrelNoise(42, 1)).not.toBe(squirrelNoise(42, 2));
+    });
+
+    it("matches captured reference values", () => {
+        // Reference implementation: SquirrelNoise5, https://gist.github.com/kevinmoran/0198d8e9de0da7057abe8b8b34d50f86
+        const reference: [number, number[]][] = [
+            [
+                0,
+                [
+                    0.9584647815208882, 0.059389577712863684, 0.1818354674614966, 0.8865617162082344,
+                    0.022372808307409286, 0.4191903949249536, 0.2869785721413791,
+                ],
+            ],
+            [
+                42,
+                [
+                    0.7869582020211965, 0.48974785418249667, 0.731001524021849, 0.1525185597129166, 0.3825406455434859,
+                    0.9102847184985876, 0.323752811178565,
+                ],
+            ],
+        ];
+        for (const [seed, expected] of reference) {
+            expect(indices.map((index) => squirrelNoise(seed, index))).toEqual(expected);
+            expect(indices.map(seededSquirrelNoise(seed))).toEqual(expected);
+        }
     });
 });

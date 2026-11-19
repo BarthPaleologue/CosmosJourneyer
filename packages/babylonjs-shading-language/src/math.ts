@@ -50,6 +50,15 @@ import { trig } from "./trigonometry";
 /**
  * @param x - Input value.
  * @param options - Optional target options.
+ * @returns Greatest integer less than or equal to each component of `x`.
+ */
+export function floor(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
+    return trig(x, TrigonometryBlockOperations.Floor, options);
+}
+
+/**
+ * @param x - Input value.
+ * @param options - Optional target options.
  * @returns Square root of `x` as a shader expression.
  */
 export function sqrt(x: NodeMaterialConnectionPoint, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint {
