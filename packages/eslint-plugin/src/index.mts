@@ -1,6 +1,7 @@
 import type { TSESLint } from "@typescript-eslint/utils";
 
 import noClassInheritance from "./rules/no-class-inheritance.mts";
+import noDefaultParameters from "./rules/no-default-parameters.mts";
 import noPickOmit from "./rules/no-pick-omit.mts";
 import noPromiseReject from "./rules/no-promise-reject.mts";
 
@@ -15,6 +16,7 @@ type CosmosPlugin = TSESLint.FlatConfig.Plugin & {
 
 const rules = {
     "no-class-inheritance": noClassInheritance,
+    "no-default-parameters": noDefaultParameters,
     "no-pick-omit": noPickOmit,
     "no-promise-reject": noPromiseReject,
 } satisfies RuleDefinitions;
