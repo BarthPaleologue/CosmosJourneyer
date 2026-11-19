@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Material } from "@babylonjs/core/Materials/material";
+import type { IVector3Like } from "@babylonjs/core/Maths/math.like";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
@@ -63,7 +64,7 @@ export class Wheel {
     readonly radius: number;
 
     /** Immutable geometry relative to the chassis, independent of its world pose. */
-    readonly frameLocalPosition: Readonly<Pick<Vector3, "x" | "y" | "z">>;
+    readonly frameLocalPosition: Readonly<IVector3Like>;
 
     readonly wheelAxleConstraint: Physics6DoFConstraint;
     readonly steering: {
