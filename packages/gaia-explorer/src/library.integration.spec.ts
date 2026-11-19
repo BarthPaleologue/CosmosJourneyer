@@ -70,7 +70,7 @@ describe("public library API", () => {
             [...simbadResult.value].map(([sourceId, metadata]) => [sourceId, classifyStar(metadata)]),
         );
         const binner = new SpatialBinner({ gridSize: 5, halfExtent: 50 });
-        for (const star of rowsToStars(gaiaResult.value, names, temperatures, natures)) {
+        for (const star of rowsToStars(gaiaResult.value, { names, temperatures, natures })) {
             binner.addStar(star);
         }
         const payload = buildOutput(
@@ -79,6 +79,7 @@ describe("public library API", () => {
             { radiusLy: 50, parallaxOverErrorMin: 10, ruweMax: 10 },
             gaiaResult.value.length,
             1,
+            () => new Date(),
         );
 
         expect(validateDataset(payload).success).toBe(true);

@@ -30,50 +30,42 @@ export function toCartesian(
     const cosDec = Math.cos(dec);
     return [distanceLy * cosDec * Math.cos(ra), distanceLy * cosDec * Math.sin(ra), distanceLy * Math.sin(dec)];
 }
+export type StarLookupMaps = Readonly<
+    Partial<{
+        names: DeepReadonly<Map<GaiaSourceId, string>>;
+        temperatures: DeepReadonly<Map<GaiaSourceId, number>>;
+        natures: DeepReadonly<Map<GaiaSourceId, StarNature>>;
+    }>
+>;
+
 /**
  * Converts a Gaia row into a positioned star when its parallax is positive.
  * @param row Validated Gaia source row.
- * @param names Optional SIMBAD names keyed by Gaia source identifier.
- * @param temperatures Optional fallback temperatures keyed by Gaia source identifier.
- * @param natures Optional stellar classifications keyed by Gaia source identifier.
+ * @param lookups Optional SIMBAD names, fallback temperatures and classifications keyed by Gaia source identifier.
  * @returns The star record, or undefined when distance cannot be derived.
  */
-export function rowToStar(
-    row: DeepReadonly<GaiaRow>,
-    names: DeepReadonly<Map<GaiaSourceId, string>> = new Map(),
-    temperatures: DeepReadonly<Map<GaiaSourceId, number>> = new Map(),
-    natures: DeepReadonly<Map<GaiaSourceId, StarNature>> = new Map(),
-): StarRecord | undefined {
+export function rowToStar(row: DeepReadonly<GaiaRow>, lookups?: StarLookupMaps): StarRecord | undefined {
     if (row.parallax === null || row.parallax <= 0) {
         return undefined;
     }
     const distanceLy = (1000 / row.parallax) * LightYearPerParsec;
     const [x, y, z] = toCartesian(row.ra, row.dec, distanceLy);
     return {
-        name: names.get(row.source_id) ?? row.designation ?? row.source_id,
+        name: lookups?.names?.get(row.source_id) ?? row.designation ?? row.source_id,
         x,
         y,
         z,
-        temperature: row.teff_k ?? temperatures.get(row.source_id) ?? null,
+        temperature: row.teff_k ?? lookups?.temperatures?.get(row.source_id) ?? null,
         sourceId: row.source_id,
-        nature: natures.get(row.source_id) ?? null,
+        nature: lookups?.natures?.get(row.source_id) ?? null,
     };
 }
 /**
  * Converts Gaia rows to star records, omitting rows without a usable parallax.
  * @param rows Validated Gaia source rows.
- * @param names Optional SIMBAD names keyed by Gaia source identifier.
- * @param temperatures Optional fallback temperatures keyed by Gaia source identifier.
- * @param natures Optional stellar classifications keyed by Gaia source identifier.
+ * @param lookups Optional SIMBAD names, fallback temperatures and classifications keyed by Gaia source identifier.
  * @returns The available star records.
  */
-export function rowsToStars(
-    rows: DeepReadonly<Array<GaiaRow>>,
-    names?: DeepReadonly<Map<GaiaSourceId, string>>,
-    temperatures?: DeepReadonly<Map<GaiaSourceId, number>>,
-    natures?: DeepReadonly<Map<GaiaSourceId, StarNature>>,
-): ReadonlyArray<StarRecord> {
-    return rows
-        .map((row) => rowToStar(row, names, temperatures, natures))
-        .filter((star): star is StarRecord => star !== undefined);
+export function rowsToStars(rows: DeepReadonly<Array<GaiaRow>>, lookups?: StarLookupMaps): ReadonlyArray<StarRecord> {
+    return rows.map((row) => rowToStar(row, lookups)).filter((star): star is StarRecord => star !== undefined);
 }

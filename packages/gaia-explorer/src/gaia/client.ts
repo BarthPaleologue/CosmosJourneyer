@@ -8,7 +8,7 @@ import { buildGaiaAdql } from "./adql";
 import { GaiaRowSchema } from "./schemas";
 import type { GaiaRow } from "./schemas";
 export const GaiaTapAsyncEndpoint = "https://gea.esac.esa.int/tap-server/tap/async";
-export type GaiaClientOptions = AsyncTapClientOptions & Readonly<{ endpoint?: string }>;
+export type GaiaClientOptions = AsyncTapClientOptions & Readonly<Partial<{ endpoint: string }>>;
 const numeric = (value: string): number | null => (value.trim() === "" ? null : Number(value));
 /**
  * Validates and converts raw Gaia TAP rows into typed Gaia records.
@@ -65,7 +65,7 @@ export class GaiaClient {
  * @param options TAP transport settings and an optional service endpoint.
  * @returns A client that queries and validates Gaia records.
  */
-export function createGaiaClient(options: GaiaClientOptions = {}): GaiaClient {
-    const { endpoint = GaiaTapAsyncEndpoint, ...tapOptions } = options;
+export function createGaiaClient(options?: GaiaClientOptions): GaiaClient {
+    const { endpoint = GaiaTapAsyncEndpoint, ...tapOptions } = options ?? {};
     return new GaiaClient(createAsyncTapClient(endpoint, tapOptions));
 }

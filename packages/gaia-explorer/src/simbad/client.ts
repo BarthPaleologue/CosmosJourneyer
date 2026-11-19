@@ -9,7 +9,7 @@ import { chooseBestName } from "./naming";
 import { SimbadRowSchema } from "./schemas";
 
 export const SimbadTapSyncEndpoint = "https://simbad.cds.unistra.fr/simbad/sim-tap/sync";
-export type SimbadClientOptions = TapClientOptions & Readonly<{ batchSize?: number; endpoint?: string }>;
+export type SimbadClientOptions = TapClientOptions & Readonly<Partial<{ batchSize: number; endpoint: string }>>;
 const quote = (value: string): string => `'${value.replaceAll("'", "''")}'`;
 const nullableText = (value: string | undefined): string | null => {
     const text = value?.trim();
@@ -57,7 +57,7 @@ function parseMetadata(
 export class SimbadClient {
     private readonly tap: Readonly<TapClient>;
     private readonly batchSize: number;
-    public constructor(tap: Readonly<TapClient>, batchSize = 400) {
+    public constructor(tap: Readonly<TapClient>, batchSize: number) {
         this.tap = tap;
         this.batchSize = batchSize;
     }
@@ -95,7 +95,7 @@ export class SimbadClient {
  * @param options TAP transport settings, batch size, and optional service endpoint.
  * @returns A client that looks up metadata for Gaia rows.
  */
-export function createSimbadClient(options: SimbadClientOptions = {}): SimbadClient {
-    const { batchSize, endpoint = SimbadTapSyncEndpoint, ...tapOptions } = options;
-    return new SimbadClient(createSyncTapClient(endpoint, tapOptions), batchSize);
+export function createSimbadClient(options?: SimbadClientOptions): SimbadClient {
+    const { batchSize, endpoint = SimbadTapSyncEndpoint, ...tapOptions } = options ?? {};
+    return new SimbadClient(createSyncTapClient(endpoint, tapOptions), batchSize ?? 400);
 }
