@@ -20,7 +20,7 @@ const updateInfo: UpdateInfo = {
  * @param draft - Whether GitHub reports the release as a draft.
  * @returns The mocked fetch function.
  */
-function stubGitHubRelease(publishedAt: unknown, draft = false) {
+function stubGitHubRelease(publishedAt: unknown, draft: boolean) {
     const makeResponse = () => new Response(JSON.stringify({ published_at: publishedAt, draft }));
     const fetchMock = vi.fn<typeof fetch>(async () => await Promise.resolve(makeResponse()));
     vi.stubGlobal("fetch", fetchMock);
@@ -35,7 +35,7 @@ describe("requireMinimumReleaseAge", () => {
 
     it("accepts a release once it is at least 24 hours old", async () => {
         vi.spyOn(Date, "now").mockReturnValue(now);
-        const fetchMock = stubGitHubRelease(new Date(now - 24 * oneHour).toISOString());
+        const fetchMock = stubGitHubRelease(new Date(now - 24 * oneHour).toISOString(), false);
 
         expect(await requireMinimumReleaseAge(() => true)(updateInfo)).toBe(true);
         expect(fetchMock.mock.calls.at(0)?.[0]).toBe(
@@ -46,7 +46,7 @@ describe("requireMinimumReleaseAge", () => {
 
     it("rejects a fresh release, then accepts it on a later check", async () => {
         const clock = vi.spyOn(Date, "now").mockReturnValue(now);
-        const fetchMock = stubGitHubRelease(new Date(now - 23 * oneHour).toISOString());
+        const fetchMock = stubGitHubRelease(new Date(now - 23 * oneHour).toISOString(), false);
         const isSupported = requireMinimumReleaseAge(() => true);
 
         expect(await isSupported(updateInfo)).toBe(false);
@@ -84,16 +84,16 @@ describe("requireMinimumReleaseAge", () => {
         vi.spyOn(Date, "now").mockReturnValue(now);
         const isSupported = requireMinimumReleaseAge(() => true);
 
-        stubGitHubRelease(null);
+        stubGitHubRelease(null, false);
         expect(await isSupported(updateInfo)).toBe(false);
 
-        stubGitHubRelease("not a date");
+        stubGitHubRelease("not a date", false);
         expect(await isSupported(updateInfo)).toBe(false);
 
         stubGitHubRelease(new Date(now - 30 * oneHour).toISOString(), true);
         expect(await isSupported(updateInfo)).toBe(false);
 
-        stubGitHubRelease(new Date(now + oneHour).toISOString());
+        stubGitHubRelease(new Date(now + oneHour).toISOString(), false);
         expect(await isSupported(updateInfo)).toBe(false);
     });
 });

@@ -271,7 +271,7 @@ export async function rendererBuildIsReady(rendererDir: string): Promise<boolean
  * @param timeoutMs - Maximum readiness wait in milliseconds.
  * @returns Whether the bundle became ready before timeout.
  */
-export async function waitForRendererBuild(rendererDir: string, timeoutMs = 5_000): Promise<boolean> {
+export async function waitForRendererBuild(rendererDir: string, timeoutMs: number): Promise<boolean> {
     const pollIntervalMs = 100;
     const startTime = Date.now();
 
