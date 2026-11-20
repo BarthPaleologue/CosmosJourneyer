@@ -105,7 +105,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
 
     private isAcceleratingFlag = false;
 
-    constructor(serializedWarpDrive: SerializedWarpDrive, enabledByDefault = false) {
+    constructor(serializedWarpDrive: SerializedWarpDrive) {
         this.type = serializedWarpDrive.type;
 
         this.size = serializedWarpDrive.size;
@@ -115,8 +115,6 @@ export class WarpDrive implements ReadonlyWarpDrive {
 
         this.maxWarpSpeed = spec.maxSpeed;
         this.rangeLY = spec.rangeLy;
-
-        this.state = enabledByDefault ? "enabled" : "disabled";
     }
 
     public serialize(): SerializedWarpDrive {
