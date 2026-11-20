@@ -57,7 +57,7 @@ export async function createStationLandingScene(
     scene.clearColor.set(0, 0, 0, 1);
     const t = (await I18n.New()).getT();
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 

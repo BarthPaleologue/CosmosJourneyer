@@ -45,7 +45,7 @@ export async function createLandingPadScene(
     scene.clearColor.set(0.1, 0.1, 0.1, 1);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const controls = new DefaultControls(scene);
     controls.speed = 10;

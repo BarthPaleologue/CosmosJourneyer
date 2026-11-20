@@ -63,20 +63,19 @@ type TestWheelLayout = {
     readonly radius?: number;
 };
 
+const defaultWheelLayout: ReadonlyArray<TestWheelLayout> = [
+    { z: 2.6, steerable: true },
+    { z: 0, steerable: false },
+    { z: -2.6, steerable: true },
+];
+
 /**
  * Builds a vehicle fixture with the requested wheel layout and overrides.
  * @param layout Test wheel positions and capabilities.
  * @param options Optional vehicle parameters to override in the fixture.
  * @returns The vehicle and Babylon physics objects used by its tests.
  */
-function createVehicle(
-    layout: ReadonlyArray<TestWheelLayout> = [
-        { z: 2.6, steerable: true },
-        { z: 0, steerable: false },
-        { z: -2.6, steerable: true },
-    ],
-    options?: Partial<VehicleOptions>,
-) {
+function createVehicle(layout: ReadonlyArray<TestWheelLayout>, options?: Partial<VehicleOptions>) {
     const engine = new NullEngine();
     const scene = new Scene(engine);
     const frameMesh = MeshBuilder.CreateBox("frame", {}, scene);
@@ -84,10 +83,10 @@ function createVehicle(
     frameMesh.rotationQuaternion = Quaternion.RotationYawPitchRoll(1, 0.3, -0.2);
     frameMesh.computeWorldMatrix(true);
     const frame = new PhysicsAggregate(frameMesh, PhysicsShapeType.BOX, { mass: 1 }, scene);
-    const models = layout.map(({ x = 0, z, steerable, powered = false, radius = 1 }) => ({
-        position: new Vector3(x, -1, z),
-        geometry: { radius, thickness: 0.3 },
-        behavior: { powered, steerable },
+    const models = layout.map(({ x, z, steerable, powered, radius }) => ({
+        position: new Vector3(x ?? 0, -1, z),
+        geometry: { radius: radius ?? 1, thickness: 0.3 },
+        behavior: { powered: powered ?? false, steerable },
     }));
     const wheels = models.map((model) => {
         const mesh = MeshBuilder.CreateBox("wheel", {}, scene);
@@ -134,7 +133,7 @@ const lastAngles = () => fixture.targets.map((target) => target.mock.lastCall?.[
 
 describe("vehicle steering", () => {
     it("sends equal opposite targets through the original position motors", () => {
-        fixture = createVehicle();
+        fixture = createVehicle(defaultWheelLayout);
         fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: kmhToMetersPerSecond(40) });
         const expected = Math.atan((EarthG * 2.6) / kmhToMetersPerSecond(40) ** 2);
         expect(lastAngles()[0]).toBeCloseTo(expected);
@@ -143,7 +142,7 @@ describe("vehicle steering", () => {
     });
 
     it("does not accumulate a hidden command while constrained, then slowing down", () => {
-        fixture = createVehicle();
+        fixture = createVehicle(defaultWheelLayout);
         for (let i = 0; i < 100; i++) {
             fixture.vehicle.turn(1.8, 0.016, { horizontalSpeed: 30 });
         }
@@ -154,7 +153,7 @@ describe("vehicle steering", () => {
     });
 
     it("keeps keyboard rate, return to center, and direction changes", () => {
-        fixture = createVehicle();
+        fixture = createVehicle(defaultWheelLayout);
         fixture.vehicle.turn(1.8, 0.01, { horizontalSpeed: 0 });
         expect(lastAngles()[0]).toBeCloseTo(0.018);
         fixture.vehicle.turn(0, 0.01, { horizontalSpeed: 0 });
@@ -165,7 +164,7 @@ describe("vehicle steering", () => {
     });
 
     it("clears commands on mode changes and preserves legacy in-phase limits", () => {
-        fixture = createVehicle();
+        fixture = createVehicle(defaultWheelLayout);
         fixture.vehicle.setTargetSteeringAngle(0.4, { horizontalSpeed: 0 });
         fixture.vehicle.setSteeringMode("inPhase");
         expect(lastAngles().every((angle) => angle === 0)).toBe(true);
@@ -183,7 +182,7 @@ describe("vehicle steering", () => {
     });
 
     it("accepts horizontal speed explicitly while retaining the 3D fallback", () => {
-        fixture = createVehicle();
+        fixture = createVehicle(defaultWheelLayout);
         vi.spyOn(fixture.frame.body, "getLinearVelocity").mockReturnValue(new Vector3(0, -50, 0));
         fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: 0 });
         expect(lastAngles()[0]).toBeCloseTo(degreesToRadians(45));
@@ -192,7 +191,7 @@ describe("vehicle steering", () => {
     });
 
     it("controls pass speed projected along the supplied local up direction", () => {
-        fixture = createVehicle();
+        fixture = createVehicle(defaultWheelLayout);
         fixture.frame.transformNode.rotationQuaternion = Quaternion.Identity();
         fixture.frame.transformNode.computeWorldMatrix(true);
         const controls = new VehicleControls(fixture.scene);
@@ -246,7 +245,7 @@ const wolfLayout: ReadonlyArray<TestWheelLayout> = [
 
 describe("vehicle steering inputs and Ackermann", () => {
     it("reaches full lock under held input instead of fighting return-to-center", () => {
-        fixture = createVehicle();
+        fixture = createVehicle(defaultWheelLayout);
         for (let i = 0; i < 120; i++) {
             fixture.vehicle.turn(1.8, 1 / 60, { horizontalSpeed: 0 });
         }
@@ -256,7 +255,7 @@ describe("vehicle steering inputs and Ackermann", () => {
     });
 
     it("integrates held input consistently at different frame rates", () => {
-        fixture = createVehicle();
+        fixture = createVehicle(defaultWheelLayout);
         for (const fps of [30, 60, 120]) {
             fixture.vehicle.setTargetSteeringAngle(0, { horizontalSpeed: 0 });
             for (let i = 0; i < fps; i++) {

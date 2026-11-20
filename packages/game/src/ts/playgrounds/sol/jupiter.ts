@@ -48,7 +48,7 @@ export async function createJupiterScene(
 
     const textures = await loadTextures(scene, engine, progressMonitor);
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const scalingFactor = 6_000e3 * 11;
 

@@ -61,12 +61,14 @@ type TestWheelLayout = {
     readonly powered?: boolean;
 };
 
+const defaultWheelLayout: ReadonlyArray<TestWheelLayout> = [{ z: 2.6, steerable: true }];
+
 /**
  * Creates wheel instances using the requested test layout.
  * @param layout Wheel positions and steering capabilities.
  * @returns The test scene, frame, and constructed wheels.
  */
-function createWheels(layout: ReadonlyArray<TestWheelLayout> = [{ z: 2.6, steerable: true }]) {
+function createWheels(layout: ReadonlyArray<TestWheelLayout>) {
     const engine = new NullEngine();
     const scene = new Scene(engine);
     const frameMesh = MeshBuilder.CreateBox("frame", {}, scene);
@@ -74,10 +76,10 @@ function createWheels(layout: ReadonlyArray<TestWheelLayout> = [{ z: 2.6, steera
     frameMesh.rotationQuaternion = Quaternion.RotationYawPitchRoll(1, 0.3, -0.2);
     frameMesh.computeWorldMatrix(true);
     const frame = new PhysicsAggregate(frameMesh, PhysicsShapeType.BOX, { mass: 1 }, scene);
-    const models = layout.map(({ z, steerable, powered = false }) => ({
+    const models = layout.map(({ z, steerable, powered }) => ({
         position: new Vector3(0, -1, z),
         geometry: { radius: 1, thickness: 0.3 },
-        behavior: { powered, steerable },
+        behavior: { powered: powered ?? false, steerable },
     }));
     const wheels = models.map((model) => {
         const mesh = MeshBuilder.CreateBox("wheel", {}, scene);
@@ -100,7 +102,7 @@ afterEach(() => {
 
 describe("wheel geometry", () => {
     it("retains immutable local wheel positions through world translation and rotation", () => {
-        fixture = createWheels();
+        fixture = createWheels(defaultWheelLayout);
         expect(fixture.wheels[0]?.frameLocalPosition).toEqual(fixture.models[0]?.position);
         fixture.models[0]?.position.set(99, 99, 99);
         expect(fixture.wheels[0]?.frameLocalPosition.z).toBe(2.6);

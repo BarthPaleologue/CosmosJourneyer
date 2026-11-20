@@ -51,7 +51,7 @@ export async function createTelluricPlanetScene(
     scene.useRightHandedSystem = true;
     scene.clearColor.setAll(0);
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
     if (!terrainSystemResult.success) {

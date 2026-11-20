@@ -4,10 +4,10 @@ import { describe, expect, it } from "vitest";
 import { AttitudePDController } from "./attitudePdController";
 import type { AngularMassProperties } from "./attitudePdController";
 
-const expectVectorClose = (actual: Vector3, expected: Vector3, precision = 6): void => {
-    expect(actual.x).toBeCloseTo(expected.x, precision);
-    expect(actual.y).toBeCloseTo(expected.y, precision);
-    expect(actual.z).toBeCloseTo(expected.z, precision);
+const expectVectorClose = (actual: Vector3, expected: Vector3): void => {
+    expect(actual.x).toBeCloseTo(expected.x, 6);
+    expect(actual.y).toBeCloseTo(expected.y, 6);
+    expect(actual.z).toBeCloseTo(expected.z, 6);
 };
 
 describe("AttitudePDController", () => {

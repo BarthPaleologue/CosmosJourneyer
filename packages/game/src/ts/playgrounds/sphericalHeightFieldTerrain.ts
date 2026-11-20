@@ -52,7 +52,7 @@ export async function createSphericalHeightFieldTerrainScene(
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
     if (!terrainSystemResult.success) {

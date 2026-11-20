@@ -62,7 +62,7 @@ export async function createForestScene(
     groundMaterial.roughness = 1;
     ground.material = groundMaterial;
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 

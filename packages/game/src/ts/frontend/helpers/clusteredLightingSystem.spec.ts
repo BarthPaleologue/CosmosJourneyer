@@ -63,7 +63,7 @@ describe("ClusteredLightingSystem", () => {
         return container;
     };
 
-    const createRegion = (name: string, lights: ReadonlyArray<Light>, distance = 0): ClusteredLightingRegion => {
+    const createRegion = (name: string, lights: ReadonlyArray<Light>, distance: number): ClusteredLightingRegion => {
         const transform = new TransformNode(`${name}Transform`, scene);
         transform.position.x = distance;
         transform.computeWorldMatrix(true);
@@ -85,7 +85,7 @@ describe("ClusteredLightingSystem", () => {
 
     it("registers a region inactive", () => {
         const lights = [createLight("first"), createLight("second")];
-        const region = createRegion("station", lights);
+        const region = createRegion("station", lights, 0);
 
         system?.registerRegion(region);
 
@@ -95,7 +95,7 @@ describe("ClusteredLightingSystem", () => {
 
     it("activates a nearby region without duplicating its lights", () => {
         const light = createLight("light");
-        const region = createRegion("station", [light]);
+        const region = createRegion("station", [light], 0);
 
         system?.registerRegion(region);
         system?.registerRegion(region);
@@ -108,7 +108,7 @@ describe("ClusteredLightingSystem", () => {
 
     it("deactivates a region that becomes too small on screen", () => {
         const lights = [createLight("first"), createLight("second")];
-        const region = createRegion("station", lights);
+        const region = createRegion("station", lights, 0);
         system?.registerRegion(region);
         system?.update(camera);
 
@@ -166,7 +166,7 @@ describe("ClusteredLightingSystem", () => {
 
     it("activates a region when the camera is inside its bounding sphere", () => {
         const light = createLight("light");
-        const region = createRegion("station", [light]);
+        const region = createRegion("station", [light], 0);
         system?.registerRegion(region);
 
         system?.update(camera);
@@ -177,7 +177,7 @@ describe("ClusteredLightingSystem", () => {
 
     it("unregisters an active region and ignores repeated unregisters", () => {
         const lights = [createLight("first"), createLight("second")];
-        const region = createRegion("station", lights);
+        const region = createRegion("station", lights, 0);
         system?.registerRegion(region);
         system?.update(camera);
 
@@ -201,7 +201,7 @@ describe("ClusteredLightingSystem", () => {
 
     it("can reactivate a region after unregistering and registering it again", () => {
         const light = createLight("light");
-        const region = createRegion("station", [light]);
+        const region = createRegion("station", [light], 0);
 
         system?.registerRegion(region);
         system?.update(camera);
@@ -219,7 +219,7 @@ describe("ClusteredLightingSystem", () => {
 
     it("keeps producer-owned lights alive when disposed", () => {
         const light = createLight("light");
-        const region = createRegion("station", [light]);
+        const region = createRegion("station", [light], 0);
         system?.registerRegion(region);
         system?.update(camera);
 
@@ -236,8 +236,8 @@ describe("ClusteredLightingSystem", () => {
         const stationLight = createLight("stationLight");
         const spaceshipLight = createLight("spaceshipLight");
 
-        system?.registerRegion(createRegion("station", [stationLight]));
-        system?.registerRegion(createRegion("spaceship", [spaceshipLight]));
+        system?.registerRegion(createRegion("station", [stationLight], 0));
+        system?.registerRegion(createRegion("spaceship", [spaceshipLight], 0));
         system?.update(camera);
 
         const containers = scene.lights.filter((light) => light instanceof ClusteredLightContainer);

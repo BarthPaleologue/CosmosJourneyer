@@ -50,7 +50,7 @@ export async function createFlightDemoScene(
     scene.defaultCursor = "crosshair";
     const t = (await I18n.New()).getT();
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 

@@ -49,7 +49,7 @@ export async function createGasPlanetScene(
 
     const textures = await loadTextures(scene, engine, progressMonitor);
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const urlParams = new URLSearchParams(window.location.search);
     const seed = urlParams.get("seed");

@@ -77,7 +77,7 @@ export async function createOnFootScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
+    const physicsEngine = await enablePhysics(scene);
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 

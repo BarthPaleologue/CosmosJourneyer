@@ -54,7 +54,7 @@ export async function createCharacterDemoScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    const physicsEngine = await enablePhysics(scene, new Vector3(0, 0, 0));
+    const physicsEngine = await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     enablePointerLock(engine);
 

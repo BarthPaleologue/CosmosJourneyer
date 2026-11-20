@@ -45,17 +45,22 @@ export function getProjectedDiameter01(
     return angularDiameter / fov;
 }
 
+export type SizeOnScreenOptions = Partial<{
+    threshold: number;
+}>;
+
 /**
  * @param object - Object whose projected size is measured.
  * @param camera - Camera used for the projection.
- * @param threshold - Minimum projected diameter as a fraction of the field of view.
- * @returns Whether the projected diameter exceeds `threshold`.
+ * @param options - Optional knobs; `threshold` is the minimum projected diameter as a fraction of the field of view.
+ * @returns Whether the projected diameter exceeds the threshold.
  */
 export function isSizeOnScreenEnough(
     object: HasBoundingSphere & Transformable,
     camera: Camera,
-    threshold = DefaultMinProjectedDiameter,
+    options?: SizeOnScreenOptions,
 ): boolean {
+    const threshold = options?.threshold ?? DefaultMinProjectedDiameter;
     const angularSize = getProjectedDiameter01(
         object.getTransform().getAbsolutePosition(),
         object.getBoundingRadius(),

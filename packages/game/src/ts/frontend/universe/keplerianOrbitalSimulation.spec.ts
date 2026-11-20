@@ -41,8 +41,8 @@ function createTestOrbitalObject(
         id,
         parentIds,
         semiMajorAxis,
-        position = Vector3.Zero(),
-        siderealPeriod = 0,
+        position,
+        siderealPeriod,
     }: {
         readonly id: string;
         readonly parentIds: ReadonlyArray<string>;
@@ -52,7 +52,7 @@ function createTestOrbitalObject(
     },
 ): KeplerianObject {
     const transform = new TransformNode(id, scene);
-    transform.position.copyFrom(position);
+    transform.position.copyFrom(position ?? Vector3.Zero());
 
     return {
         id,
@@ -72,7 +72,7 @@ function createTestOrbitalObject(
         spin: {
             axialTilt: 0,
             axisAzimuth: 0,
-            siderealPeriod,
+            siderealPeriod: siderealPeriod ?? 0,
             initialRotationAngle: 0,
         },
         getTransform: () => transform,

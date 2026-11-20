@@ -56,7 +56,7 @@ export async function createDebugAssetsScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const { textures } = await loadRenderingAssets(scene, progressMonitor);
 

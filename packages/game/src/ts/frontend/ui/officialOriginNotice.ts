@@ -30,7 +30,7 @@ type OriginLocation = {
  * @param location - Browser location to convert.
  * @returns The origin data extracted from the location.
  */
-function toOriginLocation(location: Location): OriginLocation {
+export function toOriginLocation(location: Location): OriginLocation {
     return { hostname: location.hostname, protocol: location.protocol };
 }
 
@@ -55,10 +55,7 @@ export function isOfficialGameLocation(location: OriginLocation): boolean {
  * @param location Browser location to check; defaults to the current page.
  * @returns Notice element for an unofficial origin, or `null` for an official one.
  */
-export function createOfficialOriginNotice(
-    t: TFunction,
-    location: OriginLocation = toOriginLocation(window.location),
-): HTMLElement | null {
+export function createOfficialOriginNotice(t: TFunction, location: OriginLocation): HTMLElement | null {
     if (isOfficialGameLocation(location)) {
         return null;
     }

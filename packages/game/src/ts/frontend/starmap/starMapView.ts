@@ -138,7 +138,7 @@ export class StarMapView implements View {
             this.soundPlayer.playNow("target_lock");
             this.starMapUI.setSelectedSystem(starSystemModel, this.currentSystemCoordinates);
             this.selectedSystemCoordinates = starSystemCoordinates;
-            this.focusOnSystem(starSystemCoordinates);
+            this.focusOnSystem(starSystemCoordinates, false);
         });
 
         this.soundPlayer = soundPlayer;
@@ -166,7 +166,7 @@ export class StarMapView implements View {
             t,
         );
         this.starMapUI.onSystemFocusObservable.add((starSystemCoordinates) => {
-            this.focusOnSystem(starSystemCoordinates);
+            this.focusOnSystem(starSystemCoordinates, false);
         });
 
         this.starMapUI.shortHandUIPlotItineraryButton.addEventListener("click", async () => {
@@ -206,7 +206,7 @@ export class StarMapView implements View {
         });
 
         StarMapInputs.map.focusOnCurrentSystem.on("complete", () => {
-            this.focusOnCurrentSystem();
+            this.focusOnCurrentSystem(false);
         });
 
         const glowLayer = new GlowLayer("GlowLayer", this.scene);
@@ -386,7 +386,7 @@ export class StarMapView implements View {
         this.focusOnCurrentSystem(skipAnimation);
     }
 
-    public focusOnCurrentSystem(skipAnimation = false): void {
+    public focusOnCurrentSystem(skipAnimation: boolean): void {
         if (this.currentSystemCoordinates === null) {
             console.warn("No current system seed!");
             return;
@@ -394,7 +394,7 @@ export class StarMapView implements View {
         this.focusOnSystem(this.currentSystemCoordinates, skipAnimation);
     }
 
-    public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation = false): void {
+    public focusOnSystem(starSystemCoordinates: StarSystemCoordinates, skipAnimation: boolean): void {
         const starSystemPosition = wrapVector3(this.universeBackend.getSystemGalacticPosition(starSystemCoordinates));
 
         const cameraDir = this.controls.thirdPersonCamera.getDirection(

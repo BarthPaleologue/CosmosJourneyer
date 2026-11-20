@@ -750,7 +750,7 @@ export class StarSystemView implements View {
 
     public getCurrentUniverseCoordinates(
         transform: TransformNode,
-        minimumDistanceRadiusRatio: number | null = 1.1,
+        minimumDistanceRadiusRatio: number | null,
     ): RelativeCoordinates {
         const currentStarSystem = this.getStarSystem();
 

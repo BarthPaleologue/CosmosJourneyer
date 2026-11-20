@@ -25,7 +25,7 @@ import { getLatestSaveFromBackend } from "@/backend/save/saveHelpers";
 class MockSaveBackend implements ISaveBackend {
     private readonly saves: Record<string, CmdrSaves>;
 
-    constructor(saves: Record<string, CmdrSaves> = {}) {
+    constructor(saves: Record<string, CmdrSaves>) {
         this.saves = saves;
     }
 
@@ -89,7 +89,7 @@ const createTestSave = (timestamp: number): Save => {
 
 describe("getLatestSaveFromBackend", () => {
     it("returns null when there are no commanders", async () => {
-        const backend = new MockSaveBackend();
+        const backend = new MockSaveBackend({});
 
         await expect(getLatestSaveFromBackend(backend)).resolves.toBeNull();
     });

@@ -20,6 +20,7 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
     const trueAnomaly = findMinimumNewtonRaphson(
         (anomaly) => keplerEquation(anomaly, meanAnomaly, orbit.eccentricity),
         meanAnomaly,
+        100,
     );
 
     const x = Math.cos(trueAnomaly);
