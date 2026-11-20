@@ -21,9 +21,8 @@ import type { Vector3Like } from "@/utils/types";
 
 /**
  * @param vector - Coordinates to copy.
- * @param target - Vector to update, allocated when omitted.
- * @returns The target vector containing the copied coordinates.
+ * @returns A new vector containing the copied coordinates.
  */
-export function wrapVector3(vector: Vector3Like, target = new Vector3()): Vector3 {
-    return target.copyFromFloats(vector.x, vector.y, vector.z);
+export function wrapVector3(vector: Vector3Like): Vector3 {
+    return new Vector3(vector.x, vector.y, vector.z);
 }
