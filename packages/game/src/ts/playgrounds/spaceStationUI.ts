@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
@@ -53,7 +54,7 @@ export async function createSpaceStationUIScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const t = (await I18n.New()).getT();
 

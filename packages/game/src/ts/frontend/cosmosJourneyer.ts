@@ -543,7 +543,7 @@ export class CosmosJourneyer {
 
         const soundPlayer = new SoundPlayer(assets.audio.sounds);
         const tts = new Tts(assets.audio.speakerVoiceLines);
-        const notificationManager = new NotificationManager(soundPlayer);
+        const notificationManager = new NotificationManager(soundPlayer, document);
         const terrainSystemResult = await TerrainSystemCpu.New(Settings.VERTEX_RESOLUTION);
         if (!terrainSystemResult.success) {
             return terrainSystemResult;
@@ -744,7 +744,7 @@ export class CosmosJourneyer {
      * Inits the current star system
      * @param skipMainMenu Whether to initialize directly into the current system.
      */
-    public async init(skipMainMenu = false): Promise<void> {
+    public async init(skipMainMenu: boolean): Promise<void> {
         if (!skipMainMenu) {
             const initResult = await this.mainMenu.init();
             if (!initResult.success) {
@@ -844,7 +844,7 @@ export class CosmosJourneyer {
 
             const starMap = this.starMap;
             this.activeView = starMap;
-            starMap.focusOnCurrentSystem();
+            starMap.focusOnCurrentSystem(false);
         } else {
             this.starMap.detachControl();
             this.starSystemView.attachControl();
@@ -925,6 +925,7 @@ export class CosmosJourneyer {
 
         const shipUniverseCoordinates = this.starSystemView.getCurrentUniverseCoordinates(
             spaceShipControls.getTransform(),
+            1.1,
         );
 
         const landingFacility = spaceShipControls.getLandingFacility();

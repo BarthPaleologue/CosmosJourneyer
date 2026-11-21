@@ -14,7 +14,7 @@ export type SpatialCube = Readonly<{
     origin: readonly [number, number, number];
     stars: StarOutput[];
 }>;
-export const clamp = (value: number, lower = 0, upper = 1): number => Math.max(lower, Math.min(upper, value));
+export const clamp = (value: number, lower: number, upper: number): number => Math.max(lower, Math.min(upper, value));
 export class SpatialBinner {
     readonly #cubes = new Map<CubeId, SpatialCube>();
     private readonly config: GridConfig;
@@ -47,9 +47,9 @@ export class SpatialBinner {
         cube.stars.push({
             name: star.name,
             relative_position: [
-                clamp((star.x - origin[0]) / this.config.gridSize),
-                clamp((star.y - origin[1]) / this.config.gridSize),
-                clamp((star.z - origin[2]) / this.config.gridSize),
+                clamp((star.x - origin[0]) / this.config.gridSize, 0, 1),
+                clamp((star.y - origin[1]) / this.config.gridSize, 0, 1),
+                clamp((star.z - origin[2]) / this.config.gridSize, 0, 1),
             ],
             temperature: star.temperature,
             nature: star.nature,

@@ -51,7 +51,7 @@ const internationalTextChunkType = "iTXt";
  * @param capturedAt - Capture timestamp, defaulting to the current time.
  * @returns Versioned screenshot metadata.
  */
-export function createScreenshotMetadata(location: RelativeCoordinates, capturedAt = new Date()): ScreenshotMetadata {
+export function createScreenshotMetadata(location: RelativeCoordinates, capturedAt: Date): ScreenshotMetadata {
     return {
         schemaVersion: 1,
         gameVersion: packageInfo.version,
@@ -81,7 +81,7 @@ export async function makeScreenshotPng(
         return png;
     }
 
-    return addScreenshotMetadata(png, createScreenshotMetadata(options.location));
+    return addScreenshotMetadata(png, createScreenshotMetadata(options.location, new Date()));
 }
 
 /**

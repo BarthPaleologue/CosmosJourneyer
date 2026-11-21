@@ -68,7 +68,7 @@ export async function createRoverScene(
 
     const t = (await I18n.New()).getT();
 
-    const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
+    const physicsEngine = await enablePhysics(scene);
 
     const audioEngine = await CreateAudioEngineAsync();
 

@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
@@ -91,7 +92,7 @@ export async function createStarSystemViewScene(
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
 
-    const havokPlugin = await enablePhysics(scene);
+    const havokPlugin = await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
     const moduleAssets = new ModuleAssets([]);
@@ -153,7 +154,7 @@ export async function createStarSystemViewScene(
                 console.warn("Moon not found, spawning near star instead");
                 break;
             }
-            positionNearObjectBrightSide(shipControls, moon, starSystemView.getStarSystem());
+            positionNearObjectBrightSide(shipControls, moon, starSystemView.getStarSystem(), 3);
             break;
         }
         case "aroundStar":
@@ -163,6 +164,7 @@ export async function createStarSystemViewScene(
                 starSystemView.getSpaceshipControls(),
                 starSystemView.getStarSystem().getStellarObjects()[0],
                 starSystemView.getStarSystem(),
+                3,
             );
             break;
     }

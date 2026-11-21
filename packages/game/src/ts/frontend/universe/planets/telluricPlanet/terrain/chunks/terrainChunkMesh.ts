@@ -308,7 +308,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
         const isEnabled =
             Vector3.Dot(observerToCenter, conservativeSphereNormal) >= 0 &&
-            isSizeOnScreenEnough(this, camera, 0.002 / 5);
+            isSizeOnScreenEnough(this, camera, { threshold: 0.002 / 5 });
 
         this.setActiveForCulling(isEnabled);
     }

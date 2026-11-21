@@ -84,13 +84,13 @@ export function positionNearObject(
  * @param transformable - Object or controls to reposition.
  * @param object - Target object with a bounding sphere.
  * @param starSystem - Current rendered star system.
- * @param nRadius - Target-radius multiplier; defaults to 3.
+ * @param nRadius - Target-radius multiplier.
  */
 export function positionNearObjectBrightSide(
     transformable: Transformable,
     object: Transformable & HasBoundingSphere,
     starSystem: StarSystemController,
-    nRadius = 3,
+    nRadius: number,
 ): void {
     // go from the nearest star to be on the sunny side of the object
     const nearestStar = nearestObject(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());
@@ -130,13 +130,13 @@ export function positionNearObjectBrightSide(
  * @param transformable - Object or controls to reposition.
  * @param object - Target object with a bounding sphere.
  * @param starSystem - Current rendered star system.
- * @param nRadius - Target-radius multiplier; defaults to 3.
+ * @param nRadius - Target-radius multiplier.
  */
 export function positionNearObjectWithStarVisible(
     transformable: Controls,
     object: Transformable & HasBoundingSphere,
     starSystem: StarSystemController,
-    nRadius = 3,
+    nRadius: number,
 ): void {
     // go from the nearest star to be on the sunny side of the object
     const nearestStar = nearestObject(object.getTransform().getAbsolutePosition(), starSystem.getStellarObjects());

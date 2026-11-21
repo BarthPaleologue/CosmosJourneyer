@@ -277,7 +277,7 @@ function AttachAxleToFrame(
     axle: PhysicsBody,
     frame: PhysicsBody,
     scene: Scene,
-    steerable = false,
+    steerable: boolean,
 ): Physics6DoFConstraint {
     const frameInverseWorldMatrix = frame.transformNode.getWorldMatrix().clone().invert();
 

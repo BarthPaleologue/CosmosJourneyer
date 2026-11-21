@@ -65,7 +65,7 @@ export class OPFSFileSystem implements IFileSystem {
      * @param create - Whether to create the directory if it doesn't exist
      * @returns The directory handle or null if it doesn't exist and create is false.
      */
-    private async getDirectoryHandle(path: string, create = false): Promise<FileSystemDirectoryHandle | null> {
+    private async getDirectoryHandle(path: string, create: boolean): Promise<FileSystemDirectoryHandle | null> {
         try {
             const parts = path.split("/").filter(Boolean);
             let currentHandle = this.rootHandle;
@@ -89,7 +89,7 @@ export class OPFSFileSystem implements IFileSystem {
      * @param create - Whether to create the file if it doesn't exist
      * @returns The file handle or null if it doesn't exist and create is false.
      */
-    private async getFileHandle(path: string, create = false): Promise<FileSystemFileHandle | null> {
+    private async getFileHandle(path: string, create: boolean): Promise<FileSystemFileHandle | null> {
         try {
             const parts = path.split("/").filter(Boolean);
             const fileName = parts.pop();
@@ -129,7 +129,7 @@ export class OPFSFileSystem implements IFileSystem {
                 return false;
             }
 
-            const parentHandle = await this.getDirectoryHandle("/" + parts.join("/"));
+            const parentHandle = await this.getDirectoryHandle("/" + parts.join("/"), false);
             if (!parentHandle) {
                 return false;
             }
@@ -144,7 +144,7 @@ export class OPFSFileSystem implements IFileSystem {
 
     public async listDirectory(path: string): Promise<string[] | null> {
         try {
-            const dirHandle = await this.getDirectoryHandle(path);
+            const dirHandle = await this.getDirectoryHandle(path, false);
             if (!dirHandle) {
                 return null;
             }
@@ -162,7 +162,7 @@ export class OPFSFileSystem implements IFileSystem {
     }
 
     public async directoryExists(path: string): Promise<boolean> {
-        const handle = await this.getDirectoryHandle(path);
+        const handle = await this.getDirectoryHandle(path, false);
         return handle !== null;
     }
 
@@ -186,7 +186,7 @@ export class OPFSFileSystem implements IFileSystem {
 
     public async readFile(path: string): Promise<string | null> {
         try {
-            const fileHandle = await this.getFileHandle(path);
+            const fileHandle = await this.getFileHandle(path, false);
             if (!fileHandle) {
                 return null;
             }
@@ -207,7 +207,7 @@ export class OPFSFileSystem implements IFileSystem {
                 return false;
             }
 
-            const dirHandle = await this.getDirectoryHandle("/" + parts.join("/"));
+            const dirHandle = await this.getDirectoryHandle("/" + parts.join("/"), false);
             if (!dirHandle) {
                 return false;
             }
@@ -221,7 +221,7 @@ export class OPFSFileSystem implements IFileSystem {
     }
 
     public async fileExists(path: string): Promise<boolean> {
-        const handle = await this.getFileHandle(path);
+        const handle = await this.getFileHandle(path, false);
         return handle !== null;
     }
 

@@ -47,7 +47,7 @@ export async function createAsteroidFieldScene(
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const defaultControls = new DefaultControls(scene);
 

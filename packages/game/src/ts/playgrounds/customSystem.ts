@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
@@ -123,7 +124,7 @@ export async function createCustomSystemScene(
     const ttsMock = new TtsMock();
     const notificationManager: INotificationManager = new NotificationManagerMock();
 
-    const havokPlugin = await enablePhysics(scene);
+    const havokPlugin = await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const [assets, moduleAssetsResult] = await Promise.all([
         loadRenderingAssets(scene, progressMonitor),
@@ -180,6 +181,7 @@ export async function createCustomSystemScene(
         starSystemView.getSpaceshipControls(),
         entityTarget ?? starSystemView.getStarSystem().getStellarObjects()[0],
         starSystemView.getStarSystem(),
+        3,
     );
     if (entityTarget !== undefined) {
         starSystemView.setTarget(entityTarget);

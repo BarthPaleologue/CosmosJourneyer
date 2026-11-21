@@ -31,6 +31,7 @@ describe("output", () => {
             { radiusLy: 50, parallaxOverErrorMin: 10, ruweMax: 10 },
             0,
             0,
+            () => new Date(),
         );
         const dir = await mkdtemp(join(tmpdir(), "gaia-relative-"));
         const json = relative(process.cwd(), join(dir, "nested", "gaia.json"));

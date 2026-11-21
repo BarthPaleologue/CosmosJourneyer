@@ -18,7 +18,7 @@ export interface DevWatcher {
  * @param window - Renderer window to reload after the bundle is ready.
  */
 async function reloadWhenReady(rendererDir: string, window: ElectronModule.BrowserWindow): Promise<void> {
-    const isReady = await waitForRendererBuild(rendererDir);
+    const isReady = await waitForRendererBuild(rendererDir, 5_000);
     if (!isReady || window.isDestroyed()) {
         return;
     }

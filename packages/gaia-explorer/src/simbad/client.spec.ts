@@ -49,7 +49,7 @@ describe("SimbadClient", () => {
                 }),
         };
 
-        const result = await new SimbadClient(tap).query([gaiaRow]);
+        const result = await new SimbadClient(tap, 400).query([gaiaRow]);
 
         expect(result.success).toBe(false);
         expect(!result.success && result.error.kind).toBe("protocol");
@@ -73,7 +73,7 @@ describe("SimbadClient", () => {
                 }),
         };
 
-        const result = await new SimbadClient(tap).query([gaiaRow]);
+        const result = await new SimbadClient(tap, 400).query([gaiaRow]);
 
         expect(result.success && result.value.get(gaiaRow.source_id)).toEqual({
             name: "Barnard's Star",

@@ -42,7 +42,7 @@ import { getVestaModel } from "@/modules/vesta/vesta";
 import packageInfo from "../../../../package.json";
 import { CustomAnimation } from "../helpers/animations/customAnimation";
 import { easeInOutQuadratic } from "../helpers/animations/interpolations";
-import { createOfficialOriginNotice } from "./officialOriginNotice";
+import { createOfficialOriginNotice, toOriginLocation } from "./officialOriginNotice";
 import type { SidePanels } from "./sidePanels";
 
 export class MainMenu {
@@ -223,7 +223,7 @@ export class MainMenu {
         this.aboutButton = elements.aboutButton;
         this.menuItems = elements.menuItems;
 
-        const officialOriginNotice = createOfficialOriginNotice(t);
+        const officialOriginNotice = createOfficialOriginNotice(t, toOriginLocation(window.location));
         if (officialOriginNotice !== null) {
             this.htmlRoot.appendChild(officialOriginNotice);
         }

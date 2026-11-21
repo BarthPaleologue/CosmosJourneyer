@@ -31,13 +31,12 @@ function sequentialSource(): () => number {
 }
 it("preserves fast-simplex-noise@4.0.0 outputs", () => {
     const noise3D = makeNoise3D(sequentialSource());
-    expect(
-        [
-            [0, 0, 0],
-            [0.1, 0.2, 0.3],
-            [-2.5, 7.25, -1.125],
-            [100, -20, 7],
-        ].map(([x = 0, y = 0, z = 0]) => noise3D(x, y, z)),
-    ).toEqual([0, 0.14062066323283273, -0.04304090990503559, 0]);
+    const samples: ReadonlyArray<readonly [number, number, number]> = [
+        [0, 0, 0],
+        [0.1, 0.2, 0.3],
+        [-2.5, 7.25, -1.125],
+        [100, -20, 7],
+    ];
+    expect(samples.map(([x, y, z]) => noise3D(x, y, z))).toEqual([0, 0.14062066323283273, -0.04304090990503559, 0]);
     expect(makeNoise3D(() => getRngFromSeed(42)(0))(0.1, 0.2, 0.3)).toBe(-0.6846858660819777);
 });

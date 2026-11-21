@@ -51,7 +51,7 @@ export async function createSpaceStationScene(
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const assets = await loadRenderingAssets(scene, progressMonitor);
 

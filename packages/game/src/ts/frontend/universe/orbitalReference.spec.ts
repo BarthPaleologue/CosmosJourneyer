@@ -95,7 +95,7 @@ describe("orbital reference selection", () => {
      * @param time - Simulation time in seconds.
      * @returns A simulation updated to the requested time.
      */
-    function placeModels(models: ReadonlyArray<KeplerianObjectSummary>, time = 0): KeplerianOrbitalSimulation {
+    function placeModels(models: ReadonlyArray<KeplerianObjectSummary>, time: number): KeplerianOrbitalSimulation {
         const objects = models.map((model) => ({ ...object(model.id, model.mass, Vector3.Zero()), ...model }));
         const simulation = new KeplerianOrbitalSimulation(objects);
         simulation.update(time);
@@ -207,11 +207,14 @@ describe("orbital reference selection", () => {
             generateSpaceElevatorModel("elevator", 42, planet, starSystem),
         ];
         for (const facility of facilities) {
-            const simulation = placeModels([
-                ...starSystem.stellarObjects,
-                ...starSystem.planets,
-                { id: facility.id, ...facility.placement, spin: facility.placement.attitude.spin },
-            ]);
+            const simulation = placeModels(
+                [
+                    ...starSystem.stellarObjects,
+                    ...starSystem.planets,
+                    { id: facility.id, ...facility.placement, spin: facility.placement.attitude.spin },
+                ],
+                0,
+            );
             const position = simulation.getTransform(facility.id)?.position;
             expect(position).toBeDefined();
             if (position === undefined) {
@@ -232,7 +235,7 @@ describe("orbital reference selection", () => {
     ])("keeps generated anomalies selectable outside their surface (%s)", (generateModel) => {
         const { starSystem } = getVestaModel();
         const anomaly = generateModel("anomaly", 42, "Anomaly", [...starSystem.stellarObjects]);
-        const simulation = placeModels([...starSystem.stellarObjects, anomaly]);
+        const simulation = placeModels([...starSystem.stellarObjects, anomaly], 0);
         const position = simulation.getTransform(anomaly.id)?.position;
         expect(position).toBeDefined();
         if (position === undefined) {
@@ -254,7 +257,7 @@ describe("orbital reference selection", () => {
                     : [],
             ),
         ];
-        const simulation = placeModels(models);
+        const simulation = placeModels(models, 0);
         const lab = simulation.getTransform("chronosResearchLab");
         expect(lab).toBeDefined();
         if (lab === undefined) {

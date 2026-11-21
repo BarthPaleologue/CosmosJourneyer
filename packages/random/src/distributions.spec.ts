@@ -42,24 +42,19 @@ describe("extended-random@1.2.2 compatibility", () => {
         normalRandom(5, 2, source, 0);
         expect(source.mock.calls).toEqual([[0], [1]]);
     });
-    it("preserves non-indexed samples when the index is omitted", () => {
+    it("samples consecutive indices for normalRandom starting at the given index", () => {
         const source = vi.fn(() => 0.25);
-        expect(normalRandom(5, 2, source)).toBe(5 + 2 * Math.sqrt(-2 * Math.log(0.25)) * Math.cos(2 * Math.PI * 0.25));
+        expect(normalRandom(5, 2, source, 0)).toBe(
+            5 + 2 * Math.sqrt(-2 * Math.log(0.25)) * Math.cos(2 * Math.PI * 0.25),
+        );
         expect(source.mock.calls).toEqual([[0], [1]]);
     });
-    it("defaults indexed distributions to index zero", () => {
-        expect(centeredRand(rng)).toBe(centeredRand(rng, 0));
-        expect(randRange(-3, 8, rng)).toBe(randRange(-3, 8, rng, 0));
-        expect(randRangeInt(-3, 8, rng)).toBe(randRangeInt(-3, 8, rng, 0));
-        expect(uniformRandBool(0.5, rng)).toBe(uniformRandBool(0.5, rng, 0));
-        expect(normalRandom(5, 2, rng)).toBe(6.32142004720318);
-    });
-    it("preserves default Math.random and non-indexed sources", () => {
+    it("accepts Math.random as an explicit source", () => {
         const random = vi.spyOn(Math, "random").mockReturnValue(0.25);
-        expect(centeredRand()).toBe(-0.5);
-        expect(randRange()).toBe(0.25);
-        expect(randRangeInt(2, 5)).toBe(3);
-        expect(uniformRandBool(0.25)).toBe(false);
+        expect(centeredRand(Math.random, 0)).toBe(-0.5);
+        expect(randRange(0, 1, Math.random, 0)).toBe(0.25);
+        expect(randRangeInt(2, 5, Math.random, 0)).toBe(3);
+        expect(uniformRandBool(0.25, Math.random, 0)).toBe(false);
         expect(randRange(-3, 8, () => 0.25, 7)).toBe(-0.25);
         expect(random).toHaveBeenCalledTimes(4);
     });

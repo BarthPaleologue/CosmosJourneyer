@@ -89,7 +89,11 @@ export function gcd(a: number, b: number): number {
  * @param maxIterations - Maximum number of Newton steps.
  * @returns The final root estimate, without a convergence guarantee.
  */
-export function findMinimumNewtonRaphson(f: (x: number) => number, startingPoint: number, maxIterations = 100): number {
+export function findMinimumNewtonRaphson(
+    f: (x: number) => number,
+    startingPoint: number,
+    maxIterations: number,
+): number {
     const delta = 1e-4;
     const tolerance = 1e-8;
 

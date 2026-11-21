@@ -52,7 +52,7 @@ export async function CreateSwimmingScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
+    const physicsEngine = await enablePhysics(scene);
 
     enablePointerLock(engine);
 

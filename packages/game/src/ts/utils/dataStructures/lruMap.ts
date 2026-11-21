@@ -19,30 +19,22 @@ export class LRUMap<K, V> {
     private readonly map = new Map<K, V>();
 
     private readonly maxSize: number;
-    private readonly cleanup: (key: K, item: V) => void;
 
-    public constructor(maxSize: number, cleanup: (key: K, item: V) => void = () => undefined) {
+    public constructor(maxSize: number) {
         if (maxSize < 1) {
             throw new Error("LRUMap maxSize must be greater than 0");
         }
 
         this.maxSize = maxSize;
-        this.cleanup = cleanup;
     }
 
     public set(key: K, value: V): void {
         if (this.map.has(key)) {
-            const existingValue = this.map.get(key) as V;
-            if (existingValue !== value) {
-                this.cleanup(key, existingValue);
-            }
             this.map.delete(key);
         } else if (this.map.size >= this.maxSize) {
-            const firstEntry = this.map.entries().next().value;
-            if (firstEntry !== undefined) {
-                const [firstKey, firstValue] = firstEntry;
-                this.cleanup(firstKey, firstValue);
-                this.map.delete(firstKey);
+            const first = this.map.keys().next();
+            if (first.done !== true) {
+                this.map.delete(first.value);
             }
         }
 
@@ -62,10 +54,6 @@ export class LRUMap<K, V> {
     }
 
     public clear(): void {
-        for (const [key, value] of this.map.entries()) {
-            this.cleanup(key, value);
-        }
-
         this.map.clear();
     }
 }

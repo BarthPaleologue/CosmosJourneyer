@@ -43,7 +43,7 @@ export function buildOutput(
     query: QueryConfig,
     retrieved: number,
     retained: number,
-    now: () => Date = () => new Date(),
+    now: () => Date,
 ): OutputPayload {
     const selection: OutputPayload["selection"] = {
         parallax_min_mas: computeParallaxMinMas(query),

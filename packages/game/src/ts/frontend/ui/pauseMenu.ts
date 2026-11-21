@@ -20,7 +20,7 @@ import type { TFunction } from "i18next";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 
-import { createOfficialOriginNotice } from "./officialOriginNotice";
+import { createOfficialOriginNotice, toOriginLocation } from "./officialOriginNotice";
 import type { SidePanels } from "./sidePanels";
 
 export class PauseMenu {
@@ -54,7 +54,7 @@ export class PauseMenu {
         this.rootNode.id = "pauseMenu";
         this.rootNode.classList.add("leftSideMenu");
 
-        const officialOriginNotice = createOfficialOriginNotice(t);
+        const officialOriginNotice = createOfficialOriginNotice(t, toOriginLocation(window.location));
         if (officialOriginNotice !== null) {
             this.mask.appendChild(officialOriginNotice);
         }

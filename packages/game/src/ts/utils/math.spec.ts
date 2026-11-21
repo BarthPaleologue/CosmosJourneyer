@@ -89,7 +89,7 @@ describe("math utilities", () => {
 
     describe("findMinimumNewtonRaphson", () => {
         it("finds a zero of the provided function", () => {
-            const result = findMinimumNewtonRaphson((x) => x * x - 9, 4);
+            const result = findMinimumNewtonRaphson((x) => x * x - 9, 4, 100);
 
             expect(result).toBeCloseTo(3);
         });

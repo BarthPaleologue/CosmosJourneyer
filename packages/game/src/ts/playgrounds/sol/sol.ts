@@ -52,7 +52,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
     scene.useRightHandedSystem = true;
     scene.clearColor.set(0, 0, 0, 1);
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const t = (await I18n.New()).getT();
 

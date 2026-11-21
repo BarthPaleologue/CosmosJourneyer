@@ -57,7 +57,7 @@ export async function createAutomaticLandingScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     enablePointerLock(engine);
 

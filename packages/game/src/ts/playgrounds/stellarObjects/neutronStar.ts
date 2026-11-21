@@ -49,7 +49,7 @@ export async function createNeutronStarScene(
     scene.useRightHandedSystem = true;
     scene.clearColor.setAll(0);
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const textures = await loadTextures(scene, engine, progressMonitor);
 

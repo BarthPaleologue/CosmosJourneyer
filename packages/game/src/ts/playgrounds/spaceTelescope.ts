@@ -47,7 +47,7 @@ export async function createSpaceTelescopeScene(
 ): Promise<Scene> {
     const scene = new Scene(engine, { useFloatingOrigin: true });
     scene.useRightHandedSystem = true;
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
     const [foilTextures, environment] = await Promise.all([
         loadFoilTextures(engine, progressMonitor),
         loadEnvironmentTextures(scene, progressMonitor),

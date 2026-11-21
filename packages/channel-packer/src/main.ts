@@ -66,7 +66,7 @@ function handleFileInputSelection(file: File | null): void {
  * @param message - Status text to display.
  * @param tone - Visual status severity.
  */
-function setStatus(message: string, tone: "default" | "error" = "default"): void {
+function setStatus(message: string, tone: "default" | "error"): void {
     state.statusMessage = message;
     state.statusTone = tone;
     syncUi(state, ui);
@@ -168,7 +168,7 @@ async function refreshPreview(statusPrefix?: string): Promise<void> {
         }
 
         clearPreview(state);
-        setStatus("Select or drop at least one texture to generate a preview.");
+        setStatus("Select or drop at least one texture to generate a preview.", "default");
         return;
     }
 
@@ -190,7 +190,7 @@ async function refreshPreview(statusPrefix?: string): Promise<void> {
 
         applyPreviewResponse(state, result.value);
         const message = `Packed preview ready using ${result.value.activeInputs} source texture${result.value.activeInputs === 1 ? "" : "s"}.`;
-        setStatus(statusPrefix === undefined ? message : `${statusPrefix} ${message}`);
+        setStatus(statusPrefix === undefined ? message : `${statusPrefix} ${message}`, "default");
     } finally {
         if (revision === previewRevision) {
             setBusyState(false);
@@ -217,7 +217,7 @@ async function savePackedTexture(): Promise<void> {
         }
 
         downloadBlob(result.value.blob, result.value.fileName);
-        setStatus(`Saved ${result.value.width} x ${result.value.height} PNG as ${result.value.fileName}.`);
+        setStatus(`Saved ${result.value.width} x ${result.value.height} PNG as ${result.value.fileName}.`, "default");
     } finally {
         setBusyState(false);
     }
@@ -423,7 +423,7 @@ function handleDrop(event: DragEvent, channel: ColorChannel): void {
     event.preventDefault();
 
     if (state.isBusy) {
-        setStatus("Wait for the current pack operation to finish before dropping another texture.");
+        setStatus("Wait for the current pack operation to finish before dropping another texture.", "default");
         return;
     }
 
@@ -464,7 +464,7 @@ function setupWindowDragHandling(appState: AppState, uiRefs: UiRefs): void {
 
         setHoveredDropTarget(uiRefs, appState, null);
         if (!appState.isBusy) {
-            setStatus("Drop files directly onto an output row to assign them.");
+            setStatus("Drop files directly onto an output row to assign them.", "default");
         }
     });
 }

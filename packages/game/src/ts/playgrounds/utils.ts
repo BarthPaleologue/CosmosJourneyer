@@ -22,23 +22,25 @@ import type { AbstractEngine, AbstractMesh, Camera, DirectionalLight, PhysicsEng
 import HavokPhysics from "@babylonjs/havok";
 import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { SkyMaterial } from "@babylonjs/materials";
+import { EarthG } from "@cosmos-journeyer/physics";
 import * as QRCode from "qrcode";
 
 import type { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
 
 import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
+export type EnablePhysicsOptions = Partial<{
+    gravity: Vector3;
+    havokInstance: HavokPhysicsWithBindings;
+}>;
+
 /**
  * @param scene - Scene receiving physics support.
- * @param gravity - Acceleration in meters per second squared.
- * @param havokInstance - Existing Havok bindings, if available.
+ * @param options - Optional knobs: `gravity` in meters per second squared (defaults to Earth gravity), and existing Havok bindings.
  * @returns Havok engine with the playground velocity limits applied.
  */
-export async function enablePhysics(
-    scene: Scene,
-    gravity = Vector3.Zero(),
-    havokInstance?: HavokPhysicsWithBindings,
-): Promise<PhysicsEngineV2> {
+export async function enablePhysics(scene: Scene, options?: EnablePhysicsOptions): Promise<PhysicsEngineV2> {
+    const { gravity = new Vector3(0, -EarthG, 0), havokInstance } = options ?? {};
     const havokPlugin = new HavokPlugin(true, havokInstance ?? (await HavokPhysics()));
     havokPlugin.setVelocityLimits(10_000, 10_000);
     scene.enablePhysics(gravity, havokPlugin);

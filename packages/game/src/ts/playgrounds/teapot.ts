@@ -52,7 +52,7 @@ export async function createTeapotScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene, new Vector3(0, -9.81, 0));
+    await enablePhysics(scene);
 
     const sun = new DirectionalLight("sun", new Vector3(-1, -2, -1), scene);
     createSky(sun.direction.scale(-1), scene);

@@ -48,7 +48,7 @@ export async function createGravitySystemScene(
     const scene = new Scene(engine);
     scene.useRightHandedSystem = true;
 
-    await enablePhysics(scene);
+    await enablePhysics(scene, { gravity: Vector3.Zero() });
 
     const sun = new DirectionalLight("sun", new Vector3(0.5, -1, -0.5), scene);
 

@@ -60,7 +60,7 @@ export async function createQrScanScene(
     scene.useRightHandedSystem = true;
 
     const t = (await I18n.New()).getT();
-    const physicsEngine = await enablePhysics(scene, new Vector3(0, -9.81, 0));
+    const physicsEngine = await enablePhysics(scene);
     enablePointerLock(engine);
 
     const light = new DirectionalLight("sun", new Vector3(-1, -2, 1), scene);

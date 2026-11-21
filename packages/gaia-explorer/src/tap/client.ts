@@ -15,15 +15,19 @@ export interface TapClient {
     ): Promise<Result<DeepReadonly<Array<Record<string, string>>>, TapError>>;
 }
 export type Fetch = typeof fetch;
-export type TapClientOptions = Readonly<{
-    fetchImplementation?: Fetch;
-    logger?: (message: string) => void;
-    timeoutMs?: number;
-}>;
+export type TapClientOptions = Readonly<
+    Partial<{
+        fetchImplementation: Fetch;
+        logger: (message: string) => void;
+        timeoutMs: number;
+    }>
+>;
 export type AsyncTapClientOptions = TapClientOptions &
-    Readonly<{
-        pollIntervalMs?: number;
-    }>;
+    Readonly<
+        Partial<{
+            pollIntervalMs: number;
+        }>
+    >;
 const defaultLogger = (message: string): void => {
     console.info(`[gaia-explorer] ${message}`);
 };
@@ -72,8 +76,8 @@ const logRowCount = (
  * @param options Fetch implementation, logging callback, and timeout settings.
  * @returns A client that executes synchronous TAP queries.
  */
-export function createSyncTapClient(endpoint: string, options: TapClientOptions = {}): TapClient {
-    const { fetchImplementation = fetch, logger = defaultLogger, timeoutMs = 30_000 } = options;
+export function createSyncTapClient(endpoint: string, options?: TapClientOptions): TapClient {
+    const { fetchImplementation = fetch, logger = defaultLogger, timeoutMs = 30_000 } = options ?? {};
     return {
         async query(
             adql: string,
@@ -129,13 +133,13 @@ const abortJob = async (fetchImplementation: Fetch, jobUrl: string): Promise<voi
  * @param options Fetch implementation, logging callback, polling interval, and timeout.
  * @returns A client that executes asynchronous TAP queries.
  */
-export function createAsyncTapClient(endpoint: string, options: AsyncTapClientOptions = {}): TapClient {
+export function createAsyncTapClient(endpoint: string, options?: AsyncTapClientOptions): TapClient {
     const {
         fetchImplementation = fetch,
         logger = defaultLogger,
         pollIntervalMs = 1_000,
         timeoutMs = 10 * 60_000,
-    } = options;
+    } = options ?? {};
     return {
         async query(
             adql: string,

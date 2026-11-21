@@ -32,7 +32,7 @@ export class NotificationManager implements INotificationManager {
     private readonly soundPlayer: ISoundPlayer;
     private readonly document: Document;
 
-    constructor(soundPlayer: ISoundPlayer, documentRef: Document = document) {
+    constructor(soundPlayer: ISoundPlayer, documentRef: Document) {
         this.soundPlayer = soundPlayer;
         this.document = documentRef;
 

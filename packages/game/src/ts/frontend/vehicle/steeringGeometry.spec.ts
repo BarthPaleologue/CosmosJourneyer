@@ -28,7 +28,7 @@ import {
 const wheel = (z: number, steerable: boolean) => ({ position: { x: 0, z }, steerable });
 const mechanicalLimit = degreesToRadians(45);
 const acceleration = 0.5 * EarthG;
-const curvatureAt = (arm: number, speed: number, angle = mechanicalLimit) =>
+const curvatureAt = (arm: number, speed: number, angle: number) =>
     computeSpeedLimitedCurvature(angle, arm, speed, acceleration, mechanicalLimit);
 
 describe("steering geometry", () => {
@@ -42,7 +42,12 @@ describe("steering geometry", () => {
                 minCurvature: -Math.tan(mechanicalLimit) / 5.2,
             },
         });
-        const angle = getWheelSteeringAngle(curvatureAt(5.2, kmhToMetersPerSecond(40)), 5.2, mechanicalLimit, 0);
+        const angle = getWheelSteeringAngle(
+            curvatureAt(5.2, kmhToMetersPerSecond(40), mechanicalLimit),
+            5.2,
+            mechanicalLimit,
+            0,
+        );
         expect(angle / degreesToRadians(1)).toBeCloseTo(11.7, 1);
     });
 
@@ -61,7 +66,7 @@ describe("steering geometry", () => {
             steeringReferenceZ: 0,
             referenceLeverArm: 2.6,
         });
-        const curvature = curvatureAt(2.6, kmhToMetersPerSecond(40));
+        const curvature = curvatureAt(2.6, kmhToMetersPerSecond(40), mechanicalLimit);
         const front = getWheelSteeringAngle(curvature, 2.6, mechanicalLimit, 0);
         const rear = getWheelSteeringAngle(curvature, -2.6, mechanicalLimit, 0);
         expect(front / degreesToRadians(1)).toBeCloseTo(5.9, 1);
@@ -121,7 +126,7 @@ describe("steering geometry", () => {
         expect(
             deriveSteeringGeometry([wheel(0, true)], mechanicalLimit, { steeringReferenceZOverride: NaN }),
         ).toBeUndefined();
-        expect(curvatureAt(0, 0)).toBe(0);
+        expect(curvatureAt(0, 0, mechanicalLimit)).toBe(0);
     });
 });
 
@@ -137,21 +142,21 @@ describe("curvature budget", () => {
 
     it("decreases maximum curvature with speed squared and supports acceleration tuning", () => {
         const speed = kmhToMetersPerSecond(40);
-        expect(curvatureAt(2.6, speed)).toBeCloseTo(acceleration / speed ** 2);
-        expect(curvatureAt(2.6, speed * 2)).toBeCloseTo(curvatureAt(2.6, speed) / 4);
+        expect(curvatureAt(2.6, speed, mechanicalLimit)).toBeCloseTo(acceleration / speed ** 2);
+        expect(curvatureAt(2.6, speed * 2, mechanicalLimit)).toBeCloseTo(curvatureAt(2.6, speed, mechanicalLimit) / 4);
         expect(
             computeSpeedLimitedCurvature(mechanicalLimit, 2.6, speed, acceleration * 2, mechanicalLimit),
-        ).toBeCloseTo(curvatureAt(2.6, speed) * 2);
+        ).toBeCloseTo(curvatureAt(2.6, speed, mechanicalLimit) * 2);
     });
 
     it("preserves turning signs in reverse and when changing direction", () => {
-        expect(curvatureAt(2.6, -20)).toBe(curvatureAt(2.6, 20));
-        expect(curvatureAt(2.6, 20, -mechanicalLimit)).toBe(-curvatureAt(2.6, 20));
+        expect(curvatureAt(2.6, -20, mechanicalLimit)).toBe(curvatureAt(2.6, 20, mechanicalLimit));
+        expect(curvatureAt(2.6, 20, -mechanicalLimit)).toBe(-curvatureAt(2.6, 20, mechanicalLimit));
     });
 });
 
 describe("Ackermann steering", () => {
-    const positionedWheel = (x: number, z: number, steerable = true) => ({
+    const positionedWheel = (x: number, z: number, steerable: boolean) => ({
         position: { x, z },
         steerable,
     });
@@ -177,10 +182,10 @@ describe("Ackermann steering", () => {
 
     it("limits the common curvature at the inner wheel's mechanical stop", () => {
         const wheels = [
-            positionedWheel(2.2, 2.6),
-            positionedWheel(-2.2, 2.6),
-            positionedWheel(2.2, -2.6),
-            positionedWheel(-2.2, -2.6),
+            positionedWheel(2.2, 2.6, true),
+            positionedWheel(-2.2, 2.6, true),
+            positionedWheel(2.2, -2.6, true),
+            positionedWheel(-2.2, -2.6, true),
         ];
         const limits = getMechanicalCurvatureLimits(wheels, 0, mechanicalLimit);
         expect(limits.maxCurvature).toBeCloseTo(1 / 4.8);
@@ -212,7 +217,7 @@ describe("Ackermann steering", () => {
             expect(limits.minCurvature).toBeCloseTo(-limits.maxCurvature);
         }
         const asymmetric = getMechanicalCurvatureLimits(
-            [positionedWheel(2, 4), positionedWheel(-1, -2)],
+            [positionedWheel(2, 4, true), positionedWheel(-1, -2, true)],
             0,
             mechanicalLimit,
         );
