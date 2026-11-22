@@ -72,11 +72,11 @@ export function getRngFromSeed(seed: number): IndexedRng {
  * @returns Deterministic noise in [0, 1).
  */
 export function squirrelNoise(seed: number, index: number): number {
-    const BIT_NOISE1 = 0xd2a80a3f;
-    const BIT_NOISE2 = 0xa884f197;
-    const BIT_NOISE3 = 0x6c736f4b;
-    const BIT_NOISE4 = 0xb79f3abb;
-    const BIT_NOISE5 = 0x1b56c4e9;
+    const BIT_NOISE1 = 0xd2a80a3f; // 11010010101010000000101000111111
+    const BIT_NOISE2 = 0xa884f197; // 10101000100001001111000110010111
+    const BIT_NOISE3 = 0x6c736f4b; // 01101100011100110110111101001011
+    const BIT_NOISE4 = 0xb79f3abb; // 10110111100111110011101010111011
+    const BIT_NOISE5 = 0x1b56c4f5; // 00011011010101101100010011110101
 
     let mangled = Math.imul(index, BIT_NOISE1);
     mangled = (mangled + seed) | 0;

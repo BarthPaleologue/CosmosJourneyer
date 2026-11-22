@@ -61,7 +61,7 @@ export async function createAuroraScene(
     const urlParams = new URLSearchParams(window.location.search);
     const showMagnetosphere = urlParams.get("magnetosphere") !== null;
     const seedParam = Number.parseInt(urlParams.get("seed") ?? "", 10);
-    const auroraSeed = Number.isNaN(seedParam) ? 2200 : seedParam;
+    const auroraSeed = Number.isNaN(seedParam) ? 1 : seedParam;
     if (showMagnetosphere) {
         // Far view to see the whole magnetosphere (standoff is ~10 planetary radii here).
         controls.getTransform().setAbsolutePosition(new Vector3(15.7e6, -1.05e6, -5.77e6));

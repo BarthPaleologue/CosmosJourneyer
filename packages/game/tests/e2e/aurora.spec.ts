@@ -7,7 +7,7 @@ test("The aurora playground renders its first frame correctly", async ({ page })
         scene: "aurora",
         shotName: "baseline",
         flagToWait: "frozen",
-        urlParams: { freeze: 1 },
+        urlParams: { freeze: 1, seed: 1 },
     });
 });
 
@@ -16,6 +16,6 @@ test("The aurora playground shows the magnetosphere gizmo with ?magnetosphere", 
         scene: "aurora",
         shotName: "magnetosphere",
         flagToWait: "frozen",
-        urlParams: { freeze: 1, magnetosphere: 1 },
+        urlParams: { freeze: 1, magnetosphere: 1, seed: 1 },
     });
 });
