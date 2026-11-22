@@ -55,10 +55,10 @@ describe("TargetingSystem", () => {
         expect(system.getTarget()).toBe(target);
         system.setTarget(target);
         expect(system.getTarget()).toBeNull();
-        system.setTarget(target, true);
-        system.setTarget(target, true);
+        system.setTarget(target, { forcedValue: true });
+        system.setTarget(target, { forcedValue: true });
         expect(system.getTarget()).toBe(target);
-        system.setTarget(target, false);
+        system.setTarget(target, { forcedValue: false });
         expect(system.getTarget()).toBeNull();
         system.setTarget(target);
         system.setTarget(null);
@@ -67,7 +67,7 @@ describe("TargetingSystem", () => {
 
     it("does not select or make unregistered targets known targets", () => {
         const target = createTarget(0, 10);
-        system.setTarget(target, true);
+        system.setTarget(target, { forcedValue: true });
         system.setKnownTargets([target]);
         expect(system.getTarget()).toBeNull();
         expect(system.isKnown(target)).toBe(false);

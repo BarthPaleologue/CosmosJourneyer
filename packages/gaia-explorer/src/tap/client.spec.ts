@@ -26,7 +26,7 @@ describe("asynchronous TAP client", () => {
             fetchImplementation,
             logger: (message) => messages.push(message),
             pollIntervalMs: 0,
-        }).query("SELECT source_id, name FROM stars");
+        }).query("SELECT source_id, name FROM stars", new AbortController().signal);
 
         expect(result).toEqual({ success: true, value: [{ source_id: "1", name: "Sirius" }] });
         expect(requests).toEqual([
@@ -58,7 +58,7 @@ describe("asynchronous TAP client", () => {
             fetchImplementation,
             logger: () => undefined,
             pollIntervalMs: 0,
-        }).query("broken");
+        }).query("broken", new AbortController().signal);
 
         expect(result).toEqual({
             success: false,

@@ -11,8 +11,8 @@ export interface AutoUpdaterClient {
     autoInstallOnAppQuit: boolean;
     isUpdateSupported: (info: UpdateInfo) => boolean | Promise<boolean>;
     checkForUpdates(): Promise<unknown>;
-    downloadUpdate(cancellationToken?: CancellationToken): Promise<Array<string>>;
-    quitAndInstall(isSilent?: boolean, isForceRunAfter?: boolean): void;
+    downloadUpdate(cancellationToken: CancellationToken): Promise<Array<string>>;
+    quitAndInstall(isSilent: boolean, isForceRunAfter: boolean): void;
     on(event: "update-available", listener: (info: UpdateInfo) => void): void;
     on(event: "download-progress", listener: (progress: ProgressInfo) => void): void;
     on(event: "error", listener: (error: Error) => void): void;
@@ -165,12 +165,12 @@ export class DesktopAutoUpdateService {
 /**
  * Creates the desktop update service with an optional updater implementation.
  * @param onStateChanged - Callback receiving each update state transition.
- * @param updater - Optional update client; defaults to the production updater.
+ * @param options - Optional settings, such as a custom update client; defaults to the production updater.
  * @returns The configured update service.
  */
 export function createDesktopAutoUpdateService(
     onStateChanged: (state: DesktopUpdateState) => void,
-    updater?: AutoUpdaterClient,
+    options?: Partial<{ updater: AutoUpdaterClient }>,
 ): DesktopAutoUpdateService {
-    return new DesktopAutoUpdateService(updater ?? autoUpdater, onStateChanged);
+    return new DesktopAutoUpdateService(options?.updater ?? autoUpdater, onStateChanged);
 }

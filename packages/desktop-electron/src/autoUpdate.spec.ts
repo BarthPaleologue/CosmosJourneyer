@@ -12,7 +12,7 @@ class MockUpdater extends EventEmitter {
     public autoInstallOnAppQuit = true;
     public isUpdateSupported: (info: UpdateInfo) => boolean | Promise<boolean> = () => true;
     public readonly checkForUpdates = vi.fn<() => Promise<null>>(async () => Promise.resolve(null));
-    public readonly downloadUpdate = vi.fn<(token?: CancellationToken) => Promise<Array<string>>>(async () =>
+    public readonly downloadUpdate = vi.fn<(token: CancellationToken) => Promise<Array<string>>>(async () =>
         Promise.resolve(["update"]),
     );
     public readonly quitAndInstall = vi.fn();
@@ -91,7 +91,7 @@ describe("DesktopAutoUpdateService", () => {
         updater.downloadUpdate.mockImplementationOnce(
             async (token) =>
                 new Promise((_resolve, reject) => {
-                    token?.once("cancel", () => {
+                    token.once("cancel", () => {
                         reject(new Error("Cancelled"));
                     });
                 }),

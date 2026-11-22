@@ -8,6 +8,7 @@ import {
     GaiaTapAsyncEndpoint,
     resolveTemperatureOverrides,
     rowsToStars,
+    StarLookupMaps,
     SimbadTapSyncEndpoint,
     SpatialBinner,
     validateDataset,
@@ -50,15 +51,21 @@ describe("public library API", () => {
             throw new Error(`Unexpected request to ${url}`);
         };
         const clientOptions = { fetchImplementation, logger: (): void => undefined };
-        const gaiaResult = await createGaiaClient({ ...clientOptions, pollIntervalMs: 0 }).query({
-            radiusLy: 50,
-            parallaxOverErrorMin: 10,
-            ruweMax: 10,
-        });
+        const gaiaResult = await createGaiaClient({ ...clientOptions, pollIntervalMs: 0 }).query(
+            {
+                radiusLy: 50,
+                parallaxOverErrorMin: 10,
+                ruweMax: 10,
+            },
+            new AbortController().signal,
+        );
         if (!gaiaResult.success) {
             throw new Error(gaiaResult.error.message);
         }
-        const simbadResult = await createSimbadClient(clientOptions).query(gaiaResult.value);
+        const simbadResult = await createSimbadClient(clientOptions).query(
+            gaiaResult.value,
+            new AbortController().signal,
+        );
         if (!simbadResult.success) {
             throw new Error(simbadResult.error.message);
         }
@@ -70,7 +77,7 @@ describe("public library API", () => {
             [...simbadResult.value].map(([sourceId, metadata]) => [sourceId, classifyStar(metadata)]),
         );
         const binner = new SpatialBinner({ gridSize: 5, halfExtent: 50 });
-        for (const star of rowsToStars(gaiaResult.value, { names, temperatures, natures })) {
+        for (const star of rowsToStars(gaiaResult.value, new StarLookupMaps(names, temperatures, natures))) {
             binner.addStar(star);
         }
         const payload = buildOutput(

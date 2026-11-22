@@ -16,15 +16,23 @@ const row = {
 describe("GaiaClient", () => {
     it("preserves source IDs beyond Number.MAX_SAFE_INTEGER", async () => {
         const tap: TapClient = { query: async () => await Promise.resolve({ success: true, value: [row] }) };
-        const result = await new GaiaClient(tap).query({ radiusLy: 50, parallaxOverErrorMin: 10, ruweMax: 10 });
+        const result = await new GaiaClient(tap).query(
+            { radiusLy: 50, parallaxOverErrorMin: 10, ruweMax: 10 },
+            new AbortController().signal,
+        );
         expect(result.success && result.value[0]?.source_id).toBe("2635476908753563008");
     });
     it("returns validation errors", async () => {
         const tap: TapClient = {
             query: async () => await Promise.resolve({ success: true, value: [{ ...row, ra: "nope" }] }),
         };
-        expect((await new GaiaClient(tap).query({ radiusLy: 50, parallaxOverErrorMin: 10, ruweMax: 10 })).success).toBe(
-            false,
-        );
+        expect(
+            (
+                await new GaiaClient(tap).query(
+                    { radiusLy: 50, parallaxOverErrorMin: 10, ruweMax: 10 },
+                    new AbortController().signal,
+                )
+            ).success,
+        ).toBe(false);
     });
 });

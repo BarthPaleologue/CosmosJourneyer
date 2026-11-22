@@ -66,11 +66,16 @@ void app.whenReady().then(() => {
     protocol.handle(appScheme, createHandleAppProtocol(rendererDir));
     registerAutoUpdateIpc();
     createMainWindow();
-    const developmentUpdater = createDevelopmentAutoUpdater(app, isDevelopment);
-    if (app.isPackaged || developmentUpdater !== null) {
-        autoUpdateService = createDesktopAutoUpdateService(broadcastUpdateState, developmentUpdater ?? undefined);
-        autoUpdateService.start();
+    const mockUpdater = createDevelopmentAutoUpdater(app, isDevelopment);
+    if (mockUpdater !== null) {
+        // Development build with the mock update flow enabled: use the mock updater.
+        autoUpdateService = createDesktopAutoUpdateService(broadcastUpdateState, { updater: mockUpdater });
+    } else if (app.isPackaged) {
+        // Packaged build: use the real updater.
+        autoUpdateService = createDesktopAutoUpdateService(broadcastUpdateState);
     }
+    // In development without the mock flow, no update service is started.
+    autoUpdateService?.start();
 
     app.on("activate", () => {
         if (BrowserWindow.getAllWindows().length === 0) {

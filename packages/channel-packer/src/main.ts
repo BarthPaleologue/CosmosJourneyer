@@ -73,14 +73,20 @@ function setStatus(message: string, tone: "default" | "error"): void {
     drawPreviewCanvas(state, ui);
 }
 
+const BusyState = {
+    Idle: { busyLabel: null },
+    PackingPreview: { busyLabel: "Packing preview..." },
+    SavingPng: { busyLabel: "Saving PNG..." },
+} as const;
+type BusyState = (typeof BusyState)[keyof typeof BusyState];
+
 /**
  * Updates the operation indicator and synchronizes the interface.
- * @param isBusy - Whether an operation is in progress.
- * @param busyLabel - Optional operation label.
+ * @param busyState - The busy state to apply, including its operation label.
  */
-function setBusyState(isBusy: boolean, busyLabel?: string): void {
-    state.isBusy = isBusy;
-    state.busyLabel = isBusy ? (busyLabel ?? "Working...") : null;
+function setBusyState(busyState: BusyState): void {
+    state.isBusy = busyState !== BusyState.Idle;
+    state.busyLabel = busyState.busyLabel;
     syncUi(state, ui);
     drawPreviewCanvas(state, ui);
 }
@@ -153,9 +159,9 @@ function assignFile(channel: ColorChannel, file: File): void {
 
 /**
  * Regenerates the preview, ignoring stale results superseded by a newer revision.
- * @param statusPrefix - Optional message preceding the packing result.
+ * @param options - Optional settings, such as a message preceding the packing result.
  */
-async function refreshPreview(statusPrefix?: string): Promise<void> {
+async function refreshPreview(options?: Partial<{ statusPrefix: string }>): Promise<void> {
     const revision = ++previewRevision;
     const request = buildPackRequest(state);
     const activeInputs = getAssignedInputCount(state);
@@ -172,7 +178,7 @@ async function refreshPreview(statusPrefix?: string): Promise<void> {
         return;
     }
 
-    setBusyState(true, "Packing preview...");
+    setBusyState(BusyState.PackingPreview);
     await waitForNextPaint();
 
     try {
@@ -190,10 +196,11 @@ async function refreshPreview(statusPrefix?: string): Promise<void> {
 
         applyPreviewResponse(state, result.value);
         const message = `Packed preview ready using ${result.value.activeInputs} source texture${result.value.activeInputs === 1 ? "" : "s"}.`;
+        const statusPrefix = options?.statusPrefix;
         setStatus(statusPrefix === undefined ? message : `${statusPrefix} ${message}`, "default");
     } finally {
         if (revision === previewRevision) {
-            setBusyState(false);
+            setBusyState(BusyState.Idle);
         }
     }
 }
@@ -206,7 +213,7 @@ async function savePackedTexture(): Promise<void> {
         return;
     }
 
-    setBusyState(true, "Saving PNG...");
+    setBusyState(BusyState.SavingPng);
     await waitForNextPaint();
 
     try {
@@ -219,7 +226,7 @@ async function savePackedTexture(): Promise<void> {
         downloadBlob(result.value.blob, result.value.fileName);
         setStatus(`Saved ${result.value.width} x ${result.value.height} PNG as ${result.value.fileName}.`, "default");
     } finally {
-        setBusyState(false);
+        setBusyState(BusyState.Idle);
     }
 }
 
@@ -440,9 +447,11 @@ function handleDrop(event: DragEvent, channel: ColorChannel): void {
     }
 
     assignFile(channel, file);
-    const statusPrefix =
-        fileList.length > 1 ? "Only the first dropped file was used for this output channel." : undefined;
-    void refreshPreview(statusPrefix);
+    if (fileList.length > 1) {
+        void refreshPreview({ statusPrefix: "Only the first dropped file was used for this output channel." });
+    } else {
+        void refreshPreview();
+    }
 }
 
 /**

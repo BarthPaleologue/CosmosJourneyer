@@ -100,11 +100,12 @@ export class TargetingSystem {
     /**
      * Selects or clears a target; forced selection can bypass sensor availability.
      * @param object Object to select, or `null` to clear the current selection.
-     * @param forcedValue Optional explicit selection state; true selects and false clears.
+     * @param options Optional settings, such as an explicit selection state; true selects and false clears.
      */
-    public setTarget(object: Transformable | null, forcedValue?: boolean): void {
+    public setTarget(object: Transformable | null, options?: Partial<{ forcedValue: boolean }>): void {
         const target = object === null ? null : (this.getContact(object)?.target ?? null);
         let shouldHide = this.target === target;
+        const forcedValue = options?.forcedValue;
         if (forcedValue !== undefined) {
             shouldHide = !forcedValue;
         }

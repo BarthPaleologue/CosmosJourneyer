@@ -4,7 +4,7 @@ import { classifyStar } from "./classification";
 import { computeParallaxMinMas } from "./config";
 import type { GaiaRow } from "./gaia/schemas";
 import type { SimbadMetadata } from "./metadata";
-import { rowToStar } from "./records";
+import { rowToStar, StarLookupMaps } from "./records";
 import { SpatialBinner } from "./spatial";
 import {
     estimateTemperatureFromBpRp,
@@ -28,17 +28,20 @@ describe("ported domain", () => {
         expect(classifyStar(undefined)).toBe("main-sequence");
     });
     it("converts and bins", () => {
-        const star = rowToStar({
-            source_id: "9007199254740993",
-            designation: "Test",
-            ra: 0,
-            dec: 0,
-            parallax: 200,
-            parallax_over_error: 10,
-            ruwe: 1,
-            bp_rp: null,
-            teff_k: 5000,
-        });
+        const star = rowToStar(
+            {
+                source_id: "9007199254740993",
+                designation: "Test",
+                ra: 0,
+                dec: 0,
+                parallax: 200,
+                parallax_over_error: 10,
+                ruwe: 1,
+                bp_rp: null,
+                teff_k: 5000,
+            },
+            StarLookupMaps.Empty(),
+        );
         expect(star?.x).toBeCloseTo(16.3078);
         const binner = new SpatialBinner({ gridSize: 10, halfExtent: 20 });
         expect(star && binner.addStar(star)).toBe(true);

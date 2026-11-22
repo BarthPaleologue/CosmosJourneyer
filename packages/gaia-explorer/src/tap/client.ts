@@ -11,7 +11,7 @@ export type TapError = Readonly<{
 export interface TapClient {
     query(
         adql: string,
-        signal?: DeepReadonly<AbortSignal>,
+        signal: DeepReadonly<AbortSignal>,
     ): Promise<Result<DeepReadonly<Array<Record<string, string>>>, TapError>>;
 }
 export type Fetch = typeof fetch;
@@ -36,9 +36,9 @@ const requestBody = (adql: string): URLSearchParams =>
 const errorFromException = (
     error: unknown,
     timeout: DeepReadonly<AbortSignal>,
-    signal?: DeepReadonly<AbortSignal>,
+    signal: DeepReadonly<AbortSignal>,
 ): TapError => ({
-    kind: timeout.aborted && signal?.aborted !== true ? "timeout" : signal?.aborted === true ? "aborted" : "network",
+    kind: timeout.aborted && !signal.aborted ? "timeout" : signal.aborted ? "aborted" : "network",
     message: error instanceof Error ? error.message : "TAP request failed",
 });
 const httpError = (response: DeepReadonly<Response>): TapError => ({
@@ -81,10 +81,10 @@ export function createSyncTapClient(endpoint: string, options?: TapClientOptions
     return {
         async query(
             adql: string,
-            signal?: DeepReadonly<AbortSignal>,
+            signal: DeepReadonly<AbortSignal>,
         ): Promise<Result<DeepReadonly<Array<Record<string, string>>>, TapError>> {
             const timeout = AbortSignal.timeout(timeoutMs);
-            const combined = signal === undefined ? timeout : AbortSignal.any([signal, timeout]);
+            const combined = AbortSignal.any([signal, timeout]);
             try {
                 logger(`Submitting synchronous TAP query to ${endpoint}`);
                 const response = await fetchImplementation(endpoint, {
@@ -143,10 +143,10 @@ export function createAsyncTapClient(endpoint: string, options?: AsyncTapClientO
     return {
         async query(
             adql: string,
-            signal?: DeepReadonly<AbortSignal>,
+            signal: DeepReadonly<AbortSignal>,
         ): Promise<Result<DeepReadonly<Array<Record<string, string>>>, TapError>> {
             const timeout = AbortSignal.timeout(timeoutMs);
-            const combined = signal === undefined ? timeout : AbortSignal.any([signal, timeout]);
+            const combined = AbortSignal.any([signal, timeout]);
             let jobUrl: string | undefined;
             try {
                 logger(`Creating asynchronous TAP job at ${endpoint}`);

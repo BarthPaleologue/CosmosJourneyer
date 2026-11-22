@@ -27,7 +27,7 @@ import {
     hasLiquidWater,
 } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom, uniformRandBool } from "@cosmos-journeyer/random";
-import type { DeepPartial, DeepReadonly } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type {
     AtmosphereModel,
@@ -52,7 +52,6 @@ import { getTemperatureRange } from "./temperatureRange";
  * @param seed Seed used to make procedural choices reproducible.
  * @param name Display name assigned to the planet.
  * @param parentBodies Stellar objects that parent the planet's orbit.
- * @param overrides Optional values that replace generated defaults.
  * @returns The generated telluric planet model.
  */
 export function generateTelluricPlanetModel(
@@ -60,7 +59,6 @@ export function generateTelluricPlanetModel(
     seed: number,
     name: string,
     parentBodies: DeepReadonly<Array<StellarObjectModel>>,
-    overrides?: DeepReadonly<DeepPartial<TelluricPlanetModel>>,
 ): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 
@@ -78,7 +76,7 @@ export function generateTelluricPlanetModel(
         orbitRadiuses.push(orbitRadius);
     }
 
-    const orbitRadius = overrides?.orbit?.semiMajorAxis ?? (parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0);
+    const orbitRadius = parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0;
 
     let parentAverageInclination = 0;
     let parentAverageAxialTilt = 0;
