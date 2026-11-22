@@ -44,7 +44,7 @@ describe("PlanetaryLandingTutorial", () => {
         }
 
         const shipLocation = saveData.shipLocations[saveData.playerLocation.shipId];
-        expect(shipLocation).not.toBe(undefined);
+        expect(shipLocation).toBeDefined();
         if (shipLocation === undefined) {
             throw new Error("shipLocation is undefined");
         }

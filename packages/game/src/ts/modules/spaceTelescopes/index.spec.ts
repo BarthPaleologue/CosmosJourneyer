@@ -214,14 +214,14 @@ describe("space telescope module in Vesta", () => {
             return;
         }
         expect(entity.content.getTransform().parent).toBe(entity.placement.getTransform());
-        const targets = processors.targeting.dispatch(entity, undefined);
+        const targets = processors.targeting.dispatch(entity);
         expect(targets).toHaveLength(1);
         expect(targets[0]?.type).toBe(TargetType.CUSTOM);
         expect(targets[0]?.properName).toBe("Vesta Deep Space Telescope");
         expect(targets[0]?.getTransform()).toBe(entity.content.getTransform());
         expect(targets[0]?.getBoundingRadius()).toBeGreaterThan(100);
         expect(targets[0]?.getBoundingRadius()).toBeLessThan(150);
-        expect(processors.shadowCasters.dispatch(entity, undefined)).toEqual([entity.content.getTransform()]);
+        expect(processors.shadowCasters.dispatch(entity)).toEqual([entity.content.getTransform()]);
         const initial = orbitalSimulation.getTransform(entity.model.id);
         expect(initial?.position.length()).toBeCloseTo(astronomicalUnitToMeters(3), 0);
         const parent = starSystem.stellarObjects[0];

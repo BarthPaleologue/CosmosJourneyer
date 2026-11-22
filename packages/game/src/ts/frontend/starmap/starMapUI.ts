@@ -72,7 +72,7 @@ export class StarMapUI {
     readonly onSystemFocusObservable = new Observable<StarSystemCoordinates>();
 
     private formatLyDistance(distanceInLy: number): string {
-        return distanceInLy.toLocaleString(undefined, {
+        return distanceInLy.toLocaleString([], {
             minimumFractionDigits: 1,
             maximumFractionDigits: 1,
         });

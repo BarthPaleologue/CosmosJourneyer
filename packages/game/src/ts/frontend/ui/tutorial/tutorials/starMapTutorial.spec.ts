@@ -75,7 +75,7 @@ describe("StarMapTutorial", () => {
         const shipId = saveData.playerLocation.shipId;
 
         const shipLocation = saveData.shipLocations[shipId];
-        expect(shipLocation).not.toBe(undefined);
+        expect(shipLocation).toBeDefined();
         if (shipLocation === undefined) {
             throw new Error("shipLocation is undefined");
         }

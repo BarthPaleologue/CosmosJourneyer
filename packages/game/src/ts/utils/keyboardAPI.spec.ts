@@ -40,9 +40,7 @@ describe("getGlobalKeyboardLayoutMap", () => {
         // Mock navigator.keyboard without getLayoutMap
         Object.defineProperty(global, "navigator", {
             value: {
-                keyboard: {
-                    getLayoutMap: undefined,
-                },
+                keyboard: {},
             },
             writable: true,
         });
@@ -55,9 +53,7 @@ describe("getGlobalKeyboardLayoutMap", () => {
     it("should return null when navigator.keyboard is undefined", async () => {
         // Mock navigator without keyboard
         Object.defineProperty(global, "navigator", {
-            value: {
-                keyboard: undefined,
-            },
+            value: {},
             writable: true,
         });
 

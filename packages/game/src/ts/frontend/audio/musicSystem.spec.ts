@@ -57,7 +57,7 @@ function createFixture() {
     const entityMusic = vi.fn<() => Array<keyof Musics>>(() => []);
     const music = new MusicSystem(
         musics,
-        { unlockAsync: vi.fn<() => Promise<void>>().mockResolvedValue(undefined) } as unknown as AudioEngineV2,
+        { unlockAsync: vi.fn<() => Promise<void>>().mockImplementation(async () => {}) } as unknown as AudioEngineV2,
         view as unknown as StarSystemView,
         entityMusic,
     );

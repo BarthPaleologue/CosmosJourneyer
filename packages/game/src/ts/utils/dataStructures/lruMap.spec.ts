@@ -82,6 +82,7 @@ describe("LRUMap", () => {
     test("supports undefined values", () => {
         const lru = new LRUMap<string, number | undefined>(1);
 
+        // eslint-disable-next-line cosmos/no-undefined-arguments -- the test intentionally stores undefined as a value.
         lru.set("a", undefined);
         expect(lru.get("a")).toBeUndefined();
 
@@ -92,9 +93,11 @@ describe("LRUMap", () => {
     test("evicts the oldest entry even when its key is undefined", () => {
         const lru = new LRUMap<string | undefined, number>(1);
 
+        // eslint-disable-next-line cosmos/no-undefined-arguments -- the test intentionally uses undefined as a key.
         lru.set(undefined, 1);
         lru.set("b", 2);
 
+        // eslint-disable-next-line cosmos/no-undefined-arguments -- the test intentionally looks up an undefined key.
         expect(lru.get(undefined)).toBeUndefined();
         expect(lru.get("b")).toBe(2);
     });

@@ -184,6 +184,7 @@ export class WireframeTopology {
             triangles.push(triangle.value[0], triangle.value[1], triangle.value[2]);
         }
 
+        // eslint-disable-next-line cosmos/no-undefined-arguments -- ok(undefined) is a legitimate Result value here, not a default.
         return ok(undefined);
     }
 

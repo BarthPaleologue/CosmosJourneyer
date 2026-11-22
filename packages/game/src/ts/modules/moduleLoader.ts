@@ -58,5 +58,6 @@ export function setupModules(gameModules: Iterable<GameModule>, api: GameModuleA
         }
     }
 
+    // eslint-disable-next-line cosmos/no-undefined-arguments -- ok(undefined) is a legitimate Result value here, not a default.
     return ok(undefined);
 }

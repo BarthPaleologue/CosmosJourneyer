@@ -101,7 +101,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const range = document.createElement("p");
-        range.innerText = `${this.t("spaceStation:range")}: ${this.t("units:shortLy", { value: spec.rangeLy.toLocaleString(undefined, { maximumSignificantDigits: 3 }) })}`;
+        range.innerText = `${this.t("spaceStation:range")}: ${this.t("units:shortLy", { value: spec.rangeLy.toLocaleString([], { maximumSignificantDigits: 3 }) })}`;
         container.appendChild(range);
 
         return container;
@@ -112,7 +112,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const scoopRate = document.createElement("p");
-        scoopRate.innerText = `${this.t("spaceStation:scoopRate")}: ${spec.fuelPerSecond.toLocaleString(undefined, { maximumSignificantDigits: 3 })} L/s`;
+        scoopRate.innerText = `${this.t("spaceStation:scoopRate")}: ${spec.fuelPerSecond.toLocaleString([], { maximumSignificantDigits: 3 })} L/s`;
         container.appendChild(scoopRate);
 
         return container;
@@ -123,7 +123,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const capacity = document.createElement("p");
-        capacity.innerText = `${this.t("spaceStation:capacity")}: ${spec.maxFuel.toLocaleString(undefined, { maximumSignificantDigits: 3 })} L`;
+        capacity.innerText = `${this.t("spaceStation:capacity")}: ${spec.maxFuel.toLocaleString([], { maximumSignificantDigits: 3 })} L`;
         container.appendChild(capacity);
 
         return container;
@@ -134,7 +134,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const relativeRange = document.createElement("p");
-        relativeRange.innerText = `${this.t("spaceStation:relativeRange")}: ${spec.relativeRange.toLocaleString(undefined, { maximumSignificantDigits: 3 })}`;
+        relativeRange.innerText = `${this.t("spaceStation:relativeRange")}: ${spec.relativeRange.toLocaleString([], { maximumSignificantDigits: 3 })}`;
         container.appendChild(relativeRange);
 
         return container;
@@ -145,7 +145,7 @@ export class ComponentSpecUI {
         const container = document.createElement("div");
 
         const maxSpeed = document.createElement("p");
-        maxSpeed.innerText = `${this.t("spaceStation:maxSpeed")}: ${spec.maxSpeed.toLocaleString(undefined, { maximumSignificantDigits: 3 })} m/s`;
+        maxSpeed.innerText = `${this.t("spaceStation:maxSpeed")}: ${spec.maxSpeed.toLocaleString([], { maximumSignificantDigits: 3 })} m/s`;
         container.appendChild(maxSpeed);
 
         return container;

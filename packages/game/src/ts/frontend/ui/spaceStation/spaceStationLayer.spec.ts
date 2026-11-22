@@ -87,7 +87,7 @@ describe("station service identity", () => {
     });
     it("shows a localized error when station missions cannot be loaded", () => {
         vi.spyOn(backend, "getSystemContentModelAt").mockReturnValue(null);
-        const alert = vi.spyOn(dialogModal, "alertModal").mockResolvedValue(undefined);
+        const alert = vi.spyOn(dialogModal, "alertModal").mockImplementation(async () => {});
         const missions = layer.rootHtml.querySelector<HTMLElement>(".missionsButton");
         if (missions === null) {
             throw new Error("Expected the missions button");

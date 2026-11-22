@@ -405,7 +405,7 @@ describe("station save loading", () => {
             starTransform.computeWorldMatrix(true);
             const player = new TransformNode("player", scene);
             const star = { getTransform: () => starTransform, getBoundingRadius: () => 100 };
-            const alert = vi.spyOn(dialogModal, "alertModal").mockResolvedValue(undefined);
+            const alert = vi.spyOn(dialogModal, "alertModal").mockImplementation(async () => {});
             const context = {
                 getActiveControls: () => ({ getTransform: () => player }),
                 getStarSystem: () => ({
