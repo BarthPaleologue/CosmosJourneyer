@@ -8,6 +8,7 @@ import {
     GaiaTapAsyncEndpoint,
     resolveTemperatureOverrides,
     rowsToStars,
+    StarLookupMaps,
     SimbadTapSyncEndpoint,
     SpatialBinner,
     validateDataset,
@@ -76,7 +77,7 @@ describe("public library API", () => {
             [...simbadResult.value].map(([sourceId, metadata]) => [sourceId, classifyStar(metadata)]),
         );
         const binner = new SpatialBinner({ gridSize: 5, halfExtent: 50 });
-        for (const star of rowsToStars(gaiaResult.value, { names, temperatures, natures })) {
+        for (const star of rowsToStars(gaiaResult.value, new StarLookupMaps(names, temperatures, natures))) {
             binner.addStar(star);
         }
         const payload = buildOutput(
