@@ -78,9 +78,8 @@ export async function createSpaceElevatorScene(
     };
 
     const sun = getSunModel();
-    const planet = generateTelluricPlanetModel("dummy", 0, "Dummy", [sun], {
-        orbit: { semiMajorAxis: astronomicalUnitToMeters(1) },
-    });
+    const planet = generateTelluricPlanetModel("dummy", 0, "Dummy", [sun]);
+    planet.orbit.semiMajorAxis = astronomicalUnitToMeters(1);
 
     const systemModel: StarSystemModel = {
         name: "Space Elevator PG",
