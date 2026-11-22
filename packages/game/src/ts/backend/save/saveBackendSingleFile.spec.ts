@@ -29,9 +29,9 @@ import type { CmdrSaves, Save } from "./saveFileData";
 class MockSaveBackend implements IFile {
     private mockData = "{}";
 
-    constructor(initialData?: string) {
-        if (initialData !== undefined) {
-            this.mockData = initialData;
+    constructor(options?: Partial<{ initialData: string }>) {
+        if (options?.initialData !== undefined) {
+            this.mockData = options.initialData;
         }
     }
 
@@ -132,7 +132,7 @@ describe("SaveManager", () => {
 
     describe("Create", () => {
         it("should create a SaveManager with existing saves", async () => {
-            const backend = new MockSaveBackend(JSON.stringify(testSaves));
+            const backend = new MockSaveBackend({ initialData: JSON.stringify(testSaves) });
             const backupBackend = new MockSaveBackend();
             const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
@@ -155,7 +155,7 @@ describe("SaveManager", () => {
         });
 
         it("should handle read errors", async () => {
-            const backend = new MockSaveBackend("invalid json data");
+            const backend = new MockSaveBackend({ initialData: "invalid json data" });
             const backupBackend = new MockSaveBackend();
             const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
@@ -169,14 +169,14 @@ describe("SaveManager", () => {
             const manualSaveWithoutTimestamp1 = { ...createTestSave(0), timestamp: undefined };
             const manualSaveWithoutTimestamp2 = { ...createTestSave(0), timestamp: undefined };
 
-            const backend = new MockSaveBackend(
-                JSON.stringify({
+            const backend = new MockSaveBackend({
+                initialData: JSON.stringify({
                     [cmdrUuid1]: {
                         manual: [manualSaveWithoutTimestamp1, manualSaveWithoutTimestamp2],
                         auto: [],
                     },
                 }),
-            );
+            });
             const backupBackend = new MockSaveBackend();
 
             const firstTimestamp = 1_000_000;
@@ -209,7 +209,7 @@ describe("SaveManager", () => {
 
     describe("getSavesForCmdr", () => {
         it("should return saves for an existing cmdr", async () => {
-            const backend = new MockSaveBackend(JSON.stringify(testSaves));
+            const backend = new MockSaveBackend({ initialData: JSON.stringify(testSaves) });
             const backupBackend = new MockSaveBackend();
             const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
@@ -221,7 +221,7 @@ describe("SaveManager", () => {
         });
 
         it("should return undefined for a non-existent cmdr", async () => {
-            const backend = new MockSaveBackend(JSON.stringify(testSaves));
+            const backend = new MockSaveBackend({ initialData: JSON.stringify(testSaves) });
             const backupBackend = new MockSaveBackend();
             const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
@@ -235,7 +235,7 @@ describe("SaveManager", () => {
 
     describe("addManualSave", () => {
         it("should add a manual save to an existing cmdr", async () => {
-            const backend = new MockSaveBackend(JSON.stringify(testSaves));
+            const backend = new MockSaveBackend({ initialData: JSON.stringify(testSaves) });
             const backupBackend = new MockSaveBackend();
             const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
@@ -279,7 +279,7 @@ describe("SaveManager", () => {
 
     describe("addAutoSave", () => {
         it("should add an auto save to an existing cmdr", async () => {
-            const backend = new MockSaveBackend(JSON.stringify(testSaves));
+            const backend = new MockSaveBackend({ initialData: JSON.stringify(testSaves) });
             const backupBackend = new MockSaveBackend();
             const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 
@@ -337,7 +337,7 @@ describe("SaveManager", () => {
                     ],
                 },
             };
-            const backend = new MockSaveBackend(JSON.stringify(initialData));
+            const backend = new MockSaveBackend({ initialData: JSON.stringify(initialData) });
             const backupBackend = new MockSaveBackend();
             const result = await SaveBackendSingleFile.CreateAsync(backend, backupBackend);
 

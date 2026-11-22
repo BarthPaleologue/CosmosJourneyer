@@ -42,7 +42,7 @@ import type { StationSection } from "./stationSection";
  * @param displayName - The localized name used for this facility section.
  * @param assets - The loaded models and textures needed by the facility sections.
  * @param scene - The Babylon.js scene that owns the rendered meshes.
- * @param initialSupport - The initial landing-pad support section to build.
+ * @param options - Optional settings, such as the initial landing-pad support section to build.
  * @returns The facility sections attached to the root transform.
  */
 export function createFacilitySections(
@@ -51,12 +51,12 @@ export function createFacilitySections(
     displayName: string,
     assets: RenderingAssets,
     scene: Scene,
-    initialSupport?: TransformNode,
+    options?: Partial<{ initialSupport: TransformNode }>,
 ): Array<StationSection> {
     const sections: Array<StationSection> = [];
     for (const section of models) {
         const newSection = getSectionFromModel(section, displayName, assets, scene);
-        const lastNode = sections.at(-1)?.getTransform() ?? initialSupport;
+        const lastNode = sections.at(-1)?.getTransform() ?? options?.initialSupport;
         if (lastNode !== undefined) {
             placeNode(newSection.getTransform(), lastNode);
         }

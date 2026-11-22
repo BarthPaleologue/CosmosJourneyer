@@ -158,9 +158,9 @@ describe("SaveBackendMultiFile", () => {
     const cmdrUuid1 = "68ea941b-e163-4ec0-9039-76949d435a96";
     const cmdrUuid2 = "a8052d9f-1ccd-4d74-a17d-84f50b467745";
 
-    const createTestSave = (timestamp: number, uuid?: string): Save => {
+    const createTestSave = (timestamp: number, options?: Partial<{ uuid: string }>): Save => {
         return {
-            uuid: uuid ?? crypto.randomUUID(),
+            uuid: options?.uuid ?? crypto.randomUUID(),
             timestamp,
             player: SerializedPlayerSchema.parse({}),
             playerLocation: {
@@ -235,9 +235,9 @@ describe("SaveBackendMultiFile", () => {
         });
 
         it("should load and sort saves correctly", async () => {
-            const save1 = createTestSave(1000, "save1");
-            const save2 = createTestSave(2000, "save2");
-            const save3 = createTestSave(1500, "save3");
+            const save1 = createTestSave(1000, { uuid: "save1" });
+            const save2 = createTestSave(2000, { uuid: "save2" });
+            const save3 = createTestSave(1500, { uuid: "save3" });
 
             // Create saves manually in file system
             await fileSystem.createDirectory(`/saves/${cmdrUuid1}/manual`);

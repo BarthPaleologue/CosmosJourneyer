@@ -1730,7 +1730,7 @@ export class StarSystemView implements View {
         }
 
         if (target !== undefined) {
-            this.targetingSystem.setTarget(target, true);
+            this.targetingSystem.setTarget(target, { forcedValue: true });
         }
     }
 
