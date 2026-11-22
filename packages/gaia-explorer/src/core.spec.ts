@@ -25,6 +25,7 @@ describe("ported domain", () => {
         expect(classifyStar({ name: "x", spectralType: null, objectType: "BH", effectiveTemperature: null })).toBe(
             "black-hole",
         );
+        // eslint-disable-next-line cosmos/no-undefined-arguments -- classifyStar intentionally accepts undefined as a value.
         expect(classifyStar(undefined)).toBe("main-sequence");
     });
     it("converts and bins", () => {

@@ -42,6 +42,7 @@ function parseMetadata(
     }
     const source = batch.find((row) => (row.designation ?? `Gaia DR3 ${row.source_id}`) === parsed.data.input_id);
     if (source === undefined) {
+        // eslint-disable-next-line cosmos/no-undefined-arguments -- ok(undefined) is a legitimate Result value here, not a default.
         return ok(undefined);
     }
     return ok([
