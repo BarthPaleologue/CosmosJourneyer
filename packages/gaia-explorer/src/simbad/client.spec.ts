@@ -29,10 +29,10 @@ describe("SimbadClient", () => {
                 value: [{ input_id: "Gaia DR3 2", main_id: "" }],
             });
 
-        const result = await new SimbadClient({ query }, 1).query([
-            gaiaRow,
-            { ...gaiaRow, source_id: "2", designation: "Gaia DR3 2" },
-        ]);
+        const result = await new SimbadClient({ query }, 1).query(
+            [gaiaRow, { ...gaiaRow, source_id: "2", designation: "Gaia DR3 2" }],
+            new AbortController().signal,
+        );
 
         expect(result.success).toBe(false);
         expect(!result.success && result.error.kind).toBe("protocol");
@@ -49,7 +49,7 @@ describe("SimbadClient", () => {
                 }),
         };
 
-        const result = await new SimbadClient(tap, 400).query([gaiaRow]);
+        const result = await new SimbadClient(tap, 400).query([gaiaRow], new AbortController().signal);
 
         expect(result.success).toBe(false);
         expect(!result.success && result.error.kind).toBe("protocol");
@@ -73,7 +73,7 @@ describe("SimbadClient", () => {
                 }),
         };
 
-        const result = await new SimbadClient(tap, 400).query([gaiaRow]);
+        const result = await new SimbadClient(tap, 400).query([gaiaRow], new AbortController().signal);
 
         expect(result.success && result.value.get(gaiaRow.source_id)).toEqual({
             name: "Barnard's Star",

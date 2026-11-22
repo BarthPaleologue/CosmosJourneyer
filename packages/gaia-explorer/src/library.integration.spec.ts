@@ -50,15 +50,21 @@ describe("public library API", () => {
             throw new Error(`Unexpected request to ${url}`);
         };
         const clientOptions = { fetchImplementation, logger: (): void => undefined };
-        const gaiaResult = await createGaiaClient({ ...clientOptions, pollIntervalMs: 0 }).query({
-            radiusLy: 50,
-            parallaxOverErrorMin: 10,
-            ruweMax: 10,
-        });
+        const gaiaResult = await createGaiaClient({ ...clientOptions, pollIntervalMs: 0 }).query(
+            {
+                radiusLy: 50,
+                parallaxOverErrorMin: 10,
+                ruweMax: 10,
+            },
+            new AbortController().signal,
+        );
         if (!gaiaResult.success) {
             throw new Error(gaiaResult.error.message);
         }
-        const simbadResult = await createSimbadClient(clientOptions).query(gaiaResult.value);
+        const simbadResult = await createSimbadClient(clientOptions).query(
+            gaiaResult.value,
+            new AbortController().signal,
+        );
         if (!simbadResult.success) {
             throw new Error(simbadResult.error.message);
         }

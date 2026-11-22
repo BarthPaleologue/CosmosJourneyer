@@ -63,7 +63,7 @@ export class SimbadClient {
     }
     async query(
         rows: DeepReadonly<Array<GaiaRow>>,
-        signal?: DeepReadonly<AbortSignal>,
+        signal: DeepReadonly<AbortSignal>,
     ): Promise<Result<ReadonlyMap<GaiaSourceId, SimbadMetadata>, TapError>> {
         const metadata = new Map<GaiaSourceId, SimbadMetadata>();
         for (let start = 0; start < rows.length; start += this.batchSize) {

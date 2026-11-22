@@ -44,7 +44,7 @@ export class GaiaClient {
     }
     async query(
         config: QueryConfig,
-        signal?: DeepReadonly<AbortSignal>,
+        signal: DeepReadonly<AbortSignal>,
     ): Promise<Result<ReadonlyArray<GaiaRow>, TapError>> {
         const result = await this.tap.query(buildGaiaAdql(config), signal);
         if (!result.success) {
