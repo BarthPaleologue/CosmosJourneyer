@@ -1,3 +1,4 @@
+import { CancellationToken } from "electron-updater";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { MockAutoUpdaterClient } from "./mockAutoUpdater.js";
@@ -21,7 +22,7 @@ describe("MockAutoUpdaterClient", () => {
         await checkPromise;
         expect(onAvailable).toHaveBeenCalledWith(expect.objectContaining({ version: "1.12.0-mock" }));
 
-        const downloadPromise = updater.downloadUpdate();
+        const downloadPromise = updater.downloadUpdate(new CancellationToken());
         await vi.advanceTimersByTimeAsync(5_000);
         await expect(downloadPromise).resolves.toEqual(["mock-update"]);
         expect(onProgress).toHaveBeenLastCalledWith(

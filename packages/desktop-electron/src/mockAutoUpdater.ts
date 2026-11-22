@@ -61,10 +61,10 @@ export class MockAutoUpdaterClient extends EventEmitter implements AutoUpdaterCl
         return null;
     }
 
-    public async downloadUpdate(cancellationToken?: CancellationToken): Promise<Array<string>> {
+    public async downloadUpdate(cancellationToken: CancellationToken): Promise<Array<string>> {
         for (let step = 1; step <= mockDownloadStepCount; step += 1) {
             await wait(mockDownloadStepIntervalMs);
-            if (cancellationToken?.cancelled === true) {
+            if (cancellationToken.cancelled) {
                 throw new Error("Mock update download cancelled.");
             }
             const transferred = Math.round((step / mockDownloadStepCount) * mockDownloadSizeBytes);
