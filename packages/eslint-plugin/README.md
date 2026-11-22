@@ -21,6 +21,7 @@ The package has no build step and no generated `dist/` directory.
 | [`no-optional-parameters`](./docs/rules/no-optional-parameters.md) | Disallow optional parameters except a single trailing `options?`. |
 | [`no-pick-omit`](./docs/rules/no-pick-omit.md)                     | Disallow the `Pick`/`Omit` utility types; define named types.     |
 | [`no-promise-reject`](./docs/rules/no-promise-reject.md)           | Disallow direct calls to `Promise.reject()`.                      |
+| [`no-undefined-arguments`](./docs/rules/no-undefined-arguments.md) | Disallow passing `undefined` explicitly as a call argument.       |
 
 Rules are registered under the `cosmos/` namespace.
 
