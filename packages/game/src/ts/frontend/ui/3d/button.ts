@@ -102,6 +102,7 @@ export class Button implements Transformable, Interactive {
             buttonRestPositionY,
             pressedPositionY,
             Animation.ANIMATIONLOOPMODE_CONSTANT,
+            // eslint-disable-next-line cosmos/no-undefined-arguments -- Babylon's CreateAndStartAnimation has no explicit "linear easing" value; skipping the optional easingFunction requires undefined.
             undefined,
             () => {
                 Animation.CreateAndStartAnimation(
@@ -113,6 +114,7 @@ export class Button implements Transformable, Interactive {
                     pressedPositionY,
                     buttonRestPositionY,
                     Animation.ANIMATIONLOOPMODE_CONSTANT,
+                    // eslint-disable-next-line cosmos/no-undefined-arguments -- Babylon's CreateAndStartAnimation has no explicit "linear easing" value; skipping the optional easingFunction requires undefined.
                     undefined,
                     () => {
                         this.isBeingPressed = false;

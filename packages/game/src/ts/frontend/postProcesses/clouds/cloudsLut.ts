@@ -33,7 +33,7 @@ export class CloudsLut {
             Effect.ShadersStore[`flatCloudsLUTFragmentShader`] = flatCloudLUT;
         }
 
-        this.lut = new ProceduralTexture("flatCloudLUT", 4096, "flatCloudsLUT", scene, undefined, true, false);
+        this.lut = new ProceduralTexture("flatCloudLUT", 4096, "flatCloudsLUT", scene, null, true, false);
         this.lut.refreshRate = 0;
         this.lut.onGeneratedObservable.add(() => {
             this.hasGeneratedTexture = true;

@@ -331,7 +331,7 @@ export class StarMapView implements View {
 
     private drawCurrentItinerary(path: DeepReadonly<Itinerary>): void {
         if (this.currentItineraryLine !== null) {
-            this.currentItineraryLine.dispose(undefined, true);
+            this.currentItineraryLine.dispose(false, true);
         }
         const points = this.getGreasedLinePointsFromSystems(path);
         this.currentItineraryLine = CreateGreasedLine(
@@ -348,7 +348,7 @@ export class StarMapView implements View {
 
     private drawVisitedSystems(path: DeepReadonly<Array<StarSystemCoordinates>>): void {
         if (this.visitedSystemsLines !== null) {
-            this.visitedSystemsLines.dispose(undefined, true);
+            this.visitedSystemsLines.dispose(false, true);
             this.visitedSystemsLines = null;
         }
         const { points, widths } = getGreasedLinePathFromSystemSegments(path, (system) =>
@@ -477,13 +477,13 @@ export class StarMapView implements View {
         if (this.player.currentItinerary !== null) {
             this.drawCurrentItinerary(this.player.currentItinerary);
         } else if (this.currentItineraryLine !== null) {
-            this.currentItineraryLine.dispose(undefined, true);
+            this.currentItineraryLine.dispose(false, true);
             this.currentItineraryLine = null;
         }
         if (this.player.visitedSystemHistory.length > 1) {
             this.drawVisitedSystems(this.player.visitedSystemHistory);
         } else if (this.visitedSystemsLines !== null) {
-            this.visitedSystemsLines.dispose(undefined, true);
+            this.visitedSystemsLines.dispose(false, true);
             this.visitedSystemsLines = null;
         }
     }

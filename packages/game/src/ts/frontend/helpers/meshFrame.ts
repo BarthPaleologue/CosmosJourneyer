@@ -89,6 +89,7 @@ export function createEdgeTubeFrame(
         tubes.push(joint);
     }
 
+    // eslint-disable-next-line cosmos/no-undefined-arguments -- Babylon's MergeMeshes has no explicit "no subclass" value; skipping the optional meshSubclass requires undefined.
     const merged = Mesh.MergeMeshes(tubes, true, true, undefined, false, true);
     if (!merged) {
         return null;

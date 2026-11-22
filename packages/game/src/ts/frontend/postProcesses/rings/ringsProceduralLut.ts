@@ -42,7 +42,7 @@ export class RingsProceduralPatternLut {
             },
             "ringsLUT",
             scene,
-            undefined,
+            null,
             true,
             false,
         );

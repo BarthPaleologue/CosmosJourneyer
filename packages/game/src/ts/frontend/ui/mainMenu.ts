@@ -336,6 +336,7 @@ export class MainMenu {
 
         this.show();
 
+        // eslint-disable-next-line cosmos/no-undefined-arguments -- ok(undefined) is a legitimate Result value here, not a default.
         return ok(undefined);
     }
 
@@ -419,7 +420,7 @@ export class MainMenu {
             }
         };
 
-        this.scene.onBeforeRenderObservable.add(animationCallback, undefined, true);
+        this.scene.onBeforeRenderObservable.add(animationCallback, -1, true);
 
         this.hideMenu();
         this.hideVersion();

@@ -100,7 +100,7 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
 
         this.terrain = new SphericalHeightFieldTerrain(this.model, this.material.get(), scene);
 
-        this.aggregate = new PhysicsAggregate(this.getTransform(), physicsShape, undefined, scene);
+        this.aggregate = new PhysicsAggregate(this.getTransform(), physicsShape, { mass: 0 }, scene);
         this.aggregate.body.setMassProperties({ inertia: Vector3.Zero(), mass: 0 });
         this.aggregate.body.disablePreStep = false;
 

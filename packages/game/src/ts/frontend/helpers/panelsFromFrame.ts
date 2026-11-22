@@ -280,6 +280,7 @@ export function createPanelsFromFrame(
         return null;
     }
 
+    // eslint-disable-next-line cosmos/no-undefined-arguments -- Babylon's MergeMeshes has no explicit "no subclass" value; skipping the optional meshSubclass requires undefined.
     const merged = Mesh.MergeMeshes(panels, true, true, undefined, false, true);
     if (!merged) {
         return null;

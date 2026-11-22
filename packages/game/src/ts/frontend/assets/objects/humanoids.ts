@@ -210,6 +210,7 @@ export async function loadHumanoidPrefabs(
 
     const defaultHumanoidPrefab: HumanoidPrefab = {
         spawn: () => {
+            // eslint-disable-next-line cosmos/no-undefined-arguments -- Babylon's instantiateModelsToScene has no explicit "default naming" value; skipping the optional nameFunction requires undefined.
             const entries = defaultHumanoid.instantiateModelsToScene(undefined, true);
             const root = entries.rootNodes[0];
             if (root === undefined || !(root instanceof TransformNode)) {
@@ -343,6 +344,7 @@ export async function loadHumanoidPrefabs(
 
     const astronautHumanoidPrefab: HumanoidPrefab = {
         spawn: () => {
+            // eslint-disable-next-line cosmos/no-undefined-arguments -- Babylon's instantiateModelsToScene has no explicit "default naming" value; skipping the optional nameFunction requires undefined.
             const entries = astronautHumanoid.instantiateModelsToScene(undefined, true);
             const root = entries.rootNodes[0];
             if (root === undefined || !(root instanceof TransformNode)) {
