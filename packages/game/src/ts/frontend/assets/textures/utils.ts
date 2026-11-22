@@ -38,7 +38,7 @@ export async function loadTextureAsync(
 ): Promise<Texture> {
     progressMonitor.startTask();
     const texture = await new Promise<Texture>((resolve) => {
-        const createdTexture = new Texture(url, engine, false, false, undefined, () => {
+        const createdTexture = new Texture(url, engine, false, false, Texture.TRILINEAR_SAMPLINGMODE, () => {
             resolve(createdTexture);
         });
         createdTexture.name = name;
