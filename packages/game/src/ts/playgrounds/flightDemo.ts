@@ -62,11 +62,11 @@ export async function createFlightDemoScene(
     const clusteredLightingSystem = new ClusteredLightingSystem(scene);
     clusteredLightingSystem.registerRegion(ship.getSpaceship());
 
-    const camera = ship.getActiveCamera();
-    camera.minZ = 0.1;
-    camera.attachControl();
+    const initialCamera = ship.getActiveCamera();
+    initialCamera.minZ = 0.1;
+    initialCamera.attachControl();
 
-    scene.activeCamera = camera;
+    scene.activeCamera = initialCamera;
 
     SpaceShipControlsInputs.setEnabled(true);
 
@@ -102,10 +102,18 @@ export async function createFlightDemoScene(
 
     enableShadows(sun, new DepthRendererManager(scene), { maxZ: 3e3 });
 
-    clusteredLightingSystem.update(camera);
+    clusteredLightingSystem.update(initialCamera);
     scene.onBeforeRenderObservable.add(() => {
         const deltaSeconds = engine.getDeltaTime() / 1000;
         ship.update(deltaSeconds);
+
+        const camera = ship.getActiveCamera();
+        if (scene.activeCamera !== camera) {
+            scene.activeCamera?.detachControl();
+            camera.attachControl();
+            scene.activeCamera = camera;
+        }
+
         clusteredLightingSystem.update(camera);
     });
 
