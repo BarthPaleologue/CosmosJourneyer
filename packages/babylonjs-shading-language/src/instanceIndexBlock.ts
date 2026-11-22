@@ -42,6 +42,7 @@ export class InstanceIndexBlock extends NodeMaterialBlock {
         super(name, NodeMaterialBlockTargets.Vertex);
 
         this.output = new NodeMaterialConnectionPoint("output", this, NodeMaterialConnectionPointDirection.Output);
+        // eslint-disable-next-line cosmos/no-undefined-arguments -- Babylon's registerOutput has no explicit "no target" value; skipping this optional middle parameter requires undefined.
         this.registerOutput("output", NodeMaterialBlockConnectionPointTypes.Float, undefined, this.output);
     }
 
