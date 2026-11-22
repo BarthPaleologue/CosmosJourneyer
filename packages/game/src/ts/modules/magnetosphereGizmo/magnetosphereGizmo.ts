@@ -93,7 +93,7 @@ export class MagnetosphereGizmo implements SystemContent {
                     shape[i * 3 + 2] = x * sinPhi;
                 }
 
-                const positions = scaleShape(shape, planetRadius);
+                const positions = scaleShapeToRef(shape, planetRadius, new Float32Array(shape.length));
                 const mesh = CreateLines(
                     `FieldLine_${fraction}_${plane}`,
                     { points: toVector3Array(positions), updatable: true },
@@ -130,7 +130,7 @@ export class MagnetosphereGizmo implements SystemContent {
         this.root.setEnabled(true);
 
         for (const line of this.lines) {
-            const scaled = scaleShape(line.shape, line.fraction * standoffDistance, line.positions);
+            const scaled = scaleShapeToRef(line.shape, line.fraction * standoffDistance, line.positions);
             line.mesh.updateVerticesData(VertexBuffer.PositionKind, scaled, true, false);
         }
     }
@@ -147,15 +147,14 @@ export class MagnetosphereGizmo implements SystemContent {
 /**
  * @param shape Unit-L point shapes, 3 floats per point.
  * @param lineMaxDistance L parameter of the field line in meters.
- * @param target Optional buffer to write into, reused across updates.
- * @returns The scaled positions, 3 floats per point.
+ * @param ref Buffer to write the scaled positions into, reused across updates.
+ * @returns The same buffer as `ref`, filled with the scaled positions, 3 floats per point.
  */
-function scaleShape(shape: Float32Array, lineMaxDistance: number, target?: Float32Array): Float32Array {
-    const out = target ?? new Float32Array(shape.length);
+function scaleShapeToRef(shape: Float32Array, lineMaxDistance: number, ref: Float32Array): Float32Array {
     for (let i = 0; i < shape.length; i++) {
-        out[i] = (shape[i] ?? 0) * lineMaxDistance;
+        ref[i] = (shape[i] ?? 0) * lineMaxDistance;
     }
-    return out;
+    return ref;
 }
 
 /**
