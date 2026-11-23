@@ -249,4 +249,11 @@ export default defineConfig([
     nextCoreWebVitals,
     typeScriptWorkspaceRules,
     pureLibraryRules,
+    {
+        // Babylon.js material factories and loaders return class instances indirectly.
+        files: ["packages/game/**/*.{ts,tsx,js,jsx,mts}"],
+        rules: {
+            "@typescript-eslint/no-unsafe-class-instance-assignment": "off",
+        },
+    },
 ]);
