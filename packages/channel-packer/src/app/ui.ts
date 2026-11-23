@@ -360,7 +360,7 @@ function collectRowElements(channel: ColorChannel): RowElements {
  * @param value - Text or identifier to interpret.
  * @returns The valid channel, or null.
  */
-function parseColorChannel(value: string | undefined): ColorChannel | null {
+function parseColorChannel(value: string): ColorChannel | null {
     if (value === "r" || value === "g" || value === "b" || value === "a") {
         return value;
     }
