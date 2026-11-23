@@ -1301,7 +1301,9 @@ export class StarSystemView implements View {
 
         const nearestObject = starSystem.getNearestSystemObject(spaceship.getTransform().getAbsolutePosition());
         spaceship.setNearestObject(
-            nearestObject.id === nearestOrbitalObject.model.id ? nearestOrbitalObject : nearestObject,
+            nearestObject.id === nearestOrbitalObject.model.id
+                ? { kind: "orbitalObject", object: nearestOrbitalObject }
+                : { kind: "systemObject", object: nearestObject },
         );
 
         this.spaceshipControls.setClosestLandableFacility(starSystem.getLandableFacilityById(nearestObject.id) ?? null);

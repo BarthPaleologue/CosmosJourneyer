@@ -4,6 +4,8 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
 import { describe, expect, it } from "vitest";
 
+import type { SpaceObject } from "@/frontend/universe/systemObject";
+
 import { canEngageWarpDrive } from "./components/warpDriveUtils";
 import { Spaceship } from "./spaceship";
 
@@ -25,11 +27,14 @@ describe("spaceship warp clearance with entity geometry and celestial rings", ()
             const planet = new TransformNode("planet", scene);
             const entity = new TransformNode("entity", scene);
             entity.position.copyFrom(ship.position).x -= entityDistance;
-            const nearestObject = {
-                id: "entity",
-                name: "Entity",
-                getTransform: () => entity,
-                getBoundingRadius: () => 10,
+            const nearestObject: SpaceObject = {
+                kind: "systemObject",
+                object: {
+                    id: "entity",
+                    name: "Entity",
+                    getTransform: () => entity,
+                    getBoundingRadius: () => 10,
+                },
             };
             const altimeter = { getAltitude: () => null };
             const context = {
@@ -78,8 +83,11 @@ describe("spaceship warp clearance with entity geometry and celestial rings", ()
             station.position.z = planetDistance - 2000;
             const context = {
                 nearestObject: {
-                    getTransform: () => station,
-                    getBoundingRadius: () => 1000,
+                    kind: "systemObject",
+                    object: {
+                        getTransform: () => station,
+                        getBoundingRadius: () => 1000,
+                    },
                 },
                 nearestCelestialBody: {
                     type: "telluricPlanet",

@@ -18,8 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 
-import type { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
-import type { SystemObject } from "@/frontend/universe/systemObject";
+import type { SpaceObject } from "@/frontend/universe/systemObject";
 
 import { isInsideRingRadialBounds, isPositionInsideRingVolume, projectPositionOnRingPlane } from "@/utils/ringVolume";
 
@@ -35,17 +34,18 @@ export function canEngageWarpDrive(
     shipTransform: TransformNode,
     altitude: number | null,
     currentVelocity: number,
-    nearestObject: OrbitalObject | SystemObject,
+    nearestObject: SpaceObject,
 ): boolean {
+    const object = nearestObject.object;
     const shipPosition = shipTransform.getAbsolutePosition();
-    const nearestObjectPosition = nearestObject.getTransform().getAbsolutePosition();
+    const nearestObjectPosition = object.getTransform().getAbsolutePosition();
 
     const distanceToObjectCenter = Vector3.Distance(shipPosition, nearestObjectPosition);
 
-    const roughDistance = distanceToObjectCenter - nearestObject.getBoundingRadius();
+    const roughDistance = distanceToObjectCenter - object.getBoundingRadius();
     const distanceToObject = altitude !== null ? Math.min(altitude, roughDistance) : roughDistance;
 
-    const emergencyMargin = 0.03 * nearestObject.getBoundingRadius();
+    const emergencyMargin = 0.03 * object.getBoundingRadius();
     if (distanceToObject <= emergencyMargin) {
         return false;
     }
@@ -62,18 +62,22 @@ export function canEngageWarpDrive(
         return false;
     }
 
+    if (nearestObject.kind !== "orbitalObject") {
+        return true;
+    }
+
+    const orbitalObject = nearestObject.object;
     if (
-        !("type" in nearestObject) ||
-        (nearestObject.type !== "gasPlanet" &&
-            nearestObject.type !== "telluricPlanet" &&
-            nearestObject.type !== "star" &&
-            nearestObject.type !== "neutronStar")
+        orbitalObject.type !== "gasPlanet" &&
+        orbitalObject.type !== "telluricPlanet" &&
+        orbitalObject.type !== "star" &&
+        orbitalObject.type !== "neutronStar"
     ) {
         return true;
     }
 
     // if the spaceship goes too close to planetary rings, stop the warp drive to avoid collision with asteroids
-    const asteroidField = nearestObject.asteroidField;
+    const asteroidField = orbitalObject.asteroidField;
     if (asteroidField === null) {
         return true;
     }

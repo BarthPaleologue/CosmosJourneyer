@@ -5,7 +5,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { describe, expect, it } from "vitest";
 
 import type { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
-import type { SystemObject } from "@/frontend/universe/systemObject";
+import type { SpaceObject } from "@/frontend/universe/systemObject";
 
 import { canEngageWarpDrive } from "./warpDriveUtils";
 
@@ -24,11 +24,14 @@ describe("warp clearance near entity geometry", () => {
         ship.rotationQuaternion = Quaternion.RotationYawPitchRoll(yaw, 0, 0);
         ship.computeWorldMatrix(true);
         const station = new TransformNode("station", scene);
-        const object: SystemObject = {
-            id: "station",
-            name: "Station",
-            getTransform: () => station,
-            getBoundingRadius: () => 100,
+        const object: SpaceObject = {
+            kind: "systemObject",
+            object: {
+                id: "station",
+                name: "Station",
+                getTransform: () => station,
+                getBoundingRadius: () => 100,
+            },
         };
         try {
             expect(canEngageWarpDrive(ship, null, speed, object)).toBe(allowed);
@@ -49,20 +52,23 @@ describe("warp clearance near entity geometry", () => {
         ship.rotationQuaternion = Quaternion.RotationAxis(Vector3.Right(), Math.PI / 2);
         ship.computeWorldMatrix(true);
         const planet = new TransformNode("planet", scene);
-        const object = {
-            type: "gasPlanet",
-            getTransform: () => planet,
-            getBoundingRadius: () => 100,
-            asteroidField: {
-                getRingVolume: () => ({
-                    center: Vector3.Zero(),
-                    normal: Vector3.Up(),
-                    innerRadius: 200,
-                    outerRadius: 300,
-                    halfThickness: 10,
-                }),
-            },
-        } as unknown as OrbitalObject;
+        const object: SpaceObject = {
+            kind: "orbitalObject",
+            object: {
+                type: "gasPlanet",
+                getTransform: () => planet,
+                getBoundingRadius: () => 100,
+                asteroidField: {
+                    getRingVolume: () => ({
+                        center: Vector3.Zero(),
+                        normal: Vector3.Up(),
+                        innerRadius: 200,
+                        outerRadius: 300,
+                        halfThickness: 10,
+                    }),
+                },
+            } as unknown as OrbitalObject,
+        };
         try {
             expect(canEngageWarpDrive(ship, null, speed, object)).toBe(allowed);
         } finally {
