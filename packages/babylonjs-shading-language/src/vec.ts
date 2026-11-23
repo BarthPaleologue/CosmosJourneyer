@@ -132,7 +132,12 @@ export function merge(inputs: MergeInput, options?: Partial<TargetOptions>): Mer
     return merger;
 }
 
-type SwizzleComponent = "x" | "y" | "z" | "w";
+const swizzleComponents = ["x", "y", "z", "w"] as const;
+
+type SwizzleComponent = (typeof swizzleComponents)[number];
+
+const parseSwizzleComponent = (value: string): SwizzleComponent | undefined =>
+    swizzleComponents.find((component) => component === value);
 
 type SwizzleString =
     | `${SwizzleComponent}${SwizzleComponent}`
@@ -163,17 +168,20 @@ export function swizzle(
         throw new Error("Input type is not compatible with swizzle block");
     }
 
-    if (swizzleStr[0] !== undefined) {
-        swizzleBlock.xSwizzle = swizzleStr[0] as SwizzleComponent;
+    const [x, y, z, w] = [swizzleStr[0], swizzleStr[1], swizzleStr[2], swizzleStr[3]].map((char) =>
+        char === undefined ? undefined : parseSwizzleComponent(char),
+    );
+    if (x !== undefined) {
+        swizzleBlock.xSwizzle = x;
     }
-    if (swizzleStr[1] !== undefined) {
-        swizzleBlock.ySwizzle = swizzleStr[1] as SwizzleComponent;
+    if (y !== undefined) {
+        swizzleBlock.ySwizzle = y;
     }
-    if (swizzleStr[2] !== undefined) {
-        swizzleBlock.zSwizzle = swizzleStr[2] as SwizzleComponent;
+    if (z !== undefined) {
+        swizzleBlock.zSwizzle = z;
     }
-    if (swizzleStr[3] !== undefined) {
-        swizzleBlock.wSwizzle = swizzleStr[3] as SwizzleComponent;
+    if (w !== undefined) {
+        swizzleBlock.wSwizzle = w;
     }
 
     switch (swizzleStr.length) {
