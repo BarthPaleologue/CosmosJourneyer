@@ -91,5 +91,5 @@ export function validateDataset(input: unknown): ValidationResult {
  * @returns The schema and semantic validation result.
  */
 export async function validateFile(path: string): Promise<ValidationResult> {
-    return validateDataset(JSON.parse(await readFile(path, "utf8")) as unknown);
+    return validateDataset(JSON.parse(await readFile(path, "utf8")));
 }
