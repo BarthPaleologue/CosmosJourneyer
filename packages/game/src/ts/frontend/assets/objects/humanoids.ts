@@ -25,6 +25,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { Result } from "@cosmos-journeyer/typescript";
+import { z } from "zod";
 
 import type { ILoadingProgressMonitor } from "../loadingProgressMonitor";
 import { loadAssetInContainerAsync } from "./utils";
@@ -81,18 +82,17 @@ const astronautArmClearanceAdjustments = {
 
 const astronautLocomotionArmClearance = 0.65;
 
+/** Schema for Babylon animation targets that expose a string name. */
+const namedTargetSchema = z.looseObject({ name: z.string() });
+
 /**
  * Reads a string name from an animation target when one is available.
  * @param target Babylon animation target whose name is inspected.
  * @returns The target name, or undefined when it has no string name.
  */
 function getAnimationTargetName(target: unknown): string | undefined {
-    if (typeof target !== "object" || target === null || !("name" in target)) {
-        return undefined;
-    }
-
-    const name = target.name;
-    return typeof name === "string" ? name : undefined;
+    const parsed = namedTargetSchema.safeParse(target);
+    return parsed.success ? parsed.data.name : undefined;
 }
 
 /**
