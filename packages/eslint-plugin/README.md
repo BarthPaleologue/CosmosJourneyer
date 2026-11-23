@@ -14,15 +14,16 @@ The package has no build step and no generated `dist/` directory.
 
 ## Rules
 
-| Rule                                                                                   | Description                                                                          |
-| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| [`no-class-inheritance`](./docs/rules/no-class-inheritance.md)                         | Disallow class inheritance via `extends`; prefer composition.                        |
-| [`no-default-parameters`](./docs/rules/no-default-parameters.md)                       | Disallow default values in function parameters.                                      |
-| [`no-optional-parameters`](./docs/rules/no-optional-parameters.md)                     | Disallow optional parameters except a single trailing `options?`.                    |
-| [`no-pick-omit`](./docs/rules/no-pick-omit.md)                                         | Disallow the `Pick`/`Omit` utility types; define named types.                        |
-| [`no-promise-reject`](./docs/rules/no-promise-reject.md)                               | Disallow direct calls to `Promise.reject()`.                                         |
-| [`no-string-in`](./docs/rules/no-string-in.md)                                         | Disallow `"key" in obj` string-literal checks; use Zod, discriminants or instanceof. |
-| [`no-undefined-required-parameters`](./docs/rules/no-undefined-required-parameters.md) | Disallow `T \| undefined` on required parameters.                                    |
+| Rule                                                                                   | Description                                                                                 |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| [`no-class-inheritance`](./docs/rules/no-class-inheritance.md)                         | Disallow class inheritance via `extends`; prefer composition.                               |
+| [`no-default-parameters`](./docs/rules/no-default-parameters.md)                       | Disallow default values in function parameters.                                             |
+| [`no-optional-parameters`](./docs/rules/no-optional-parameters.md)                     | Disallow optional parameters except a single trailing `options?`.                           |
+| [`no-pick-omit`](./docs/rules/no-pick-omit.md)                                         | Disallow the `Pick`/`Omit` utility types; define named types.                               |
+| [`no-promise-reject`](./docs/rules/no-promise-reject.md)                               | Disallow direct calls to `Promise.reject()`.                                                |
+| [`no-string-in`](./docs/rules/no-string-in.md)                                         | Disallow `"key" in obj` string-literal checks; use Zod, discriminants or instanceof.        |
+| [`no-type-guards`](./docs/rules/no-type-guards.md)                                     | Disallow written type predicates (`x is T`); rely on inferred predicates, Zod or narrowing. |
+| [`no-undefined-required-parameters`](./docs/rules/no-undefined-required-parameters.md) | Disallow `T \| undefined` on required parameters.                                           |
 
 Rules are registered under the `cosmos/` namespace.
 
