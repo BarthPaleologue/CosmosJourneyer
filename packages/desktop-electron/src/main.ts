@@ -13,6 +13,7 @@ import { appHost, appScheme, createHandleAppProtocol } from "./protocol.js";
 import { updateIpcChannels } from "./updateContract.js";
 
 const require = createRequire(import.meta.url);
+// eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- createRequire returns any; electron is CommonJS so this is the only way to get its types in ESM.
 const { app, BrowserWindow, ipcMain, protocol, shell } = require("electron") as typeof ElectronModule;
 
 const isDevelopment = process.env["COSMOS_DESKTOP_DEV"] === "1";

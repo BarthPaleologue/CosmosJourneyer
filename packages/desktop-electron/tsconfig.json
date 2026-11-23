@@ -10,7 +10,7 @@
         "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
-        "lib": ["ES2024", "DOM"],
+        "lib": ["ES2024"],
         "types": ["node"]
     },
     "include": ["src/**/*.ts", "src/**/*.cts"]
