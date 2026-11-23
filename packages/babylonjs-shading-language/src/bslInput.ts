@@ -22,7 +22,7 @@
 
 import { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inputBlock";
 import { NodeMaterialBlockTargets } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialBlockTargets";
-import type { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
+import { NodeMaterialConnectionPoint } from "@babylonjs/core/Materials/Node/nodeMaterialBlockConnectionPoint";
 import type { Color3, Color4 } from "@babylonjs/core/Maths/math.color";
 import type { Vector2, Vector3, Vector4 } from "@babylonjs/core/Maths/math.vector";
 
@@ -51,7 +51,7 @@ export function parse(
         return undefined;
     }
 
-    if (typeof value !== "number" && "connectTo" in value) {
+    if (value instanceof NodeMaterialConnectionPoint) {
         return value;
     }
 
