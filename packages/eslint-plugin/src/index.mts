@@ -5,6 +5,7 @@ import noDefaultParameters from "./rules/no-default-parameters.mts";
 import noOptionalParameters from "./rules/no-optional-parameters.mts";
 import noPickOmit from "./rules/no-pick-omit.mts";
 import noPromiseReject from "./rules/no-promise-reject.mts";
+import noStringIn from "./rules/no-string-in.mts";
 import noUndefinedRequiredParameters from "./rules/no-undefined-required-parameters.mts";
 
 type RuleDefinitions = NonNullable<TSESLint.FlatConfig.Plugin["rules"]>;
@@ -22,6 +23,7 @@ const rules = {
     "no-optional-parameters": noOptionalParameters,
     "no-pick-omit": noPickOmit,
     "no-promise-reject": noPromiseReject,
+    "no-string-in": noStringIn,
     "no-undefined-required-parameters": noUndefinedRequiredParameters,
 } satisfies RuleDefinitions;
 
