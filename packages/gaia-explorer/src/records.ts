@@ -94,5 +94,5 @@ export function rowsToStars(
     rows: DeepReadonly<Array<GaiaRow>>,
     lookups: Readonly<StarLookupMaps>,
 ): ReadonlyArray<StarRecord> {
-    return rows.map((row) => rowToStar(row, lookups)).filter((star): star is StarRecord => star !== undefined);
+    return rows.map((row) => rowToStar(row, lookups)).filter((star) => star !== undefined);
 }
