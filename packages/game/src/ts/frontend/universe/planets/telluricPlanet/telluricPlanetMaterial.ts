@@ -149,7 +149,7 @@ export class TelluricPlanetMaterial {
                     temperature,
                     normalStrength,
                     elevationAboveSeaLevel,
-                    planetModel.ocean?.depth,
+                    planetModel.ocean?.depth ?? null,
                     textures,
                 );
                 break;
@@ -254,7 +254,7 @@ export class TelluricPlanetMaterial {
         temperature: NodeMaterialConnectionPoint,
         normalStrength: NodeMaterialConnectionPoint,
         elevationAboveSeaLevel: NodeMaterialConnectionPoint,
-        oceanDepth: number | undefined,
+        oceanDepth: number | null,
         textures: {
             grass: TerrainTextures;
             sand: TerrainTextures;
@@ -308,7 +308,7 @@ export class TelluricPlanetMaterial {
         const flatnessFactor = smoothstep(0.85, 1.0, add(detailedFlatness, flatnessFactorOffset));
 
         let flatSamples = mixTriPlanarSamples(sandSamples, grassSamples, wetnessFactor);
-        if (oceanDepth !== undefined) {
+        if (oceanDepth !== null) {
             const beachElevationSpan = BeachElevationSpan;
             const beachElevationStart = -beachElevationSpan / 2;
             const beachElevationEnd = beachElevationSpan / 2;

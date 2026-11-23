@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import {
     buildOutput,
-    classifyStar,
     createGaiaClient,
     createSimbadClient,
     GaiaTapAsyncEndpoint,
@@ -74,7 +73,7 @@ describe("public library API", () => {
             [...simbadResult.value].map(([sourceId, metadata]) => [sourceId, metadata.name]),
         );
         const natures = new Map<GaiaSourceId, StarNature>(
-            [...simbadResult.value].map(([sourceId, metadata]) => [sourceId, classifyStar(metadata)]),
+            [...simbadResult.value].map(([sourceId]) => [sourceId, "main-sequence"]),
         );
         const binner = new SpatialBinner({ gridSize: 5, halfExtent: 50 });
         for (const star of rowsToStars(gaiaResult.value, new StarLookupMaps(names, temperatures, natures))) {

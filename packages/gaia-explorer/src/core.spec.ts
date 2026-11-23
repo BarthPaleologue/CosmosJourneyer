@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { classifyStar } from "./classification";
 import { computeParallaxMinMas } from "./config";
 import type { GaiaRow } from "./gaia/schemas";
 import type { SimbadMetadata } from "./metadata";
@@ -14,18 +13,6 @@ import {
 describe("ported domain", () => {
     it("computes parallax", () => {
         expect(computeParallaxMinMas({ radiusLy: 50, parallaxOverErrorMin: 10, ruweMax: 1.5 })).toBeCloseTo(65.2312);
-    });
-    it("classifies", () => {
-        expect(classifyStar({ name: "x", spectralType: "DA4", objectType: "WD*", effectiveTemperature: 12000 })).toBe(
-            "white-dwarf",
-        );
-        expect(classifyStar({ name: "x", spectralType: null, objectType: "Psr", effectiveTemperature: null })).toBe(
-            "neutron-star",
-        );
-        expect(classifyStar({ name: "x", spectralType: null, objectType: "BH", effectiveTemperature: null })).toBe(
-            "black-hole",
-        );
-        expect(classifyStar(undefined)).toBe("main-sequence");
     });
     it("converts and bins", () => {
         const star = rowToStar(

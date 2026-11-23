@@ -1,4 +1,4 @@
-export * from "./classification";
+export type * from "./classification";
 export * from "./config";
 export * from "./gaia/adql";
 export * from "./gaia/client";

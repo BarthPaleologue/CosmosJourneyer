@@ -38,10 +38,12 @@ export type BslInput = number | Vector2 | Vector3 | Vector4 | Color3 | Color4 | 
  */
 export function parse(value: BslInput, options?: Partial<TargetOptions>): NodeMaterialConnectionPoint;
 export function parse(
+    // eslint-disable-next-line cosmos/no-undefined-required-parameters -- An absent input is part of the contract: parse returns undefined so callers can skip the connection; this is not a hidden default.
     value: BslInput | undefined,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint | undefined;
 export function parse(
+    // eslint-disable-next-line cosmos/no-undefined-required-parameters -- An absent input is part of the contract: parse returns undefined so callers can skip the connection; this is not a hidden default.
     value: BslInput | undefined,
     options?: Partial<TargetOptions>,
 ): NodeMaterialConnectionPoint | undefined {

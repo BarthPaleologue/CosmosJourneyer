@@ -11,14 +11,6 @@ import { SimbadRowSchema } from "./schemas";
 export const SimbadTapSyncEndpoint = "https://simbad.cds.unistra.fr/simbad/sim-tap/sync";
 export type SimbadClientOptions = TapClientOptions & Readonly<Partial<{ batchSize: number; endpoint: string }>>;
 const quote = (value: string): string => `'${value.replaceAll("'", "''")}'`;
-const nullableText = (value: string | undefined): string | null => {
-    const text = value?.trim();
-    return text === undefined || text === "" ? null : text;
-};
-const nullableNumber = (value: string | undefined): number | null => {
-    const text = nullableText(value);
-    return text === null ? null : Number(text);
-};
 /**
  * Parses one SIMBAD response row and associates it with its Gaia source row.
  * @param raw Raw columns returned by the SIMBAD TAP service.
@@ -29,14 +21,7 @@ function parseMetadata(
     raw: Readonly<Record<string, string>>,
     batch: DeepReadonly<Array<GaiaRow>>,
 ): Result<readonly [GaiaSourceId, SimbadMetadata] | undefined, string> {
-    const parsed = SimbadRowSchema.safeParse({
-        input_id: raw["input_id"],
-        main_id: raw["main_id"],
-        ids: (raw["ids"] ?? "").split("|").filter((identifier) => identifier !== ""),
-        spectral_type: nullableText(raw["spectral_type"]),
-        object_type: nullableText(raw["object_type"]),
-        effective_temperature: nullableNumber(raw["effective_temperature"]),
-    });
+    const parsed = SimbadRowSchema.safeParse(raw);
     if (!parsed.success) {
         return err(parsed.error.message);
     }
