@@ -17,7 +17,7 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
-import { assertUnreachable, isNonEmptyArray } from "@cosmos-journeyer/typescript";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
 import type {
     AnomalyModel,
@@ -133,11 +133,12 @@ export class StarSystemLoader {
             await wait(this.timeOut);
         }
 
-        if (!isNonEmptyArray(stellarObjects)) {
+        const [firstStellarObject, ...restStellarObjects] = stellarObjects;
+        if (firstStellarObject === undefined) {
             throw new Error("No stellar objects found in the star system");
         }
 
-        return stellarObjects;
+        return [firstStellarObject, ...restStellarObjects];
     }
 
     private async loadAnomalies(
