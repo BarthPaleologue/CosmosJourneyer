@@ -70,13 +70,13 @@ window.scene = scene;
 loadingProgressMonitor.completeTask();
 
 if (urlParams.get("debug") !== null) {
-    let inspector = ShowInspector(scene, { overlay: true });
+    let inspector = ShowInspector(scene, { layoutMode: "overlay" });
     document.addEventListener("keypress", (e) => {
         if (e.key === "i") {
             if (!inspector.isDisposed) {
                 void inspector.dispose();
             } else {
-                inspector = ShowInspector(scene, { overlay: true });
+                inspector = ShowInspector(scene, { layoutMode: "overlay" });
             }
         }
     });

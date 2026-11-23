@@ -62,7 +62,7 @@
         "eslint-plugin-jsdoc": "catalog:",
         "husky": "9.1.7",
         "jiti": "catalog:",
-        "lint-staged": "17.6.0",
+        "lint-staged": "17.6.1",
         "oxfmt": "catalog:",
         "typescript": "catalog:",
         "typescript-eslint": "catalog:"
