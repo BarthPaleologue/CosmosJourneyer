@@ -98,7 +98,15 @@ function unwrapParameterProperty(param: TSESTree.Node): TSESTree.Node {
  */
 function isOptionalParameter(param: TSESTree.Node): boolean {
     const target = unwrapParameterProperty(param);
-    return "optional" in target && target.optional === true;
+    if (
+        target.type !== AST_NODE_TYPES.Identifier &&
+        target.type !== AST_NODE_TYPES.ObjectPattern &&
+        target.type !== AST_NODE_TYPES.ArrayPattern
+    ) {
+        return false;
+    }
+
+    return target.optional;
 }
 
 /**
