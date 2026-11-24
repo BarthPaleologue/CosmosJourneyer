@@ -264,6 +264,13 @@ export default defineConfig([
     nextCoreWebVitals,
     typeScriptWorkspaceRules,
     {
+        // Playgrounds are non-persistent demo scenes by role, not by file name: implicit randomness stays allowed there.
+        files: ["packages/game/src/ts/playgrounds/**/*.ts"],
+        rules: {
+            "cosmos/no-implicit-random": "off",
+        },
+    },
+    {
         files: ["**/*.{spec,test}.{ts,tsx,mts,cts}"],
         rules: {
             "@typescript-eslint/dot-notation": ["error", { allowPrivateClassPropertyAccess: true }],
