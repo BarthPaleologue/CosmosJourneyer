@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { AxisComposite } from "@brianchirls/game-input/browser";
+import { AxisComposite } from "@brianchirls/game-input/browser";
 import type { Result } from "@cosmos-journeyer/typescript";
 import type { TFunction } from "i18next";
 
@@ -50,7 +50,11 @@ function getSpaceshipUpKeys(keyboardLayoutMap: Map<string, string> | null, t: TF
         throw new Error("Spaceship up/down controls are missing");
     }
 
-    return axisCompositeToString(upDownBinding.control as AxisComposite, keyboardLayoutMap)
+    if (!(upDownBinding.control instanceof AxisComposite)) {
+        throw new Error("Spaceship up/down control is not an axis composite");
+    }
+
+    return axisCompositeToString(upDownBinding.control, keyboardLayoutMap)
         .filter(([direction]) => direction === "positive")
         .map(([, key]) => key)
         .join(` ${t("common:or")} `);

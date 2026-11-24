@@ -23,7 +23,6 @@ import {
     Vector2InputControl,
 } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import type Interaction from "@brianchirls/game-input/interactions/Interaction";
 import type { TFunction } from "i18next";
 
 import {
@@ -136,7 +135,7 @@ export class SettingsPanel {
             for (const [actionName, action] of Object.entries(inputMap.map)) {
                 const subActionMap: Map<string, string[]> = new Map();
 
-                const actionOrInteraction = action as Action | Interaction;
+                const actionOrInteraction = action;
                 const bindings =
                     actionOrInteraction instanceof Action
                         ? actionOrInteraction.bindings
@@ -152,7 +151,7 @@ export class SettingsPanel {
                             subActionMap.get(key)?.push(name);
                         });
                     } else if (binding.control instanceof ButtonInputControl) {
-                        const text = buttonInputToString(binding.control as ButtonInputControl, keyboardLayoutMap);
+                        const text = buttonInputToString(binding.control, keyboardLayoutMap);
                         if (!subActionMap.has("BUTTON")) {
                             subActionMap.set("BUTTON", []);
                         }

@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type AxisComposite from "@brianchirls/game-input/controls/AxisComposite";
-import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+import AxisComposite from "@brianchirls/game-input/controls/AxisComposite";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import type { Result } from "@cosmos-journeyer/typescript";
 import type { TFunction } from "i18next";
 
@@ -101,14 +101,12 @@ export class StarMapTutorial implements Tutorial {
             <p>${this.t("tutorials:starMap:open3")}</p>
         </div>`;
 
-        const horizontalKeys = dPadCompositeToString(
-            StarMapInputs.map.move.bindings[0]?.control as DPadComposite,
-            keyboardLayoutMap,
-        );
-        const verticalKeys = axisCompositeToString(
-            StarMapInputs.map.upDown.bindings[0]?.control as AxisComposite,
-            keyboardLayoutMap,
-        );
+        const moveControl = StarMapInputs.map.move.bindings[0]?.control;
+        const horizontalKeys =
+            moveControl instanceof DPadComposite ? dPadCompositeToString(moveControl, keyboardLayoutMap) : [];
+        const upDownControl = StarMapInputs.map.upDown.bindings[0]?.control;
+        const verticalKeys =
+            upDownControl instanceof AxisComposite ? axisCompositeToString(upDownControl, keyboardLayoutMap) : [];
         const rawKeys = horizontalKeys.concat(verticalKeys);
 
         const keys = rawKeys.map((key) => key[1].replace("Key", "")).join(", ");

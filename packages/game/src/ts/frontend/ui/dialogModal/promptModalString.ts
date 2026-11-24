@@ -48,7 +48,10 @@ export async function promptModalString(
     modal.showModal();
 
     return new Promise((resolve) => {
-        const input = modal.querySelector("input") as HTMLInputElement;
+        const input = modal.querySelector("input");
+        if (input === null) {
+            throw new Error("Prompt modal has no input element");
+        }
         input.focus();
         input.select();
         input.addEventListener("keydown", (e) => {
