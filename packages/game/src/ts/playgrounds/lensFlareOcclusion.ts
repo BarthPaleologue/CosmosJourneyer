@@ -73,10 +73,11 @@ export async function createLensFlareOcclusionScene(
 
     const urlParams = new URLSearchParams(window.location.search);
     const occlusion = urlParams.get("occlusion") ?? "partially-occluded";
-    if (!(occlusion in OCCLUDER_POSITIONS)) {
+    const occluderEntry = Object.entries(OCCLUDER_POSITIONS).find(([mode]) => mode === occlusion);
+    if (occluderEntry === undefined) {
         throw new Error(`Unknown lens flare occlusion mode: ${occlusion}`);
     }
-    occluder.position.copyFrom(OCCLUDER_POSITIONS[occlusion as keyof typeof OCCLUDER_POSITIONS]);
+    occluder.position.copyFrom(occluderEntry[1]);
 
     const lensFlare = new LensFlarePostProcess(
         flareTarget,

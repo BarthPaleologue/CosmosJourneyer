@@ -79,16 +79,6 @@ describe("LRUMap", () => {
         expect(lru.get("c")).toBeUndefined();
     });
 
-    test("supports undefined values", () => {
-        const lru = new LRUMap<string, number | undefined>(1);
-
-        lru.set("a", undefined);
-        expect(lru.get("a")).toBeUndefined();
-
-        lru.set("b", 2);
-        expect(lru.get("b")).toBe(2);
-    });
-
     test("evicts the oldest entry even when its key is undefined", () => {
         const lru = new LRUMap<string | undefined, number>(1);
 

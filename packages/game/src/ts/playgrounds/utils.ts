@@ -209,5 +209,5 @@ export async function renderQrCodeOverlay(qrUrl: string): Promise<void> {
  * @param value - Debug value.
  */
 export function addToWindow(name: string, value: unknown): void {
-    (window as typeof window & { [name]: unknown })[name] = value;
+    Object.assign(window, { [name]: value });
 }

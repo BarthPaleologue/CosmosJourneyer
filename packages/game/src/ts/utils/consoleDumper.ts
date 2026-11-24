@@ -42,7 +42,7 @@ export class ConsoleDumper {
                         }
 
                         try {
-                            const jsonString = JSON.stringify(arg) as string | undefined;
+                            const jsonString: string | undefined = JSON.stringify(arg);
                             return jsonString ?? String(arg);
                         } catch {
                             return String(arg);

@@ -117,7 +117,7 @@ export class CrashReporter {
                 };
             case "error": {
                 const event = crashSource.value;
-                const eventError = event.error as unknown;
+                const eventError: unknown = event.error;
                 return {
                     source: "window-error",
                     error: {
@@ -130,7 +130,7 @@ export class CrashReporter {
                 };
             }
             case "unhandledrejection": {
-                const reason = crashSource.value.reason as unknown;
+                const reason: unknown = crashSource.value.reason;
                 return {
                     source: "unhandled-rejection",
                     error: serializeUnknownError(reason),

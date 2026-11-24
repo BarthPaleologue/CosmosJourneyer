@@ -66,10 +66,12 @@ export default defineConfig(({ mode }) => {
                 name: "cosmos-journeyer",
             }),
             glsl(),
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- The wasm plugin ships its own Plugin type from a different Vite copy.
             wasm() as Plugin,
         ],
         worker: {
             format: "es",
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- The wasm plugin ships its own Plugin type from a different Vite copy.
             plugins: () => [wasm() as Plugin],
         },
         assetsInclude: ["**/*.env", "**/*.babylon", "**/*.glb", "**/*.wasm"],
