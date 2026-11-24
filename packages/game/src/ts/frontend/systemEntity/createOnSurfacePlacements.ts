@@ -184,7 +184,7 @@ function createPlacementsFromTerrainResults(
     terrainResults: Iterable<SurfaceTerrainResult>,
     scene: Scene,
 ): Result<Map<string, OnSurfacePlacement>, Error> {
-    const entityIdToPlacement: Map<string, OnSurfacePlacement> = new Map();
+    const entityIdToPlacement = new Map<string, OnSurfacePlacement>();
     for (const {
         batch: { parent, placements },
         heights,

@@ -26,8 +26,8 @@ type VertexHandle = number;
  */
 export class WireframeTopology {
     private nextVertexId = 0;
-    private readonly vertices: Map<VertexHandle, [number, number, number]> = new Map();
-    private readonly edges: Map<string, [VertexHandle, VertexHandle]> = new Map();
+    private readonly vertices = new Map<VertexHandle, [number, number, number]>();
+    private readonly edges = new Map<string, [VertexHandle, VertexHandle]>();
 
     /**
      * Adds a new vertex to the topology.

@@ -16,7 +16,7 @@ export class EncyclopaediaGalacticaLocal implements EncyclopaediaGalactica {
     /**
      * This maps object IDs (as JSON strings) to the data gathered about them.
      */
-    private readonly spaceExplorationData: Map<string, SpaceDiscoveryData> = new Map();
+    private readonly spaceExplorationData = new Map<string, SpaceDiscoveryData>();
 
     /**
      * Because an object has already been discovered does not mean new data on it has no value.

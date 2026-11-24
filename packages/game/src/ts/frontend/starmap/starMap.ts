@@ -103,8 +103,8 @@ export class StarMap {
 
     private readonly loadedStarSectors: Map<string, StarSectorView> = new Map<string, StarSectorView>();
 
-    private readonly coordinatesToInstanceMap: Map<string, InstancedMesh> = new Map();
-    private readonly instanceToCoordinatesMap: Map<InstancedMesh, string> = new Map();
+    private readonly coordinatesToInstanceMap = new Map<string, InstancedMesh>();
+    private readonly instanceToCoordinatesMap = new Map<InstancedMesh, string>();
 
     /** Scratch buffer for computing a sector's coordinates (reused to avoid allocations in the hot loop). */
     private readonly sectorCoordinatesScratch = new Vector3();

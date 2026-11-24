@@ -66,12 +66,12 @@ export class UniverseBackend {
     /**
      * Maps star sectors to the custom systems they contain.
      */
-    private readonly starSectorToCustomSystems: Map<string, Array<StarSystemModel>> = new Map();
+    private readonly starSectorToCustomSystems = new Map<string, Array<StarSystemModel>>();
 
     /**
      * Maps coordinates to custom systems.
      */
-    private readonly coordinatesToCustomSystems: Map<string, StarSystemModel> = new Map();
+    private readonly coordinatesToCustomSystems = new Map<string, StarSystemModel>();
 
     /**
      * Function that returns the density of the universe in a given star sector.

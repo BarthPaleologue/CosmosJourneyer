@@ -51,7 +51,7 @@ export class HelixHabitat implements Transformable {
     private attachmentAggregate: PhysicsAggregate | null = null;
 
     private readonly helices: Array<AbstractMesh> = [];
-    private readonly helixAggregates: Map<AbstractMesh, PhysicsAggregate> = new Map();
+    private readonly helixAggregates = new Map<AbstractMesh, PhysicsAggregate>();
 
     private readonly helixMaterial: Material;
     private readonly metalSectionMaterial: Material;

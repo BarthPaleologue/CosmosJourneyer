@@ -137,7 +137,7 @@ export class SaveLoadingPanelContent {
 
         const cmdrUuids = await saveManager.getCmdrUuids();
 
-        const flatSortedSaves: Map<string, Array<DeepReadonly<Save>>> = new Map();
+        const flatSortedSaves = new Map<string, Array<DeepReadonly<Save>>>();
         for (const uuid of cmdrUuids) {
             const cmdrSaves = await saveManager.getSavesForCmdr(uuid);
             if (cmdrSaves === undefined) {

@@ -115,7 +115,7 @@ export class PostProcessManager {
         this.blackHoles,
     ];
 
-    private readonly celestialBodyToPostProcesses: Map<Transformable, Array<PostProcess>> = new Map();
+    private readonly celestialBodyToPostProcesses = new Map<Transformable, Array<PostProcess>>();
 
     /**
      * The color correction post process responsible for tone mapping, display encoding, saturation, contrast and brightness.

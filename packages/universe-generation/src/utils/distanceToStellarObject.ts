@@ -29,7 +29,7 @@ export function getDistancesToStellarObjects(
     orbit: DeepReadonly<Orbit>,
     systemModel: DeepReadonly<StarSystemModel>,
 ): DeepReadonly<Map<StellarObjectModel, number>> {
-    const distances: Map<DeepReadonly<StellarObjectModel>, number> = new Map();
+    const distances = new Map<DeepReadonly<StellarObjectModel>, number>();
 
     for (const parentId of orbit.parentIds) {
         const parent = getObjectModelById(parentId, systemModel);

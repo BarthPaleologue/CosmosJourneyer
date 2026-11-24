@@ -46,7 +46,7 @@ export class Player {
         uploaded: Array<DeepReadonly<SpaceDiscoveryData>>;
     };
 
-    private readonly visitedObjects: Set<string> = new Set();
+    private readonly visitedObjects = new Set<string>();
 
     currentItinerary: DeepReadonly<Itinerary> | null;
     systemBookmarks: Array<DeepReadonly<StarSystemCoordinates>>;

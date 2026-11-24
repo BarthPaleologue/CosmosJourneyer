@@ -27,9 +27,9 @@ import type { KeplerianObject } from "./keplerianOrbitalSimulation";
 import type { CreateLinesMeshFunction } from "./lineRendering";
 
 export class OrbitRenderer {
-    private readonly orbitMeshes: Map<KeplerianObject, Mesh> = new Map();
+    private readonly orbitMeshes = new Map<KeplerianObject, Mesh>();
 
-    private readonly orbitalObjectToParents: Map<KeplerianObject, ReadonlyArray<KeplerianObject>> = new Map();
+    private readonly orbitalObjectToParents = new Map<KeplerianObject, ReadonlyArray<KeplerianObject>>();
 
     private _isVisible = false;
 

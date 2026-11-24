@@ -18,9 +18,9 @@
 import { PriorityQueue } from "@/utils/priorityQueue";
 
 export class WorkerPool<TTask, TWorkerInput, TWorkerOutput> {
-    private readonly availableWorkers: Set<Worker> = new Set();
-    private readonly busyWorkers: Set<Worker> = new Set();
-    private readonly finishedWorkers: Set<Worker> = new Set();
+    private readonly availableWorkers = new Set<Worker>();
+    private readonly busyWorkers = new Set<Worker>();
+    private readonly finishedWorkers = new Set<Worker>();
     private readonly activeTasks = new Map<Worker, TTask>();
     private readonly taskQueue: PriorityQueue<TTask>;
 

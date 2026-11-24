@@ -93,7 +93,7 @@ export class StarMapView implements View {
 
     private readonly stellarPathfinder: StellarPathfinder;
 
-    public readonly onTargetSetObservable: Observable<StarSystemCoordinates> = new Observable();
+    public readonly onTargetSetObservable = new Observable<StarSystemCoordinates>();
 
     private readonly soundPlayer: ISoundPlayer;
     private readonly notificationManager: INotificationManager;

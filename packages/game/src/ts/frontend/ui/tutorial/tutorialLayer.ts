@@ -32,7 +32,7 @@ export class TutorialLayer implements IDisposable {
 
     private currentPanelIndex = 0;
 
-    readonly onQuitTutorial: Observable<void> = new Observable();
+    readonly onQuitTutorial = new Observable<void>();
 
     private readonly t: TFunction;
 

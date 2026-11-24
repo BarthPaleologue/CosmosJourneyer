@@ -60,7 +60,7 @@ export class SpaceStation implements SystemContent {
         this.landingBays = this.sections.filter((section) => section instanceof LandingBay);
 
         const allLandingPads: Array<ILandingPad> = [];
-        const landingPadToLandingBay: Map<ILandingPad, { bay: LandingBay; index: number }> = new Map();
+        const landingPadToLandingBay = new Map<ILandingPad, { bay: LandingBay; index: number }>();
         for (const bay of this.landingBays) {
             for (const [landingPadIndex, landingPad] of bay.landingPads.entries()) {
                 allLandingPads.push(landingPad);

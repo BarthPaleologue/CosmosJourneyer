@@ -49,9 +49,9 @@ export class StellarPathfinder {
         position: Vector3;
     } | null = null;
 
-    private readonly coordinatesToPrevious: Map<string, StarSystemCoordinates> = new Map();
+    private readonly coordinatesToPrevious = new Map<string, StarSystemCoordinates>();
 
-    private readonly openList: PriorityQueue<Node> = new PriorityQueue((a, b) => a.G + a.H < b.G + b.H);
+    private readonly openList = new PriorityQueue<Node>((a, b) => a.G + a.H < b.G + b.H);
     private closedList: Array<Node> = [];
 
     private jumpRange = 10;

@@ -31,7 +31,7 @@ import { ModuleAssets } from "./moduleAssets";
  * content factories through their load context.
  */
 export class ModuleAssetRegistry {
-    private readonly loaders: Map<string, (scene: Scene) => Promise<AssetContainer>> = new Map();
+    private readonly loaders = new Map<string, (scene: Scene) => Promise<AssetContainer>>();
 
     /**
      * @param id Namespaced asset identifier shared between modules.

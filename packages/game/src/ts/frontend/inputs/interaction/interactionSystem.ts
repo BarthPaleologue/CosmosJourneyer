@@ -52,7 +52,7 @@ export class InteractionSystem {
 
     private currentTarget: PhysicsBody | null = null;
 
-    private readonly interactions: Map<PhysicsBody, () => Array<Interaction>> = new Map();
+    private readonly interactions = new Map<PhysicsBody, () => Array<Interaction>>();
 
     private longPressTimer: number | null = null;
 

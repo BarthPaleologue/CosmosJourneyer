@@ -25,7 +25,7 @@ export type SystemEntityProcessor<T extends AnySystemContentType, TContext, TOut
 export type ErasedSystemEntityProcessor<TContext, TOutput> = (entity: SystemEntity, context: TContext) => TOutput;
 
 export class SystemEntityProcessorRegistry<TContext, TOutput> {
-    private readonly registry: Map<string, ErasedSystemEntityProcessor<TContext, TOutput>> = new Map();
+    private readonly registry = new Map<string, ErasedSystemEntityProcessor<TContext, TOutput>>();
 
     private readonly fallbackProcessor: ErasedSystemEntityProcessor<TContext, TOutput>;
 
