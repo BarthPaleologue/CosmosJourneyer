@@ -26,21 +26,74 @@ import { PhysicsMotionType, PhysicsPrestepType } from "@babylonjs/core/Physics/v
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
-import type { TFunction } from "i18next";
+import { createInstance } from "i18next";
 import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 
 import { Settings } from "@/settings";
 
-import type { ISoundPlayer } from "../audio/soundPlayer";
-import type { ITts } from "../audio/tts";
+import type { SpaceDots } from "../assets/procedural/spaceDots";
+import { SoundPlayerMock } from "../audio/soundPlayer";
+import { TtsMock } from "../audio/tts";
 import { FloatingOriginSystem } from "../helpers/floatingOriginSystem";
 import { createHavokForTests } from "../helpers/havokTest";
-import type { INotificationManager } from "../ui/notificationManager";
+import { NotificationManagerMock } from "../ui/notificationManager";
 import { LandingPadProvider, LandingPadSize } from "../universe/orbitalFacility/landingPadProvider";
 import type { ILandingPad } from "../universe/orbitalFacility/landingPadProvider";
 import type { LandableFacility } from "../universe/systemObject";
 import { ShipControls } from "./shipControls";
-import type { Spaceship } from "./spaceship";
+import { Spaceship } from "./spaceship";
+import type { SpaceshipInternals } from "./spaceshipInternals";
+
+const i18n = createInstance();
+void i18n.init({ lng: "en-US", resources: {} });
+const t = i18n.getFixedT("en-US");
+
+/**
+ * The part of the Spaceship surface that ShipControls drives in these tests.
+ * Class-typed members are narrowed to the members the controls actually call.
+ */
+type SpaceshipStandIn = {
+    getTransform: Spaceship["getTransform"];
+    boundingExtent: Spaceship["boundingExtent"];
+    onFuelScoopStart: Spaceship["onFuelScoopStart"];
+    onFuelScoopEnd: Spaceship["onFuelScoopEnd"];
+    onLowFuelWarning: Spaceship["onLowFuelWarning"];
+    onLandingObservable: Spaceship["onLandingObservable"];
+    onPlanetaryLandingEngaged: Spaceship["onPlanetaryLandingEngaged"];
+    onLandingCancelled: Spaceship["onLandingCancelled"];
+    onTakeOff: Spaceship["onTakeOff"];
+    onAutoPilotEngaged: Spaceship["onAutoPilotEngaged"];
+    onWarpDriveDisabled: Spaceship["onWarpDriveDisabled"];
+    onWarpDriveEnabled: Spaceship["onWarpDriveEnabled"];
+    getInternals: () => { getWarpDrive: SpaceshipInternals["getWarpDrive"] };
+    isAutoPiloted: Spaceship["isAutoPiloted"];
+    isLanded: Spaceship["isLanded"];
+    isLanding: Spaceship["isLanding"];
+    getTargetLandingPad: Spaceship["getTargetLandingPad"];
+    engageLandingOnPad: Spaceship["engageLandingOnPad"];
+    spawnOnPad: Spaceship["spawnOnPad"];
+    cancelLanding: Spaceship["cancelLanding"];
+    takeOff: Spaceship["takeOff"];
+    spaceDots: { setSteering: SpaceDots["setSteering"] };
+    update: Spaceship["update"];
+    increaseMainEngineThrottle: Spaceship["increaseMainEngineThrottle"];
+    getThrottle: Spaceship["getThrottle"];
+    dispose: Spaceship["dispose"];
+};
+
+/**
+ * Hands a stand-in to ShipControls' nominal Spaceship parameter: the prototype is aligned
+ * with Spaceship first, so the instanceof guard below is a genuine runtime check.
+ * @param standIn The typed stand-in to present as a Spaceship.
+ * @returns The stand-in, narrowed to Spaceship by the runtime instanceof check.
+ */
+function toSpaceship(standIn: SpaceshipStandIn): Spaceship {
+    Object.setPrototypeOf(standIn, Spaceship.prototype);
+    if (standIn instanceof Spaceship) {
+        return standIn;
+    }
+    throw new Error("Spaceship stand-in failed its instanceof check");
+}
 
 describe("ShipControls camera transforms", () => {
     const engine = new NullEngine();
@@ -52,7 +105,7 @@ describe("ShipControls camera transforms", () => {
     });
 
     afterEach(() => {
-        controls.dispose({} as ISoundPlayer);
+        controls.dispose(new SoundPlayerMock());
         scene.dispose();
         vi.restoreAllMocks();
     });
@@ -64,19 +117,19 @@ describe("ShipControls camera transforms", () => {
         ship.rotationQuaternion = Quaternion.Identity();
         let targetLandingPad: ILandingPad | null = null;
         const onLandingCancelled = new Observable<void>();
-        const spaceship = {
+        const spaceship: SpaceshipStandIn = {
             getTransform: () => ship,
             boundingExtent: Vector3.One(),
-            onFuelScoopStart: new Observable(),
-            onFuelScoopEnd: new Observable(),
-            onLowFuelWarning: new Observable(),
-            onLandingObservable: new Observable(),
-            onPlanetaryLandingEngaged: new Observable(),
+            onFuelScoopStart: new Observable<void>(),
+            onFuelScoopEnd: new Observable<void>(),
+            onLowFuelWarning: new Observable<void>(),
+            onLandingObservable: new Observable<void>(),
+            onPlanetaryLandingEngaged: new Observable<void>(),
             onLandingCancelled,
-            onTakeOff: new Observable(),
-            onAutoPilotEngaged: new Observable(),
-            onWarpDriveDisabled: new Observable(),
-            onWarpDriveEnabled: new Observable(),
+            onTakeOff: new Observable<void>(),
+            onAutoPilotEngaged: new Observable<void>(),
+            onWarpDriveDisabled: new Observable<boolean>(),
+            onWarpDriveEnabled: new Observable<void>(),
             getInternals: () => ({ getWarpDrive: () => null }),
             isAutoPiloted: () => true,
             isLanded: () => true,
@@ -95,19 +148,19 @@ describe("ShipControls camera transforms", () => {
             takeOff: () => {
                 targetLandingPad = null;
             },
-            spaceDots: { setSteering: vi.fn() },
-            update: vi.fn(),
-            increaseMainEngineThrottle: vi.fn(),
+            spaceDots: { setSteering: vi.fn<SpaceDots["setSteering"]>() },
+            update: vi.fn<Spaceship["update"]>(),
+            increaseMainEngineThrottle: vi.fn<Spaceship["increaseMainEngineThrottle"]>(),
             getThrottle: () => 0,
-            dispose: vi.fn(),
-        } as unknown as Spaceship;
+            dispose: vi.fn<Spaceship["dispose"]>(),
+        };
         controls = new ShipControls(
-            spaceship,
+            toSpaceship(spaceship),
             scene,
-            {} as ISoundPlayer,
-            { enqueueSay: vi.fn() } as unknown as ITts,
-            { create: vi.fn() } as unknown as INotificationManager,
-            (() => "") as unknown as TFunction,
+            new SoundPlayerMock(),
+            new TtsMock(),
+            new NotificationManagerMock(),
+            t,
         );
         return ship;
     }

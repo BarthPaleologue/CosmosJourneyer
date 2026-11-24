@@ -1,87 +1,95 @@
-import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import type { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
-import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import "@babylonjs/core/Physics/physicsEngineComponent";
 
-import type { LandingPad } from "@/modules/orbitalFacilities/assets/landingPad/landingPad";
+import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
+import { Scene } from "@babylonjs/core/scene";
+import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { createHavokForTests } from "@/frontend/helpers/havokTest";
+import { LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
+import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
+
+import { getPhysicsEngineV2 } from "@/utils/physicsEngineV2";
 
 import { AttitudePDController } from "./attitudePdController";
 import { LandingComputer, LandingComputerStatusBit } from "./landingComputer";
 
-// Mock BabylonJS classes
-vi.mock("@babylonjs/core/Physics/v2/physicsAggregate", () => ({
-    PhysicsAggregate: vi.fn(),
-}));
-
-vi.mock("@babylonjs/core/Physics/v2/physicsBody", () => ({
-    PhysicsBody: vi.fn(),
-}));
-
 describe("LandingComputer", () => {
+    let havok: HavokPhysicsWithBindings;
+    let engine: NullEngine;
+    let scene: Scene;
+    let physicsEngine: PhysicsEngineV2;
+    let shipTransform: TransformNode;
+    let aggregate: PhysicsAggregate;
     let landingComputer: LandingComputer;
-    let mockAggregate: PhysicsAggregate;
-    let mockPhysicsEngine: PhysicsEngineV2;
-    let mockTransform: TransformNode;
-    let mockPhysicsBody: PhysicsBody;
+
+    beforeAll(async () => {
+        havok = await createHavokForTests();
+    });
 
     beforeEach(() => {
-        // Setup mocks
-        mockTransform = {
-            getAbsolutePosition: vi.fn().mockReturnValue(new Vector3(0, 0, 0)),
-            getHierarchyBoundingVectors: vi.fn().mockReturnValue({
-                min: new Vector3(-1, -1, -1),
-                max: new Vector3(1, 1, 1),
-            }),
-            absoluteRotationQuaternion: new Quaternion(),
-            up: Vector3.Up(),
-            right: Vector3.Right(),
-            forward: Vector3.Forward(),
-            position: new Vector3(0, 0, 0),
-            getScene: () => ({ useRightHandedSystem: false }),
-        } as unknown as TransformNode;
+        // Setup a real scene with the Havok physics engine
+        engine = new NullEngine();
+        scene = new Scene(engine);
+        scene.enablePhysics(Vector3.Zero(), new HavokPlugin(true, havok));
+        physicsEngine = getPhysicsEngineV2(scene);
 
-        mockPhysicsBody = {
-            getLinearVelocity: vi.fn().mockReturnValue(new Vector3(0, 0, 0)),
-            getAngularVelocity: vi.fn().mockReturnValue(new Vector3(0, 0, 0)),
-            getMassProperties: vi.fn().mockReturnValue({ mass: 1 }),
-            applyForce: vi.fn(),
-            applyTorque: vi.fn(),
-        } as unknown as PhysicsBody;
+        shipTransform = new TransformNode("ship", scene);
+        shipTransform.rotationQuaternion = Quaternion.Identity();
+        // A size-2 hull gives the ship the same (-1, -1, -1)..(1, 1, 1) hierarchy bounds as the fixture
+        const hull = CreateBox("shipHull", { size: 2 }, scene);
+        hull.parent = shipTransform;
 
-        mockAggregate = {
-            transformNode: mockTransform,
-            body: mockPhysicsBody,
-        } as unknown as PhysicsAggregate;
+        aggregate = new PhysicsAggregate(shipTransform, PhysicsShapeType.BOX, { mass: 1 }, scene);
 
-        mockPhysicsEngine = {
-            raycastToRef: vi.fn().mockImplementation((start, end, result: PhysicsRaycastResult) => {
+        vi.spyOn(physicsEngine, "raycastToRef").mockImplementation((from, to, result) => {
+            if (!Array.isArray(result)) {
                 result.setHitData(Vector3.Up(), Vector3.Zero(), 0);
-            }),
-        } as unknown as PhysicsEngineV2;
+            }
+        });
 
-        landingComputer = new LandingComputer(mockAggregate, mockPhysicsEngine);
+        landingComputer = new LandingComputer(aggregate, physicsEngine);
     });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        scene.dispose();
+        engine.dispose();
+    });
+
+    /**
+     * @returns A landing pad backed by a real transform node at (0, 10, 0) with identity rotation.
+     */
+    function createLandingPad(): ILandingPad {
+        const padTransform = new TransformNode("landingPad", scene);
+        padTransform.rotationQuaternion = Quaternion.Identity();
+        padTransform.position.set(0, 10, 0);
+        return {
+            getTransform: () => padTransform,
+            getBoundingRadius: () => 10,
+            getIdentifier: () => "landingPad",
+            getPadSize: () => LandingPadSize.SMALL,
+            getPadHeight: () => 2,
+        };
+    }
 
     it("should initialize with null target", () => {
         expect(landingComputer.getTarget()).toBeNull();
     });
 
     it("should set landing pad target", () => {
-        const mockLandingPad = {
-            getTransform: () => ({
-                getAbsolutePosition: (): Vector3 => new Vector3(0, 10, 0),
-                up: Vector3.Up(),
-                absoluteRotationQuaternion: new Quaternion(),
-            }),
-            getPadHeight: () => 2,
-        } as unknown as LandingPad;
+        const landingPad = createLandingPad();
 
         landingComputer.setTarget({
             kind: "landing_pad",
-            landingPad: mockLandingPad,
+            landingPad,
         });
 
         expect(landingComputer.getTarget()).not.toBeNull();
@@ -89,13 +97,12 @@ describe("LandingComputer", () => {
     });
 
     it("should set celestial body target", () => {
-        const mockCelestialBody = {
-            position: new Vector3(0, 100, 0),
-        } as unknown as TransformNode;
+        const celestialBody = new TransformNode("celestialBody", scene);
+        celestialBody.position.set(0, 100, 0);
 
         landingComputer.setTarget({
             kind: "celestial_body",
-            celestialBody: mockCelestialBody,
+            celestialBody,
         });
 
         expect(landingComputer.getTarget()).not.toBeNull();
@@ -108,18 +115,11 @@ describe("LandingComputer", () => {
     });
 
     it("should timeout after max seconds", () => {
-        const mockLandingPad = {
-            getTransform: () => ({
-                getAbsolutePosition: (): Vector3 => new Vector3(0, 10, 0),
-                up: Vector3.Up(),
-                absoluteRotationQuaternion: new Quaternion(),
-            }),
-            getPadHeight: () => 2,
-        } as unknown as LandingPad;
+        const landingPad = createLandingPad();
 
         landingComputer.setTarget({
             kind: "landing_pad",
-            landingPad: mockLandingPad,
+            landingPad,
         });
 
         // Simulate passage of time beyond timeout
@@ -129,18 +129,11 @@ describe("LandingComputer", () => {
     });
 
     it("should report progress during normal operation", () => {
-        const mockLandingPad = {
-            getTransform: () => ({
-                getAbsolutePosition: (): Vector3 => new Vector3(0, 10, 0),
-                up: Vector3.Up(),
-                absoluteRotationQuaternion: new Quaternion(),
-            }),
-            getPadHeight: () => 2,
-        } as unknown as LandingPad;
+        const landingPad = createLandingPad();
 
         landingComputer.setTarget({
             kind: "landing_pad",
-            landingPad: mockLandingPad,
+            landingPad,
         });
 
         const status = landingComputer.update(0.016);
@@ -158,15 +151,16 @@ describe("LandingComputer", () => {
     });
 
     it("plans a finite surface landing when the ship is upside down", () => {
-        mockTransform.absoluteRotationQuaternion.copyFrom(Quaternion.RotationAxis(Vector3.RightReadOnly, Math.PI));
-        mockTransform.up.copyFrom(Vector3.DownReadOnly);
-        mockTransform.position.set(0, 100, 0);
+        shipTransform.rotationQuaternion = Quaternion.RotationAxis(Vector3.RightReadOnly, Math.PI);
+        shipTransform.position.set(0, 100, 0);
         const computeTorque = vi.spyOn(AttitudePDController.prototype, "computeTorqueToRef");
 
         try {
+            const celestialBody = new TransformNode("celestialBody", scene);
+            celestialBody.position.set(0, -100, 0);
             landingComputer.setTarget({
                 kind: "celestial_body",
-                celestialBody: { position: new Vector3(0, -100, 0) } as TransformNode,
+                celestialBody,
             });
             const status = landingComputer.update(0.016);
             const targetRotation = computeTorque.mock.lastCall?.[1].orientation;

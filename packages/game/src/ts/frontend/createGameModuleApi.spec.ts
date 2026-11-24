@@ -34,6 +34,21 @@ import { createSystemView } from "./universe/systemView";
 
 const type = makeSystemContentType<SystemContentModel<"capabilities-test">, SystemContent>("capabilities-test");
 
+/**
+ * Builds a fresh per-test object inheriting the class prototype, narrowed by a runtime
+ * instanceof check so no type assertion is needed and the shared class prototype stays untouched.
+ * @param fields State and method overrides placed on the fresh object.
+ * @returns A per-test instance of the class, narrowed by a runtime instanceof check.
+ */
+function createStarSystemController(fields: Record<string, unknown>): StarSystemController {
+    const candidate: unknown = Object.setPrototypeOf(fields, StarSystemController.prototype);
+    if (!(candidate instanceof StarSystemController)) {
+        throw new Error("unreachable: candidate inherits StarSystemController.prototype");
+    }
+
+    return candidate;
+}
+
 describe("module entity capabilities", () => {
     let engine: NullEngine;
     let scene: Scene;
@@ -122,22 +137,22 @@ describe("module entity capabilities", () => {
             getTransform: () => bodyTransform,
             getBoundingRadius: () => 990,
         };
-        const controller = {
-            getOrbitalObjects: () => [body],
-            getSystemObjects: () => StarSystemController.prototype.getSystemObjects.call(controller),
+        const controller = createStarSystemController({
+            stellarObjects: [body],
+            planets: [],
+            satellites: [],
+            anomalies: [],
             systemEntityProcessors: processors,
             systemEntities: [entity, ignored],
-        } as unknown as StarSystemController;
+        });
 
         expect(controller.getSystemObjects().map((object) => object.id)).toEqual(["body", entity.model.id]);
-        const found = StarSystemController.prototype.getSystemObjectById.call(controller, entity.model.id);
+        const found = controller.getSystemObjectById(entity.model.id);
         expect(found?.getTransform()).toBe(geometry.getTransform());
         expect(found?.getBoundingRadius()).toBe(10);
-        expect(StarSystemController.prototype.getSystemObjectById.call(controller, "missing")).toBeUndefined();
-        expect(StarSystemController.prototype.getNearestSystemObject.call(controller, Vector3.Zero()).id).toBe("body");
-        expect(StarSystemController.prototype.getNearestSystemObject.call(controller, new Vector3(0, 0, -30)).id).toBe(
-            entity.model.id,
-        );
+        expect(controller.getSystemObjectById("missing")).toBeUndefined();
+        expect(controller.getNearestSystemObject(Vector3.Zero()).id).toBe("body");
+        expect(controller.getNearestSystemObject(new Vector3(0, 0, -30)).id).toBe(entity.model.id);
     });
 
     it("uses the monolith's physical bounds for navigation", () => {
@@ -171,25 +186,22 @@ describe("module entity capabilities", () => {
         const provider = new LandingPadProvider([pad]);
         api.systemEntities.registerSpatialGeometry(type, () => geometry);
         api.landingPad.systemEntities.register(type, () => provider);
-        const controller = {
-            getOrbitalObjects: () => [],
-            getSystemEntities: () => [entity],
-            getSystemTargets: () => [],
-            getLandableFacilities: () => StarSystemController.prototype.getLandableFacilities.call(controller),
+        const controller = createStarSystemController({
+            stellarObjects: [],
+            planets: [],
+            satellites: [],
+            anomalies: [],
+            systemTargets: [],
             systemEntityProcessors: processors,
-            systemEntities: [entity, ignored],
-        } as unknown as StarSystemController;
+            systemEntities: [entity],
+        });
         const facilities = controller.getLandableFacilities();
         expect(facilities.map((facility) => facility.id)).toEqual([entity.model.id]);
         const facility = facilities.find((candidate) => candidate.id === entity.model.id);
         expect(facility?.getLandingPadProvider()).toBe(provider);
         expect(facility?.getTransform()).toBe(geometry.getTransform());
-        expect(
-            StarSystemController.prototype.getLandableFacilityById
-                .call(controller, entity.model.id)
-                ?.getLandingPadProvider(),
-        ).toBe(provider);
-        expect(StarSystemController.prototype.getLandableFacilityById.call(controller, "missing")).toBeUndefined();
+        expect(controller.getLandableFacilityById(entity.model.id)?.getLandingPadProvider()).toBe(provider);
+        expect(controller.getLandableFacilityById("missing")).toBeUndefined();
         const targets = getSystemTargets(controller, () => []);
         expect(targets).toHaveLength(1);
         expect(targets[0]?.type).toBe(TargetType.LANDING_PAD);
@@ -200,15 +212,17 @@ describe("module entity capabilities", () => {
 
     it("requires spatial geometry for a landing provider and handles a system without landable facilities", () => {
         api.landingPad.systemEntities.register(type, () => new LandingPadProvider([]));
-        const controller = {
-            getLandableFacilities: () => StarSystemController.prototype.getLandableFacilities.call(controller),
+        const controller = createStarSystemController({
+            stellarObjects: [],
+            planets: [],
+            satellites: [],
+            anomalies: [],
+            systemTargets: [],
             systemEntityProcessors: processors,
             systemEntities: [entity],
-        } as unknown as StarSystemController;
+        });
         expect(controller.getLandableFacilities()).toEqual([]);
-        expect(
-            StarSystemController.prototype.getLandableFacilityById.call(controller, entity.model.id),
-        ).toBeUndefined();
+        expect(controller.getLandableFacilityById(entity.model.id)).toBeUndefined();
     });
 
     it("shares module information registrations with the game's star-map registry", () => {
