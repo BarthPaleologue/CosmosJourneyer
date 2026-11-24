@@ -17,6 +17,7 @@
 
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { squirrelNoise } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import { build_chunk_vertex_data, BuildData, Direction } from "terrain-generation";
 
@@ -24,6 +25,7 @@ import { AvailableRockSizes } from "@/frontend/assets/objects/rockSizes";
 import { filterPoints, MaxScatterDensity } from "@/frontend/helpers/instancing";
 import type { ScatteringLayer } from "@/frontend/helpers/instancing";
 
+import { hashString } from "@/utils/hash";
 import { smoothstep } from "@/utils/math";
 
 import { Settings } from "@/settings";
@@ -72,6 +74,13 @@ export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffer
     const planetModel = task.planetModel;
     const planetDiameter = planetModel.radius * 2;
 
+    // Deterministic per-chunk random source: the same planet chunk always scatters identically.
+    const chunkSeed = hashString(
+        `${planetModel.id}/${task.faceIndex}/${task.depth}/${task.position[0]}/${task.position[1]}/${task.position[2]}`,
+    );
+    let rngCounter = 0;
+    const rand = (): number => squirrelNoise(chunkSeed, rngCounter++);
+
     const size = planetDiameter / 2 ** task.depth;
     const space_between_vertices = size / nbSubdivisions;
     const scatter_per_square_meter =
@@ -117,12 +126,8 @@ export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffer
     if (scattered_point_buffer.length !== 0) {
         const rockLayer: ScatteringLayer = () => ({
             density: 1 / 15 ** 2,
-            scalingOverride: AvailableRockSizes[Math.floor(AvailableRockSizes.length * Math.random() ** 2)] ?? 1,
-            rotationOverride: Quaternion.FromEulerAngles(
-                Math.random() * Math.PI,
-                Math.random() * Math.PI,
-                Math.random() * Math.PI,
-            ),
+            scalingOverride: AvailableRockSizes[Math.floor(AvailableRockSizes.length * rand() ** 2)] ?? 1,
+            rotationOverride: Quaternion.FromEulerAngles(rand() * Math.PI, rand() * Math.PI, rand() * Math.PI),
         });
 
         if (planetModel.atmosphere !== null && planetModel.ocean !== null) {
@@ -147,7 +152,7 @@ export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffer
                         Vector3.UpReadOnly,
                         gravityUp,
                         Quaternion.Identity(),
-                    ).multiply(Quaternion.RotationAxis(Axis.Y, Math.random() * 2 * Math.PI)),
+                    ).multiply(Quaternion.RotationAxis(Axis.Y, rand() * 2 * Math.PI)),
                 };
             };
 
@@ -170,8 +175,8 @@ export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffer
                         Vector3.UpReadOnly,
                         gravityUp,
                         Quaternion.Identity(),
-                    ).multiply(Quaternion.RotationAxis(Axis.Y, Math.random() * 2 * Math.PI)),
-                    scalingOverride: 0.5 + 2 * Math.random() ** 1.5,
+                    ).multiply(Quaternion.RotationAxis(Axis.Y, rand() * 2 * Math.PI)),
+                    scalingOverride: 0.5 + 2 * rand() ** 1.5,
                 };
             };
 
@@ -198,18 +203,17 @@ export function createChunkBuffers(task: BuildChunkWorkerPayload): TerrainBuffer
                 };
             };
 
-            const [rockBuffer, grassBuffer, treeBuffer, butterflyBuffer] = filterPoints(scattered_point_buffer, [
-                rockLayer,
-                grassLayer,
-                treeLayer,
-                butterflyLayer,
-            ]);
+            const [rockBuffer, grassBuffer, treeBuffer, butterflyBuffer] = filterPoints(
+                scattered_point_buffer,
+                [rockLayer, grassLayer, treeLayer, butterflyLayer],
+                rand,
+            );
             scatteredInstances.rock = rockBuffer;
             scatteredInstances.grass = grassBuffer;
             scatteredInstances.tree = treeBuffer;
             scatteredInstances.butterfly = butterflyBuffer;
         } else {
-            const [rockBuffer] = filterPoints(scattered_point_buffer, [rockLayer]);
+            const [rockBuffer] = filterPoints(scattered_point_buffer, [rockLayer], rand);
             scatteredInstances.rock = rockBuffer;
         }
     }

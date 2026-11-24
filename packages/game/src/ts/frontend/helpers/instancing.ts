@@ -110,11 +110,13 @@ export const MaxScatterDensity = 16;
 /**
  * @param pointBuffer - Packed points with three position and three normal values each.
  * @param layers - Placement rules returning density from 0 (never) to `MaxScatterDensity` (always).
+ * @param rand - Explicit deterministic random source for the per-point placement decision.
  * @returns Per-layer transforms, positions, rotations, scales, and instance counts.
  */
 export function filterPoints<const TLayers extends ReadonlyArray<ScatteringLayer>>(
     pointBuffer: Float32Array,
     layers: TLayers,
+    rand: () => number,
 ): ScatteringLayersBuffers<TLayers> {
     const pointStride = 6;
 
@@ -149,7 +151,7 @@ export function filterPoints<const TLayers extends ReadonlyArray<ScatteringLayer
             const { density, rotationOverride, scalingOverride } = layer(position, normal);
 
             const probability = density / MaxScatterDensity;
-            if (Math.random() > probability) {
+            if (rand() > probability) {
                 continue;
             }
 
