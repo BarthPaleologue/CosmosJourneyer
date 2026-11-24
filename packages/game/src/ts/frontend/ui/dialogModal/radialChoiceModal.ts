@@ -23,6 +23,9 @@ export type RadialChoiceModalOptions = {
     useVirtualCursor: boolean;
 };
 
+/** Monotonic id source for DOM clip-path ids: unique per modal without any randomness. */
+let nextClipPathId = 0;
+
 /**
  * Presents choices in a radial menu and resolves with the selected item.
  * @param choices Values shown as radial menu options.
@@ -73,7 +76,7 @@ export async function radialChoiceModal<T>(
     const outerRadius = circleSize / 2 - strokeWidth / 2;
     const innerRadius = outerRadius - 110;
     const labelRadius = (outerRadius + innerRadius) / 2;
-    const clipPathId = `radial-choice-${Math.random().toString(36).slice(2)}`;
+    const clipPathId = `radial-choice-${nextClipPathId++}`;
     const baseSegmentColor = getComputedStyle(document.documentElement).getPropertyValue("--accent-color").trim();
     const activeSegmentColor = getComputedStyle(document.documentElement)
         .getPropertyValue("--accent-color-light")

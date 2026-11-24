@@ -19,10 +19,13 @@ import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstra
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 import { SoundState } from "@babylonjs/core/AudioV2/soundState";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { squirrelNoise } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import type { Musics } from "@/frontend/assets/audio/musics";
 import type { StarSystemView } from "@/frontend/starSystemView";
+
+import { hashString } from "@/utils/hash";
 
 import type { ErasedSystemEntityProcessor } from "../systemEntity/systemEntityProcessor";
 
@@ -32,8 +35,14 @@ export type SystemEntityMusicContext = {
 
 export type SystemEntityMusicProcessor = ErasedSystemEntityProcessor<SystemEntityMusicContext, Array<keyof Musics>>;
 
+/** Fixed seed for music picks: deterministic across runs, no implicit randomness. */
+const MUSIC_SEED = hashString("musicSystem");
+
 export class MusicSystem {
     private currentMusic: AbstractSound | null = null;
+
+    /** Draw counter for the deterministic music seed. */
+    private rngCounter = 0;
 
     /**
      * The number of seconds to wait before playing a new music.
@@ -73,7 +82,8 @@ export class MusicSystem {
             return;
         }
 
-        const selectedMusic = musicSelection[Math.floor(Math.random() * musicSelection.length)];
+        const selectedMusic =
+            musicSelection[Math.floor(squirrelNoise(MUSIC_SEED, this.rngCounter++) * musicSelection.length)];
         if (selectedMusic === undefined) {
             return;
         }
@@ -127,7 +137,7 @@ export class MusicSystem {
             // if the music has finished playing, set it to null
             if (!isPaused && this.currentMusic.state === SoundState.Stopped) {
                 this.currentMusic = null;
-                this.silenceSeconds = 30 + (Math.random() - 0.5) * 20;
+                this.silenceSeconds = 30 + (squirrelNoise(MUSIC_SEED, this.rngCounter++) - 0.5) * 20;
             }
         }
 

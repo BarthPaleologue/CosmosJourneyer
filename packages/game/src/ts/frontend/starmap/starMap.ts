@@ -30,10 +30,12 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
+import { squirrelNoise } from "@cosmos-journeyer/random";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
 
+import { hashString } from "@/utils/hash";
 import { getRgbFromTemperature } from "@/utils/specrend";
 
 import { Settings } from "@/settings";
@@ -402,7 +404,7 @@ export class StarMap {
             0,
             this.shimmerAnimationDuration / this.shimmerAnimationFrameRate,
             true,
-            0.1 + Math.random() * 0.2,
+            0.1 + squirrelNoise(hashString(mesh.name), 0) * 0.2,
         );
     }
 

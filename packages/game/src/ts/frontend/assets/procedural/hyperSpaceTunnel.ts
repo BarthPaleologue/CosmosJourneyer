@@ -6,11 +6,13 @@ import type { TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
+import { squirrelNoise } from "@cosmos-journeyer/random";
 
 import type { NoiseTextures } from "@/frontend/assets/textures/noises";
 import { rotate } from "@/frontend/helpers/transform";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
+import { hashVec3 } from "@/utils/hash";
 import { clamp } from "@/utils/math";
 
 import warpConeFragment from "@shaders/warpConeMaterial/fragment.glsl";
@@ -38,7 +40,13 @@ export class HyperSpaceTunnel implements Transformable {
         this.direction = direction;
 
         // find two orthogonal vectors to the direction vector (see  https://en.wikipedia.org/wiki/Gram%E2%80%93Schmidt_process)
-        const v1 = new Vector3(Math.random(), Math.random(), Math.random()).normalize();
+        // deterministic per direction: same warp direction, same tunnel basis
+        const tunnelSeed = hashVec3(direction.x, direction.y, direction.z);
+        const v1 = new Vector3(
+            squirrelNoise(tunnelSeed, 0),
+            squirrelNoise(tunnelSeed, 1),
+            squirrelNoise(tunnelSeed, 2),
+        ).normalize();
         v1.subtractInPlace(this.direction.scale(this.direction.dot(v1))).normalize();
 
         const v2 = Vector3.Cross(this.direction, v1).normalize();
