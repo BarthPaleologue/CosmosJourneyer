@@ -111,7 +111,7 @@ export class ShipControls implements Controls {
 
         this.firstPersonCamera = new FreeCamera("shipFirstPersonCamera", Vector3.Zero(), scene);
         this.firstPersonCamera.parent = this.getTransform();
-        this.firstPersonCamera.position = new Vector3(0, 1.5, -8);
+        this.firstPersonCamera.position = new Vector3(0, 1.75, -8);
         this.firstPersonCamera.minZ = 0.1;
         this.firstPersonCamera.rotationQuaternion = Quaternion.Identity();
         this.firstPersonCamera.speed = 0;
