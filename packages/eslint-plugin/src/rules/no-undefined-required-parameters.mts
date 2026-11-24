@@ -102,7 +102,16 @@ function unwrapParameterProperty(param: TSESTree.Node): TSESTree.Node {
  * @returns Whether the parameter has a `typeAnnotation` node.
  */
 function hasExplicitTypeAnnotation(param: TSESTree.Node): boolean {
-    return "typeAnnotation" in param && param.typeAnnotation !== undefined;
+    if (
+        param.type !== AST_NODE_TYPES.Identifier &&
+        param.type !== AST_NODE_TYPES.ObjectPattern &&
+        param.type !== AST_NODE_TYPES.ArrayPattern &&
+        param.type !== AST_NODE_TYPES.RestElement
+    ) {
+        return false;
+    }
+
+    return param.typeAnnotation !== undefined;
 }
 
 /**
@@ -111,11 +120,15 @@ function hasExplicitTypeAnnotation(param: TSESTree.Node): boolean {
  * @returns Whether the parameter may be omitted at the call site.
  */
 function isOptionalOrDefaulted(param: TSESTree.Node): boolean {
-    return (
-        ("optional" in param && param.optional === true) ||
-        param.type === AST_NODE_TYPES.AssignmentPattern ||
-        param.type === AST_NODE_TYPES.RestElement
-    );
+    if (
+        param.type !== AST_NODE_TYPES.Identifier &&
+        param.type !== AST_NODE_TYPES.ObjectPattern &&
+        param.type !== AST_NODE_TYPES.ArrayPattern
+    ) {
+        return param.type === AST_NODE_TYPES.AssignmentPattern || param.type === AST_NODE_TYPES.RestElement;
+    }
+
+    return param.optional;
 }
 
 /**

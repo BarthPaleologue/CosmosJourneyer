@@ -37,7 +37,8 @@
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
-        "electron-updater": "6.8.11"
+        "electron-updater": "6.8.11",
+        "zod": "catalog:"
     },
     "devDependencies": {
         "@types/node": "catalog:",

@@ -171,6 +171,9 @@ importers:
       electron-updater:
         specifier: 6.8.11
         version: 6.8.11
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
     devDependencies:
       '@types/node':
         specifier: 'catalog:'

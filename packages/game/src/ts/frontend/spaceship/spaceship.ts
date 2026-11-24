@@ -41,10 +41,10 @@ import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
 import type { ClusteredLightingRegion } from "@/frontend/helpers/clusteredLightingSystem";
 import { translate } from "@/frontend/helpers/transform";
 import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
-import type { CelestialBody, OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import type { CelestialBody } from "@/frontend/universe/architecture/orbitalObject";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 import type { ILandingPad } from "@/frontend/universe/orbitalFacility/landingPadProvider";
-import type { SystemObject } from "@/frontend/universe/systemObject";
+import type { SpaceObject } from "@/frontend/universe/systemObject";
 
 import { CollisionMask } from "@/settings";
 
@@ -96,7 +96,7 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
 
     private state: ShipState = "flying";
 
-    private nearestObject: OrbitalObject | SystemObject | null = null;
+    private nearestObject: SpaceObject | null = null;
     private nearestCelestialBody: CelestialBody | null = null;
 
     readonly spaceDots: SpaceDots;
@@ -296,7 +296,7 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
         return this.altimeter;
     }
 
-    public setNearestObject(object: OrbitalObject | SystemObject): void {
+    public setNearestObject(object: SpaceObject): void {
         this.nearestObject = object;
     }
 
@@ -429,8 +429,11 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
             (this.nearestObject === null ||
                 canEngageWarpDrive(transform, altimeter.getAltitude(), currentVelocity, this.nearestObject)) &&
             (this.nearestCelestialBody === null ||
-                this.nearestCelestialBody === this.nearestObject ||
-                canEngageWarpDrive(transform, null, currentVelocity, this.nearestCelestialBody))
+                this.nearestCelestialBody === this.nearestObject?.object ||
+                canEngageWarpDrive(transform, null, currentVelocity, {
+                    kind: "orbitalObject",
+                    object: this.nearestCelestialBody,
+                }))
         );
     }
 
@@ -609,8 +612,8 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
                 warpInfluences.push({
                     type: "solid",
                     volume: {
-                        center: this.nearestObject.getTransform().getAbsolutePosition(),
-                        radius: this.nearestObject.getBoundingRadius(),
+                        center: this.nearestObject.object.getTransform().getAbsolutePosition(),
+                        radius: this.nearestObject.object.getBoundingRadius(),
                     },
                 });
             }

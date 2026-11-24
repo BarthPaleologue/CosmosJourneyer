@@ -17,6 +17,7 @@
 
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { Result } from "@cosmos-journeyer/typescript";
+import { z } from "zod";
 
 import type { IFileSystem } from "./saveBackendMultiFile";
 
@@ -25,6 +26,10 @@ declare global {
         entries(): AsyncIterableIterator<[string, FileSystemHandle]>;
     }
 }
+
+const opfsStorageManagerSchema = z.looseObject({
+    getDirectory: z.function(),
+});
 
 /**
  * Implementation of IFileSystem using the Origin Private File System (OPFS) API.
@@ -230,6 +235,6 @@ export class OPFSFileSystem implements IFileSystem {
      * @returns Boolean indicating OPFS support.
      */
     public static IsSupported(): boolean {
-        return "storage" in navigator && "getDirectory" in navigator.storage;
+        return opfsStorageManagerSchema.safeParse(navigator.storage).success;
     }
 }

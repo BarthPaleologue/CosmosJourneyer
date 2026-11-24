@@ -1,8 +1,14 @@
 import type { UpdateInfo } from "electron-updater";
+import { z } from "zod";
 
 const minimumReleaseAgeMs = 24 * 60 * 60 * 1_000;
 const githubApiTimeoutMs = 10_000;
 const githubReleaseApiUrl = "https://api.github.com/repos/BarthPaleologue/CosmosJourneyer/releases/tags/";
+
+const githubReleaseSchema = z.looseObject({
+    published_at: z.string(),
+    draft: z.literal(false),
+});
 
 type VerifyUpdateSupport = (info: UpdateInfo) => boolean | Promise<boolean>;
 
@@ -33,20 +39,13 @@ export function requireMinimumReleaseAge(originalCheck: VerifyUpdateSupport): Ve
                 return false;
             }
 
-            const release: unknown = await response.json();
-            if (
-                typeof release !== "object" ||
-                release === null ||
-                !("published_at" in release) ||
-                typeof release.published_at !== "string" ||
-                !("draft" in release) ||
-                release.draft !== false
-            ) {
+            const parsedRelease = githubReleaseSchema.safeParse(await response.json());
+            if (!parsedRelease.success) {
                 console.warn(`Could not verify the publication date of desktop release ${info.version}.`);
                 return false;
             }
 
-            const publishedAt = Date.parse(release.published_at);
+            const publishedAt = Date.parse(parsedRelease.data.published_at);
             return Number.isFinite(publishedAt) && Date.now() - publishedAt >= minimumReleaseAgeMs;
         } catch (error) {
             console.warn(`Could not verify desktop release ${info.version} with GitHub.`, error);
