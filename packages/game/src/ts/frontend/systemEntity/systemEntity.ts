@@ -39,6 +39,7 @@ export type SystemContentType<TModel extends SystemContentModel, TContent extend
 export function makeSystemContentType<TModel extends SystemContentModel, TContent extends SystemContent>(
     type: TModel["type"],
 ): SystemContentType<TModel, TContent> {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- Branded-type constructor: SystemContentType is a Tagged discriminator and this factory is the single place applying the brand.
     return type as SystemContentType<TModel, TContent>;
 }
 

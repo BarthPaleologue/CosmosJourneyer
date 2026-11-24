@@ -253,6 +253,7 @@ function eraseFactory<T extends AnySystemContentType>(
             return err(new Error(`Expected model type "${type}", got "${model.content.type}"`));
         }
 
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- Generic-erasure boundary: the erased factory receives a SystemEntityModel<SystemContentModel> and the type tag was checked above.
         return factory(model as DeepReadonly<SystemEntityModel<ContentModelOf<T>>>, context);
     };
 }
