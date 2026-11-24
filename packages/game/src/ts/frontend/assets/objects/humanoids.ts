@@ -305,9 +305,7 @@ export async function loadHumanoidPrefabs(
                 return err("Could not find the head bone in the skeleton");
             }
 
-            const headAttachmentMesh = root
-                .getChildMeshes()
-                .find((mesh): mesh is AbstractMesh => mesh.skeleton === skeleton);
+            const headAttachmentMesh = root.getChildMeshes().find((mesh) => mesh.skeleton === skeleton);
             if (headAttachmentMesh === undefined) {
                 return err("Could not find a mesh bound to the humanoid skeleton");
             }
@@ -438,9 +436,7 @@ export async function loadHumanoidPrefabs(
                 return err("Could not find the head bone in the skeleton");
             }
 
-            const headAttachmentMesh = root
-                .getChildMeshes()
-                .find((mesh): mesh is AbstractMesh => mesh.skeleton === skeleton);
+            const headAttachmentMesh = root.getChildMeshes().find((mesh) => mesh.skeleton === skeleton);
             if (headAttachmentMesh === undefined) {
                 return err("Could not find a mesh bound to the humanoid skeleton");
             }

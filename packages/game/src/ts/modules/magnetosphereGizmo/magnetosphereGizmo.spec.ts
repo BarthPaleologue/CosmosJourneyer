@@ -18,7 +18,6 @@
 import { VertexBuffer } from "@babylonjs/core/Buffers/buffer";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { Scene } from "@babylonjs/core/scene";
 import {
     astronomicalUnitToMeters,
@@ -65,7 +64,7 @@ describe("MagnetosphereGizmo", () => {
             const lines = gizmo
                 .getTransform()
                 .getChildMeshes()
-                .filter((mesh): mesh is Mesh => mesh.getClassName() === "LinesMesh");
+                .filter((mesh) => mesh.getClassName() === "LinesMesh");
             expect(lines.length).toBeGreaterThan(0);
 
             // the outermost line reaches the standoff distance at the magnetic equator

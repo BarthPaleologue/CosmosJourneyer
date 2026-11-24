@@ -20,8 +20,8 @@ import { Alphabet, ReversedGreekAlphabet } from "#/utils/strings/alphabets";
 import { romanNumeral } from "#/utils/strings/romanNumerals";
 import { generateStarName } from "#/utils/strings/starNameGenerator";
 import { getRngFromSeed, wheelOfFortune, centeredRand, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
-import { assertUnreachable, isNonEmptyArray } from "@cosmos-journeyer/typescript";
-import type { DeepReadonly } from "@cosmos-journeyer/typescript";
+import { assertUnreachable } from "@cosmos-journeyer/typescript";
+import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
 import { createOrbitalObjectId } from "@cosmos-journeyer/universe-model";
 import type {
     StarSystemCoordinates,
@@ -237,14 +237,16 @@ export function generateStarSystemModel(
         }
     }
 
-    if (!isNonEmptyArray(stellarObjects)) {
+    const [primaryBody, ...otherStellarObjects] = stellarObjects;
+    if (primaryBody === undefined) {
         throw new Error("No stellar objects were generated for the star system");
     }
+    const nonEmptyStellarObjects: NonEmptyArray<StellarObjectModel> = [primaryBody, ...otherStellarObjects];
 
     const systemModel: StarSystemModel = {
         name: systemName,
         coordinates,
-        stellarObjects: stellarObjects,
+        stellarObjects: nonEmptyStellarObjects,
         planets: planets,
         satellites: satellites,
         anomalies: anomalies,

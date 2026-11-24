@@ -110,7 +110,7 @@ export class SpaceElevator implements SystemContent {
         this.sections = createFacilitySections(this.root, model.sections, this.name, assets, scene, {
             initialSupport: this.tether,
         });
-        this.landingBays = this.sections.filter((section): section is LandingBay => section instanceof LandingBay);
+        this.landingBays = this.sections.filter((section) => section instanceof LandingBay);
 
         const allLandingPads: Array<ILandingPad> = [];
         const landingPadToLandingBay: Map<ILandingPad, { bay: LandingBay; index: number }> = new Map();

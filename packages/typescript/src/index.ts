@@ -52,14 +52,6 @@ export type DeepMutable<T> = T extends Primitive | AnyFunction
 export type NonEmptyArray<T> = [T, ...T[]];
 
 /**
- * @param arr Array to inspect.
- * @returns Whether the array has at least one element.
- */
-export function isNonEmptyArray<T>(arr: ReadonlyArray<T>): arr is NonEmptyArray<T> {
-    return arr.length > 0;
-}
-
-/**
  * Compares two arrays for equal length and element-by-element identity.
  * @param a First array to compare.
  * @param b Second array to compare.
