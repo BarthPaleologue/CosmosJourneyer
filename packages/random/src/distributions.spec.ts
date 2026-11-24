@@ -49,14 +49,14 @@ describe("extended-random@1.2.2 compatibility", () => {
         );
         expect(source.mock.calls).toEqual([[0], [1]]);
     });
-    it("accepts Math.random as an explicit source", () => {
-        const random = vi.spyOn(Math, "random").mockReturnValue(0.25);
-        expect(centeredRand(Math.random, 0)).toBe(-0.5);
-        expect(randRange(0, 1, Math.random, 0)).toBe(0.25);
-        expect(randRangeInt(2, 5, Math.random, 0)).toBe(3);
-        expect(uniformRandBool(0.25, Math.random, 0)).toBe(false);
+    it("accepts any explicit function as a random source", () => {
+        const source = vi.fn(() => 0.25);
+        expect(centeredRand(source, 0)).toBe(-0.5);
+        expect(randRange(0, 1, source, 0)).toBe(0.25);
+        expect(randRangeInt(2, 5, source, 0)).toBe(3);
+        expect(uniformRandBool(0.25, source, 0)).toBe(false);
         expect(randRange(-3, 8, () => 0.25, 7)).toBe(-0.25);
-        expect(random).toHaveBeenCalledTimes(4);
+        expect(source).toHaveBeenCalledTimes(4);
     });
     it("includes both integer endpoints and preserves floating endpoints", () => {
         expect(randRangeInt(-3, 8, () => 0, 0)).toBe(-3);
