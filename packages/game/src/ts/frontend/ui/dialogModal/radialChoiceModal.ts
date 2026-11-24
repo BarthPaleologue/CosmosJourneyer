@@ -328,7 +328,9 @@ export async function radialChoiceModal<T>(
 
     svg.appendChild(strokeOverlay);
 
-    let detachVirtualCursorListeners = (): void => {};
+    let detachVirtualCursorListeners = (): void => {
+        // Without a virtual cursor, there are no listeners to detach.
+    };
 
     if (useVirtualCursor) {
         const virtualCursor = { x: window.innerWidth / 2, y: window.innerHeight / 2 };

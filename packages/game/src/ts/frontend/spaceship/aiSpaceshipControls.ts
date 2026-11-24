@@ -53,7 +53,9 @@ export class AiSpaceshipControls implements Controls {
         return false;
     }
 
-    update(): void {}
+    update(): void {
+        // AI ships have no player input to process.
+    }
 
     dispose(soundPlayer: ISoundPlayer): void {
         this.spaceship.dispose(soundPlayer);

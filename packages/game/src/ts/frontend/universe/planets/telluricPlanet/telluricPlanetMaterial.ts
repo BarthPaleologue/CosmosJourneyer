@@ -160,7 +160,7 @@ export class TelluricPlanetMaterial {
                     gravityUpPlanetSpace,
                     normalStrength,
                     temperature,
-                    planetModel.composition["h2o"] ?? 0,
+                    planetModel.composition.h2o ?? 0,
                     textures,
                 );
                 break;

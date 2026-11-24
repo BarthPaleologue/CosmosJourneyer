@@ -171,7 +171,7 @@ export class CurrentMissionDisplay {
             return;
         }
 
-        if (allMissions.indexOf(this.activeMission) === -1) {
+        if (!allMissions.includes(this.activeMission)) {
             const defaultMission = allMissions.at(0);
             if (defaultMission !== undefined) {
                 this.setMission(defaultMission, universeBackend);
