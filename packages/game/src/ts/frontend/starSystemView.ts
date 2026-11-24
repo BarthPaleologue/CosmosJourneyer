@@ -27,7 +27,7 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { Scene } from "@babylonjs/core/scene";
 import { AxisComposite } from "@brianchirls/game-input/browser";
-import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
+import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import { metersToLightYears } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
@@ -1580,14 +1580,12 @@ export class StarSystemView implements View {
         );
 
         if (showHelpNotification) {
-            const horizontalKeys = dPadCompositeToString(
-                DefaultControlsInputs.map.move.bindings[0]?.control as DPadComposite,
-                keyboardLayoutMap,
-            );
-            const verticalKeys = axisCompositeToString(
-                DefaultControlsInputs.map.upDown.bindings[0]?.control as AxisComposite,
-                keyboardLayoutMap,
-            );
+            const moveControl = DefaultControlsInputs.map.move.bindings[0]?.control;
+            const horizontalKeys =
+                moveControl instanceof DPadComposite ? dPadCompositeToString(moveControl, keyboardLayoutMap) : [];
+            const upDownControl = DefaultControlsInputs.map.upDown.bindings[0]?.control;
+            const verticalKeys =
+                upDownControl instanceof AxisComposite ? axisCompositeToString(upDownControl, keyboardLayoutMap) : [];
             const keys = horizontalKeys.concat(verticalKeys);
             this.notificationManager.create(
                 "general",

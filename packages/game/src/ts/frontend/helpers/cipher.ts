@@ -49,6 +49,7 @@ export async function decryptFunction<T extends (...args: never[]) => unknown>(
         if (typeof evaluated !== "function") {
             return err(new Error("Decrypted source did not evaluate to a function."));
         }
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- Dynamic code evaluation: the decrypted source is compiled at runtime and cannot be narrowed statically.
         return ok(evaluated as T);
     } catch (error) {
         if (error instanceof Error) {

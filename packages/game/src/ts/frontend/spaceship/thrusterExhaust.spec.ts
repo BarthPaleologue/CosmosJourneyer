@@ -60,11 +60,13 @@ describe("ThrusterExhaust", () => {
 
         const material = exhaust.getProxyMesh().material;
         expect(material).toBeInstanceOf(ShaderMaterial);
-        expect((material as ShaderMaterial).options.defines).toEqual([
-            "CROSS_SECTION_EXTENT_X 0.21",
-            "CROSS_SECTION_EXTENT_Z 0.42",
-            "RAY_MARCH_STEP_COUNT 24",
-        ]);
+        if (material instanceof ShaderMaterial) {
+            expect(material.options.defines).toEqual([
+                "CROSS_SECTION_EXTENT_X 0.21",
+                "CROSS_SECTION_EXTENT_Z 0.42",
+                "RAY_MARCH_STEP_COUNT 24",
+            ]);
+        }
 
         exhaust.dispose();
     });

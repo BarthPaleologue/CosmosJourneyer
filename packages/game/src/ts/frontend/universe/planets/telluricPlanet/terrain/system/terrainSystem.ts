@@ -30,6 +30,7 @@ export type ChunkId = Brand<string, "ChunkId">;
  * @returns A registry key for the task.
  */
 export function makeTaskId(taskId: string): TaskId {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- Branded-type constructor: TaskId is Brand<string, "TaskId"> and this factory is the single place applying the brand.
     return taskId as TaskId;
 }
 
@@ -39,6 +40,7 @@ export function makeTaskId(taskId: string): TaskId {
  * @returns A registry key for the chunk.
  */
 export function makeChunkId(chunkId: string): ChunkId {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- Branded-type constructor: ChunkId is Brand<string, "ChunkId"> and this factory is the single place applying the brand.
     return chunkId as ChunkId;
 }
 

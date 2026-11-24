@@ -6,8 +6,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getSunModel } from "@/backend/universe/customSystems/sol/sun";
 
+import type { Textures } from "@/frontend/assets/textures";
+import { createTexturePools } from "@/frontend/assets/textures/texturePools";
 import type { SystemEntity } from "@/frontend/systemEntity/systemEntity";
 import type { OrbitalObject } from "@/frontend/universe/architecture/orbitalObject";
+import { Star } from "@/frontend/universe/stellarObjects/star/star";
 
 import { getVestaModel } from "@/modules/vesta/vesta";
 
@@ -64,6 +67,46 @@ describe("mission guidance targets", () => {
         return { system, entity, factory, targets, id, transform };
     }
 
+    /**
+     * Builds the texture bundle a star needs, leaving the groups the star never reads unimplemented.
+     * @returns A fully typed texture bundle with a real star-material LUT pool.
+     */
+    function createStarTextures(): Textures {
+        return {
+            get terrains(): Textures["terrains"] {
+                throw new Error("Terrain textures are not used by this fixture");
+            },
+            get water(): Textures["water"] {
+                throw new Error("Water textures are not used by this fixture");
+            },
+            get particles(): Textures["particles"] {
+                throw new Error("Particle textures are not used by this fixture");
+            },
+            get materials(): Textures["materials"] {
+                throw new Error("Material textures are not used by this fixture");
+            },
+            get gasPlanet(): Textures["gasPlanet"] {
+                throw new Error("Gas planet textures are not used by this fixture");
+            },
+            get rings(): Textures["rings"] {
+                throw new Error("Ring textures are not used by this fixture");
+            },
+            get environment(): Textures["environment"] {
+                throw new Error("Environment textures are not used by this fixture");
+            },
+            get noises(): Textures["noises"] {
+                throw new Error("Noise textures are not used by this fixture");
+            },
+            get ui(): Textures["ui"] {
+                throw new Error("UI textures are not used by this fixture");
+            },
+            get empty(): Textures["empty"] {
+                throw new Error("The empty texture is not used by this fixture");
+            },
+            pools: createTexturePools(scene),
+        };
+    }
+
     it("resolves an entity ID through its module factory and keeps all of its targets", () => {
         const { system, entity, factory, targets, id } = createFixture();
         expect(getMissionKnownTargets([{ getGuidanceTargetObjectIds: () => [id] }], system, factory)).toEqual(targets);
@@ -81,18 +124,14 @@ describe("mission guidance targets", () => {
     });
 
     it("keeps orbital object targets ahead of entities with the same local ID", () => {
-        const { system, factory, id, transform } = createFixture();
+        const { system, factory, id } = createFixture();
         const model = getSunModel();
-        system.getOrbitalObjectById.mockReturnValue({
-            type: model.type,
-            model,
-            getTransform: () => transform,
-            getBoundingRadius: () => model.radius,
-        } as unknown as OrbitalObject);
+        const star = new Star(model, createStarTextures(), scene);
+        system.getOrbitalObjectById.mockReturnValue(star);
         const targets = getMissionKnownTargets([{ getGuidanceTargetObjectIds: () => [id] }], system, factory);
         expect(targets).toHaveLength(1);
         expect(targets[0]).toMatchObject({ type: TargetType.STAR, properName: model.name });
-        expect(targets[0]?.getTransform()).toBe(transform);
+        expect(targets[0]?.getTransform()).toBe(star.getTransform());
         expect(factory).not.toHaveBeenCalled();
     });
 

@@ -15,7 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
+import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { Scene } from "@babylonjs/core/scene";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
 import { getLoneStarSystem } from "@/backend/universe/customSystems/loneStar";
@@ -23,8 +28,24 @@ import { UniverseBackend } from "@/backend/universe/universeBackend";
 
 import { makeScreenshotPng } from "@/frontend/helpers/screenshot";
 import { Player } from "@/frontend/player/player";
+import type { View } from "@/frontend/view";
 
 import { CosmosJourneyer } from "./cosmosJourneyer";
+
+/**
+ * Builds a fresh per-test object inheriting the class prototype, narrowed by a runtime
+ * instanceof check so no type assertion is needed and the shared class prototype stays untouched.
+ * @param fields State and method overrides placed on the fresh object.
+ * @returns A per-test instance of the class, narrowed by a runtime instanceof check.
+ */
+function createCosmosJourneyer(fields: Record<string, unknown>): CosmosJourneyer {
+    const candidate: unknown = Object.setPrototypeOf(fields, CosmosJourneyer.prototype);
+    if (!(candidate instanceof CosmosJourneyer)) {
+        throw new Error("unreachable: candidate inherits CosmosJourneyer.prototype");
+    }
+
+    return candidate;
+}
 
 vi.mock("@/frontend/helpers/screenshot", () => ({
     bytesToDataUrl: vi.fn(() => "data:image/png;base64,thumbnail"),
@@ -33,8 +54,19 @@ vi.mock("@/frontend/helpers/screenshot", () => ({
 }));
 
 describe("CosmosJourneyer", () => {
+    let engine: NullEngine;
+    let scene: Scene;
+
     beforeEach(() => {
         vi.clearAllMocks();
+        engine = new NullEngine();
+        scene = new Scene(engine);
+        scene.activeCamera = new FreeCamera("camera", Vector3.Zero(), scene);
+    });
+
+    afterEach(() => {
+        scene.dispose();
+        engine.dispose();
     });
 
     it.each([false, true])(
@@ -55,15 +87,20 @@ describe("CosmosJourneyer", () => {
             });
             vi.mocked(makeScreenshotPng).mockReturnValue(screenshotPromise);
 
+            const shipTransform = new TransformNode("ship", scene);
             const spaceship = {
                 id: serializedSpaceship.id,
                 isLandedAtFacility: (): boolean => docked,
             };
-            const context = {
-                activeView: {
-                    getMainScene: () => ({ activeCamera: {} }),
-                },
-                engine: {},
+            const activeView: View = {
+                render: () => {},
+                detachControl: () => {},
+                attachControl: () => {},
+                getMainScene: () => scene,
+            };
+            const context = createCosmosJourneyer({
+                activeView,
+                engine,
                 player,
                 starSystemView: {
                     getCurrentUniverseCoordinates: () => ({
@@ -76,14 +113,14 @@ describe("CosmosJourneyer", () => {
                         rotation: { x: 0, y: 0, z: 0, w: 1 },
                     }),
                     getSpaceshipControls: () => ({
-                        getSpaceship: (): { id: string; isLandedAtFacility: () => boolean } => spaceship,
-                        getTransform: (): object => ({}),
+                        getSpaceship: () => spaceship,
+                        getTransform: () => shipTransform,
                         getLandingFacility: () => (docked ? { id: "module-station" } : null),
                     }),
                 },
-            } as unknown as CosmosJourneyer;
+            });
 
-            const savePromise = CosmosJourneyer.prototype.generateSaveData.call(context);
+            const savePromise = context.generateSaveData();
 
             player.serializedSpaceships.length = 0;
             player.tutorials.flightCompleted = true;

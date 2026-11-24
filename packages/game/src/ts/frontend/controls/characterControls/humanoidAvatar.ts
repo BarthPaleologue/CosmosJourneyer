@@ -19,7 +19,7 @@ import type { AnimationGroup } from "@babylonjs/core/Animations/animationGroup";
 import { BoneLookController } from "@babylonjs/core/Bones/boneLookController";
 import { Space } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import type { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import { PhysicsAggregate, PhysicsShapeCapsule } from "@babylonjs/core/Physics/v2";
@@ -117,7 +117,10 @@ export class HumanoidAvatar implements Transformable {
 
     constructor(instance: HumanoidInstance, physicsEngine: PhysicsEngineV2, scene: Scene) {
         this.instance = instance;
-        this.root = instance.root as AbstractMesh;
+        if (!(instance.root instanceof AbstractMesh)) {
+            throw new Error("Humanoid instance root is not a mesh");
+        }
+        this.root = instance.root;
         this.getTransform().rotationQuaternion = Quaternion.Identity();
 
         const capsuleRadius = 0.4;

@@ -53,16 +53,19 @@ function preprocessLegacyMissionNodeType(type: unknown): unknown {
     }
 }
 
+const recordSchema = z.record(z.string(), z.unknown());
+
 /**
  * @param node - Candidate node value read from a legacy mission document.
  * @returns Updated node value, preserving non-object and unrecognized values unchanged.
  */
 function preprocessLegacyMissionNode(node: unknown): unknown {
-    if (typeof node !== "object" || node === null) {
+    const parsed = recordSchema.safeParse(node);
+    if (!parsed.success) {
         return node;
     }
 
-    const candidate = node as Record<string, unknown>;
+    const candidate = parsed.data;
     const normalizedType = preprocessLegacyMissionNodeType(candidate["type"]);
 
     if (!Array.isArray(candidate["children"])) {

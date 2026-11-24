@@ -70,6 +70,7 @@ function eraseProcessor<T extends AnySystemContentType, TContext, TOutput>(
             throw new Error(`Expected "${type}", got "${entity.model.content.type}"`);
         }
 
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- Generic-erasure boundary: the erased processor receives a SystemEntity<SystemContent> and the type tag was checked above.
         return processor(entity as SystemEntity<T>, context);
     };
 }

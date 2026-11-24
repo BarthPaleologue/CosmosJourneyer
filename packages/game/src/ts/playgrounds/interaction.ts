@@ -269,10 +269,11 @@ function spawnBoxAtPosition(
             {
                 label: "change color",
                 perform: async (): Promise<void> => {
-                    box.material = new PBRMaterial("boxMaterial", scene);
-                    (box.material as PBRMaterial).albedoColor = Color3.Random();
-                    (box.material as PBRMaterial).metallic = 0;
-                    (box.material as PBRMaterial).roughness = 0.7;
+                    const pbrMaterial = new PBRMaterial("boxMaterial", scene);
+                    box.material = pbrMaterial;
+                    pbrMaterial.albedoColor = Color3.Random();
+                    pbrMaterial.metallic = 0;
+                    pbrMaterial.roughness = 0.7;
                     return Promise.resolve();
                 },
             },

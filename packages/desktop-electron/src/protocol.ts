@@ -192,7 +192,7 @@ async function createFileResponse(filePath: string, request: Request): Promise<R
     }
 
     const nodeStream = createReadStream(filePath, { start, end });
-    return new Response(Readable.toWeb(nodeStream) as globalThis.ReadableStream<Uint8Array>, {
+    return new Response(Readable.toWeb(nodeStream), {
         status: parsedRange === null ? 200 : 206,
         headers,
     });

@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { AssetContainer } from "@babylonjs/core/assetContainer";
+import { AssetContainer } from "@babylonjs/core/assetContainer";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Scene } from "@babylonjs/core/scene";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -25,14 +25,13 @@ import { LoadingProgressMonitor } from "./loadingProgressMonitor";
 import { ModuleAssetRegistry } from "./moduleAssetRegistry";
 
 /**
- * @returns A fake container paired with its disposal spy.
+ * @param scene Scene that owns the container.
+ * @returns A real empty container paired with a spy on its disposal.
  */
-function createContainer(): { container: AssetContainer; dispose: Mock<() => void> } {
-    const dispose = vi.fn<() => void>();
-    return {
-        container: { dispose } as unknown as AssetContainer,
-        dispose,
-    };
+function createContainer(scene: Scene): { container: AssetContainer; dispose: Mock<() => void> } {
+    const container = new AssetContainer(scene);
+    const dispose = vi.spyOn(container, "dispose");
+    return { container, dispose };
 }
 
 /**
@@ -65,7 +64,7 @@ describe("ModuleAssetRegistry", () => {
     });
 
     it("registers a loader without running it", () => {
-        const loader = vi.fn(createLoader(createContainer().container));
+        const loader = vi.fn(createLoader(createContainer(scene).container));
 
         registry.registerContainer("module/asset", loader);
 
@@ -73,8 +72,8 @@ describe("ModuleAssetRegistry", () => {
     });
 
     it("returns every loaded container keyed by identifier", async () => {
-        const first = createContainer();
-        const second = createContainer();
+        const first = createContainer(scene);
+        const second = createContainer(scene);
         registry.registerContainer("module/first", createLoader(first.container));
         registry.registerContainer("module/second", createLoader(second.container));
 
@@ -90,7 +89,7 @@ describe("ModuleAssetRegistry", () => {
     });
 
     it("runs every loader with the load scene", async () => {
-        const loader = vi.fn(createLoader(createContainer().container));
+        const loader = vi.fn(createLoader(createContainer(scene).container));
         registry.registerContainer("module/asset", loader);
 
         await registry.load(scene, progressMonitor);
@@ -100,7 +99,7 @@ describe("ModuleAssetRegistry", () => {
     });
 
     it("refuses duplicate identifiers", () => {
-        const loader = createLoader(createContainer().container);
+        const loader = createLoader(createContainer(scene).container);
         registry.registerContainer("module/asset", loader);
 
         expect(() => {
@@ -125,14 +124,14 @@ describe("ModuleAssetRegistry", () => {
     });
 
     it("disposes successfully loaded containers after a partial failure", async () => {
-        const loaded = createContainer();
+        const loaded = createContainer(scene);
         let shouldFail = true;
         const failingLoader = async (): Promise<AssetContainer> => {
             await Promise.resolve();
             if (shouldFail) {
                 throw new Error("import failed");
             }
-            return createContainer().container;
+            return createContainer(scene).container;
         };
         registry.registerContainer("module/loaded", createLoader(loaded.container));
         registry.registerContainer("module/failing", failingLoader);
@@ -154,7 +153,7 @@ describe("ModuleAssetRegistry", () => {
     });
 
     it("returns an asset set that disposes its containers", async () => {
-        const loaded = createContainer();
+        const loaded = createContainer(scene);
         registry.registerContainer("module/asset", createLoader(loaded.container));
 
         const result = await registry.load(scene, progressMonitor);
@@ -174,8 +173,8 @@ describe("ModuleAssetRegistry", () => {
         progressMonitor.addProgressCallback((started, completed) => {
             progressUpdates.push([started, completed]);
         });
-        registry.registerContainer("module/first", createLoader(createContainer().container));
-        registry.registerContainer("module/second", createLoader(createContainer().container));
+        registry.registerContainer("module/first", createLoader(createContainer(scene).container));
+        registry.registerContainer("module/second", createLoader(createContainer(scene).container));
 
         await registry.load(scene, progressMonitor);
 

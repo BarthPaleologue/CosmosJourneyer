@@ -128,6 +128,10 @@ const typeScriptWorkspaceRules = {
 
         "@typescript-eslint/consistent-type-exports": "error",
 
+        // no type assertions by default; `as const` and `satisfies` stay allowed, exceptions need a justified line-scoped disable
+        "@typescript-eslint/consistent-type-assertions": ["error", { assertionStyle: "never" }],
+        "@typescript-eslint/no-non-null-assertion": "error",
+
         "@typescript-eslint/prefer-readonly": "error",
 
         "@typescript-eslint/prefer-nullish-coalescing": "error",
@@ -153,7 +157,7 @@ const typeScriptWorkspaceRules = {
 
         "@typescript-eslint/no-deprecated": "warn",
         "@typescript-eslint/no-unnecessary-condition": "warn",
-        "@typescript-eslint/no-unsafe-type-assertion": "warn",
+        "@typescript-eslint/no-unsafe-type-assertion": "error",
 
         // enforce ===
         eqeqeq: "error",

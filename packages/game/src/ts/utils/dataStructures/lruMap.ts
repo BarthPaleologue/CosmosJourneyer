@@ -15,7 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-export class LRUMap<K, V> {
+/** Any storable value: anything except `undefined` and `null`, which `get` could not distinguish from a missing key. */
+type StoredValue = string | number | bigint | boolean | symbol | object;
+
+/**
+ * `V` must not include `undefined` (nor `null`): a stored `undefined` would be indistinguishable
+ * from a missing key in `get`, breaking the recency refresh. The constraint turns that into a
+ * compile-time error at the `set` call site instead of a silent LRU bug.
+ */
+export class LRUMap<K, V extends StoredValue> {
     private readonly map = new Map<K, V>();
 
     private readonly maxSize: number;
@@ -42,11 +50,11 @@ export class LRUMap<K, V> {
     }
 
     public get(key: K): V | undefined {
-        if (!this.map.has(key)) {
+        const value = this.map.get(key);
+        if (value === undefined) {
             return undefined;
         }
 
-        const value = this.map.get(key) as V;
         this.map.delete(key);
         this.map.set(key, value);
 

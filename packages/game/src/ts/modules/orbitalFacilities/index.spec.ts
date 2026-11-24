@@ -1,7 +1,10 @@
+import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
+import { createOrbitalObjectId } from "@cosmos-journeyer/universe-model";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
@@ -48,15 +51,27 @@ describe("orbital facilities module", () => {
         const scene = new Scene(engine);
         const camera = new FreeCamera("camera", Vector3.Zero(), scene);
         const pads = new LandingPadProvider([]);
+        const transform = new TransformNode("facility", scene);
         const content = {
+            getTransform: () => transform,
+            dispose: vi.fn(),
             getLandingPadProvider: () => pads,
             getBoundingRadius: () => 100,
-            update: vi.fn(),
-            computeCulling: vi.fn(),
-            getLandingBays: () => [],
-            getClimber: () => ({ getTransform: vi.fn(), getBoundingRadius: vi.fn() }),
+            update: vi.fn<(observerPosition: Vector3, deltaSeconds: number) => void>(),
+            computeCulling: vi.fn<(camera: Camera) => void>(),
+            getLandingBays: (): Array<never> => [],
+            getClimber: () => ({ getTransform: () => transform, getBoundingRadius: () => 10 }),
         };
-        const entity = { model: { name: "Facility", content: { type } }, content } as unknown as SystemEntity;
+        const entity: SystemEntity = {
+            model: {
+                id: "facility",
+                name: "Facility",
+                content: { type },
+                placement: { type: "inFrame", parentId: createOrbitalObjectId([], "planet", 0) },
+            },
+            content,
+            placement: { type: "inFrame", getTransform: () => transform },
+        };
         try {
             expect(processors.spatialGeometry.dispatch(entity)).toBe(content);
             expect(processors.landingPadProviders.dispatch(entity)).toBe(pads);

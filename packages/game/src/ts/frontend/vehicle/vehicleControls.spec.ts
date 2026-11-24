@@ -15,19 +15,34 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import "@babylonjs/core/Physics/physicsEngineComponent";
+
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
+import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
+import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
-import { afterAll, describe, expect, it, vi } from "vitest";
+import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
-import type { Vehicle } from "./vehicle";
+import { createHavokForTests } from "@/frontend/helpers/havokTest";
+
+import { Vehicle } from "./vehicle";
 import { VehicleControls } from "./vehicleControls";
 import { VehicleInputs } from "./vehicleControlsInputs";
 
 describe("VehicleControls", () => {
     const engine = new NullEngine();
     const scene = new Scene(engine);
+    let havok: HavokPhysicsWithBindings;
+
+    beforeAll(async () => {
+        havok = await createHavokForTests();
+        scene.enablePhysics(Vector3.Zero(), new HavokPlugin(true, havok));
+    });
 
     afterAll(() => {
         scene.dispose();
@@ -57,19 +72,19 @@ describe("VehicleControls", () => {
     });
 
     it("detaches the first person camera before releasing the vehicle", () => {
-        const vehicleTransform = new TransformNode("vehicleTransform", scene);
-        const vehicle = {
-            getTransform: () => vehicleTransform,
-        } as unknown as Vehicle;
+        const vehicleMesh = MeshBuilder.CreateBox("vehicle", {}, scene);
+        vehicleMesh.computeWorldMatrix(true);
+        const frame = new PhysicsAggregate(vehicleMesh, PhysicsShapeType.BOX, { mass: 1 }, scene);
+        const vehicle = new Vehicle("testVehicle", frame, [], [], [], [vehicleMesh]);
         const vehicleControls = new VehicleControls(scene);
 
         vehicleControls.setVehicle(vehicle);
-        expect(vehicleControls.firstPersonCamera.parent).toBe(vehicleTransform);
+        expect(vehicleControls.firstPersonCamera.parent).toBe(vehicleMesh);
 
         vehicleControls.setVehicle(null);
 
         expect(vehicleControls.firstPersonCamera.parent).toBeNull();
-        vehicleTransform.dispose();
+        vehicleMesh.dispose();
     });
 
     it("aligns the camera to successive up directions without refreshing matrices", () => {

@@ -171,6 +171,7 @@ export function filterPoints<const TLayers extends ReadonlyArray<ScatteringLayer
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion -- Branded container constructor: ScatteringLayersBuffers<TLayers> tags the array and this is the single place applying the brand.
     return instanceBuffers.map(
         (b) =>
             ({

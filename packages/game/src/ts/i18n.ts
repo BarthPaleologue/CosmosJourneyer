@@ -17,7 +17,7 @@
 
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { createInstance } from "i18next";
-import type { Resource, ResourceKey, ResourceLanguage, TFunction, i18n } from "i18next";
+import type { Resource, ResourceLanguage, TFunction, i18n } from "i18next";
 import { z } from "zod";
 
 import type { I18nExtensionPoint, ModuleLocales } from "./modules/i18n";
@@ -56,15 +56,16 @@ function loadResources(): Resource {
         }
 
         resources[languageFolder] = resources[languageFolder] ?? {};
-        let currentResource: ResourceLanguage | ResourceKey = resources[languageFolder];
+        let currentResource: ResourceLanguage = resources[languageFolder];
         subFolders.forEach((subFolder) => {
-            if (typeof currentResource === "string") {
+            if (!(subFolder in currentResource)) {
+                currentResource[subFolder] = {};
+            }
+            const next = currentResource[subFolder];
+            if (next === undefined || typeof next === "string") {
                 throw new Error("Encountered recursion error when iterating locale subfolders!");
             }
-            if (!(subFolder in currentResource)) {
-                currentResource[subFolder] = {} as ResourceLanguage;
-            }
-            currentResource = currentResource[subFolder] as ResourceLanguage;
+            currentResource = next;
         });
 
         const fileContent = jsonSchema.parse(moduleContent);

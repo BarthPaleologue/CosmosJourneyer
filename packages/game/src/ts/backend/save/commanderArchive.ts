@@ -120,7 +120,10 @@ export function parseCommanderArchive(archiveData: Uint8Array): Result<Commander
             return err("INVALID_SAVE");
         }
 
-        const saveType = pathMatch[1] as "manual" | "auto";
+        const saveType = pathMatch[1];
+        if (saveType !== "manual" && saveType !== "auto") {
+            return err("INVALID_SAVE");
+        }
         const fileUuid = pathMatch[2];
         const saveJson = jsonSafeParse(strFromU8(data));
         if (saveJson === null) {
