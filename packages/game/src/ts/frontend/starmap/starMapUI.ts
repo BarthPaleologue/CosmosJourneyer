@@ -59,7 +59,7 @@ export class StarMapUI {
     private hoveredSystem: StarSystemCoordinates | null = null;
     private currentSystem: StarSystemCoordinates | null = null;
 
-    private systemIcons: SystemIcons[] = [];
+    private systemIcons: Array<SystemIcons> = [];
 
     private readonly scene: Scene;
 
@@ -362,7 +362,7 @@ export class StarMapUI {
             // remove duplicates
             .filter((value, index, self) => self.findIndex((v) => starSystemCoordinatesEquals(v, value)) === index);
 
-        const systemIconsToKeep: SystemIcons[] = [];
+        const systemIconsToKeep: Array<SystemIcons> = [];
 
         this.systemIcons.forEach((systemIcons) => {
             const system = systemIcons.getSystemCoordinates();

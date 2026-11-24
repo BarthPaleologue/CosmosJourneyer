@@ -109,7 +109,7 @@ describe("stellar spectral colorimetry", () => {
     });
 
     it("includes 360 and 830 nm with trapezoidal endpoint weights", () => {
-        const wavelengths: number[] = [];
+        const wavelengths: Array<number> = [];
         const xyz = integrateSpectrum((wavelength) => {
             wavelengths.push(wavelength);
             return wavelength < 361e-9 ? 1 / 5e-9 : 0;

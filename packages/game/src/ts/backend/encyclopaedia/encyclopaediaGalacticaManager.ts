@@ -5,7 +5,7 @@ import type { UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import type { EncyclopaediaGalactica, SpaceDiscoveryData } from "./encyclopaediaGalactica";
 
 export class EncyclopaediaGalacticaManager implements EncyclopaediaGalactica {
-    readonly backends: EncyclopaediaGalactica[] = [];
+    readonly backends: Array<EncyclopaediaGalactica> = [];
 
     public async contributeDiscoveryIfNew(data: SpaceDiscoveryData): Promise<boolean> {
         let hasBeenContributed = false;

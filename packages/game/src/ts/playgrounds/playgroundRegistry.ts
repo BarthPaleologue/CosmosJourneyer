@@ -76,10 +76,10 @@ import { createTutorialScene } from "./tutorial";
 import { createXrScene } from "./xr";
 
 export class PlaygroundRegistry {
-    private readonly map: Map<
+    private readonly map = new Map<
         string,
         (engine: AbstractEngine, progressMonitor: ILoadingProgressMonitor) => Promise<Scene>
-    > = new Map([
+    >([
         ["orbitalDemo", createOrbitalDemoScene],
         ["tunnel", createHyperspaceTunnelDemo],
         ["automaticLanding", createAutomaticLandingScene],

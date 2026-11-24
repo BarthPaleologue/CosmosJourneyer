@@ -15,8 +15,8 @@ function assertClosed(quoted: boolean): void {
  * @returns Parsed rows keyed by trimmed header names.
  */
 export function parseCsv(text: string): DeepReadonly<Array<Record<string, string>>> {
-    const rows: string[][] = [];
-    let row: string[] = [];
+    const rows: Array<Array<string>> = [];
+    let row: Array<string> = [];
     let field = "";
     let quoted = false;
     for (let i = 0; i < text.length; i++) {

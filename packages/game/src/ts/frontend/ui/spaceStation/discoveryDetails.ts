@@ -41,7 +41,7 @@ export class DiscoveryDetails {
 
     private currentDiscovery: SpaceDiscoveryData | null = null;
 
-    readonly onSellDiscovery: Observable<SpaceDiscoveryData> = new Observable();
+    readonly onSellDiscovery = new Observable<SpaceDiscoveryData>();
 
     readonly objectName: HTMLHeadingElement;
 

@@ -62,8 +62,8 @@ export default createRule({
  * @param pattern Parameter pattern to inspect.
  * @returns The assignment patterns found in the pattern, in source order.
  */
-function collectAssignmentPatterns(pattern: TSESTree.Node): TSESTree.AssignmentPattern[] {
-    const found: TSESTree.AssignmentPattern[] = [];
+function collectAssignmentPatterns(pattern: TSESTree.Node): Array<TSESTree.AssignmentPattern> {
+    const found: Array<TSESTree.AssignmentPattern> = [];
     visit(pattern);
     return found;
 

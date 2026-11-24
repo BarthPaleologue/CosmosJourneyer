@@ -46,16 +46,16 @@ export class Player {
         uploaded: Array<DeepReadonly<SpaceDiscoveryData>>;
     };
 
-    private readonly visitedObjects: Set<string> = new Set();
+    private readonly visitedObjects = new Set<string>();
 
     currentItinerary: DeepReadonly<Itinerary> | null;
     systemBookmarks: Array<DeepReadonly<StarSystemCoordinates>>;
 
-    currentMissions: Mission[] = [];
-    completedMissions: Mission[] = [];
+    currentMissions: Array<Mission> = [];
+    completedMissions: Array<Mission> = [];
 
     serializedSpaceships: Array<DeepReadonly<SerializedSpaceship>> = [];
-    instancedSpaceships: Spaceship[] = [];
+    instancedSpaceships: Array<Spaceship> = [];
 
     spareSpaceshipComponents: Set<DeepReadonly<SerializedComponent>>;
 

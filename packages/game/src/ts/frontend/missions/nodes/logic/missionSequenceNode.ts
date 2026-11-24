@@ -29,13 +29,13 @@ import type { MissionNodeBase } from "../missionNodeBase";
  * Node used to describe a sequence of tasks that must be completed in order.
  */
 export class MissionSequenceNode implements MissionNodeBase<MissionSequenceNodeSerialized> {
-    public children: MissionNode[];
+    public children: Array<MissionNode>;
 
     private hasCompletedLock = false;
 
     private activeChildIndex = 0;
 
-    constructor(children: MissionNode[]) {
+    constructor(children: Array<MissionNode>) {
         this.children = children;
     }
 
@@ -112,7 +112,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionSequenceNodeS
         return activeChild.describeNextTask(context, keyboardLayout, universeBackend, t);
     }
 
-    getTargetSystems(): StarSystemCoordinates[] {
+    getTargetSystems(): Array<StarSystemCoordinates> {
         const activeChild = this.children[this.activeChildIndex];
         if (activeChild === undefined) {
             return [];
@@ -121,7 +121,7 @@ export class MissionSequenceNode implements MissionNodeBase<MissionSequenceNodeS
         return activeChild.getTargetSystems();
     }
 
-    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+    getGuidanceTargetObjectIds(): Array<UniverseObjectId> {
         const activeChild = this.children[this.activeChildIndex];
         if (activeChild === undefined) {
             return [];

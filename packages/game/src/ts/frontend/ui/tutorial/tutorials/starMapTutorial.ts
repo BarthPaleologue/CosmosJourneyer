@@ -68,7 +68,7 @@ export class StarMapTutorial implements Tutorial {
         return this.t("tutorials:starMap:description");
     }
 
-    async getContentPanelsHtml(): Promise<string[]> {
+    async getContentPanelsHtml(): Promise<Array<string>> {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
         const welcomePanelHtml = `
         <div class="tutorialContent">

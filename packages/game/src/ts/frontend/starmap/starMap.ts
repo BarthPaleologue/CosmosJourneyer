@@ -88,12 +88,12 @@ export class StarMap {
         Animation.ANIMATIONLOOPMODE_CYCLE,
     );
 
-    private readonly recycledStars: InstancedMesh[] = [];
-    private readonly recycledBlackHoles: InstancedMesh[] = [];
+    private readonly recycledStars: Array<InstancedMesh> = [];
+    private readonly recycledBlackHoles: Array<InstancedMesh> = [];
 
     /** Defines how many new stars are made each frame */
     private readonly starBuildBatchSize = 100;
-    private readonly starBuildStack: BuildData[] = [];
+    private readonly starBuildStack: Array<BuildData> = [];
 
     /** Max loaded star sector count in any direction */
     private readonly starSectorLoadRadius = 6;
@@ -103,8 +103,8 @@ export class StarMap {
 
     private readonly loadedStarSectors: Map<string, StarSectorView> = new Map<string, StarSectorView>();
 
-    private readonly coordinatesToInstanceMap: Map<string, InstancedMesh> = new Map();
-    private readonly instanceToCoordinatesMap: Map<InstancedMesh, string> = new Map();
+    private readonly coordinatesToInstanceMap = new Map<string, InstancedMesh>();
+    private readonly instanceToCoordinatesMap = new Map<InstancedMesh, string>();
 
     /** Scratch buffer for computing a sector's coordinates (reused to avoid allocations in the hot loop). */
     private readonly sectorCoordinatesScratch = new Vector3();

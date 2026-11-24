@@ -65,7 +65,7 @@ export type SystemEntityLoadContext = Readonly<
 >;
 
 export class SystemEntityLoader {
-    private readonly registry: Map<string, ErasedSystemContentFactory> = new Map();
+    private readonly registry = new Map<string, ErasedSystemContentFactory>();
 
     registerFactory<T extends AnySystemContentType>(type: T, factory: SystemContentFactoryOf<T>): void {
         if (this.registry.has(type)) {

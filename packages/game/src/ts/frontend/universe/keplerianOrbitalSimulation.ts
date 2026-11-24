@@ -50,7 +50,7 @@ export class KeplerianOrbitalSimulation {
 
     private readonly orbitalObjects: Array<KeplerianObject> = [];
 
-    private readonly objectsAwaitingParents: Set<KeplerianObject> = new Set();
+    private readonly objectsAwaitingParents = new Set<KeplerianObject>();
 
     private elapsedSeconds = 0;
 

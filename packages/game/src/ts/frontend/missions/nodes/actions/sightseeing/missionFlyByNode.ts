@@ -178,11 +178,11 @@ export class MissionFlyByNode implements MissionNodeBase<MissionFlyByNodeSeriali
         }
     }
 
-    getTargetSystems(): StarSystemCoordinates[] {
+    getTargetSystems(): Array<StarSystemCoordinates> {
         return [this.targetSystemCoordinates];
     }
 
-    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+    getGuidanceTargetObjectIds(): Array<UniverseObjectId> {
         return [this.objectId];
     }
 

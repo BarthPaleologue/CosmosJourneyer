@@ -69,12 +69,12 @@ export interface MissionNodeBase<TSerialized> {
     /**
      * @returns Systems containing active targets in this subtree.
      */
-    getTargetSystems(): StarSystemCoordinates[];
+    getTargetSystems(): Array<StarSystemCoordinates>;
 
     /**
      * @returns Objects that should guide the player in the current system.
      */
-    getGuidanceTargetObjectIds(): UniverseObjectId[];
+    getGuidanceTargetObjectIds(): Array<UniverseObjectId>;
 
     /**
      * @returns Serialized state for this subtree.

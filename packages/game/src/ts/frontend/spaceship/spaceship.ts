@@ -108,7 +108,7 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
 
     private readonly internals: SpaceshipInternals;
 
-    private readonly mainThrusters: Thruster[] = [];
+    private readonly mainThrusters: Array<Thruster> = [];
 
     private isFuelScooping = false;
 
@@ -598,7 +598,7 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
         const warpSpeed = this.aggregate.transformNode.forward.scale(warpDrive.getWarpSpeed());
         this.spaceDots.update(deltaSeconds);
 
-        const warpInfluences: WarpInfluence[] = [];
+        const warpInfluences: Array<WarpInfluence> = [];
         const shipPosition = this.getTransform().getAbsolutePosition();
         const shipForward = this.aggregate.transformNode.forward;
 
@@ -882,7 +882,7 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
         return amount - fuelLeftToRefuel;
     }
 
-    public getMainThrusters(): Thruster[] {
+    public getMainThrusters(): Array<Thruster> {
         return this.mainThrusters;
     }
 

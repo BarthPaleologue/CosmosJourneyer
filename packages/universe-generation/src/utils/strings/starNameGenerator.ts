@@ -19,7 +19,7 @@
  * @see https://en.wikipedia.org/wiki/List_of_proper_names_of_stars
  * @see https://www.aavso.org/constellation-names-and-abbreviations
  */
-const constellationNames: string[] = [
+const constellationNames: Array<string> = [
     "Andromedae",
     "Antliae",
     "Apodis",
@@ -156,7 +156,7 @@ const constellationNames: string[] = [
     "Zimmerman",
 ];
 
-const greekLetters: string[] = [
+const greekLetters: Array<string> = [
     "Alpha",
     "Beta",
     "Gamma",

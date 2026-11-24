@@ -95,27 +95,27 @@ export class PostProcessManager {
      */
     private renderingPipeline: PostProcessRenderPipeline;
 
-    private readonly bodyEntries: RenderableBodyEntry[] = [];
+    private readonly bodyEntries: Array<RenderableBodyEntry> = [];
 
-    private sortedBodies: RenderableBodyEntry[] = [];
+    private sortedBodies: Array<RenderableBodyEntry> = [];
 
     private readonly bodyPostProcessesInRenderOrder: Array<PostProcess> = [];
 
-    readonly volumetricLights: PostProcess[] = [];
-    readonly lensFlares: PostProcess[] = [];
+    readonly volumetricLights: Array<PostProcess> = [];
+    readonly lensFlares: Array<PostProcess> = [];
 
-    private readonly celestialBodyUberShaders: CelestialBodyUberShaderPass[] = [];
-    private readonly blackHoles: BlackHolePostProcess[] = [];
+    private readonly celestialBodyUberShaders: Array<CelestialBodyUberShaderPass> = [];
+    private readonly blackHoles: Array<BlackHolePostProcess> = [];
 
     /**
      * All post processes that are updated every frame.
      */
-    private readonly updatablePostProcesses: UpdatablePostProcess[][] = [
+    private readonly updatablePostProcesses: Array<Array<UpdatablePostProcess>> = [
         this.celestialBodyUberShaders,
         this.blackHoles,
     ];
 
-    private readonly celestialBodyToPostProcesses: Map<Transformable, PostProcess[]> = new Map();
+    private readonly celestialBodyToPostProcesses = new Map<Transformable, Array<PostProcess>>();
 
     /**
      * The color correction post process responsible for tone mapping, display encoding, saturation, contrast and brightness.
@@ -206,7 +206,7 @@ export class PostProcessManager {
         );
     }
 
-    private getRenderSortedBodies(): RenderableBodyEntry[] {
+    private getRenderSortedBodies(): Array<RenderableBodyEntry> {
         const camera = this.scene.activeCamera;
         if (camera === null) {
             return [...this.bodyEntries];
@@ -227,7 +227,7 @@ export class PostProcessManager {
             });
     }
 
-    private getBodyRenderPostProcesses(body: Transformable): PostProcess[] {
+    private getBodyRenderPostProcesses(body: Transformable): Array<PostProcess> {
         return this.celestialBodyToPostProcesses.get(body) ?? [];
     }
 
@@ -256,7 +256,7 @@ export class PostProcessManager {
 
     private registerBodyPostProcesses(
         body: Transformable & HasBoundingSphere,
-        postProcesses: PostProcess[],
+        postProcesses: Array<PostProcess>,
         visibilityRadius: number,
     ): void {
         this.bodyEntries.push({ body, visibilityRadius });
@@ -268,7 +268,7 @@ export class PostProcessManager {
         lightSources: ReadonlyArray<DirectionalLight>,
         excludedMeshes: ReadonlyArray<AbstractMesh>,
     ): void {
-        const postProcesses: PostProcess[] = [];
+        const postProcesses: Array<PostProcess> = [];
         const volumetricLight = new VolumetricLight(
             star.mesh,
             star.volumetricLightUniforms,
@@ -315,7 +315,7 @@ export class PostProcessManager {
         lightSources: ReadonlyArray<DirectionalLight>,
         excludedMeshes: ReadonlyArray<AbstractMesh>,
     ): void {
-        const postProcesses: PostProcess[] = [];
+        const postProcesses: Array<PostProcess> = [];
         const volumetricLight = new VolumetricLight(
             neutronStar.mesh,
             neutronStar.volumetricLightUniforms,
@@ -379,7 +379,7 @@ export class PostProcessManager {
     }
 
     public addTelluricPlanet(planet: TelluricPlanet, stellarObjects: ReadonlyArray<DirectionalLight>): void {
-        const postProcesses: PostProcess[] = [];
+        const postProcesses: Array<PostProcess> = [];
 
         if (
             planet.atmosphereUniforms !== null ||
@@ -422,7 +422,7 @@ export class PostProcessManager {
     }
 
     public addGasPlanet(planet: GasPlanet, stellarObjects: ReadonlyArray<DirectionalLight>): void {
-        const postProcesses: PostProcess[] = [];
+        const postProcesses: Array<PostProcess> = [];
 
         const celestialBodyUberShader = new CelestialBodyUberShaderPass(
             {
@@ -620,7 +620,7 @@ export class PostProcessManager {
      * Collects every Babylon post-process owned by this manager, including the ones behind wrappers.
      * @returns All disposable post-processes.
      */
-    private getDisposablePostProcesses(): PostProcess[] {
+    private getDisposablePostProcesses(): Array<PostProcess> {
         return [
             ...this.volumetricLights,
             ...this.lensFlares,

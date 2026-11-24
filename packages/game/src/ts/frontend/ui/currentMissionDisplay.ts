@@ -171,7 +171,7 @@ export class CurrentMissionDisplay {
             return;
         }
 
-        if (allMissions.indexOf(this.activeMission) === -1) {
+        if (!allMissions.includes(this.activeMission)) {
             const defaultMission = allMissions.at(0);
             if (defaultMission !== undefined) {
                 this.setMission(defaultMission, universeBackend);
@@ -252,7 +252,7 @@ export class CurrentMissionDisplay {
         this.updateMissionCounter();
     }
 
-    private getAllMissions(): Mission[] {
+    private getAllMissions(): Array<Mission> {
         return this.player.completedMissions.concat(this.player.currentMissions);
     }
 

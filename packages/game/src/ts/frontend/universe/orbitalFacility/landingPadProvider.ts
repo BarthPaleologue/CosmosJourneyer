@@ -50,8 +50,8 @@ export type StatusChangedHandler = (status: LandingPadStatus) => void;
  */
 export class LandingPadProvider {
     private readonly landingPads: ReadonlyArray<ILandingPad>;
-    private readonly landingPadStatus: Map<ILandingPad, LandingPadStatus> = new Map();
-    readonly onStatusChanged: Observable<{ pad: ILandingPad; status: LandingPadStatus }> = new Observable();
+    private readonly landingPadStatus = new Map<ILandingPad, LandingPadStatus>();
+    readonly onStatusChanged = new Observable<{ pad: ILandingPad; status: LandingPadStatus }>();
 
     /**
      * @param landingPads Array of landing pads to be managed

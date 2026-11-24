@@ -102,7 +102,7 @@ export function generateSpaceElevatorModel(
     const targetPopulationDensity = 4_000;
 
     const mix = randomPieChart(CropTypes.length, rng, 498);
-    const agricultureMix: [number, CropType][] = mix.map((proportion, index) => {
+    const agricultureMix: Array<[number, CropType]> = mix.map((proportion, index) => {
         const cropType = CropTypes[index];
         if (cropType === undefined) {
             throw new Error("CropTypes out of bound!");

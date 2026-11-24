@@ -90,7 +90,7 @@ export class SpaceTelescope implements SystemContent {
     private createCollider(): void {
         const scene = this.transform.getScene();
         const container = new PhysicsShapeContainer(scene);
-        const shapes: PhysicsShape[] = [];
+        const shapes: Array<PhysicsShape> = [];
         for (const mesh of this.transform.getChildMeshes()) {
             if (!(mesh instanceof Mesh)) {
                 continue;

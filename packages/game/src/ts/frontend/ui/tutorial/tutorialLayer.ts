@@ -28,11 +28,11 @@ export class TutorialLayer implements IDisposable {
 
     private readonly nextButton: HTMLElement;
 
-    private tutorialPanelsHtml: string[] = [];
+    private tutorialPanelsHtml: Array<string> = [];
 
     private currentPanelIndex = 0;
 
-    readonly onQuitTutorial: Observable<void> = new Observable();
+    readonly onQuitTutorial = new Observable<void>();
 
     private readonly t: TFunction;
 

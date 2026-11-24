@@ -46,7 +46,7 @@ export class Tts implements ITts {
     private readonly voiceLines: SpeakerVoiceLines;
 
     private isPlaying = false;
-    private readonly soundQueue: Set<AbstractSound> = new Set();
+    private readonly soundQueue = new Set<AbstractSound>();
 
     constructor(voiceLines: SpeakerVoiceLines) {
         this.voiceLines = voiceLines;

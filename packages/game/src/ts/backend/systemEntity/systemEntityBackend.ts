@@ -33,7 +33,7 @@ export type SystemEntityModelContext = DeepReadonly<{
 }>;
 
 export class SystemEntityBackend {
-    private readonly systemToEntities: Map<string, Array<DeepReadonly<SystemEntityModel>>> = new Map();
+    private readonly systemToEntities = new Map<string, Array<DeepReadonly<SystemEntityModel>>>();
 
     private readonly proceduralEntityGenerators: Array<SystemEntityModelGenerator> = [];
 

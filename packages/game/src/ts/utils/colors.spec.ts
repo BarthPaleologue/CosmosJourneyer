@@ -189,7 +189,7 @@ describe("color utilities", () => {
 
         it("should produce values in valid RGB range", () => {
             // Test with various random-ish values
-            const testCases: HSVColor[] = [
+            const testCases: Array<HSVColor> = [
                 { h: 123.45, s: 0.67, v: 0.89 },
                 { h: 234.56, s: 0.34, v: 0.12 },
                 { h: 345.67, s: 0.91, v: 0.56 },
@@ -209,7 +209,7 @@ describe("color utilities", () => {
         });
 
         it("should handle extreme saturation and value combinations", () => {
-            const testCases: HSVColor[] = [
+            const testCases: Array<HSVColor> = [
                 { h: 180, s: 0.001, v: 0.999 }, // Very low saturation, high value
                 { h: 180, s: 0.999, v: 0.001 }, // Very high saturation, low value
                 { h: 180, s: 1, v: 1 }, // Maximum saturation and value

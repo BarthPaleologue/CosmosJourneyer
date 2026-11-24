@@ -39,7 +39,7 @@ type ValidatedStar = z.infer<typeof StarSchema>;
  * @returns Validation issues found for the star.
  */
 function validateStar(star: DeepReadonly<ValidatedStar>, cubeId: string): ReadonlyArray<string> {
-    const issues: string[] = [];
+    const issues: Array<string> = [];
     if (star.nature === null) {
         issues.push(`Missing nature for ${star.name} in cube ${cubeId}`);
     }

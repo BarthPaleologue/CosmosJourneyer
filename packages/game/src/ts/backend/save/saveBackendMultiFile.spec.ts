@@ -66,7 +66,7 @@ class MockFileSystem implements IFileSystem {
         return Promise.resolve(true);
     }
 
-    public async listDirectory(path: string): Promise<string[] | null> {
+    public async listDirectory(path: string): Promise<Array<string> | null> {
         if (!this.directories.has(path)) {
             return Promise.resolve(null);
         }
@@ -139,7 +139,7 @@ class MockFileSystem implements IFileSystem {
         return Object.fromEntries(this.files);
     }
 
-    public getAllDirectories(): string[] {
+    public getAllDirectories(): Array<string> {
         return Array.from(this.directories).sort();
     }
 
@@ -398,7 +398,7 @@ describe("SaveBackendMultiFile", () => {
                 const backend = result.value;
 
                 // Add 7 auto saves (more than the limit of 5)
-                const saves: Save[] = [];
+                const saves: Array<Save> = [];
                 for (let i = 1; i <= 7; i++) {
                     const save = createTestSave(i * 1000);
                     saves.push(save);

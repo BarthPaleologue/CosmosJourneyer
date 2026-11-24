@@ -27,7 +27,7 @@ import {
 
 // Captured from the installed squirrel-noise@1.0.0 on main before extraction.
 const indices = [-100, -1, 0, 1, 2, 100, 1000000];
-const cases: [number, number[]][] = [
+const cases: Array<[number, Array<number>]> = [
     [
         0,
         [
@@ -99,7 +99,7 @@ describe("modern squirrel noise", () => {
 
     it("matches captured reference values", () => {
         // Reference implementation: SquirrelNoise5, https://gist.github.com/kevinmoran/0198d8e9de0da7057abe8b8b34d50f86
-        const reference: [number, number[]][] = [
+        const reference: Array<[number, Array<number>]> = [
             [
                 0,
                 [

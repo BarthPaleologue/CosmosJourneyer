@@ -27,7 +27,7 @@ export function estimateTemperatureFromBpRp(bpRp: number | null): number | undef
  * @returns The parsed number, or undefined when no number is present.
  */
 function numeric(text: string): number | undefined {
-    const match = text.match(/\d+(?:\.\d+)?/);
+    const match = /\d+(?:\.\d+)?/.exec(text);
     return match === null ? undefined : Number(match[0]);
 }
 /**

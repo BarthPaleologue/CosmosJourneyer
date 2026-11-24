@@ -49,10 +49,10 @@ export class StellarPathfinder {
         position: Vector3;
     } | null = null;
 
-    private readonly coordinatesToPrevious: Map<string, StarSystemCoordinates> = new Map();
+    private readonly coordinatesToPrevious = new Map<string, StarSystemCoordinates>();
 
-    private readonly openList: PriorityQueue<Node> = new PriorityQueue((a, b) => a.G + a.H < b.G + b.H);
-    private closedList: Node[] = [];
+    private readonly openList = new PriorityQueue<Node>((a, b) => a.G + a.H < b.G + b.H);
+    private closedList: Array<Node> = [];
 
     private jumpRange = 10;
 
@@ -211,7 +211,7 @@ export class StellarPathfinder {
             return err(new Error("No path found"));
         }
 
-        const path: StarSystemCoordinates[] = [];
+        const path: Array<StarSystemCoordinates> = [];
         let currentCoordinates = this.targetSystem.coordinates;
         while (currentCoordinates !== this.startSystem.coordinates) {
             if (path.length >= 2 ** 32) {

@@ -91,20 +91,20 @@ export type MissionNodeSerializedShape =
     | MissionAsteroidFieldNodeSerialized
     | {
           type: "and";
-          children: MissionNodeSerializedShape[];
+          children: Array<MissionNodeSerializedShape>;
       }
     | {
           type: "or";
-          children: MissionNodeSerializedShape[];
+          children: Array<MissionNodeSerializedShape>;
       }
     | {
           type: "xor";
-          children: MissionNodeSerializedShape[];
+          children: Array<MissionNodeSerializedShape>;
       }
     | {
           type: "sequence";
           activeChildIndex: number;
-          children: MissionNodeSerializedShape[];
+          children: Array<MissionNodeSerializedShape>;
       };
 
 export const MissionOrNodeSerializedSchema = z.object({

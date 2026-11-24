@@ -53,7 +53,7 @@ export class TemplateTutorial implements Tutorial {
         return "This is a template tutorial to help building more tutorials!";
     }
 
-    async getContentPanelsHtml(): Promise<string[]> {
+    async getContentPanelsHtml(): Promise<Array<string>> {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
         const welcomePanelHtml = `
         <div class="tutorialContent">

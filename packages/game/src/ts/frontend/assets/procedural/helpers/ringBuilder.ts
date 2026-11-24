@@ -17,9 +17,9 @@ export function createRingVertexData(
     height: number,
     tesselation: number,
 ): VertexData {
-    const indices: number[] = [];
-    const positions: number[] = [];
-    const normals: number[] = [];
+    const indices: Array<number> = [];
+    const positions: Array<number> = [];
+    const normals: Array<number> = [];
     const uvs = [];
 
     const innerRadius = radius - thickness / 2;

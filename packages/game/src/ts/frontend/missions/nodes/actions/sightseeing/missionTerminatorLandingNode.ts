@@ -199,11 +199,11 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
         }
     }
 
-    getTargetSystems(): StarSystemCoordinates[] {
+    getTargetSystems(): Array<StarSystemCoordinates> {
         return [this.targetSystemCoordinates];
     }
 
-    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+    getGuidanceTargetObjectIds(): Array<UniverseObjectId> {
         return [];
     }
 

@@ -1,6 +1,6 @@
 import type { ColorChannel } from "../types";
 
-export const ChannelOrder: readonly ColorChannel[] = ["r", "g", "b", "a"];
+export const ChannelOrder: ReadonlyArray<ColorChannel> = ["r", "g", "b", "a"];
 
 export const ChannelLabels: Readonly<Record<ColorChannel, string>> = {
     r: "R",

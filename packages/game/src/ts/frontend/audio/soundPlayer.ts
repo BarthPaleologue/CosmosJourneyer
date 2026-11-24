@@ -58,7 +58,7 @@ export class SoundPlayer implements ISoundPlayer {
     private isPlaying = false;
     private readonly soundQueue: Array<StaticSound> = [];
 
-    private readonly soundInstances: Set<ISoundInstance> = new Set();
+    private readonly soundInstances = new Set<ISoundInstance>();
     private soundInstanceMask = 0b1111;
 
     constructor(sounds: Sounds) {

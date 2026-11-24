@@ -37,6 +37,7 @@ const withProjectService = (config) => ({
 });
 
 const strictTypeChecked = tseslint.configs.strictTypeChecked.map(withProjectService);
+const stylisticTypeChecked = tseslint.configs.stylisticTypeChecked.map(withProjectService);
 
 const nextConfigFiles = ["packages/website/**/*.{js,jsx,ts,tsx,mts}", "eslint.config.mts"];
 const nextCoreWebVitalsSource = nextPlugin.flatConfig?.coreWebVitals ?? {
@@ -120,7 +121,6 @@ const typeScriptWorkspaceRules = {
         "no-implicit-coercion": "error",
 
         "@typescript-eslint/switch-exhaustiveness-check": "error",
-        "@typescript-eslint/no-inferrable-types": "error",
         "@typescript-eslint/require-array-sort-compare": "error",
         "@typescript-eslint/strict-boolean-expressions": "error",
 
@@ -133,8 +133,6 @@ const typeScriptWorkspaceRules = {
         "@typescript-eslint/no-non-null-assertion": "error",
 
         "@typescript-eslint/prefer-readonly": "error",
-
-        "@typescript-eslint/prefer-nullish-coalescing": "error",
 
         "@typescript-eslint/no-shadow": "error",
 
@@ -247,11 +245,31 @@ export default defineConfig([
     },
     eslint.configs.recommended,
     ...strictTypeChecked,
+    ...stylisticTypeChecked,
+    {
+        rules: {
+            "@typescript-eslint/array-type": ["error", { default: "generic" }],
+            // Data records use types and class contracts use interfaces.
+            "@typescript-eslint/consistent-type-definitions": "off",
+            // The strict preset forbids non-null assertions.
+            "@typescript-eslint/non-nullable-type-assertion-style": "off",
+            // Optional calls can produce nullable booleans rejected by strict-boolean-expressions.
+            "@typescript-eslint/prefer-optional-chain": "off",
+            "@typescript-eslint/prefer-string-starts-ends-with": ["error", { allowSingleElementEquality: "always" }],
+        },
+    },
     jsdoc.configs["flat/recommended-typescript-error"],
     importX.flatConfigs.recommended,
     importX.flatConfigs.typescript,
     nextCoreWebVitals,
     typeScriptWorkspaceRules,
+    {
+        files: ["**/*.{spec,test}.{ts,tsx,mts,cts}"],
+        rules: {
+            "@typescript-eslint/dot-notation": ["error", { allowPrivateClassPropertyAccess: true }],
+            "@typescript-eslint/no-empty-function": "off",
+        },
+    },
     pureLibraryRules,
     {
         // Babylon.js material factories and loaders return class instances indirectly.

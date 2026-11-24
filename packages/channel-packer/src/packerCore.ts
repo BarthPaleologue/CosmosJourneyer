@@ -243,8 +243,8 @@ async function loadImages<TInput>(
     inputsByKey: ReadonlyMap<string, TInput>,
     cache: ImageCache,
     fileAdapter: PackerFileAdapter<TInput>,
-): Promise<Result<readonly LoadedImage[], Error>> {
-    const loadedImages: LoadedImage[] = [];
+): Promise<Result<ReadonlyArray<LoadedImage>, Error>> {
+    const loadedImages: Array<LoadedImage> = [];
     const requestImages = new Map<string, DecodedImage>();
     let expectedDimensions: readonly [number, number] | null = null;
 

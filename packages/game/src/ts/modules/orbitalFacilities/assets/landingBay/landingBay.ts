@@ -58,10 +58,10 @@ export class LandingBay {
     private readonly ring: Mesh;
     private ringAggregate: PhysicsAggregate | null = null;
 
-    private readonly arms: Mesh[] = [];
-    private readonly armAggregates: PhysicsAggregate[] = [];
+    private readonly arms: Array<Mesh> = [];
+    private readonly armAggregates: Array<PhysicsAggregate> = [];
 
-    readonly landingPads: LandingPad[] = [];
+    readonly landingPads: Array<LandingPad> = [];
 
     private readonly landingPadLights: ProceduralSpotLightInstances;
 

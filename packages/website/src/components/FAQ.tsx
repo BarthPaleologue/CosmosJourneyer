@@ -7,7 +7,7 @@ export interface FAQItem {
 }
 
 interface FAQProps {
-    items: readonly FAQItem[];
+    items: ReadonlyArray<FAQItem>;
 }
 
 export const FAQ = ({ items }: FAQProps): ReactElement => (

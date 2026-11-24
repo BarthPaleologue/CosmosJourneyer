@@ -27,9 +27,9 @@ import type { KeplerianObject } from "./keplerianOrbitalSimulation";
 import type { CreateLinesMeshFunction } from "./lineRendering";
 
 export class OrbitRenderer {
-    private readonly orbitMeshes: Map<KeplerianObject, Mesh> = new Map();
+    private readonly orbitMeshes = new Map<KeplerianObject, Mesh>();
 
-    private readonly orbitalObjectToParents: Map<KeplerianObject, ReadonlyArray<KeplerianObject>> = new Map();
+    private readonly orbitalObjectToParents = new Map<KeplerianObject, ReadonlyArray<KeplerianObject>>();
 
     private _isVisible = false;
 
@@ -63,7 +63,7 @@ export class OrbitRenderer {
         const orbit = orbitalObject.orbit;
         const nbSteps = Math.max(100, Math.round(Math.sqrt(orbit.semiMajorAxis / 200e3)));
         const timestep = getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum) / nbSteps;
-        const points: Vector3[] = [];
+        const points: Array<Vector3> = [];
 
         for (let step = 0; step < nbSteps; step++) {
             const t = step * timestep;

@@ -36,8 +36,8 @@ export class TerrainTaskRegistry {
 
     private readonly completedHeightTasks: LRUMap<TaskId, Float32Array<ArrayBuffer>>;
 
-    private readonly failedHeightTasks: Set<TaskId> = new Set();
-    private readonly failedChunks: Set<ChunkId> = new Set();
+    private readonly failedHeightTasks = new Set<TaskId>();
+    private readonly failedChunks = new Set<ChunkId>();
 
     public constructor(maxCachedChunks: number) {
         this.completedChunks = new LRUMap(maxCachedChunks);

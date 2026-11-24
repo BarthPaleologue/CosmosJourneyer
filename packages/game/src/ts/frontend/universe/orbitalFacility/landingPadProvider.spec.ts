@@ -68,7 +68,7 @@ describe("LandingPadProvider", () => {
     let smallPad: ILandingPad;
     let mediumPad: ILandingPad;
     let largePad: ILandingPad;
-    let allPads: ILandingPad[];
+    let allPads: Array<ILandingPad>;
     let landingPadProvider: LandingPadProvider;
 
     beforeEach(() => {

@@ -21,7 +21,7 @@ import type { Scene } from "@babylonjs/core/scene";
 import { createSquareTextDecalTexture } from "./textures/squareTextDecalTexture";
 
 export class LandingPadTexturePool {
-    private readonly landingPadTextures: Map<number, Texture> = new Map();
+    private readonly landingPadTextures = new Map<number, Texture>();
 
     get(padNumber: number, scene: Scene): Texture {
         const texture = this.landingPadTextures.get(padNumber);

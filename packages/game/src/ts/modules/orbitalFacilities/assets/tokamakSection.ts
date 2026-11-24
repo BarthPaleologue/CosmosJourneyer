@@ -45,11 +45,11 @@ export class TokamakSection implements StationSection {
     private readonly tokamak: Mesh;
     private tokamakAggregate: PhysicsAggregate | null = null;
 
-    private readonly arms: Mesh[] = [];
-    private readonly armAggregates: PhysicsAggregate[] = [];
+    private readonly arms: Array<Mesh> = [];
+    private readonly armAggregates: Array<PhysicsAggregate> = [];
 
-    private readonly radiators: Mesh[] = [];
-    private readonly radiatorAggregates: PhysicsAggregate[] = [];
+    private readonly radiators: Array<Mesh> = [];
+    private readonly radiatorAggregates: Array<PhysicsAggregate> = [];
 
     private readonly radiatorMaterial: PBRMaterial;
 

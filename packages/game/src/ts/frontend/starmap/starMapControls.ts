@@ -60,7 +60,7 @@ export class StarMapControls implements Controls {
         return this.thirdPersonCamera;
     }
 
-    public getCameras(): Camera[] {
+    public getCameras(): Array<Camera> {
         return [this.thirdPersonCamera];
     }
 

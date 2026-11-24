@@ -35,7 +35,7 @@ export type EncryptedCodePayload = EncryptedCodePayloadV1;
  * @param passphrase - Passphrase used to derive the encryption key.
  * @returns The evaluated function, or a decryption or evaluation error.
  */
-export async function decryptFunction<T extends (...args: never[]) => unknown>(
+export async function decryptFunction<T extends (...args: Array<never>) => unknown>(
     payload: EncryptedCodePayload,
     passphrase: string,
 ): Promise<Result<T, Error>> {
@@ -67,7 +67,7 @@ export async function decryptFunction<T extends (...args: never[]) => unknown>(
  * @returns Encrypted function source and derivation metadata.
  */
 export async function encryptFunction(
-    func: (...args: never[]) => unknown,
+    func: (...args: Array<never>) => unknown,
     passphrase: string,
 ): Promise<EncryptedCodePayload> {
     const sourceCode = func.toString();
@@ -173,7 +173,7 @@ async function deriveAesKey(
     passphrase: string,
     salt: Uint8Array<ArrayBuffer>,
     iterations: number,
-    usages: KeyUsage[],
+    usages: Array<KeyUsage>,
 ): Promise<CryptoKey> {
     const textEncoder = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey("raw", textEncoder.encode(passphrase), "PBKDF2", false, [

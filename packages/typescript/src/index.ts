@@ -49,7 +49,7 @@ export type DeepMutable<T> = T extends Primitive | AnyFunction
       ? { -readonly [K in keyof T]: DeepMutable<T[K]> }
       : T;
 
-export type NonEmptyArray<T> = [T, ...T[]];
+export type NonEmptyArray<T> = [T, ...Array<T>];
 
 /**
  * Compares two arrays for equal length and element-by-element identity.

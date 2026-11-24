@@ -47,13 +47,13 @@ export class SphereShadowsPostProcess {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = sphereShadowsFragment;
         }
 
-        const uniforms: string[] = [
+        const uniforms: Array<string> = [
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(SphereShadowCasterUniformNames),
         ];
 
-        const samplers: string[] = [...Object.values(SamplerUniformNames)];
+        const samplers: Array<string> = [...Object.values(SamplerUniformNames)];
 
         this.postProcess = new PostProcess(
             "SphereShadowsPostProcess",

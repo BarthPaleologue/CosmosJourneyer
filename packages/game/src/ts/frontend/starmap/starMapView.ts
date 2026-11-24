@@ -93,7 +93,7 @@ export class StarMapView implements View {
 
     private readonly stellarPathfinder: StellarPathfinder;
 
-    public readonly onTargetSetObservable: Observable<StarSystemCoordinates> = new Observable();
+    public readonly onTargetSetObservable = new Observable<StarSystemCoordinates>();
 
     private readonly soundPlayer: ISoundPlayer;
     private readonly notificationManager: INotificationManager;
@@ -318,7 +318,7 @@ export class StarMapView implements View {
         window.StarMap = this;
     }
 
-    private getGreasedLinePointsFromSystems(systems: DeepReadonly<Array<StarSystemCoordinates>>): Vector3[] {
+    private getGreasedLinePointsFromSystems(systems: DeepReadonly<Array<StarSystemCoordinates>>): Array<Vector3> {
         if (systems.length < 2) {
             return [];
         }

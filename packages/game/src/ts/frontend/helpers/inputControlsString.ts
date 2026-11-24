@@ -7,8 +7,8 @@ import type PressInteraction from "@brianchirls/game-input/interactions/PressInt
  * @param input - Stick whose directional bindings are formatted.
  * @returns Directional key-label pairs, excluding raw `x` and `y` axes.
  */
-export function stickInputToString(input: StickInputControl): [string, string][] {
-    const keys: [string, string][] = [];
+export function stickInputToString(input: StickInputControl): Array<[string, string]> {
+    const keys: Array<[string, string]> = [];
     input.children.forEach((child, key) => {
         if (key === "x" || key === "y") {
             return;
@@ -27,8 +27,8 @@ export function stickInputToString(input: StickInputControl): [string, string][]
 export function dPadCompositeToString(
     input: DPadComposite,
     keyboardMap: Map<string, string> | null,
-): [string, string][] {
-    const keys: [string, string][] = [];
+): Array<[string, string]> {
+    const keys: Array<[string, string]> = [];
     input.children.forEach((child, key) => {
         if (key === "x" || key === "y") {
             return;
@@ -50,7 +50,7 @@ export function dPadCompositeToString(
 /**
  * @returns The pointer axis identifiers and labels.
  */
-export function vector2ToString(): [string, string][] {
+export function vector2ToString(): Array<[string, string]> {
     return [
         ["x", "pointerX"],
         ["y", "pointerY"],
@@ -83,8 +83,8 @@ export function buttonInputToString(input: NamedInputControl, keyboardMap: Map<s
 export function axisCompositeToString(
     input: AxisComposite,
     keyboardMap: Map<string, string> | null,
-): [string, string][] {
-    const keys: [string, string][] = [];
+): Array<[string, string]> {
+    const keys: Array<[string, string]> = [];
     input.children.forEach((child, key) => {
         let name = child.name;
         // remove the "key:" prefix
@@ -103,7 +103,7 @@ export function axisCompositeToString(
 export function pressInteractionToStrings(
     pressInteraction: PressInteraction,
     keyboardMap: Map<string, string> | null,
-): string[] {
+): Array<string> {
     const bindings = pressInteraction.action.bindings;
     return bindings.flatMap((binding) => {
         if (!(binding.control instanceof ButtonInputControl)) {

@@ -79,7 +79,7 @@ export class PlanetaryLandingTutorial implements Tutorial {
     getDescription(): string {
         return this.t("tutorials:planetaryLanding:description");
     }
-    async getContentPanelsHtml(): Promise<string[]> {
+    async getContentPanelsHtml(): Promise<Array<string>> {
         const keyboardLayoutMap = await getGlobalKeyboardLayoutMap();
         const spaceshipUpKeys = getSpaceshipUpKeys(keyboardLayoutMap, this.t);
 

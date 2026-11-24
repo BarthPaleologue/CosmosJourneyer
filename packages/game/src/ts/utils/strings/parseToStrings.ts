@@ -107,7 +107,7 @@ export function parseSecondsPrecise(seconds: number, t: TFunction): string {
     secondsLeft -= nbMinutes * 60;
     const nbSeconds = Math.floor(secondsLeft);
 
-    const result: string[] = [];
+    const result: Array<string> = [];
     if (nbYears > 0) {
         result.push(t("units:years", { count: nbYears }));
     }

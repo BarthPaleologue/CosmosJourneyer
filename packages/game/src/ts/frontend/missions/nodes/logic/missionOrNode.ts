@@ -29,11 +29,11 @@ import type { MissionNodeBase } from "../missionNodeBase";
  * Node used to describe a set of tasks where only a subset must be completed in any order.
  */
 export class MissionOrNode implements MissionNodeBase<MissionOrNodeSerialized> {
-    readonly children: MissionNode[];
+    readonly children: Array<MissionNode>;
 
     private hasCompletedLock = false;
 
-    constructor(children: MissionNode[]) {
+    constructor(children: Array<MissionNode>) {
         this.children = children;
     }
 
@@ -91,11 +91,11 @@ export class MissionOrNode implements MissionNodeBase<MissionOrNodeSerialized> {
             .join(` ${t("common:or")} `);
     }
 
-    getTargetSystems(): StarSystemCoordinates[] {
+    getTargetSystems(): Array<StarSystemCoordinates> {
         return this.children.flatMap((child) => child.getTargetSystems());
     }
 
-    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+    getGuidanceTargetObjectIds(): Array<UniverseObjectId> {
         return this.children.flatMap((child) => child.getGuidanceTargetObjectIds());
     }
 

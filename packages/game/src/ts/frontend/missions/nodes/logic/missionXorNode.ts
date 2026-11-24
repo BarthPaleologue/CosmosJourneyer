@@ -29,11 +29,11 @@ import type { MissionNodeBase } from "../missionNodeBase";
  * Node used to describe a set of tasks where only one must be completed.
  */
 export class MissionXorNode implements MissionNodeBase<MissionXorNodeSerialized> {
-    readonly children: MissionNode[];
+    readonly children: Array<MissionNode>;
 
     private hasCompletedLock = false;
 
-    constructor(children: MissionNode[]) {
+    constructor(children: Array<MissionNode>) {
         this.children = children;
     }
 
@@ -89,11 +89,11 @@ export class MissionXorNode implements MissionNodeBase<MissionXorNodeSerialized>
             .join(" xor ");
     }
 
-    getTargetSystems(): StarSystemCoordinates[] {
+    getTargetSystems(): Array<StarSystemCoordinates> {
         return this.children.flatMap((child) => child.getTargetSystems());
     }
 
-    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+    getGuidanceTargetObjectIds(): Array<UniverseObjectId> {
         return this.children.flatMap((child) => child.getGuidanceTargetObjectIds());
     }
 

@@ -21,7 +21,7 @@ import { getRngFromSeed, randomPieChart, uniformToExponential, wheelOfFortune } 
 
 describe("sampling compatibility", () => {
     it("normalizes weights and uses strict cumulative boundaries", () => {
-        const options: [string, number][] = [
+        const options: Array<[string, number]> = [
             ["zero", 0],
             ["a", 2],
             ["b", 3],

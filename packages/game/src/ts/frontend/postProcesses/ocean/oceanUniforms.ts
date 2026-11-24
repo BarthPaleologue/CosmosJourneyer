@@ -55,7 +55,7 @@ export class OceanUniforms {
         this.waveBlendingSharpness = 0.5;
     }
 
-    getUniformNames(): string[] {
+    getUniformNames(): Array<string> {
         return Object.values(OceanUniformNames);
     }
 
@@ -72,7 +72,7 @@ export class OceanUniforms {
         );
     }
 
-    getSamplerNames(): string[] {
+    getSamplerNames(): Array<string> {
         return Object.values(OceanSamplerNames);
     }
 

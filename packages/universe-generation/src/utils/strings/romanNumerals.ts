@@ -21,7 +21,7 @@
  * @returns a string representing the number as a roman numeral
  */
 export function romanNumeral(n: number): string {
-    const romanNumerals: [number, string][] = [
+    const romanNumerals: Array<[number, string]> = [
         [1000, "M"],
         [900, "CM"],
         [500, "D"],

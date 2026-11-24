@@ -241,7 +241,7 @@ export class StarSystemView implements View {
 
     readonly postProcessManager: PostProcessManager;
 
-    private keyboardLayoutMap: Map<string, string> = new Map();
+    private keyboardLayoutMap = new Map<string, string>();
 
     private readonly soundPlayer: ISoundPlayer;
     private readonly tts: ITts;
@@ -1367,7 +1367,7 @@ export class StarSystemView implements View {
             physicsEngine: this.physicsEngine,
         };
 
-        const newlyCompletedMissions: Mission[] = [];
+        const newlyCompletedMissions: Array<Mission> = [];
         this.player.currentMissions.forEach((mission) => {
             if (mission.isCompleted()) {
                 return;

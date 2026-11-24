@@ -53,7 +53,9 @@ export class SystemEntityProcessors {
         this.spatialGeometry = new SystemEntityProcessorRegistry(() => null);
         this.targeting = new SystemEntityProcessorRegistry(() => []);
         this.music = new SystemEntityProcessorRegistry(() => []);
-        this.update = new SystemEntityProcessorRegistry(() => {});
+        this.update = new SystemEntityProcessorRegistry(() => {
+            // Only entity types with a registered processor need an update.
+        });
         this.shadowCasters = new SystemEntityProcessorRegistry(() => []);
         this.sphereOccluders = new SystemEntityProcessorRegistry(() => []);
         this.landingPadProviders = new SystemEntityProcessorRegistry(() => null);

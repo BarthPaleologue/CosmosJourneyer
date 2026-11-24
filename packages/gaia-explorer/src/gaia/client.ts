@@ -16,7 +16,7 @@ const numeric = (value: string): number | null => (value.trim() === "" ? null : 
  * @returns Parsed Gaia records, or the first schema validation error.
  */
 function parseGaiaRows(rows: DeepReadonly<Array<Record<string, string>>>): Result<ReadonlyArray<GaiaRow>, string> {
-    const parsedRows: GaiaRow[] = [];
+    const parsedRows: Array<GaiaRow> = [];
     for (const raw of rows) {
         const designation = raw["designation"]?.trim();
         const parsed = GaiaRowSchema.safeParse({

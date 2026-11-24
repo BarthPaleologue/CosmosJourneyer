@@ -72,9 +72,9 @@ export class ShipControls implements Controls {
 
     private targetFov = Tools.ToRadians(60);
 
-    readonly onToggleWarpDrive: Observable<boolean> = new Observable();
+    readonly onToggleWarpDrive = new Observable<boolean>();
 
-    readonly onCompleteLanding: Observable<void> = new Observable();
+    readonly onCompleteLanding = new Observable<void>();
 
     private readonly rotationInertia = Vector3.Zero();
 
@@ -376,7 +376,7 @@ export class ShipControls implements Controls {
         return this.activeCamera;
     }
 
-    public getCameras(): Camera[] {
+    public getCameras(): Array<Camera> {
         return [this.thirdPersonCamera, this.firstPersonCamera];
     }
 

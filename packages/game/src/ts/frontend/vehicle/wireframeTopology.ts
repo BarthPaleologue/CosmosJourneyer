@@ -26,8 +26,8 @@ type VertexHandle = number;
  */
 export class WireframeTopology {
     private nextVertexId = 0;
-    private readonly vertices: Map<VertexHandle, [number, number, number]> = new Map();
-    private readonly edges: Map<string, [VertexHandle, VertexHandle]> = new Map();
+    private readonly vertices = new Map<VertexHandle, [number, number, number]>();
+    private readonly edges = new Map<string, [VertexHandle, VertexHandle]>();
 
     /**
      * Adds a new vertex to the topology.
@@ -141,7 +141,7 @@ export class WireframeTopology {
             }
         }
 
-        const triangles: number[] = [];
+        const triangles: Array<number> = [];
         for (const [u, nu] of adj) {
             for (const v of nu) {
                 if (v <= u) {
@@ -163,7 +163,7 @@ export class WireframeTopology {
         nu: Set<VertexHandle>,
         u: VertexHandle,
         v: VertexHandle,
-        triangles: number[],
+        triangles: Array<number>,
     ): Result<void, string> {
         const nv = adj.get(v);
         if (!nv) {

@@ -27,7 +27,7 @@ export interface INotificationManager {
 
 export class NotificationManager implements INotificationManager {
     private readonly container: HTMLDivElement;
-    private activeNotifications: Notification[] = [];
+    private activeNotifications: Array<Notification> = [];
     private isVisible = true;
     private readonly soundPlayer: ISoundPlayer;
     private readonly document: Document;
@@ -86,7 +86,15 @@ export class NotificationManager implements INotificationManager {
 }
 
 export class NotificationManagerMock implements INotificationManager {
-    update(): void {}
-    create(): void {}
-    setVisible(): void {}
+    update(): void {
+        // The mock has no active notifications to advance.
+    }
+
+    create(): void {
+        // Discard notifications in tests and playgrounds.
+    }
+
+    setVisible(): void {
+        // The mock owns no UI to show or hide.
+    }
 }

@@ -61,7 +61,7 @@ export async function loadAsteroids(scene: Scene, progressMonitor: ILoadingProgr
 export async function loadAsteroidModels(
     scene: Scene,
     progressMonitor: ILoadingProgressMonitor,
-): Promise<AssetContainer[]> {
+): Promise<Array<AssetContainer>> {
     const asteroidPromises = [
         loadAssetInContainerAsync("Asteroid1", asteroidPath, scene, progressMonitor),
         loadAssetInContainerAsync("Asteroid2", asteroid2Path, scene, progressMonitor),
@@ -76,7 +76,7 @@ export async function loadAsteroidModels(
  * @param scalings Scale factors applied to the asteroid geometry.
  * @returns Independent mesh copies with the requested scales baked into their vertices.
  */
-export function diversifyAsteroid(asteroid: Mesh, scalings: ReadonlyArray<number>): Mesh[] {
+export function diversifyAsteroid(asteroid: Mesh, scalings: ReadonlyArray<number>): Array<Mesh> {
     const asteroids: Array<Mesh> = [];
     for (const scaling of scalings) {
         const asteroidClone = asteroid.clone(`asteroidClone${asteroids.length}`);
@@ -96,7 +96,7 @@ export function diversifyAsteroid(asteroid: Mesh, scalings: ReadonlyArray<number
  * @param scalings Scale factors applied to the asteroid geometry.
  * @returns The source mesh and its scaled variants, all initially disabled.
  */
-export function processAsteroids(container: AssetContainer, scalings: ReadonlyArray<number>): Mesh[] {
+export function processAsteroids(container: AssetContainer, scalings: ReadonlyArray<number>): Array<Mesh> {
     const asteroids: Array<Mesh> = [];
 
     const asteroid = container.meshes[1];

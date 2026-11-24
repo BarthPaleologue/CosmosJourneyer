@@ -46,7 +46,7 @@ export function wheelOfFortune<T>(options: ReadonlyArray<readonly [T, number]>, 
  * @see https://stackoverflow.com/questions/53279807/how-to-get-random-number-list-with-fixed-sum-and-size
  * @returns Random non-negative components normalized to sum to one.
  */
-export function randomPieChart(nbSlices: number, rng: IndexedRng, baseIndex: number): number[] {
+export function randomPieChart(nbSlices: number, rng: IndexedRng, baseIndex: number): Array<number> {
     const results = [];
     let sum = 0.0;
     for (let i = 0; i < nbSlices; i++) {

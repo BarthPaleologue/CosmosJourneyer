@@ -106,8 +106,8 @@ export class SaveBackendSingleFile implements ISaveBackend {
             ...backupSaves,
         };
 
-        const correctSaves: Record<string, { manual: Save[]; auto: Save[] }> = {};
-        const corruptedSaves: Record<string, { manual: unknown[]; auto: unknown[] }> = {};
+        const correctSaves: Record<string, { manual: Array<Save>; auto: Array<Save> }> = {};
+        const corruptedSaves: Record<string, { manual: Array<unknown>; auto: Array<unknown> }> = {};
 
         // filter saves
         for (const [cmdrUuid, cmdrSaves] of Object.entries(allSaves)) {
@@ -187,7 +187,7 @@ export class SaveBackendSingleFile implements ISaveBackend {
         return this.save();
     }
 
-    public async getCmdrUuids(): Promise<string[]> {
+    public async getCmdrUuids(): Promise<Array<string>> {
         return Promise.resolve([...this.saves.keys()]);
     }
 

@@ -199,7 +199,7 @@ export class ExplorationCenterPanel {
         this.discoveryList.innerHTML = "";
         this.discoveryToHtmlItem.clear();
 
-        const discoveries: SpaceDiscoveryData[] = [];
+        const discoveries: Array<SpaceDiscoveryData> = [];
         switch (this.filter) {
             case ExplorationCenterFilter.LOCAL_ONLY:
                 discoveries.push(...this.player.discoveries.local);

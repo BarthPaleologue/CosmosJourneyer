@@ -39,10 +39,10 @@ export function CreateTorusVertexData(options: {
     majorLpExponent?: number;
     minorLpExponent?: number;
 }): VertexData {
-    const indices: number[] = [];
-    const positions: number[] = [];
-    const normals: number[] = [];
-    const uvs: number[] = [];
+    const indices: Array<number> = [];
+    const positions: Array<number> = [];
+    const normals: Array<number> = [];
+    const uvs: Array<number> = [];
 
     const diameter = options.diameter ?? 1;
     const thickness = options.thickness ?? 0.5;

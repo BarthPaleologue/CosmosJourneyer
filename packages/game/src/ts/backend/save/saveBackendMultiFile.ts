@@ -95,7 +95,7 @@ interface CorruptedSave {
  */
 export class SaveBackendMultiFile implements ISaveBackend {
     private readonly fileSystem: IFileSystem;
-    private readonly corruptedSaves: CorruptedSave[] = [];
+    private readonly corruptedSaves: Array<CorruptedSave> = [];
 
     private static readonly SAVES_DIR = "/saves";
 
@@ -194,8 +194,8 @@ export class SaveBackendMultiFile implements ISaveBackend {
             return undefined;
         }
 
-        const manualSaves: Save[] = [];
-        const autoSaves: Save[] = [];
+        const manualSaves: Array<Save> = [];
+        const autoSaves: Array<Save> = [];
 
         // Load manual saves
         const manualDir = `${cmdrDir}/manual`;
@@ -282,7 +282,7 @@ export class SaveBackendMultiFile implements ISaveBackend {
             return [];
         }
 
-        const cmdrUuids: string[] = [];
+        const cmdrUuids: Array<string> = [];
         for (const entry of entries) {
             const cmdrSaves = await this.getSavesForCmdr(entry);
             if (cmdrSaves === undefined) {
