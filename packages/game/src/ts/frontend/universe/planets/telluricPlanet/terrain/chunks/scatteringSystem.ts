@@ -28,7 +28,8 @@ import type { Objects } from "@/frontend/assets/objects";
 import { createInstancePatch } from "@/frontend/helpers/instancing";
 import type { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
 
-export type AssetType = "grass" | "rock" | "tree" | "butterfly";
+export const assetTypes = ["grass", "rock", "tree", "butterfly"] as const;
+export type AssetType = (typeof assetTypes)[number];
 
 type InstanceBuffers = {
     matrices: Float32Array;
@@ -72,9 +73,8 @@ export class ScatteringSystem implements IScatteringSystem {
         this.clearChunk(chunkTransform.name);
 
         const chunkPatches: Partial<Record<AssetType, ScatteredInstances>> = {};
-        for (const [assetType, buffers] of Object.entries(scattering) as Iterable<
-            [AssetType, ScatteredInstanceBuffers[AssetType]]
-        >) {
+        for (const assetType of assetTypes) {
+            const buffers = scattering[assetType];
             if (buffers === undefined) {
                 continue;
             }
