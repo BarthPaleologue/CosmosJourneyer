@@ -1,4 +1,5 @@
-import type { AxisComposite, ButtonInputControl, StickInputControl } from "@brianchirls/game-input/browser";
+import { ButtonInputControl } from "@brianchirls/game-input/browser";
+import type { AxisComposite, StickInputControl } from "@brianchirls/game-input/browser";
 import type DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
 import type PressInteraction from "@brianchirls/game-input/interactions/PressInteraction";
 
@@ -56,12 +57,17 @@ export function vector2ToString(): [string, string][] {
     ];
 }
 
+/** Minimal structural view of a named input control, as needed for labeling. */
+export type NamedInputControl = {
+    readonly name: string;
+};
+
 /**
  * @param input - Button binding to label.
  * @param keyboardMap - Keyboard labels, or null to use control names.
  * @returns The display label for the binding.
  */
-export function buttonInputToString(input: ButtonInputControl, keyboardMap: Map<string, string> | null): string {
+export function buttonInputToString(input: NamedInputControl, keyboardMap: Map<string, string> | null): string {
     let name = input.name;
     // remove the "key:" prefix
     name = name.replace("key:", "");
@@ -99,5 +105,11 @@ export function pressInteractionToStrings(
     keyboardMap: Map<string, string> | null,
 ): string[] {
     const bindings = pressInteraction.action.bindings;
-    return bindings.map((binding) => buttonInputToString(binding.control as ButtonInputControl, keyboardMap));
+    return bindings.flatMap((binding) => {
+        if (!(binding.control instanceof ButtonInputControl)) {
+            return [];
+        }
+
+        return [buttonInputToString(binding.control, keyboardMap)];
+    });
 }
