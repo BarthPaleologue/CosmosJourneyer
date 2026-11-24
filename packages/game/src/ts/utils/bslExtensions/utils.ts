@@ -57,7 +57,7 @@ export function unpackNormal(
     return unpackedNormal;
 }
 
-type InputList = readonly [BslInput, BslInput, ...BslInput[]];
+type InputList = readonly [BslInput, BslInput, ...Array<BslInput>];
 
 /**
  * Adds two or more shader values from left to right.

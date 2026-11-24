@@ -121,7 +121,7 @@ export class AtmosphereUniforms {
         effect.setFloat(AtmosphereUniformNames.ATMOSPHERE_SUN_INTENSITY, this.lightIntensity);
     }
 
-    getUniformNames(): string[] {
+    getUniformNames(): Array<string> {
         return Object.values(AtmosphereUniformNames);
     }
 }

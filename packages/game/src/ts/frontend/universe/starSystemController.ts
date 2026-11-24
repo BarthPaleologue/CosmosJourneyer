@@ -589,7 +589,7 @@ export class StarSystemController {
         return placeholderTransform;
     }
 
-    getSystemTargets(): SystemTarget[] {
+    getSystemTargets(): Array<SystemTarget> {
         return this.systemTargets;
     }
 

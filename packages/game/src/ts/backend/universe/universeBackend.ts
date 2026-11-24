@@ -66,7 +66,7 @@ export class UniverseBackend {
     /**
      * Maps star sectors to the custom systems they contain.
      */
-    private readonly starSectorToCustomSystems: Map<string, StarSystemModel[]> = new Map();
+    private readonly starSectorToCustomSystems: Map<string, Array<StarSystemModel>> = new Map();
 
     /**
      * Maps coordinates to custom systems.
@@ -131,7 +131,7 @@ export class UniverseBackend {
      * @param sectorZ - The coordinate of the sector to query.
      * @returns Read-only custom systems in that sector, or an empty array when none are configured.
      */
-    private getCustomSystemsFromSector(sectorX: number, sectorY: number, sectorZ: number): StarSystemModel[] {
+    private getCustomSystemsFromSector(sectorX: number, sectorY: number, sectorZ: number): Array<StarSystemModel> {
         const sectorKey = serializeStarSectorCoordinates(sectorX, sectorY, sectorZ);
         const systems = this.starSectorToCustomSystems.get(sectorKey);
         if (systems === undefined) {
@@ -197,14 +197,14 @@ export class UniverseBackend {
         sectorX: number,
         sectorY: number,
         sectorZ: number,
-    ): {
+    ): Array<{
         starSectorX: number;
         starSectorY: number;
         starSectorZ: number;
         localX: number;
         localY: number;
         localZ: number;
-    }[] {
+    }> {
         const localPositions = this.getGeneratedLocalPositionsInStarSector(sectorX, sectorY, sectorZ);
 
         return localPositions.map((localPosition) => {

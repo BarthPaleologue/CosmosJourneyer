@@ -46,7 +46,7 @@ export class HyperSpaceTunnel implements Transformable {
         this.v1 = v1;
         this.v2 = v2;
 
-        const path: Vector3[] = [];
+        const path: Array<Vector3> = [];
         const nbPoint = 100;
         const tunnelOffset = 500;
         path.push(new Vector3(0, 0, 200));

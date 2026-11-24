@@ -25,7 +25,7 @@ export interface Controls extends Transformable {
      */
     getActiveCamera(): Camera;
 
-    getCameras(): Camera[];
+    getCameras(): Array<Camera>;
 
     shouldLockPointer(): boolean;
 

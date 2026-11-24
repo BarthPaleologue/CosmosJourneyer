@@ -141,7 +141,7 @@ export class WireframeTopology {
             }
         }
 
-        const triangles: number[] = [];
+        const triangles: Array<number> = [];
         for (const [u, nu] of adj) {
             for (const v of nu) {
                 if (v <= u) {
@@ -163,7 +163,7 @@ export class WireframeTopology {
         nu: Set<VertexHandle>,
         u: VertexHandle,
         v: VertexHandle,
-        triangles: number[],
+        triangles: Array<number>,
     ): Result<void, string> {
         const nv = adj.get(v);
         if (!nv) {

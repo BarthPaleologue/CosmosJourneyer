@@ -1367,7 +1367,7 @@ export class StarSystemView implements View {
             physicsEngine: this.physicsEngine,
         };
 
-        const newlyCompletedMissions: Mission[] = [];
+        const newlyCompletedMissions: Array<Mission> = [];
         this.player.currentMissions.forEach((mission) => {
             if (mission.isCompleted()) {
                 return;

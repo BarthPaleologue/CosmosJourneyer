@@ -41,7 +41,7 @@ export function getNeighborStarSystemCoordinates(
     const starSectorSize = Settings.STAR_SECTOR_SIZE;
     const starSectorRadius = Math.ceil(radius / starSectorSize);
 
-    const starSectorCoordinates: Vector3[] = [];
+    const starSectorCoordinates: Array<Vector3> = [];
     for (
         let x = starSystemCoordinates.starSectorX - starSectorRadius;
         x <= starSystemCoordinates.starSectorX + starSectorRadius;

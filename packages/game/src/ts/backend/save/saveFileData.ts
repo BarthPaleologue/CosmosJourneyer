@@ -87,12 +87,12 @@ export function createUrlFromSave(save: DeepReadonly<Save>): URL | null {
  * @param rawSaves - Parsed values from the imported save collection.
  * @returns Valid saves and invalid original values paired with their validation errors.
  */
-export function parseSaveArray(rawSaves: Record<string, unknown>[]): {
-    validSaves: Save[];
-    invalidSaves: { save: unknown; error: SaveLoadingError }[];
+export function parseSaveArray(rawSaves: Array<Record<string, unknown>>): {
+    validSaves: Array<Save>;
+    invalidSaves: Array<{ save: unknown; error: SaveLoadingError }>;
 } {
-    const validSaves: Save[] = [];
-    const invalidSaves: { save: unknown; error: SaveLoadingError }[] = [];
+    const validSaves: Array<Save> = [];
+    const invalidSaves: Array<{ save: unknown; error: SaveLoadingError }> = [];
 
     for (const save of rawSaves) {
         const result = safeParseSave(save);

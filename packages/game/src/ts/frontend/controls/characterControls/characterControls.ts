@@ -120,7 +120,7 @@ export class CharacterControls implements Controls {
         return this.activeCamera;
     }
 
-    public getCameras(): Camera[] {
+    public getCameras(): Array<Camera> {
         return [this.firstPersonCamera, this.thirdPersonCamera];
     }
 

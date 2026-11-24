@@ -84,7 +84,7 @@ const faqItems = [
             </p>
         ),
     },
-] as const satisfies readonly FAQItem[];
+] as const satisfies ReadonlyArray<FAQItem>;
 
 export const ViewCommunity = (): ReactElement => (
     <section className="communitySection" id="community">

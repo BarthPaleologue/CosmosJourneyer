@@ -43,8 +43,8 @@ export class EngineBay implements StationSection {
     private skirtAggregate: PhysicsAggregate | null = null;
     private readonly skirtMaterial: Material;
 
-    private readonly engines: AbstractMesh[] = [];
-    private readonly engineBodies: PhysicsBody[] = [];
+    private readonly engines: Array<AbstractMesh> = [];
+    private readonly engineBodies: Array<PhysicsBody> = [];
     private readonly engineShape: PhysicsShape;
 
     private readonly scene: Scene;

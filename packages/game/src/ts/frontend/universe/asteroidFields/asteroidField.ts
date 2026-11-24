@@ -203,7 +203,7 @@ export class AsteroidField implements IDisposable {
         maxRadius: number,
         maxTypeIndex: number,
         rng: (index: number) => number,
-    ): [Vector3[], Quaternion[], number[], Vector3[], number[]] {
+    ): [Array<Vector3>, Array<Quaternion>, Array<number>, Array<Vector3>, Array<number>] {
         const positions = [];
         const rotations = [];
         const asteroidTypeIndices = [];

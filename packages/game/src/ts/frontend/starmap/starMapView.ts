@@ -318,7 +318,7 @@ export class StarMapView implements View {
         window.StarMap = this;
     }
 
-    private getGreasedLinePointsFromSystems(systems: DeepReadonly<Array<StarSystemCoordinates>>): Vector3[] {
+    private getGreasedLinePointsFromSystems(systems: DeepReadonly<Array<StarSystemCoordinates>>): Array<Vector3> {
         if (systems.length < 2) {
             return [];
         }

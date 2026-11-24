@@ -34,7 +34,7 @@ export type SpaceStationModel = SystemContentModel<"spaceStation"> & {
      */
     populationDensity: number;
 
-    agricultureMix: [number, CropType][];
+    agricultureMix: Array<[number, CropType]>;
 
     nbHydroponicLayers: number;
 

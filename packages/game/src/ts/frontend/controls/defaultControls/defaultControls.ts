@@ -53,7 +53,7 @@ export class DefaultControls implements Controls {
         this.camera.rotationQuaternion = Quaternion.Identity();
     }
 
-    public getCameras(): Camera[] {
+    public getCameras(): Array<Camera> {
         return [this.camera];
     }
 

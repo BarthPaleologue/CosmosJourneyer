@@ -51,11 +51,11 @@ export class Player {
     currentItinerary: DeepReadonly<Itinerary> | null;
     systemBookmarks: Array<DeepReadonly<StarSystemCoordinates>>;
 
-    currentMissions: Mission[] = [];
-    completedMissions: Mission[] = [];
+    currentMissions: Array<Mission> = [];
+    completedMissions: Array<Mission> = [];
 
     serializedSpaceships: Array<DeepReadonly<SerializedSpaceship>> = [];
-    instancedSpaceships: Spaceship[] = [];
+    instancedSpaceships: Array<Spaceship> = [];
 
     spareSpaceshipComponents: Set<DeepReadonly<SerializedComponent>>;
 

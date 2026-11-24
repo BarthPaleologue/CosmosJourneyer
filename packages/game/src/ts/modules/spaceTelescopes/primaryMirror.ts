@@ -75,7 +75,7 @@ export function createPrimaryMirrorSegments(model: DeepReadonly<PrimaryMirrorMod
     const flat = Math.sqrt(3) * tileRadius;
     const spacingScale = (flat + gap) / flat;
     const axialLimit = Math.ceil((model.apertureRadius + tileRadius) / (tileRadius * 1.5 * spacingScale));
-    const segments: MirrorSegment[] = [];
+    const segments: Array<MirrorSegment> = [];
     for (let q = -axialLimit; q <= axialLimit; q++) {
         for (let r = Math.max(-axialLimit, -q - axialLimit); r <= Math.min(axialLimit, -q + axialLimit); r++) {
             if (q === 0 && r === 0) {

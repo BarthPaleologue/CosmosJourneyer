@@ -33,7 +33,7 @@ const milestones = [
         image: "/static/showcase/stories.webp",
         alt: "A rover traveling across the surface of a moon",
     },
-] as const satisfies readonly Milestone[];
+] as const satisfies ReadonlyArray<Milestone>;
 
 export const ViewRoadmap = (): ReactElement => (
     <section className="contentSection roadmapSection" id="roadmap">

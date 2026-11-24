@@ -5,7 +5,7 @@ test.use({
 });
 
 test("The main menu renders after loading the game", async ({ page }, testInfo) => {
-    const errors: string[] = [];
+    const errors: Array<string> = [];
     page.on("pageerror", (error) => errors.push(error.message));
     page.on("console", (message) => {
         if (message.type() === "error" || /INVALID_|OUT_OF_MEMORY/.test(message.text())) {

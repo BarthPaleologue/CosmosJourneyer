@@ -376,7 +376,7 @@ export class ShipControls implements Controls {
         return this.activeCamera;
     }
 
-    public getCameras(): Camera[] {
+    public getCameras(): Array<Camera> {
         return [this.thirdPersonCamera, this.firstPersonCamera];
     }
 

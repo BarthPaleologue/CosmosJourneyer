@@ -28,15 +28,15 @@ import type { Asteroid } from "@/frontend/assets/objects/asteroids";
 export class AsteroidPatch {
     readonly parent: TransformNode;
 
-    readonly instances: InstancedMesh[] = [];
-    readonly instancePhysicsBodies: PhysicsBody[] = [];
+    readonly instances: Array<InstancedMesh> = [];
+    readonly instancePhysicsBodies: Array<PhysicsBody> = [];
 
-    private readonly positions: Vector3[];
-    private readonly rotations: Quaternion[];
-    private readonly typeIndices: number[];
+    private readonly positions: Array<Vector3>;
+    private readonly rotations: Array<Quaternion>;
+    private readonly typeIndices: Array<number>;
 
-    private readonly rotationAxes: Vector3[] = [];
-    private readonly rotationSpeeds: number[] = [];
+    private readonly rotationAxes: Array<Vector3> = [];
+    private readonly rotationSpeeds: Array<number> = [];
 
     private nbInstances = 0;
 
@@ -45,11 +45,11 @@ export class AsteroidPatch {
     public static BATCH_SIZE = 10;
 
     constructor(
-        positions: Vector3[],
-        rotations: Quaternion[],
-        typeIndices: number[],
-        rotationAxes: Vector3[],
-        rotationSpeeds: number[],
+        positions: Array<Vector3>,
+        rotations: Array<Quaternion>,
+        typeIndices: Array<number>,
+        rotationAxes: Array<Vector3>,
+        rotationSpeeds: Array<number>,
         parent: TransformNode,
     ) {
         this.parent = parent;

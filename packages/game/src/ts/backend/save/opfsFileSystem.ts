@@ -147,14 +147,14 @@ export class OPFSFileSystem implements IFileSystem {
         }
     }
 
-    public async listDirectory(path: string): Promise<string[] | null> {
+    public async listDirectory(path: string): Promise<Array<string> | null> {
         try {
             const dirHandle = await this.getDirectoryHandle(path, false);
             if (!dirHandle) {
                 return null;
             }
 
-            const entries: string[] = [];
+            const entries: Array<string> = [];
             for await (const [name] of dirHandle.entries()) {
                 entries.push(name);
             }

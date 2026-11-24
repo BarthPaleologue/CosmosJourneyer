@@ -31,8 +31,8 @@ export type StarSystemSegment = DeepReadonly<{
 }>;
 
 export type GreasedLinePath = Readonly<{
-    points: Vector3[];
-    widths: number[];
+    points: Array<Vector3>;
+    widths: Array<number>;
 }>;
 
 type GetSystemGalacticPosition = (system: DeepReadonly<StarSystemCoordinates>) => Vector3Like;
@@ -58,9 +58,9 @@ function getUndirectedSystemSegmentKey(
  * @param systems Ordered star systems that form the route.
  * @returns Unique adjacent system segments in encounter order.
  */
-export function getUniqueSystemSegments(systems: DeepReadonly<Array<StarSystemCoordinates>>): StarSystemSegment[] {
+export function getUniqueSystemSegments(systems: DeepReadonly<Array<StarSystemCoordinates>>): Array<StarSystemSegment> {
     const visitedSegmentKeys = new Set<string>();
-    const segments: StarSystemSegment[] = [];
+    const segments: Array<StarSystemSegment> = [];
 
     for (let index = 1; index < systems.length; index++) {
         const from = systems[index - 1];
@@ -96,8 +96,8 @@ export function getGreasedLinePathFromSystemSegments(
     systems: DeepReadonly<Array<StarSystemCoordinates>>,
     getSystemGalacticPosition: GetSystemGalacticPosition,
 ): GreasedLinePath {
-    const points: Vector3[] = [];
-    const widths: number[] = [];
+    const points: Array<Vector3> = [];
+    const widths: Array<number> = [];
     let lastDrawnSystem: DeepReadonly<StarSystemCoordinates> | null = null;
     let currentRun: Array<DeepReadonly<StarSystemCoordinates>> = [];
 

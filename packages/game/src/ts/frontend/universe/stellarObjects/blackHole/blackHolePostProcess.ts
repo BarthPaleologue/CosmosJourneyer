@@ -52,13 +52,16 @@ export class BlackHolePostProcess implements UpdatablePostProcess {
             Effect.ShadersStore[`${shaderName}FragmentShader`] = blackHoleFragment;
         }
 
-        const uniforms: string[] = [
+        const uniforms: Array<string> = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(BlackHoleUniformNames),
         ];
 
-        const samplers: string[] = [...Object.values(SamplerUniformNames), ...Object.values(BlackHoleSamplerNames)];
+        const samplers: Array<string> = [
+            ...Object.values(SamplerUniformNames),
+            ...Object.values(BlackHoleSamplerNames),
+        ];
 
         this.postProcess = new PostProcess(
             blackHoleTransform.name,

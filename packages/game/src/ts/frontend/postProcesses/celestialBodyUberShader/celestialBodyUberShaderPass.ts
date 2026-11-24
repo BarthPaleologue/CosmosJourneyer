@@ -128,14 +128,14 @@ export class CelestialBodyUberShaderPass implements UpdatablePostProcess {
         const shaderName = "celestialBodyUberShader";
         Effect.ShadersStore[`${shaderName}FragmentShader`] ??= celestialBodyUberShaderFragment;
 
-        const uniforms: string[] = [
+        const uniforms: Array<string> = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(StellarObjectUniformNames),
             ...Object.values(CameraUniformNames),
             UberShaderUniformNames.ELAPSED_SECONDS,
         ];
-        const samplers: string[] = [...Object.values(SamplerUniformNames)];
-        const defines: string[] = [];
+        const samplers: Array<string> = [...Object.values(SamplerUniformNames)];
+        const defines: Array<string> = [];
 
         if (enabledFeatures.raymarchedBody !== null) {
             uniforms.push(...Object.values(RaymarchedBodyUniformNames));

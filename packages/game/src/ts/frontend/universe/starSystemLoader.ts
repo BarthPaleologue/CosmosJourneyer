@@ -108,7 +108,7 @@ export class StarSystemLoader {
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
     ): Promise<NonEmptyArray<StellarObject>> {
-        const stellarObjects: StellarObject[] = [];
+        const stellarObjects: Array<StellarObject> = [];
         for (const stellarObjectModel of stellarObjectModels) {
             console.log("Loading stellar object:", stellarObjectModel.name);
             let stellarObject: StellarObject;
@@ -146,7 +146,7 @@ export class StarSystemLoader {
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
     ): Promise<Array<Anomaly>> {
-        const anomalies: Anomaly[] = [];
+        const anomalies: Array<Anomaly> = [];
         for (const anomalyModel of anomalyModels) {
             console.log("Loading Anomaly:", anomalyModel.name);
             let anomaly: Anomaly;
@@ -186,7 +186,7 @@ export class StarSystemLoader {
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
     ): Promise<Array<Planet>> {
-        const planets: Planet[] = [];
+        const planets: Array<Planet> = [];
         for (const planetModel of planetModels) {
             console.log("Loading planet", planetModel.name);
 
@@ -218,7 +218,7 @@ export class StarSystemLoader {
         scene: Scene,
         progressMonitor: ILoadingProgressMonitor,
     ): Promise<Array<TelluricPlanet>> {
-        const satellites: TelluricPlanet[] = [];
+        const satellites: Array<TelluricPlanet> = [];
         for (const satelliteModel of satelliteModels) {
             console.log("Loading satellite:", satelliteModel.name);
             const satellite = new TelluricPlanet(satelliteModel, assets, scene);

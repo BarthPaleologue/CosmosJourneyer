@@ -62,7 +62,7 @@ export async function createXrScene(
     const depthRendererManager = new DepthRendererManager(scene);
     const light = new DirectionalLight("xrAnomalyLight", new Vector3(-1, -0.4, -0.7).normalize(), scene);
     const ringsLutPool = new ItemPool<RingsProceduralPatternLut>(() => new RingsProceduralPatternLut(scene));
-    const ringsReadyPromises: Promise<void>[] = [];
+    const ringsReadyPromises: Array<Promise<void>> = [];
 
     /**
      * @param transform - Anomaly transform, including its visual scale.

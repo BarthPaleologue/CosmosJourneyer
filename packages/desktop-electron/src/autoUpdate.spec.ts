@@ -40,7 +40,7 @@ describe("DesktopAutoUpdateService", () => {
 
     it("waits for explicit consent before downloading and installing", async () => {
         const updater = new MockUpdater();
-        const states: DesktopUpdateState[] = [];
+        const states: Array<DesktopUpdateState> = [];
         const service = new DesktopAutoUpdateService(updater, (state) => states.push(state));
 
         expect(updater.autoDownload).toBe(false);

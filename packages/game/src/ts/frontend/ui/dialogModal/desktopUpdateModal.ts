@@ -122,7 +122,7 @@ export class DesktopUpdateModal {
     }
 
     private appendAvailableMenu(backupTarget: CommanderBackupTarget): void {
-        const buttons: MenuButton[] = [{ action: "later", labelKey: "desktopUpdate:later" }];
+        const buttons: Array<MenuButton> = [{ action: "later", labelKey: "desktopUpdate:later" }];
         if (backupTarget !== null) {
             buttons.push({
                 action: "backup",

@@ -252,7 +252,7 @@ export class CurrentMissionDisplay {
         this.updateMissionCounter();
     }
 
-    private getAllMissions(): Mission[] {
+    private getAllMissions(): Array<Mission> {
         return this.player.completedMissions.concat(this.player.currentMissions);
     }
 

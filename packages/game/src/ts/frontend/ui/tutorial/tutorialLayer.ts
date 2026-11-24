@@ -28,7 +28,7 @@ export class TutorialLayer implements IDisposable {
 
     private readonly nextButton: HTMLElement;
 
-    private tutorialPanelsHtml: string[] = [];
+    private tutorialPanelsHtml: Array<string> = [];
 
     private currentPanelIndex = 0;
 

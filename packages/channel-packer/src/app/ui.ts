@@ -322,7 +322,7 @@ function getAppRoot(): HTMLDivElement {
 function requireElement<T extends Element>(
     parent: ParentNode,
     selector: string,
-    constructor: abstract new (...args: never[]) => T,
+    constructor: abstract new (...args: Array<never>) => T,
 ): T {
     const element = parent.querySelector(selector);
     if (!(element instanceof constructor)) {

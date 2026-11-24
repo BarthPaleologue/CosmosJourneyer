@@ -88,12 +88,12 @@ export class StarMap {
         Animation.ANIMATIONLOOPMODE_CYCLE,
     );
 
-    private readonly recycledStars: InstancedMesh[] = [];
-    private readonly recycledBlackHoles: InstancedMesh[] = [];
+    private readonly recycledStars: Array<InstancedMesh> = [];
+    private readonly recycledBlackHoles: Array<InstancedMesh> = [];
 
     /** Defines how many new stars are made each frame */
     private readonly starBuildBatchSize = 100;
-    private readonly starBuildStack: BuildData[] = [];
+    private readonly starBuildStack: Array<BuildData> = [];
 
     /** Max loaded star sector count in any direction */
     private readonly starSectorLoadRadius = 6;

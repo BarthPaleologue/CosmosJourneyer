@@ -44,9 +44,9 @@ export class StarSectorView {
     /**
      * The star instances of the sector
      */
-    readonly starInstances: InstancedMesh[] = [];
+    readonly starInstances: Array<InstancedMesh> = [];
 
-    readonly blackHoleInstances: InstancedMesh[] = [];
+    readonly blackHoleInstances: Array<InstancedMesh> = [];
 
     readonly coordinates: Vector3;
 
@@ -77,7 +77,7 @@ export class StarSectorView {
         });
     }
 
-    generate(): BuildData[] {
+    generate(): Array<BuildData> {
         const sectorString = this.getKey();
         return this.systems.map(({ model, position }) => {
             return {

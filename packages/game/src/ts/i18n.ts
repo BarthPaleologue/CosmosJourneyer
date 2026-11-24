@@ -44,7 +44,7 @@ function loadResources(): Resource {
             throw new Error("Language folder is undefined: some json files are at root level in the locales folder");
         }
 
-        const subFolders: string[] = parts.slice(1, parts.length - 1); // (en-US/subFolder/subSubFolder/notifications.json) => ["subFolder", "subSubFolder"]
+        const subFolders: Array<string> = parts.slice(1, parts.length - 1); // (en-US/subFolder/subSubFolder/notifications.json) => ["subFolder", "subSubFolder"]
         const fileName = parts.at(-1); // (./en-US/notifications.json) => notifications.json
         if (fileName === undefined) {
             throw new Error("File name is undefined");

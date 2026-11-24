@@ -27,7 +27,7 @@ export interface INotificationManager {
 
 export class NotificationManager implements INotificationManager {
     private readonly container: HTMLDivElement;
-    private activeNotifications: Notification[] = [];
+    private activeNotifications: Array<Notification> = [];
     private isVisible = true;
     private readonly soundPlayer: ISoundPlayer;
     private readonly document: Document;

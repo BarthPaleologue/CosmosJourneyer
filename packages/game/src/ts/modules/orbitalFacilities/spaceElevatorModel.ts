@@ -34,7 +34,7 @@ export type SpaceElevatorModel = SystemContentModel<"spaceElevator"> & {
      */
     populationDensity: number;
 
-    agricultureMix: [number, CropType][];
+    agricultureMix: Array<[number, CropType]>;
 
     nbHydroponicLayers: number;
 

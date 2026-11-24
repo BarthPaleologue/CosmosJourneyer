@@ -63,7 +63,7 @@ export class OrbitRenderer {
         const orbit = orbitalObject.orbit;
         const nbSteps = Math.max(100, Math.round(Math.sqrt(orbit.semiMajorAxis / 200e3)));
         const timestep = getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum) / nbSteps;
-        const points: Vector3[] = [];
+        const points: Array<Vector3> = [];
 
         for (let step = 0; step < nbSteps; step++) {
             const t = step * timestep;

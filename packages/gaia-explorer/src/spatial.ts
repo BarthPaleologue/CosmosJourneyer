@@ -12,7 +12,7 @@ export type StarOutput = Readonly<{
 export type SpatialCube = Readonly<{
     index: readonly [number, number, number];
     origin: readonly [number, number, number];
-    stars: StarOutput[];
+    stars: Array<StarOutput>;
 }>;
 export const clamp = (value: number, lower: number, upper: number): number => Math.max(lower, Math.min(upper, value));
 export class SpatialBinner {

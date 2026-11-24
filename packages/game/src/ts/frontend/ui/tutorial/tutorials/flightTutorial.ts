@@ -62,7 +62,7 @@ export class FlightTutorial implements Tutorial {
         return this.t("tutorials:flightTutorial:description");
     }
 
-    async getContentPanelsHtml(): Promise<string[]> {
+    async getContentPanelsHtml(): Promise<Array<string>> {
         const keybordLayoutMap = await getGlobalKeyboardLayoutMap();
         const welcomePanelHtml = `
         <div class="tutorialContent">

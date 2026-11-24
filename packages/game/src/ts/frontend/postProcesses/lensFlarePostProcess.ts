@@ -72,13 +72,13 @@ export class LensFlarePostProcess {
             SCREEN_RADIUS: "screenRadius",
         };
 
-        const uniforms: string[] = [
+        const uniforms: Array<string> = [
             ...Object.values(ObjectUniformNames),
             ...Object.values(CameraUniformNames),
             ...Object.values(LensFlareUniformNames),
         ];
 
-        const samplers: string[] = Object.values(SamplerUniformNames);
+        const samplers: Array<string> = Object.values(SamplerUniformNames);
 
         this.postProcess = new PostProcess(
             stellarTransform.name + "LensFlare",

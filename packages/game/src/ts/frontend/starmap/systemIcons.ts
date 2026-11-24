@@ -72,8 +72,8 @@ export class SystemIcons {
 
     static IconMaskForSystem(
         system: StarSystemCoordinates,
-        bookmarkedSystems: StarSystemCoordinates[],
-        targetSystems: StarSystemCoordinates[],
+        bookmarkedSystems: Array<StarSystemCoordinates>,
+        targetSystems: Array<StarSystemCoordinates>,
     ): number {
         let iconMask = 0;
         if (bookmarkedSystems.find((bookmarkedSystem) => starSystemCoordinatesEquals(bookmarkedSystem, system))) {

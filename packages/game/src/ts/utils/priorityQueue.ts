@@ -24,7 +24,7 @@ const rightIndex = (i: number): number => (i + 1) << 1;
 
 /** Priority queue whose comparator selects the element returned first. */
 export class PriorityQueue<T> {
-    readonly #heap: T[];
+    readonly #heap: Array<T>;
     readonly #comparator: (a: T, b: T) => boolean;
 
     constructor(comparator: (a: T, b: T) => boolean) {
@@ -52,7 +52,7 @@ export class PriorityQueue<T> {
      * @param values Elements to enqueue.
      * @returns The queue's new size.
      */
-    push(...values: T[]): number {
+    push(...values: Array<T>): number {
         values.forEach((value) => {
             this.#heap.push(value);
             this.#siftUp();

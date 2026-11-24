@@ -87,14 +87,14 @@ export class Mission {
     /**
      * @returns Systems the player still needs to visit.
      */
-    getTargetSystems(): StarSystemCoordinates[] {
+    getTargetSystems(): Array<StarSystemCoordinates> {
         return this.tree.getTargetSystems();
     }
 
     /**
      * @returns Objects that should guide the player in the current system.
      */
-    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+    getGuidanceTargetObjectIds(): Array<UniverseObjectId> {
         return this.tree.getGuidanceTargetObjectIds();
     }
 

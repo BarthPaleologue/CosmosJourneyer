@@ -112,7 +112,7 @@ export function createPanelsFromFrame(
     // Face tracing by rightmost turns
     const directedEdgeKey = (u: number, v: number): string => `${u}>${v}`;
     const visitedDirected = new Set<string>();
-    const candidateLoops: number[][] = [];
+    const candidateLoops: Array<Array<number>> = [];
     const maxSteps = 4 * edges.length;
 
     for (let i = 0; i < edges.length; i += 2) {
@@ -150,7 +150,7 @@ export function createPanelsFromFrame(
      * @param loop - Candidate face boundary, possibly with its first vertex repeated at the end.
      * @returns Canonical boundary, or `null` when fewer than three vertices remain.
      */
-    function normalizeLoop(loop: number[]): number[] | null {
+    function normalizeLoop(loop: Array<number>): Array<number> | null {
         let ring = loop;
         if (ring.length >= 2 && ring[0] === ring[ring.length - 1]) {
             ring = ring.slice(0, -1);
@@ -190,7 +190,7 @@ export function createPanelsFromFrame(
     }
 
     // Deduplicate closed loops
-    const uniqueLoops = new Map<string, number[]>();
+    const uniqueLoops = new Map<string, Array<number>>();
     for (const L of candidateLoops) {
         if (L.length < 4 || L[0] !== L[L.length - 1]) {
             continue;
@@ -205,7 +205,7 @@ export function createPanelsFromFrame(
 
     // Build panels
     const PLANARITY_EPS = 1e-2;
-    const panels: Mesh[] = [];
+    const panels: Array<Mesh> = [];
 
     for (const ringIndices of uniqueLoops.values()) {
         const points = ringIndices.map((i) => getVec3(i));
@@ -257,7 +257,7 @@ export function createPanelsFromFrame(
         const axisV = Vector3.Cross(normal, axisU).normalize();
 
         // Project to 2D
-        const shape2D: Vector2[] = points.map((p) => {
+        const shape2D: Array<Vector2> = points.map((p) => {
             const d = p.subtract(faceCentroid);
             return new Vector2(Vector3.Dot(d, axisU), Vector3.Dot(d, axisV));
         });
@@ -307,8 +307,8 @@ function traceFace(
     directedEdgeKey: (u: number, v: number) => string,
     visitedDirected: Set<string>,
     maxSteps: number,
-): number[] | null {
-    const loop: number[] = [u0];
+): Array<number> | null {
+    const loop: Array<number> = [u0];
     let u = u0;
     let v = v0;
     let steps = 0;

@@ -5,7 +5,7 @@ import type { Fetch } from "./client";
 
 describe("asynchronous TAP client", () => {
     it("creates, follows and retrieves a UWS job", async () => {
-        const requests: string[] = [];
+        const requests: Array<string> = [];
         const responses = [
             new Response(null, { status: 303, headers: { location: "/tap/async/42" } }),
             new Response(null, { status: 303 }),
@@ -21,7 +21,7 @@ describe("asynchronous TAP client", () => {
             }
             return await Promise.resolve(response);
         };
-        const messages: string[] = [];
+        const messages: Array<string> = [];
         const result = await createAsyncTapClient("https://example.test/tap/async", {
             fetchImplementation,
             logger: (message) => messages.push(message),

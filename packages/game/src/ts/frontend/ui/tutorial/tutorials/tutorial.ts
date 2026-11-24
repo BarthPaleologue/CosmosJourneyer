@@ -27,5 +27,5 @@ export interface Tutorial {
 
     getSaveData(): Result<Save, SaveLoadingError>;
 
-    getContentPanelsHtml(): Promise<string[]>;
+    getContentPanelsHtml(): Promise<Array<string>>;
 }

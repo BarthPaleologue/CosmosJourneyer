@@ -45,7 +45,7 @@ export class AiSpaceshipControls implements Controls {
         return this.thirdPersonCamera;
     }
 
-    getCameras(): Camera[] {
+    getCameras(): Array<Camera> {
         return [this.thirdPersonCamera];
     }
 

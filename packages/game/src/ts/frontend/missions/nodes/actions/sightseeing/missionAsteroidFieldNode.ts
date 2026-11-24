@@ -193,11 +193,11 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
         }
     }
 
-    getTargetSystems(): StarSystemCoordinates[] {
+    getTargetSystems(): Array<StarSystemCoordinates> {
         return [this.targetSystemCoordinates];
     }
 
-    getGuidanceTargetObjectIds(): UniverseObjectId[] {
+    getGuidanceTargetObjectIds(): Array<UniverseObjectId> {
         return [];
     }
 

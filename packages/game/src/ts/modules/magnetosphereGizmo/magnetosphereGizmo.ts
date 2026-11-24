@@ -161,8 +161,8 @@ function scaleShapeToRef(shape: Float32Array, lineMaxDistance: number, ref: Floa
  * @param positions Flat positions, 3 floats per point.
  * @returns The positions as Vector3 tuples for line creation.
  */
-function toVector3Array(positions: Float32Array): Vector3[] {
-    const points: Vector3[] = [];
+function toVector3Array(positions: Float32Array): Array<Vector3> {
+    const points: Array<Vector3> = [];
     for (let i = 0; i < positions.length; i += 3) {
         points.push(new Vector3(positions[i] ?? 0, positions[i + 1] ?? 0, positions[i + 2] ?? 0));
     }

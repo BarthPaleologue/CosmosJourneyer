@@ -133,7 +133,7 @@ export class SettingsPanel {
             mapDiv.appendChild(mapName);
 
             for (const [actionName, action] of Object.entries(inputMap.map)) {
-                const subActionMap: Map<string, string[]> = new Map();
+                const subActionMap: Map<string, Array<string>> = new Map();
 
                 const actionOrInteraction = action;
                 const bindings =

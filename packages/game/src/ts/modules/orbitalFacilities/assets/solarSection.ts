@@ -41,11 +41,11 @@ export class SolarSection implements StationSection {
     private readonly attachment: Mesh;
     private attachmentAggregate: PhysicsAggregate | null = null;
 
-    private readonly arms: Mesh[] = [];
-    private readonly armAggregates: PhysicsAggregate[] = [];
+    private readonly arms: Array<Mesh> = [];
+    private readonly armAggregates: Array<PhysicsAggregate> = [];
 
-    private readonly solarPanels: AbstractMesh[] = [];
-    private readonly solarPanelAggregates: PhysicsAggregate[] = [];
+    private readonly solarPanels: Array<AbstractMesh> = [];
+    private readonly solarPanelAggregates: Array<PhysicsAggregate> = [];
 
     private readonly metalSectionMaterial: Material;
 
@@ -276,7 +276,7 @@ export class SolarSection implements StationSection {
         armCount: number,
         requiredSurface: number,
         solarPanelMaterial: Material,
-    ): { position: Vector3; rotation: Quaternion }[] {
+    ): Array<{ position: Vector3; rotation: Quaternion }> {
         const scene = this.getTransform().getScene();
 
         const lightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
@@ -380,7 +380,7 @@ export class SolarSection implements StationSection {
             const lightsAlongWidth = Math.max(2, Math.floor((panelHalfWidth * 2) / outlineLightStep));
             const lightsAlongDepth = Math.max(2, Math.floor((panelHalfDepth * 2) / outlineLightStep));
 
-            const localOffsets: Vector3[] = [];
+            const localOffsets: Array<Vector3> = [];
 
             for (let i = 0; i <= lightsAlongWidth; i += 2) {
                 const t = i / lightsAlongWidth;

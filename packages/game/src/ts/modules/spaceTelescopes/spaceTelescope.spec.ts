@@ -101,8 +101,8 @@ describe("SpaceTelescope resources", () => {
             const telescope = new SpaceTelescope(createSpaceTelescopeModel(), foil, scene);
             const materials = scene.materials.slice(baseline.materials);
             const textures = scene.textures.slice(baseline.textures);
-            const disposedMaterials: string[] = [];
-            const disposedTextures: string[] = [];
+            const disposedMaterials: Array<string> = [];
+            const disposedTextures: Array<string> = [];
             materials.forEach((material) =>
                 material.onDisposeObservable.add(() => disposedMaterials.push(material.name)),
             );

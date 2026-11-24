@@ -373,7 +373,7 @@ function createInput(
     name: string,
     width: number,
     height: number,
-    rgba: readonly number[],
+    rgba: ReadonlyArray<number>,
     options?: {
         readonly signature?: FileSignature;
     },
@@ -396,7 +396,7 @@ function createInput(
  * @param rgba - Single RGBA pixel to repeat, or full image bytes.
  * @returns The decoded image fixture.
  */
-function createImage(width: number, height: number, rgba: readonly number[]): DecodedImage {
+function createImage(width: number, height: number, rgba: ReadonlyArray<number>): DecodedImage {
     const pixels = new Uint8ClampedArray(width * height * 4);
 
     if (rgba.length === 4) {

@@ -54,8 +54,8 @@ export class RingHabitat implements Transformable {
     private readonly attachment: Mesh;
     private attachmentAggregate: PhysicsAggregate | null = null;
 
-    private readonly arms: Mesh[] = [];
-    private readonly armAggregates: PhysicsAggregate[] = [];
+    private readonly arms: Array<Mesh> = [];
+    private readonly armAggregates: Array<PhysicsAggregate> = [];
 
     readonly habitableSurface: number;
 

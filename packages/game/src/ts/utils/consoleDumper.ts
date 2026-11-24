@@ -34,7 +34,7 @@ export class ConsoleDumper {
             }
 
             const originalFn = console[method].bind(console);
-            console[method] = (...args: unknown[]): void => {
+            console[method] = (...args: Array<unknown>): void => {
                 const message = args
                     .map((arg) => {
                         if (arg instanceof Error) {
