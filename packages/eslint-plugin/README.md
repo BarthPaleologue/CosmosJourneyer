@@ -18,6 +18,7 @@ The package has no build step and no generated `dist/` directory.
 | -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | [`no-class-inheritance`](./docs/rules/no-class-inheritance.md)                         | Disallow class inheritance via `extends`; prefer composition.                               |
 | [`no-default-parameters`](./docs/rules/no-default-parameters.md)                       | Disallow default values in function parameters.                                             |
+| [`no-implicit-random`](./docs/rules/no-implicit-random.md)                             | Disallow `Math.random`; require an explicit seedable rng source.                            |
 | [`no-optional-parameters`](./docs/rules/no-optional-parameters.md)                     | Disallow optional parameters except a single trailing `options?`.                           |
 | [`no-pick-omit`](./docs/rules/no-pick-omit.md)                                         | Disallow the `Pick`/`Omit` utility types; define named types.                               |
 | [`no-promise-reject`](./docs/rules/no-promise-reject.md)                               | Disallow direct calls to `Promise.reject()`.                                                |
