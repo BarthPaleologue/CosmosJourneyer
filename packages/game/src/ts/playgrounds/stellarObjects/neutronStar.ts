@@ -32,8 +32,6 @@ import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProc
 import { VolumetricLight } from "@/frontend/postProcesses/volumetricLight/volumetricLight";
 import { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 
-import { getRgbFromTemperature } from "@/utils/specrend";
-
 import { enablePhysics } from "../utils";
 
 /**
@@ -87,9 +85,13 @@ export async function createNeutronStarScene(
     camera.attachPostProcess(celestialBodyUberShader.get());
 
     const lensFlare = new LensFlarePostProcess(
-        neutronStar.getTransform(),
-        neutronStar.getRadius(),
-        getRgbFromTemperature(neutronStarModel.blackBodyTemperature),
+        [
+            {
+                transform: neutronStar.getTransform(),
+                boundingRadius: neutronStar.getRadius(),
+                color: neutronStar.getEmissiveColor(),
+            },
+        ],
         depthRendererManager,
         scene,
     );

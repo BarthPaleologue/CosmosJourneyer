@@ -51,10 +51,9 @@ import { BlackHolePostProcess } from "@/frontend/universe/stellarObjects/blackHo
 import type { NeutronStar } from "@/frontend/universe/stellarObjects/neutronStar/neutronStar";
 import type { Star } from "@/frontend/universe/stellarObjects/star/star";
 
-import { getRgbFromTemperature } from "@/utils/specrend";
-
 import type { DepthRendererManager } from "../helpers/depthRendererManager";
 import { getProjectedDiameter01 } from "../helpers/isObjectVisibleOnScreen";
+import type { StellarLightSources } from "../helpers/stellarLightSystem";
 import { CelestialBodyUberShaderPass } from "./celestialBodyUberShader/celestialBodyUberShaderPass";
 import { getMatterJetsVisibilityRadius } from "./celestialBodyUberShader/matterJetsSettings";
 import { ColorCorrection } from "./colorCorrection";
@@ -102,7 +101,7 @@ export class PostProcessManager {
     private readonly bodyPostProcessesInRenderOrder: Array<PostProcess> = [];
 
     readonly volumetricLights: Array<PostProcess> = [];
-    readonly lensFlares: Array<PostProcess> = [];
+    private readonly lensFlare: LensFlarePostProcess;
 
     private readonly celestialBodyUberShaders: Array<CelestialBodyUberShaderPass> = [];
     private readonly blackHoles: Array<BlackHolePostProcess> = [];
@@ -180,11 +179,13 @@ export class PostProcessManager {
             return [this.fxaa];
         });
 
-        this.renderingPipeline = new PostProcessRenderPipeline(scene.getEngine(), "renderingPipeline");
-        this.renderingPipelineManager.addPipeline(this.renderingPipeline);
-
         this.bloomRenderEffect = new BloomEffect(scene, 1.0, 0.05, 16, Constants.TEXTURETYPE_HALF_FLOAT);
         this.bloomRenderEffect.threshold = 0.0;
+
+        this.lensFlare = new LensFlarePostProcess([], depthRendererManager, scene);
+        this.lensFlareRenderEffect = new PostProcessRenderEffect(this.engine, "lensFlareRenderEffect", () =>
+            this.lensFlare.get(),
+        );
 
         this.sphereShadows = new SphereShadowsPostProcess(depthRendererManager, scene);
         this.sphereShadowsRenderEffect = new PostProcessRenderEffect(
@@ -199,11 +200,7 @@ export class PostProcessManager {
             () => this.bodyPostProcessesInRenderOrder,
         );
 
-        this.lensFlareRenderEffect = new PostProcessRenderEffect(
-            scene.getEngine(),
-            "lensFlareRenderEffect",
-            () => this.lensFlares,
-        );
+        this.renderingPipeline = this.createPipeline();
     }
 
     private getRenderSortedBodies(): Array<RenderableBodyEntry> {
@@ -278,15 +275,6 @@ export class PostProcessManager {
         this.volumetricLights.push(volumetricLight);
         postProcesses.push(volumetricLight);
 
-        const lensFlare = new LensFlarePostProcess(
-            star.getTransform(),
-            star.getBoundingRadius(),
-            getRgbFromTemperature(star.model.blackBodyTemperature),
-            this.depthRendererManager,
-            this.scene,
-        );
-        this.lensFlares.push(lensFlare.get());
-
         if (star.ringsUniforms !== null) {
             const celestialBodyUberShader = new CelestialBodyUberShaderPass(
                 {
@@ -324,15 +312,6 @@ export class PostProcessManager {
         );
         this.volumetricLights.push(volumetricLight);
         postProcesses.push(volumetricLight);
-
-        const lensFlare = new LensFlarePostProcess(
-            neutronStar.getTransform(),
-            neutronStar.getBoundingRadius(),
-            getRgbFromTemperature(neutronStar.model.blackBodyTemperature),
-            this.depthRendererManager,
-            this.scene,
-        );
-        this.lensFlares.push(lensFlare.get());
 
         const celestialBodyUberShader = new CelestialBodyUberShaderPass(
             {
@@ -487,9 +466,10 @@ export class PostProcessManager {
 
     public addCelestialBodies(
         bodies: ReadonlyArray<CelestialBody>,
-        lightSources: ReadonlyArray<DirectionalLight>,
+        stellarLightSources: StellarLightSources,
         excludedMeshes: ReadonlyArray<AbstractMesh>,
     ): void {
+        const lightSources = stellarLightSources.getLights();
         for (const object of bodies) {
             switch (object.type) {
                 case "star":
@@ -532,6 +512,8 @@ export class PostProcessManager {
 
         this.sphereShadows.addStellarLights(lightSources);
 
+        this.lensFlare.setSources(stellarLightSources.getLensFlareSources());
+
         this.sortedBodies = this.getRenderSortedBodies();
         this.rebuild();
     }
@@ -546,17 +528,24 @@ export class PostProcessManager {
 
         this.updateBodyPostProcessesInRenderOrder();
 
-        this.renderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "renderingPipeline");
+        this.renderingPipeline = this.createPipeline();
+    }
 
-        this.renderingPipeline.addEffect(this.sphereShadowsRenderEffect);
-        this.renderingPipeline.addEffect(this.bodyRenderEffect);
-        this.renderingPipeline.addEffect(this.bloomRenderEffect);
-        this.renderingPipeline.addEffect(this.lensFlareRenderEffect);
-        this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
-        this.renderingPipeline.addEffect(this.fxaaRenderEffect);
+    /** @returns The pipeline attached to the current cameras, including scene-wide effects. */
+    private createPipeline(): PostProcessRenderPipeline {
+        const pipeline = new PostProcessRenderPipeline(this.engine, "renderingPipeline");
+        if (this.bodyEntries.length > 0) {
+            pipeline.addEffect(this.sphereShadowsRenderEffect);
+            pipeline.addEffect(this.bodyRenderEffect);
+        }
+        pipeline.addEffect(this.bloomRenderEffect);
+        pipeline.addEffect(this.lensFlareRenderEffect);
+        pipeline.addEffect(this.colorCorrectionRenderEffect);
+        pipeline.addEffect(this.fxaaRenderEffect);
 
-        this.renderingPipelineManager.addPipeline(this.renderingPipeline);
-        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
+        this.renderingPipelineManager.addPipeline(pipeline);
+        this.renderingPipelineManager.attachCamerasToRenderPipeline(pipeline.name, this.scene.cameras);
+        return pipeline;
     }
 
     /**
@@ -580,50 +569,37 @@ export class PostProcessManager {
     }
 
     /**
-     * Disposes of all post-processes tied to a star system (everything except color correction and FXAA).
-     * Recreates the rendering pipeline in a minimal state.
+     * Releases body post-processes and clears the system data from scene-wide effects.
      */
     public reset(): void {
-        this.renderingPipelineManager.detachCamerasFromRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
-        this.renderingPipelineManager.removePipeline(this.renderingPipeline.name);
-        this.renderingPipeline.dispose();
-
-        this.renderingPipeline = new PostProcessRenderPipeline(this.scene.getEngine(), "renderingPipeline");
-        this.renderingPipeline.addEffect(this.bloomRenderEffect);
-        this.renderingPipeline.addEffect(this.colorCorrectionRenderEffect);
-        this.renderingPipeline.addEffect(this.fxaaRenderEffect);
-
-        this.renderingPipelineManager.addPipeline(this.renderingPipeline);
-        this.renderingPipelineManager.attachCamerasToRenderPipeline(this.renderingPipeline.name, this.scene.cameras);
-
-        // disposing on every camera is necessary because BabylonJS only detaches the post-processes from a single camera at a time
-        this.scene.cameras.forEach((camera) => {
-            for (const postProcess of this.getDisposablePostProcesses()) {
-                postProcess.dispose(camera);
-            }
-        });
+        const bodyPostProcesses = this.getBodyPostProcessesToDispose();
 
         this.volumetricLights.length = 0;
-        this.lensFlares.length = 0;
         this.celestialBodyUberShaders.length = 0;
         this.blackHoles.length = 0;
-        this.bodyPostProcessesInRenderOrder.length = 0;
 
         this.sphereShadows.reset();
+        this.lensFlare.setSources([]);
 
         this.celestialBodyToPostProcesses.clear();
         this.bodyEntries.length = 0;
         this.sortedBodies = [];
+        this.rebuild();
+
+        // BabylonJS only detaches a disposed post-process from one camera at a time.
+        for (const camera of this.scene.cameras) {
+            for (const postProcess of bodyPostProcesses) {
+                postProcess.dispose(camera);
+            }
+        }
     }
 
     /**
-     * Collects every Babylon post-process owned by this manager, including the ones behind wrappers.
-     * @returns All disposable post-processes.
+     * @returns The Babylon post-processes created for individual celestial bodies.
      */
-    private getDisposablePostProcesses(): Array<PostProcess> {
+    private getBodyPostProcessesToDispose(): Array<PostProcess> {
         return [
             ...this.volumetricLights,
-            ...this.lensFlares,
             ...this.celestialBodyUberShaders.map((shader) => shader.get()),
             ...this.blackHoles.map((blackHole) => blackHole.get()),
         ];

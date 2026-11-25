@@ -77,9 +77,7 @@ export async function createSunScene(engine: AbstractEngine, progressMonitor: IL
     camera.attachPostProcess(volumetricLight);
 
     const lensFlare = new LensFlarePostProcess(
-        sun.getTransform(),
-        sun.getBoundingRadius(),
-        sun.getEmissiveColor(),
+        [{ transform: sun.getTransform(), boundingRadius: sun.getBoundingRadius(), color: sun.getEmissiveColor() }],
         depthRendererManager,
         scene,
     );

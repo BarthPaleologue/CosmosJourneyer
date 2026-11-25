@@ -633,14 +633,10 @@ export class StarSystemView implements View {
 
         const scene = this.scene;
 
-        this.postProcessManager.addCelestialBodies(
-            starSystem.getCelestialBodies(),
-            starSystem.stellarLightSystem.getLights(),
-            [
-                starSystem.starFieldBox.mesh,
-                ...spaceship.getMainThrusters().map((thruster) => thruster.exhaust.getProxyMesh()),
-            ],
-        );
+        this.postProcessManager.addCelestialBodies(starSystem.getCelestialBodies(), starSystem.stellarLightSystem, [
+            starSystem.starFieldBox.mesh,
+            ...spaceship.getMainThrusters().map((thruster) => thruster.exhaust.getProxyMesh()),
+        ]);
 
         const systemEntities = starSystem.getSystemEntities();
         const sphereOccluders = systemEntities.flatMap((entity) =>

@@ -80,9 +80,7 @@ export async function createLensFlareOcclusionScene(
     occluder.position.copyFrom(occluderEntry[1]);
 
     const lensFlare = new LensFlarePostProcess(
-        flareTarget,
-        5,
-        new Color3(1.0, 0.92, 0.68),
+        [{ transform: flareTarget, boundingRadius: 5, color: sourceMaterial.emissiveColor }],
         depthRendererManager,
         scene,
     );

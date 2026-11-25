@@ -107,7 +107,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
     const postProcessManager = new PostProcessManager(depthRendererManager, scene);
     postProcessManager.addCelestialBodies(
         starSystemController.getCelestialBodies(),
-        starSystemController.stellarLightSystem.getLights(),
+        starSystemController.stellarLightSystem,
         [starSystemController.starFieldBox.mesh],
     );
 
