@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { meters } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, randRangeInt } from "@cosmos-journeyer/random";
 
 import type { HelixHabitatModel } from "@/modules/orbitalFacilities/sections/habitats/helix";
@@ -29,8 +30,8 @@ export function generateHelixHabitatModel(
     surface: Readonly<HelixHabitatModel["surface"]>,
 ): HelixHabitatModel {
     const rng = getRngFromSeed(seed);
-    const baseRadius = 10e3 + rng(0) * 10e3;
-    const deltaRadius = 700 + rng(1) * 200;
+    const baseRadius = meters(10e3 + rng(0) * 10e3);
+    const deltaRadius = meters(700 + rng(1) * 200);
     const helixCount = randRangeInt(2, 4, rng, 654);
     const thicknessFactor = randRangeInt(1, 5 - helixCount, rng, 150);
     const helixPitchMultiplier = 1 + 0.3 * (rng(2) * 2 - 1);

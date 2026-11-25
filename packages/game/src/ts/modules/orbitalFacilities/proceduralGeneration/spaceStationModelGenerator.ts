@@ -22,6 +22,7 @@ import {
     km2ToM2,
     kwhPerYearToWatts,
     meters,
+    squareMeters,
     wattsPerSquareMeter,
     radians,
     seconds,
@@ -204,7 +205,7 @@ export function generateSpaceStationModel(
             sections.push(
                 generateRingHabitatModel(SeedHalfRange * rng(27), {
                     housing: housingSurface,
-                    agriculture: agricultureSurface,
+                    agriculture: squareMeters(agricultureSurface),
                 }),
             );
             break;
@@ -212,7 +213,7 @@ export function generateSpaceStationModel(
             sections.push(
                 generateHelixHabitatModel(SeedHalfRange * rng(19), {
                     housing: housingSurface,
-                    agriculture: agricultureSurface,
+                    agriculture: squareMeters(agricultureSurface),
                 }),
             );
             break;
@@ -220,7 +221,7 @@ export function generateSpaceStationModel(
             sections.push(
                 generateCylinderHabitatModel(SeedHalfRange * rng(13), {
                     housing: housingSurface,
-                    agriculture: agricultureSurface,
+                    agriculture: squareMeters(agricultureSurface),
                 }),
             );
             break;

@@ -230,7 +230,7 @@ function createInsulationSheets(
 ): TransformNode {
     const { size, count, spacing, distance } = model;
     const insulationRig = new TransformNode("insulationRig", scene);
-    insulationRig.position.y = -distance;
+    insulationRig.position.y = distance * -1;
     for (let i = 0; i < count; i++) {
         const sheet = CreatePlane(`insulationSheet${i}`, { width: size, height: size }, scene);
         sheet.rotation.x = Math.PI / 2;

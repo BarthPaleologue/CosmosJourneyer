@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { meters } from "@cosmos-journeyer/physics";
 import { getRngFromSeed } from "@cosmos-journeyer/random";
 
 import type { CylinderHabitatModel } from "@/modules/orbitalFacilities/sections/habitats/cylinder";
@@ -29,7 +30,7 @@ export function generateCylinderHabitatModel(
     surface: Readonly<CylinderHabitatModel["surface"]>,
 ): CylinderHabitatModel {
     const rng = getRngFromSeed(seed);
-    const radius = 4e3 + rng(0) * 2e3;
+    const radius = meters(4e3 + rng(0) * 2e3);
     return {
         type: "cylinderHabitat",
         surface,

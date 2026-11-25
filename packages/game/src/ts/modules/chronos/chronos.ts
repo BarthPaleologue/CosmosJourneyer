@@ -23,6 +23,8 @@ import {
     radians,
     seconds,
     solarMassToKg,
+    squareMeters,
+    watts,
 } from "@cosmos-journeyer/physics";
 import type { StarSystemModel, BlackHoleModel, StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
@@ -89,9 +91,13 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             sections: [
                 { type: "engineBay" },
                 { type: "utility", hasTanks: true },
-                { type: "cylinderHabitat", radius: 10e3, surface: { housing: 0.5, agriculture: 0.5 } },
+                {
+                    type: "cylinderHabitat",
+                    radius: meters(10e3),
+                    surface: { housing: squareMeters(0.5), agriculture: squareMeters(0.5) },
+                },
                 { type: "utility", hasTanks: true },
-                { type: "fusion", netPowerOutput: 500_000 * 2000 * 10 },
+                { type: "fusion", netPowerOutput: watts(500_000 * 2000 * 10) },
                 { type: "utility", hasTanks: true },
                 { type: "landingBay", heightFactor: 2 },
             ],
@@ -168,9 +174,13 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             population: 200,
             populationDensity: 1,
             sections: [
-                { type: "cylinderHabitat", radius: 5e3, surface: { housing: 0.5, agriculture: 0.1 } },
+                {
+                    type: "cylinderHabitat",
+                    radius: meters(5e3),
+                    surface: { housing: squareMeters(0.5), agriculture: squareMeters(0.1) },
+                },
                 { type: "utility", hasTanks: true },
-                { type: "fusion", netPowerOutput: 2000 * 200 },
+                { type: "fusion", netPowerOutput: watts(2000 * 200) },
                 { type: "utility", hasTanks: true },
                 { type: "landingBay", heightFactor: 2 },
             ],
@@ -214,9 +224,13 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             population: 5_000_000,
             populationDensity: 1,
             sections: [
-                { type: "cylinderHabitat", radius: 8e3, surface: { housing: 0.5, agriculture: 0.5 } },
+                {
+                    type: "cylinderHabitat",
+                    radius: meters(8e3),
+                    surface: { housing: squareMeters(0.5), agriculture: squareMeters(0.5) },
+                },
                 { type: "utility", hasTanks: true },
-                { type: "fusion", netPowerOutput: 5_000_000 * 1000 },
+                { type: "fusion", netPowerOutput: watts(5_000_000 * 1000) },
                 { type: "utility", hasTanks: true },
                 { type: "landingBay", heightFactor: 2 },
             ],
@@ -260,7 +274,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             population: 50_000,
             populationDensity: 1,
             sections: [
-                { type: "fusion", netPowerOutput: 50_000 * 10_000 },
+                { type: "fusion", netPowerOutput: watts(50_000 * 10_000) },
                 { type: "utility", hasTanks: true },
                 { type: "landingBay", heightFactor: 2 },
             ],

@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { squareMeters } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, wheelOfFortune, randRangeInt } from "@cosmos-journeyer/random";
 
 import type { SolarSectionModel } from "../../sections/solar";
@@ -39,7 +40,7 @@ export function generateSolarSectionModel(seed: number, surface: number): SolarS
     const secondaryArmCount = axisCount === 2 ? randRangeInt(2, 4, rng, 777) : undefined;
     return {
         type: "solar",
-        surface,
+        surface: squareMeters(surface),
         axisCount,
         secondaryArmCount,
     };

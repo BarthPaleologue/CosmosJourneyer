@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { WattsSchema } from "@cosmos-journeyer/physics";
 import { z } from "zod";
 
 export const FusionSectionModelSchema = z.object({
     type: z.literal("fusion"),
-    netPowerOutput: z.number().positive(),
+    netPowerOutput: z.number().positive().pipe(WattsSchema),
 });
 
 export type FusionSectionModel = z.infer<typeof FusionSectionModelSchema>;

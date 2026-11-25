@@ -19,6 +19,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { PBRMaterial } from "@babylonjs/core/Materials/PBR/pbrMaterial";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 import { describe, expect, it } from "vitest";
 
 import { createPrimaryMirrorSegments, sampleConic, TelescopePrimaryMirror } from "./primaryMirror";
@@ -54,9 +55,9 @@ describe("conic primary mirror", () => {
         { apertureRadius: 5, gap: 2 },
     ])("lays out only six first-ring segments for %j", ({ apertureRadius, gap }) => {
         const segments = createPrimaryMirrorSegments({
-            apertureRadius,
-            shape: { focalLength: 5, conicConstant: -1 },
-            segmentation: { tileRadius: 1, gap },
+            apertureRadius: meters(apertureRadius),
+            shape: { focalLength: meters(5), conicConstant: -1 },
+            segmentation: { tileRadius: meters(1), gap: meters(gap) },
         });
         expect(segments).toHaveLength(6);
         for (const { position: center } of segments) {
@@ -67,14 +68,14 @@ describe("conic primary mirror", () => {
     it.each([
         createSpaceTelescopeModel().primaryMirror,
         {
-            apertureRadius: 8,
-            shape: { focalLength: 5, conicConstant: -1 },
-            segmentation: { tileRadius: 0.5, gap: 0 },
+            apertureRadius: meters(8),
+            shape: { focalLength: meters(5), conicConstant: -1 },
+            segmentation: { tileRadius: meters(0.5), gap: meters(0) },
         },
         {
-            apertureRadius: 5,
-            shape: { focalLength: 5, conicConstant: -1 },
-            segmentation: { tileRadius: 1, gap: 2 },
+            apertureRadius: meters(5),
+            shape: { focalLength: meters(5), conicConstant: -1 },
+            segmentation: { tileRadius: meters(1), gap: meters(2) },
         },
     ])("includes every grid tile whose center or corner lies inside the aperture for %j", (model) => {
         const { tileRadius, gap } = model.segmentation;

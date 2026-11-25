@@ -15,14 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { MetersSchema, SquareMetersSchema } from "@cosmos-journeyer/physics";
 import { z } from "zod";
 
 export const CylinderHabitatModelSchema = z.object({
     type: z.literal("cylinderHabitat"),
-    radius: z.number().positive(),
+    radius: z.number().positive().pipe(MetersSchema),
     surface: z.object({
-        housing: z.number().positive(),
-        agriculture: z.number().positive(),
+        housing: z.number().positive().pipe(SquareMetersSchema),
+        agriculture: z.number().positive().pipe(SquareMetersSchema),
     }),
 });
 

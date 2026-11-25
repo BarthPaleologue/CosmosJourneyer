@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { meters } from "@cosmos-journeyer/physics";
 import { getRngFromSeed } from "@cosmos-journeyer/random";
 
 import type { RingHabitatModel } from "@/modules/orbitalFacilities/sections/habitats/ring";
@@ -29,7 +30,7 @@ export function generateRingHabitatModel(
     surface: Readonly<RingHabitatModel["surface"]>,
 ): RingHabitatModel {
     const rng = getRngFromSeed(seed);
-    const baseRadius = 5e3 + rng(0) * 10e3;
+    const baseRadius = meters(5e3 + rng(0) * 10e3);
     const attachmentTessellation = 4 + 2 * Math.floor(rng(1) * 2);
     return {
         type: "ringHabitat",

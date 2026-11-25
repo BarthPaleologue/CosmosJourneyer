@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { SquareMetersSchema } from "@cosmos-journeyer/physics";
 import { z } from "zod";
 
 export const SolarSectionModelSchema = z.object({
     type: z.literal("solar"),
-    surface: z.number().positive(),
+    surface: z.number().positive().pipe(SquareMetersSchema),
     axisCount: z.number().int().positive(),
     secondaryArmCount: z.number().int().positive().optional(),
 });

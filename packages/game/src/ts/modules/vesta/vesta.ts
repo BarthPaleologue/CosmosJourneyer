@@ -40,6 +40,7 @@ import {
     meters,
     radians,
     seconds,
+    squareMeters,
 } from "@cosmos-journeyer/physics";
 import type {
     StarSystemCoordinates,
@@ -344,15 +345,18 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
                 { type: "utility", hasTanks: false },
                 { type: "utility", hasTanks: false },
                 { type: "utility", hasTanks: true },
-                { type: "solar", surface: 10_000e3, axisCount: 3, secondaryArmCount: 2 },
+                { type: "solar", surface: squareMeters(10_000e3), axisCount: 3, secondaryArmCount: 2 },
                 { type: "utility", hasTanks: true },
                 { type: "utility", hasTanks: false },
                 { type: "utility", hasTanks: false },
                 { type: "utility", hasTanks: true },
                 {
                     type: "cylinderHabitat",
-                    radius: 3e3,
-                    surface: { housing: km2ToM2(300_000 / 4_000), agriculture: km2ToM2(300_000 / 4_000) * 0.3 },
+                    radius: meters(3e3),
+                    surface: {
+                        housing: km2ToM2(300_000 / 4_000),
+                        agriculture: squareMeters(km2ToM2(300_000 / 4_000) * 0.3),
+                    },
                 },
                 { type: "utility", hasTanks: true },
                 { type: "utility", hasTanks: false },
