@@ -68,7 +68,7 @@ export function generateBlackHoleModel(
         initialRotationAngle: radians(0),
     };
 
-    const blackHoleAccretionDiskRadius = schwarzschildRadius * normalRandom(12, 3, rng, 7777);
+    const blackHoleAccretionDiskRadius = meters(schwarzschildRadius * normalRandom(12, 3, rng, 7777));
     const blackHoleBlackBodyTemperature = 7_000;
 
     return {

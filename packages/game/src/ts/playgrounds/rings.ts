@@ -19,7 +19,8 @@ import { DirectionalLight, MeshBuilder, Vector3 } from "@babylonjs/core";
 import type { TransformNode } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
-import type { RingsModel } from "@cosmos-journeyer/universe-model";
+import { meters } from "@cosmos-journeyer/physics";
+import type { ProceduralRingsModel } from "@cosmos-journeyer/universe-model";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
@@ -69,9 +70,9 @@ export async function createRingsScene(
     const urlParams = new URLSearchParams(window.location.search);
     const seed = urlParams.get("seed");
 
-    const ringsModel: RingsModel = {
-        innerRadius: 1.7 * scalingFactor,
-        outerRadius: 3.5 * scalingFactor,
+    const ringsModel: ProceduralRingsModel = {
+        innerRadius: meters(1.7 * scalingFactor),
+        outerRadius: meters(3.5 * scalingFactor),
         type: "procedural",
         seed: seed !== null ? Number(seed) : Math.random() * 1000,
         frequency: 10.0,

@@ -58,7 +58,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         },
         mass: chronosMass,
         blackBodyTemperature: 6000,
-        accretionDiskRadius: chronosShadowRadius * 4,
+        accretionDiskRadius: meters(chronosShadowRadius * 4),
         spin: {
             siderealPeriod: seconds(1e-3),
             axialTilt: radians(0),

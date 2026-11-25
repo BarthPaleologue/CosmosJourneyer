@@ -3,6 +3,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 import type { StarModel } from "@cosmos-journeyer/universe-model";
 import { describe, expect, it, vi } from "vitest";
 
@@ -100,8 +101,8 @@ describe("warp clearance near entity geometry", () => {
         const planet = new Star(
             {
                 ...getSunModel(),
-                radius: 100,
-                rings: { type: "textured", textureId: "saturn", innerRadius: 200, outerRadius: 300 },
+                radius: meters(100),
+                rings: { type: "textured", textureId: "saturn", innerRadius: meters(200), outerRadius: meters(300) },
             } satisfies StarModel,
             createStarTextures(scene),
             scene,

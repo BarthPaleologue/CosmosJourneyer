@@ -69,7 +69,7 @@ export function generateTelluricPlanetModel(
 ): TelluricPlanetModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = Math.max(0.1, normalRandom(1.0, 0.4, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius;
+    const radius = meters(Math.max(0.1, normalRandom(1.0, 0.4, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius);
 
     const mass = kilograms(EarthMass * (radius / 6_371e3) ** 3);
 
@@ -129,7 +129,7 @@ export function generateTelluricPlanetModel(
     const effectiveTemperature = computeEffectiveTemperature(
         parentBodies.map((body) => ({
             temperature: kelvin(body.blackBodyTemperature),
-            radius: meters(getCelestialBodyRadius(body)),
+            radius: getCelestialBodyRadius(body),
             distance: orbit.semiMajorAxis,
         })),
         0.3,

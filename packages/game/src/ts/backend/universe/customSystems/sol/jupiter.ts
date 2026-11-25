@@ -35,7 +35,7 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
         id: "jupiter",
         name: "Jupiter",
         type: "gasPlanet",
-        radius: 69_911e3,
+        radius: meters(69_911e3),
         mass: kilograms(1.898e27),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 9, minutes: 55, seconds: 30 }),

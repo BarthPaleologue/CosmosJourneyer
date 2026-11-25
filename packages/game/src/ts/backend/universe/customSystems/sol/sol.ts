@@ -54,7 +54,7 @@ export function getSolSystemModel(): StarSystemModel {
             north: { latitude: Math.PI / 2, longitude: 0 },
             magnitude: MercuryMagneticDipoleMoment,
         },
-        radius: 2_439.7e3,
+        radius: meters(2_439.7e3),
         mass: kilograms(3.301e23),
         spin: {
             siderealPeriod: durationToSeconds({ days: 58.646 }),
@@ -105,7 +105,7 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Venus",
         type: "telluricPlanet",
         magneticField: null,
-        radius: 6_051.8e3,
+        radius: meters(6_051.8e3),
         mass: kilograms(4.8e20),
         spin: {
             siderealPeriod: durationToSeconds({ days: 243.0226 }),
@@ -173,7 +173,7 @@ export function getSolSystemModel(): StarSystemModel {
             north: { latitude: degreesToRadians(79), longitude: 0 },
             magnitude: EarthMagneticDipoleMoment,
         },
-        radius: 6_371e3,
+        radius: meters(6_371e3),
         mass: kilograms(5.972e24),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 23, minutes: 56, seconds: 4 }),
@@ -241,7 +241,7 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Moon",
         type: "telluricSatellite",
         magneticField: null,
-        radius: 1_737.1e3,
+        radius: meters(1_737.1e3),
         mass: kilograms(7.342e22),
         spin: {
             siderealPeriod: durationToSeconds({ days: 27.321_661 }),
@@ -291,7 +291,7 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Mars",
         type: "telluricPlanet",
         magneticField: null,
-        radius: 3_389.5e3,
+        radius: meters(3_389.5e3),
         mass: kilograms(6.4171e23),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 24, minutes: 37, seconds: 23 }),
@@ -348,7 +348,7 @@ export function getSolSystemModel(): StarSystemModel {
         id: "uranus",
         name: "Uranus",
         type: "gasPlanet",
-        radius: 25_362e3,
+        radius: meters(25_362e3),
         mass: kilograms(8.681e25),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 17, minutes: 14, seconds: 52 }),
@@ -381,8 +381,8 @@ export function getSolSystemModel(): StarSystemModel {
             greenHouseEffectFactor: 0.5,
         },
         rings: {
-            innerRadius: 50_724e3,
-            outerRadius: 62_000e3,
+            innerRadius: meters(50_724e3),
+            outerRadius: meters(62_000e3),
             type: "textured",
             textureId: "uranus",
         },
@@ -393,7 +393,7 @@ export function getSolSystemModel(): StarSystemModel {
         id: "neptune",
         name: "Neptune",
         type: "gasPlanet",
-        radius: 24_622e3,
+        radius: meters(24_622e3),
         mass: kilograms(1.024e26),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 16, minutes: 6, seconds: 36 }),

@@ -54,7 +54,7 @@ export function generateNeutronStarModel(
 
     const blackBodyTemperature = randRangeInt(200_000, 5_000_000, rng, GenerationSteps.TEMPERATURE);
 
-    const radius = clamp(normalRandom(10e3, 1e3, rng, GenerationSteps.RADIUS), 2e3, 50e3);
+    const radius = meters(clamp(normalRandom(10e3, 1e3, rng, GenerationSteps.RADIUS), 2e3, 50e3));
 
     const dipoleTilt = randRange(-Math.PI / 6, Math.PI / 6, rng, GenerationSteps.DIPOLE_TILT);
 

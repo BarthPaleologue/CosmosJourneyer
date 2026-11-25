@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { normalRandom, randRange } from "@cosmos-journeyer/random";
 import type { RingsModel } from "@cosmos-journeyer/universe-model";
 
@@ -23,9 +25,9 @@ import type { RingsModel } from "@cosmos-journeyer/universe-model";
  * @param rng Indexed random source for reproducible procedural choices.
  * @returns Ring geometry scaled to the body's radius.
  */
-export function generateSeededRingsModel(celestialBodyRadius: number, rng: (step: number) => number): RingsModel {
-    const innerRadius = celestialBodyRadius * randRange(1.8, 2.2, rng, 1400);
-    const ringWidth = celestialBodyRadius * Math.max(0.2, normalRandom(1.0, 0.5, rng, 1405));
+export function generateSeededRingsModel(celestialBodyRadius: Meters, rng: (step: number) => number): RingsModel {
+    const innerRadius = meters(celestialBodyRadius * randRange(1.8, 2.2, rng, 1400));
+    const ringWidth = meters(celestialBodyRadius * Math.max(0.2, normalRandom(1.0, 0.5, rng, 1405)));
     const dustBrightness = randRange(0.35, 0.65, rng, 1430);
     const dustWarmth = randRange(0.0, 1.0, rng, 1431);
     const dustRedBias = randRange(-0.03, 0.04, rng, 1432);
@@ -34,7 +36,7 @@ export function generateSeededRingsModel(celestialBodyRadius: number, rng: (step
 
     return {
         innerRadius: innerRadius,
-        outerRadius: innerRadius + ringWidth,
+        outerRadius: meters(innerRadius + ringWidth),
         type: "procedural",
         seed: randRange(-1, 1, rng, 1440),
         frequency: 10.0,

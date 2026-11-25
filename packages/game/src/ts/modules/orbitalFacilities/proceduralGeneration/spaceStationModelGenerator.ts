@@ -77,7 +77,7 @@ export function generateSpaceStationModel(
 
     let parentMaxRadius = getCelestialBodyRadius(parentBody);
     if (parentBody.type === "blackHole") {
-        parentMaxRadius += parentBody.accretionDiskRadius;
+        parentMaxRadius = meters(parentMaxRadius + parentBody.accretionDiskRadius);
     }
 
     if (
@@ -144,7 +144,7 @@ export function generateSpaceStationModel(
     if (parentBody.type === "star" || parentBody.type === "neutronStar" || parentBody.type === "blackHole") {
         totalIrradiance = getSphereIrradianceAtDistance(
             kelvin(parentBody.blackBodyTemperature),
-            meters(getCelestialBodyRadius(parentBody)),
+            getCelestialBodyRadius(parentBody),
             orbit.semiMajorAxis,
         );
     } else {
@@ -153,7 +153,7 @@ export function generateSpaceStationModel(
         for (const [model, distance] of distancesToStellarObjects) {
             totalIrradiance += getSphereIrradianceAtDistance(
                 kelvin(model.blackBodyTemperature),
-                meters(getCelestialBodyRadius(model)),
+                getCelestialBodyRadius(model),
                 meters(distance),
             );
         }

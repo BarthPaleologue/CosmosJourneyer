@@ -1,8 +1,8 @@
-import { kilograms } from "@cosmos-journeyer/physics";
+import { kilograms, meters } from "@cosmos-journeyer/physics";
 
-export const ScaledEarthRadius = 1_000e3;
+export const ScaledEarthRadius = meters(1_000e3);
 
-export const CloudLayerHeight = 7e3;
+export const CloudLayerHeight = meters(7e3);
 
 export const SeedHalfRange = 1e4;
 

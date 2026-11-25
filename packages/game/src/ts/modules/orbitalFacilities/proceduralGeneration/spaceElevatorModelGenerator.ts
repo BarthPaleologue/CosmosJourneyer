@@ -187,7 +187,7 @@ export function generateSpaceElevatorModel(
     for (const [model, distance] of distancesToStellarObjects) {
         totalIrradiance += getSphereIrradianceAtDistance(
             kelvin(model.blackBodyTemperature),
-            meters(getCelestialBodyRadius(model)),
+            getCelestialBodyRadius(model),
             meters(distance),
         );
     }

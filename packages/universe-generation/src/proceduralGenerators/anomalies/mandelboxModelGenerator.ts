@@ -40,7 +40,7 @@ export function generateMandelboxModel(
 ): MandelboxModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = 200e3;
+    const radius = meters(200e3);
 
     const mr2 = randRange(0.0, 1.0, rng, GenerationSteps.POWER);
     const spread = randRange(1.0, 1.5, rng, GenerationSteps.POWER + 1);

@@ -267,7 +267,7 @@ const blackHoleModel: StellarObjectModel = {
     id: "blackHole",
     name: "Black Hole",
     mass: kilograms(1e30),
-    accretionDiskRadius: 0,
+    accretionDiskRadius: meters(0),
     blackBodyTemperature: 0,
     orbit: {
         parentIds: [],

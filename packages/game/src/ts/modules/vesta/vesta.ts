@@ -107,7 +107,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         name: "Janus",
         id: "janus",
         magneticField: null,
-        radius: EarthRadius * 0.1,
+        radius: meters(EarthRadius * 0.1),
         mass: kilograms(EarthMass * 0.1 ** 3),
         seed: 44,
         spin: {
@@ -151,7 +151,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
     };
 
-    const aphroditeRadius = EarthRadius * 0.2;
+    const aphroditeRadius = meters(EarthRadius * 0.2);
     const aphrodite = {
         type: "telluricPlanet",
         name: "Aphrodite",
@@ -187,8 +187,8 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             dustAlbedo: { r: 0.85, g: 0.7, b: 0.65 },
             seed: 0.65,
             frequency: 5,
-            innerRadius: aphroditeRadius * 1.7,
-            outerRadius: aphroditeRadius * 3.0,
+            innerRadius: meters(aphroditeRadius * 1.7),
+            outerRadius: meters(aphroditeRadius * 3.0),
         },
         ocean: {
             depth: 10e3,
@@ -234,7 +234,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         name: "Adonis",
         id: "adonis",
         magneticField: null,
-        radius: EarthRadius * 0.02,
+        radius: meters(EarthRadius * 0.02),
         mass: kilograms(EarthMass * 0.02 ** 3),
         seed: 74,
         orbit: {
@@ -283,7 +283,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         name: "Phileas",
         id: "phileas",
         magneticField: null,
-        radius: EarthRadius * 0.1,
+        radius: meters(EarthRadius * 0.1),
         mass: kilograms(EarthMass * 0.1 ** 3),
         seed: 62,
         orbit: {
@@ -387,13 +387,13 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
     };
 
-    const snowLine = getWaterIceFrostLine(kelvin(vesta.blackBodyTemperature), meters(vesta.radius));
+    const snowLine = getWaterIceFrostLine(kelvin(vesta.blackBodyTemperature), vesta.radius);
 
     const melpomene: GasPlanetModel = {
         type: "gasPlanet",
         name: "Melpomene",
         id: "melpomene",
-        radius: JupiterRadius * 0.7,
+        radius: meters(JupiterRadius * 0.7),
         mass: kilograms(JupiterMass * 0.7 ** 3),
         seed: 43,
         spin: {

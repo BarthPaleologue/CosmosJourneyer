@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
+import type { LinearSrgbColor, Meters } from "@cosmos-journeyer/physics";
 
 import type { AtmosphereModel } from "./atmosphereModel";
 import type { HasSeed } from "./hasSeed";
@@ -42,7 +42,7 @@ export type GasPlanetColorPalette = GasPlanetProceduralColorPalette | GasPlanetT
 
 export type GasPlanetModel = OrbitalObjectModelBase<"gasPlanet"> &
     HasSeed & {
-        radius: number;
+        radius: Meters;
         atmosphere: AtmosphereModel;
         magneticField: MagneticFieldModel;
         rings: RingsModel | null;

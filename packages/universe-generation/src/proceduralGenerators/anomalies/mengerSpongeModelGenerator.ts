@@ -40,7 +40,7 @@ export function generateMengerSpongeModel(
 ): MengerSpongeModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = 200e3;
+    const radius = meters(200e3);
 
     const accentColor = hsvToRgb({
         h: 360 * rng(GenerationSteps.ACCENT_COLOR),

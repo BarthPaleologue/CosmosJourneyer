@@ -40,7 +40,7 @@ export function generateMandelbulbModel(
 ): MandelbulbModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = 1000e3;
+    const radius = meters(1000e3);
 
     const power = randRange(7.0, 10.0, rng, GenerationSteps.POWER);
     const accentColor = hsvToRgb({

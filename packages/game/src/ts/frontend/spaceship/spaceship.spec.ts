@@ -12,6 +12,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
+import { meters } from "@cosmos-journeyer/physics";
 import type { StarModel } from "@cosmos-journeyer/universe-model";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -163,8 +164,8 @@ async function createTestSpaceship(scene: Scene): Promise<Spaceship> {
 function createRingedStar(scene: Scene, textures: Textures, radius: number): Star {
     const model: StarModel = {
         ...getSunModel(),
-        radius,
-        rings: { type: "textured", textureId: "saturn", innerRadius: 200, outerRadius: 300 },
+        radius: meters(radius),
+        rings: { type: "textured", textureId: "saturn", innerRadius: meters(200), outerRadius: meters(300) },
     };
     const star = new Star(model, textures, scene);
     const asteroidField = star.asteroidField;
@@ -255,7 +256,7 @@ describe("spaceship warp clearance with entity geometry and celestial rings", ()
                 },
             };
             const textures = createTestTextures(scene);
-            const planet = new Star({ ...getSunModel(), radius: 6_000_000, rings: null }, textures, scene);
+            const planet = new Star({ ...getSunModel(), radius: meters(6_000_000), rings: null }, textures, scene);
             vi.spyOn(ship.getAltimeter(), "getAltitude").mockReturnValue(altitude);
             ship.setNearestObject(nearestObject);
             ship.setNearestCelestialBody(planet);

@@ -122,9 +122,7 @@ export class MagnetosphereGizmo implements SystemContent {
         let pressure = 0;
         for (const source of sources) {
             const distance = Vector3.Distance(position, source.position);
-            pressure += getStellarWindDynamicPressure(
-                getStellarWind(source.mass, meters(source.radius), meters(distance)),
-            );
+            pressure += getStellarWindDynamicPressure(getStellarWind(source.mass, source.radius, meters(distance)));
         }
 
         const standoffDistance = getMagnetopauseStandoffDistance(ampereSquareMeters(this.moment), pascals(pressure));

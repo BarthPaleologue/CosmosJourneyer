@@ -33,7 +33,7 @@ import {
     pascals,
     radians,
 } from "@cosmos-journeyer/physics";
-import type { Kilograms } from "@cosmos-journeyer/physics";
+import type { Kilograms, Meters } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom } from "@cosmos-journeyer/random";
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
@@ -74,11 +74,11 @@ export function generateTelluricSatelliteModel(
     const isSatelliteOfTelluric = parentBodies.some((parent) => parent.type === "telluricPlanet");
     const isSatelliteOfGas = parentBodies.some((parent) => parent.type === "gasPlanet");
 
-    let radius: number;
+    let radius: Meters;
     if (isSatelliteOfTelluric) {
-        radius = Math.max(0.03, normalRandom(0.06, 0.03, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius;
+        radius = meters(Math.max(0.03, normalRandom(0.06, 0.03, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius);
     } else if (isSatelliteOfGas) {
-        radius = Math.max(0.03, normalRandom(0.25, 0.15, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius;
+        radius = meters(Math.max(0.03, normalRandom(0.25, 0.15, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius);
     } else {
         throw new Error("Satellite is not around telluric or gas planet. Something is missing!");
     }
@@ -116,7 +116,7 @@ export function generateTelluricSatelliteModel(
     const effectiveTemperature = computeEffectiveTemperature(
         stellarParents.map(({ stellarObject, distance }) => ({
             temperature: kelvin(stellarObject.blackBodyTemperature),
-            radius: meters(getCelestialBodyRadius(stellarObject)),
+            radius: getCelestialBodyRadius(stellarObject),
             distance: meters(distance),
         })),
         0.3,
@@ -147,7 +147,7 @@ export function generateTelluricSatelliteModel(
 
     const ocean: OceanModel | null = canHaveLiquidWater
         ? {
-              depth: getOceanDepth(meters(radius), kilograms(mass), waterAmount, oceanCoverage),
+              depth: getOceanDepth(radius, mass, waterAmount, oceanCoverage),
           }
         : null;
 

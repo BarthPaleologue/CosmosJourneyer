@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Meters } from "@cosmos-journeyer/physics";
+
 import type { AtmosphereModel } from "./atmosphereModel";
 import type { CloudsModel } from "./cloudsModel";
 import type { OrbitalObjectType } from "./index";
@@ -28,7 +30,7 @@ type Elements = "rock" | "h2o";
 export type TelluricPlanetaryMassObjectComposition = Partial<Record<Elements, number>>;
 
 export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = OrbitalObjectModelBase<T> & {
-    radius: number;
+    radius: Meters;
     terrainSettings: TerrainSettings;
 
     composition: TelluricPlanetaryMassObjectComposition;

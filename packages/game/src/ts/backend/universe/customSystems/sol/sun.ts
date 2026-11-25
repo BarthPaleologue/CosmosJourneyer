@@ -9,7 +9,7 @@ export function getSunModel(): StarModel {
         id: "sun",
         name: "Sun",
         type: "star",
-        radius: 695_508e3,
+        radius: meters(695_508e3),
         mass: kilograms(1.989e30),
         blackBodyTemperature: 5778,
         spin: {

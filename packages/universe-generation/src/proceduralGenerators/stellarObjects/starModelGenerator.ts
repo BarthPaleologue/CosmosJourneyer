@@ -54,7 +54,7 @@ export function generateStarModel(
         initialRotationAngle: radians(0),
     };
 
-    const radius = getRandomRadiusFromStellarType(stellarType, rng);
+    const radius = meters(getRandomRadiusFromStellarType(stellarType, rng));
 
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 

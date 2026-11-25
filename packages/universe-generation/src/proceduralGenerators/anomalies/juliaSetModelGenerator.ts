@@ -40,7 +40,7 @@ export function generateJuliaSetModel(
 ): JuliaSetModel {
     const rng = getRngFromSeed(seed);
 
-    const radius = 1000e3;
+    const radius = meters(1000e3);
 
     const accentColor = hsvToRgb({
         h: 360 * rng(GenerationSteps.ACCENT_COLOR),

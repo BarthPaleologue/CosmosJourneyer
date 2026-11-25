@@ -15,18 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
+import type { LinearSrgbColor, Meters } from "@cosmos-journeyer/physics";
 
 type RingsModelBase = {
     /**
      * The closest distance between the rings and the center of the celestial body in meters
      */
-    innerRadius: number;
+    innerRadius: Meters;
 
     /**
      * The farthest distance between the rings and the center of the celestial body in meters
      */
-    outerRadius: number;
+    outerRadius: Meters;
 };
 
 export type ProceduralRingsModel = RingsModelBase & {

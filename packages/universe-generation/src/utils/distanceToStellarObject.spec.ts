@@ -97,7 +97,7 @@ describe("distanceToStellarObject", () => {
                     initialRotationAngle: radians(0),
                 },
                 seed: 0,
-                radius: ScaledEarthRadius * 10,
+                radius: meters(ScaledEarthRadius * 10),
                 mass: kilograms(EarthMass * 10000),
                 rings: null,
                 atmosphere: {

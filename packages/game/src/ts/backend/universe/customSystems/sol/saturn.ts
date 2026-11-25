@@ -35,7 +35,7 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
         id: "saturn",
         name: "Saturn",
         type: "gasPlanet",
-        radius: 58_232e3,
+        radius: meters(58_232e3),
         mass: kilograms(5.683e26),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 10, minutes: 33, seconds: 38 }),
@@ -68,8 +68,8 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
             textureId: "saturn",
         },
         rings: {
-            innerRadius: 74_658e3,
-            outerRadius: 136_775e3,
+            innerRadius: meters(74_658e3),
+            outerRadius: meters(136_775e3),
             type: "textured",
             textureId: "saturn",
         },

@@ -22,7 +22,6 @@ import {
     degreesToRadians,
     EarthSeaLevelPressure,
     getCoolGasGiantRadiusFromMass,
-    kilograms,
     meters,
     radians,
     seconds,
@@ -52,7 +51,7 @@ export function generateGasPlanetModel(
 
     const mass = sampleGasPlanetMass(rng);
 
-    const radius = getCoolGasGiantRadiusFromMass(kilograms(mass));
+    const radius = getCoolGasGiantRadiusFromMass(mass);
 
     const orbitRadiuses: Array<number> = [];
     for (const parent of parentBodies) {

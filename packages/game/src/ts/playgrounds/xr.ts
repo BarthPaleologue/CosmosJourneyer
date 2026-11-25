@@ -20,6 +20,7 @@ import type { TransformNode } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 import {
     generateJuliaSetModel,
     generateMandelboxModel,
@@ -74,8 +75,8 @@ export async function createXrScene(
         const frequencyScale = 1e6 / visualRadius;
         const ringsModel: ProceduralRingsModel = {
             type: "procedural",
-            innerRadius: visualRadius * 1.15,
-            outerRadius: visualRadius * 1.85,
+            innerRadius: meters(visualRadius * 1.15),
+            outerRadius: meters(visualRadius * 1.85),
             seed: Math.random() * 1000,
             frequency: 12.0 * frequencyScale,
             iceAlbedo: { r: 0.8, g: 0.88, b: 1.0 },
