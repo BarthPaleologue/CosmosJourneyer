@@ -1,4 +1,4 @@
-import { degreesToRadians, durationToSeconds, kilograms, meters, radians } from "@cosmos-journeyer/physics";
+import { degreesToRadians, durationToSeconds, kelvin, kilograms, meters, radians } from "@cosmos-journeyer/physics";
 import type { StarModel } from "@cosmos-journeyer/universe-model";
 
 /**
@@ -11,7 +11,7 @@ export function getSunModel(): StarModel {
         type: "star",
         radius: meters(695_508e3),
         mass: kilograms(1.989e30),
-        blackBodyTemperature: 5778,
+        blackBodyTemperature: kelvin(5778),
         spin: {
             siderealPeriod: durationToSeconds({ days: 25.67 }),
             axialTilt: degreesToRadians(7.25),

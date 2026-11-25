@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Meters } from "@cosmos-journeyer/physics";
+import type { Kelvin, Meters } from "@cosmos-journeyer/physics";
 
 import type { AtmosphereModel } from "./atmosphereModel";
 import type { CloudsModel } from "./cloudsModel";
@@ -43,11 +43,11 @@ export type TelluricPlanetaryMassObjectModelBase<T extends OrbitalObjectType> = 
         /**
          * Minimum temperature of the object in Kelvin
          */
-        min: number;
+        min: Kelvin;
         /**
          * Maximum temperature of the object in Kelvin
          */
-        max: number;
+        max: Kelvin;
     };
 
     /** Intrinsic global dipole; excludes crustal and externally induced fields. */

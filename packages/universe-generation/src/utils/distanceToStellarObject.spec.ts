@@ -19,6 +19,7 @@ import { ScaledEarthRadius } from "#/constants";
 import {
     astronomicalUnitToMeters,
     EarthMass,
+    kelvin,
     kilograms,
     meters,
     radians,
@@ -70,7 +71,7 @@ describe("distanceToStellarObject", () => {
                 radius: SolarRadius,
                 mass: SolarMass,
                 rings: null,
-                blackBodyTemperature: 5778,
+                blackBodyTemperature: kelvin(5778),
             },
         ],
         planets: [

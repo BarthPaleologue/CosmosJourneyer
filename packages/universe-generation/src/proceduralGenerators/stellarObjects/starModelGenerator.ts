@@ -17,7 +17,7 @@
 
 import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGenerator";
 import { GenerationSteps } from "#/utils/generationSteps";
-import { kilograms, meters, radians, seconds, SolarRadius } from "@cosmos-journeyer/physics";
+import { kelvin, kilograms, meters, radians, seconds, SolarRadius } from "@cosmos-journeyer/physics";
 import type { StellarType } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, wheelOfFortune, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
@@ -44,7 +44,7 @@ export function generateStarModel(
 
     const stellarType = getRandomStellarType(rng);
 
-    const temperature = getRandomTemperatureFromStellarType(stellarType, rng);
+    const temperature = kelvin(getRandomTemperatureFromStellarType(stellarType, rng));
     const mass = kilograms(1.9885e30);
 
     const spin: SpinModel = {

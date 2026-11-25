@@ -21,7 +21,6 @@ import {
     getSphereIrradianceAtDistance,
     km2ToM2,
     kwhPerYearToWatts,
-    kelvin,
     meters,
     wattsPerSquareMeter,
     radians,
@@ -143,7 +142,7 @@ export function generateSpaceStationModel(
     let totalIrradiance = 0;
     if (parentBody.type === "star" || parentBody.type === "neutronStar" || parentBody.type === "blackHole") {
         totalIrradiance = getSphereIrradianceAtDistance(
-            kelvin(parentBody.blackBodyTemperature),
+            parentBody.blackBodyTemperature,
             getCelestialBodyRadius(parentBody),
             orbit.semiMajorAxis,
         );
@@ -152,7 +151,7 @@ export function generateSpaceStationModel(
 
         for (const [model, distance] of distancesToStellarObjects) {
             totalIrradiance += getSphereIrradianceAtDistance(
-                kelvin(model.blackBodyTemperature),
+                model.blackBodyTemperature,
                 getCelestialBodyRadius(model),
                 meters(distance),
             );

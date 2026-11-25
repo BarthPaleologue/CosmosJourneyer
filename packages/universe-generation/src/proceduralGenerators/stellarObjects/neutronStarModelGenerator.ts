@@ -18,7 +18,7 @@
 import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGenerator";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { clamp } from "#/utils/math";
-import { kilograms, radians, seconds, meters } from "@cosmos-journeyer/physics";
+import { kelvin, kilograms, radians, seconds, meters } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectModel, Orbit, NeutronStarModel, SpinModel } from "@cosmos-journeyer/universe-model";
@@ -52,11 +52,11 @@ export function generateNeutronStarModel(
         ),
     };
 
-    const blackBodyTemperature = randRangeInt(200_000, 5_000_000, rng, GenerationSteps.TEMPERATURE);
+    const blackBodyTemperature = kelvin(randRangeInt(200_000, 5_000_000, rng, GenerationSteps.TEMPERATURE));
 
     const radius = meters(clamp(normalRandom(10e3, 1e3, rng, GenerationSteps.RADIUS), 2e3, 50e3));
 
-    const dipoleTilt = randRange(-Math.PI / 6, Math.PI / 6, rng, GenerationSteps.DIPOLE_TILT);
+    const dipoleTilt = radians(randRange(-Math.PI / 6, Math.PI / 6, rng, GenerationSteps.DIPOLE_TILT));
 
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 

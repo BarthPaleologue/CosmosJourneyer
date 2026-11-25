@@ -15,7 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { degreesToRadians, getShadowRadius, meters, radians, seconds, solarMassToKg } from "@cosmos-journeyer/physics";
+import {
+    degreesToRadians,
+    getShadowRadius,
+    kelvin,
+    meters,
+    radians,
+    seconds,
+    solarMassToKg,
+} from "@cosmos-journeyer/physics";
 import type { StarSystemModel, BlackHoleModel, StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
 import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
@@ -57,7 +65,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             p: 2,
         },
         mass: chronosMass,
-        blackBodyTemperature: 6000,
+        blackBodyTemperature: kelvin(6000),
         accretionDiskRadius: meters(chronosShadowRadius * 4),
         spin: {
             siderealPeriod: seconds(1e-3),

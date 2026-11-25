@@ -25,7 +25,6 @@ import {
     EarthSeaLevelPressure,
     getOceanDepth,
     hasLiquidWater,
-    kelvin,
     kilograms,
     meters,
     pascals,
@@ -128,7 +127,7 @@ export function generateTelluricPlanetModel(
 
     const effectiveTemperature = computeEffectiveTemperature(
         parentBodies.map((body) => ({
-            temperature: kelvin(body.blackBodyTemperature),
+            temperature: body.blackBodyTemperature,
             radius: getCelestialBodyRadius(body),
             distance: orbit.semiMajorAxis,
         })),
@@ -145,11 +144,7 @@ export function generateTelluricPlanetModel(
     };
 
     const waterAmount = clamp(normalRandom(0.02, 0.01, rng, GenerationSteps.WATER_AMOUNT), 0, 0.2);
-    const canHaveLiquidWater = hasLiquidWater(
-        pascals(pressure),
-        kelvin(temperatureRange.min),
-        kelvin(temperatureRange.max),
-    );
+    const canHaveLiquidWater = hasLiquidWater(pascals(pressure), temperatureRange.min, temperatureRange.max);
 
     let oceanCoverage = clamp(normalRandom(0.8, 0.1, rng, GenerationSteps.TERRAIN), 0.1, 0.95);
     if (pressure === 0) {

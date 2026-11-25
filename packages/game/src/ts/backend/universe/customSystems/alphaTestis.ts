@@ -20,6 +20,7 @@ import {
     degreesToRadians,
     EarthSeaLevelPressure,
     getOrbitRadiusFromPeriod,
+    kelvin,
     meters,
     radians,
 } from "@cosmos-journeyer/physics";
@@ -50,7 +51,7 @@ export function getAlphaTestisSystemModel(): StarSystemContentModel {
     };
 
     const weierstrass = generateStarModel("star0", 420, "Weierstrass", []);
-    weierstrass.blackBodyTemperature = 5778;
+    weierstrass.blackBodyTemperature = kelvin(5778);
 
     const hecate = generateTelluricPlanetModel("hecate", 253, "Hécate", [weierstrass]);
     hecate.temperature.min = celsiusToKelvin(-40);

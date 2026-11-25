@@ -22,6 +22,7 @@ import {
     degreesToRadians,
     durationToSeconds,
     EarthMagneticDipoleMoment,
+    kelvin,
     kilograms,
     MercuryMagneticDipoleMoment,
     UranusMagneticDipoleMoment,
@@ -66,8 +67,8 @@ export function getSolSystemModel(): StarSystemModel {
             rock: 1,
         },
         temperature: {
-            min: 437,
-            max: 437,
+            min: kelvin(437),
+            max: kelvin(437),
         },
         orbit: {
             parentIds: [sun.id],
@@ -117,8 +118,8 @@ export function getSolSystemModel(): StarSystemModel {
             rock: 1,
         },
         temperature: {
-            min: 719,
-            max: 763,
+            min: kelvin(719),
+            max: kelvin(763),
         },
         orbit: {
             parentIds: [sun.id],
@@ -253,8 +254,8 @@ export function getSolSystemModel(): StarSystemModel {
             rock: 1,
         },
         temperature: {
-            min: 100,
-            max: 100,
+            min: kelvin(100),
+            max: kelvin(100),
         },
         orbit: {
             parentIds: [earth.id],

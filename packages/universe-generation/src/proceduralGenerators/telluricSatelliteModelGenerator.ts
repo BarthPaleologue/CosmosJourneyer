@@ -26,7 +26,6 @@ import {
     getOceanDepth,
     getOrbitalPeriod,
     hasLiquidWater,
-    kelvin,
     kilograms,
     meters,
     MoonMass,
@@ -115,7 +114,7 @@ export function generateTelluricSatelliteModel(
 
     const effectiveTemperature = computeEffectiveTemperature(
         stellarParents.map(({ stellarObject, distance }) => ({
-            temperature: kelvin(stellarObject.blackBodyTemperature),
+            temperature: stellarObject.blackBodyTemperature,
             radius: getCelestialBodyRadius(stellarObject),
             distance: meters(distance),
         })),
@@ -134,11 +133,7 @@ export function generateTelluricSatelliteModel(
               }
             : null;
 
-    const canHaveLiquidWater = hasLiquidWater(
-        pascals(pressure),
-        kelvin(temperatureRange.min),
-        kelvin(temperatureRange.max),
-    );
+    const canHaveLiquidWater = hasLiquidWater(pascals(pressure), temperatureRange.min, temperatureRange.max);
 
     let oceanCoverage = clamp(normalRandom(0.8, 0.1, rng, GenerationSteps.TERRAIN), 0.1, 0.95);
     if (pressure === 0) {

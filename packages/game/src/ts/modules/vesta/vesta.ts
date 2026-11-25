@@ -146,8 +146,8 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             rock: 1,
         },
         temperature: {
-            min: 50,
-            max: 400,
+            min: kelvin(50),
+            max: kelvin(400),
         },
     };
 
@@ -272,8 +272,8 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             rock: 0.99,
         },
         temperature: {
-            min: 50,
-            max: 350,
+            min: kelvin(50),
+            max: kelvin(350),
         },
     } satisfies TelluricSatelliteModel;
 
@@ -321,8 +321,8 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             rock: 0.99,
         },
         temperature: {
-            min: 50,
-            max: 350,
+            min: kelvin(50),
+            max: kelvin(350),
         },
     } satisfies TelluricSatelliteModel;
 
@@ -387,7 +387,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
     };
 
-    const snowLine = getWaterIceFrostLine(kelvin(vesta.blackBodyTemperature), vesta.radius);
+    const snowLine = getWaterIceFrostLine(vesta.blackBodyTemperature, vesta.radius);
 
     const melpomene: GasPlanetModel = {
         type: "gasPlanet",

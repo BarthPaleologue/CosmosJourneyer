@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { meters, radians, seconds, SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
+import { kelvin, meters, radians, seconds, SolarMass, SolarRadius } from "@cosmos-journeyer/physics";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { generateSpaceStationModel } from "@/modules/orbitalFacilities/proceduralGeneration/spaceStationModelGenerator";
@@ -43,7 +43,7 @@ export function getLoneStarSystem(): StarSystemContentModel {
                 type: "star",
                 mass: SolarMass,
                 radius: SolarRadius,
-                blackBodyTemperature: 5778,
+                blackBodyTemperature: kelvin(5778),
                 spin: {
                     siderealPeriod: seconds(0),
                     axialTilt: radians(0),

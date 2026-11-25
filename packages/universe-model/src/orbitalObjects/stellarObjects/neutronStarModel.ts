@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Meters } from "@cosmos-journeyer/physics";
+import type { Kelvin, Meters, Radians } from "@cosmos-journeyer/physics";
 
 import type { HasSeed } from "../hasSeed";
 import type { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
@@ -24,13 +24,13 @@ import type { RingsModel } from "../ringsModel";
 export type NeutronStarModel = OrbitalObjectModelBase<"neutronStar"> &
     HasSeed & {
         radius: Meters;
-        readonly blackBodyTemperature: number;
+        readonly blackBodyTemperature: Kelvin;
 
         /**
          * The angle between the magnetic dipole axis and the rotation axis.
          * If the magnetic field were perfectly aligned with the rotation axis, this angle would be 0.
          */
-        readonly dipoleTilt: number;
+        readonly dipoleTilt: Radians;
 
         readonly rings: RingsModel | null;
     };

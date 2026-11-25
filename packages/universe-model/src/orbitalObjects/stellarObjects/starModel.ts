@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import type { Meters } from "@cosmos-journeyer/physics";
+import type { Kelvin, Meters } from "@cosmos-journeyer/physics";
 
 import type { HasSeed } from "../hasSeed";
 import type { OrbitalObjectModelBase } from "../orbitalObjectModelBase";
@@ -28,7 +28,7 @@ export type StarModel = OrbitalObjectModelBase<"star"> &
         /**
          * Black body temperature of the object in Kelvin
          */
-        blackBodyTemperature: number;
+        blackBodyTemperature: Kelvin;
 
         readonly rings: RingsModel | null;
     };
