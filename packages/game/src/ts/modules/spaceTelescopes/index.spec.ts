@@ -225,7 +225,7 @@ describe("space telescope module in Vesta", () => {
         const initial = orbitalSimulation.getTransform(entity.model.id);
         expect(initial?.position.length()).toBeCloseTo(astronomicalUnitToMeters(3), 0);
         const parent = starSystem.stellarObjects[0];
-        const orbitalPeriod = getOrbitalPeriod(astronomicalUnitToMeters(3), kilograms(parent.mass));
+        const orbitalPeriod = getOrbitalPeriod(astronomicalUnitToMeters(3), parent.mass);
         orbitalSimulation.update(orbitalPeriod / 4);
         const advanced = orbitalSimulation.getTransform(entity.model.id);
         expect(advanced?.position.length()).toBeCloseTo(astronomicalUnitToMeters(3), 0);

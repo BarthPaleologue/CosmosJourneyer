@@ -71,7 +71,7 @@ export function generateTelluricPlanetModel(
 
     const radius = Math.max(0.1, normalRandom(1.0, 0.4, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius;
 
-    const mass = EarthMass * (radius / 6_371e3) ** 3;
+    const mass = kilograms(EarthMass * (radius / 6_371e3) ** 3);
 
     const orbitRadiuses: Array<number> = [];
     for (const parent of parentBodies) {

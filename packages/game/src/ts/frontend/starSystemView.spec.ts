@@ -33,7 +33,7 @@ import { PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape"
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
-import { meters, radians, seconds } from "@cosmos-journeyer/physics";
+import { kilograms, meters, radians, seconds } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { StarSystemModel, StellarObjectModel } from "@cosmos-journeyer/universe-model";
 import { createInstance } from "i18next";
@@ -266,7 +266,7 @@ const blackHoleModel: StellarObjectModel = {
     type: "blackHole",
     id: "blackHole",
     name: "Black Hole",
-    mass: 1e30,
+    mass: kilograms(1e30),
     accretionDiskRadius: 0,
     blackBodyTemperature: 0,
     orbit: {

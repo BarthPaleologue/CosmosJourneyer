@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getSchwarzschildRadius, kilograms } from "@cosmos-journeyer/physics";
+import { getSchwarzschildRadius } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
@@ -29,7 +29,7 @@ import type { CelestialBodyModel } from "./index";
 export function getCelestialBodyRadius(body: DeepReadonly<CelestialBodyModel>): number {
     switch (body.type) {
         case "blackHole":
-            return getSchwarzschildRadius(kilograms(body.mass));
+            return getSchwarzschildRadius(body.mass);
         case "star":
         case "neutronStar":
         case "telluricPlanet":

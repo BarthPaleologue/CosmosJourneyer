@@ -101,14 +101,14 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
     };
 
     const janusOrbitRadius = astronomicalUnitToMeters(0.2);
-    const janusOrbitalPeriod = getOrbitalPeriod(janusOrbitRadius, kilograms(vesta.mass));
+    const janusOrbitalPeriod = getOrbitalPeriod(janusOrbitRadius, vesta.mass);
     const janus: TelluricPlanetModel = {
         type: "telluricPlanet",
         name: "Janus",
         id: "janus",
         magneticField: null,
         radius: EarthRadius * 0.1,
-        mass: EarthMass * 0.1 ** 3,
+        mass: kilograms(EarthMass * 0.1 ** 3),
         seed: 44,
         spin: {
             axialTilt: degreesToRadians(5),
@@ -161,7 +161,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             magnitude: EarthMagneticDipoleMoment * 0.2 ** 3,
         },
         radius: aphroditeRadius,
-        mass: EarthMass * 0.2 ** 3,
+        mass: kilograms(EarthMass * 0.2 ** 3),
         seed: 45,
         spin: {
             axialTilt: degreesToRadians(10),
@@ -235,7 +235,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         id: "adonis",
         magneticField: null,
         radius: EarthRadius * 0.02,
-        mass: EarthMass * 0.02 ** 3,
+        mass: kilograms(EarthMass * 0.02 ** 3),
         seed: 74,
         orbit: {
             parentIds: ["aphrodite"],
@@ -252,7 +252,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         spin: {
             axialTilt: degreesToRadians(0.2),
             axisAzimuth: degreesToRadians(22),
-            siderealPeriod: getOrbitalPeriod(meters(adonisOrbitRadius), kilograms(aphrodite.mass)),
+            siderealPeriod: getOrbitalPeriod(meters(adonisOrbitRadius), aphrodite.mass),
             initialRotationAngle: degreesToRadians(18),
         },
         terrainSettings: {
@@ -277,14 +277,14 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
     } satisfies TelluricSatelliteModel;
 
-    const phileasOrbitRadius = getOrbitRadiusFromPeriod(durationToSeconds({ days: 80 }), kilograms(aphrodite.mass));
+    const phileasOrbitRadius = getOrbitRadiusFromPeriod(durationToSeconds({ days: 80 }), aphrodite.mass);
     const phileas = {
         type: "telluricSatellite",
         name: "Phileas",
         id: "phileas",
         magneticField: null,
         radius: EarthRadius * 0.1,
-        mass: EarthMass * 0.1 ** 3,
+        mass: kilograms(EarthMass * 0.1 ** 3),
         seed: 62,
         orbit: {
             parentIds: ["aphrodite"],
@@ -301,7 +301,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         spin: {
             axialTilt: degreesToRadians(5),
             axisAzimuth: degreesToRadians(246),
-            siderealPeriod: getOrbitalPeriod(phileasOrbitRadius, kilograms(aphrodite.mass)),
+            siderealPeriod: getOrbitalPeriod(phileasOrbitRadius, aphrodite.mass),
             initialRotationAngle: degreesToRadians(354),
         },
         terrainSettings: {
@@ -394,7 +394,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         name: "Melpomene",
         id: "melpomene",
         radius: JupiterRadius * 0.7,
-        mass: JupiterMass * 0.7 ** 3,
+        mass: kilograms(JupiterMass * 0.7 ** 3),
         seed: 43,
         spin: {
             axialTilt: degreesToRadians(30),
@@ -461,7 +461,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         content: createSpaceTelescopeModel(),
         placement: {
             type: "inOrbit",
-            mass: 100_000,
+            mass: kilograms(100_000),
             orbit: {
                 parentIds: [vesta.id],
                 semiMajorAxis: meters(spaceTelescopeOrbitRadius),
@@ -479,7 +479,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
                     axialTilt: radians(0),
                     axisAzimuth: radians(0),
                     initialRotationAngle: radians(0),
-                    siderealPeriod: getOrbitalPeriod(spaceTelescopeOrbitRadius, kilograms(vesta.mass)),
+                    siderealPeriod: getOrbitalPeriod(spaceTelescopeOrbitRadius, vesta.mass),
                 },
                 localFrameOrientation: { yaw: 0, pitch: 0, roll: -Math.PI / 2 },
             },
@@ -494,7 +494,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
         placement: {
             type: "inOrbit",
-            mass: 0.5,
+            mass: kilograms(0.5),
             orbit: {
                 parentIds: [melpomene.id],
                 semiMajorAxis: meters(4.2 * melpomene.radius),

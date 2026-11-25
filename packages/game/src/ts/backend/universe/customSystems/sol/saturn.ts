@@ -19,6 +19,7 @@ import {
     degreesToRadians,
     durationToSeconds,
     EarthSeaLevelPressure,
+    kilograms,
     SaturnMagneticDipoleMoment,
     meters,
     radians,
@@ -35,7 +36,7 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
         name: "Saturn",
         type: "gasPlanet",
         radius: 58_232e3,
-        mass: 5.683e26,
+        mass: kilograms(5.683e26),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 10, minutes: 33, seconds: 38 }),
             axialTilt: degreesToRadians(26.73),

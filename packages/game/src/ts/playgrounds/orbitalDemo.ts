@@ -21,7 +21,7 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
-import { meters, radians, seconds } from "@cosmos-journeyer/physics";
+import { kilograms, meters, radians, seconds } from "@cosmos-journeyer/physics";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
@@ -77,7 +77,7 @@ export async function createOrbitalDemoScene(
             axisAzimuth: radians(0),
             initialRotationAngle: radians(0),
         },
-        mass: 1e12,
+        mass: kilograms(1e12),
     });
 
     const earth = new CustomOrbitalObject(MeshBuilder.CreateSphere("earth", { diameter: 0.5 }, scene), {
@@ -102,7 +102,7 @@ export async function createOrbitalDemoScene(
             axisAzimuth: radians(0),
             initialRotationAngle: radians(0),
         },
-        mass: 1e11,
+        mass: kilograms(1e11),
     });
 
     const moon = new CustomOrbitalObject(MeshBuilder.CreateSphere("moon", { diameter: 0.2 }, scene), {
@@ -121,7 +121,7 @@ export async function createOrbitalDemoScene(
             p: 2,
         },
         type: "custom",
-        mass: 1e10,
+        mass: kilograms(1e10),
         spin: {
             siderealPeriod: seconds(0),
             axialTilt: radians(0),

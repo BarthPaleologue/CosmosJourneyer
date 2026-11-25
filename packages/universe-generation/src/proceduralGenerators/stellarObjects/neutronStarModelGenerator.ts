@@ -18,7 +18,7 @@
 import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGenerator";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { clamp } from "#/utils/math";
-import { radians, seconds, meters } from "@cosmos-journeyer/physics";
+import { kilograms, radians, seconds, meters } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectModel, Orbit, NeutronStarModel, SpinModel } from "@cosmos-journeyer/universe-model";
@@ -40,7 +40,7 @@ export function generateNeutronStarModel(
 ): NeutronStarModel {
     const rng = getRngFromSeed(seed);
 
-    const mass = 1.9885e30;
+    const mass = kilograms(1.9885e30);
 
     const spin: SpinModel = {
         axialTilt: radians(0),

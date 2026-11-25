@@ -2,7 +2,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
-import { meters, radians, seconds } from "@cosmos-journeyer/physics";
+import { kilograms, meters, radians, seconds } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -37,7 +37,7 @@ describe("system entity content factories", () => {
         content: { type: "factory-test" },
         placement: {
             type: "inOrbit",
-            mass: 1,
+            mass: kilograms(1),
             orbit: {
                 parentIds: [],
                 semiMajorAxis: meters(0),
@@ -136,7 +136,7 @@ describe("system entity content factories", () => {
             type: "custom",
             id: "parent",
             name: "Parent",
-            mass: 1,
+            mass: kilograms(1),
             orbit: model.placement.orbit,
             spin: model.placement.attitude.spin,
         });
@@ -201,7 +201,7 @@ describe("system entity content factories", () => {
             type: "custom",
             id: "parent",
             name: "Parent",
-            mass: 1,
+            mass: kilograms(1),
             orbit: model.placement.orbit,
             spin: model.placement.attitude.spin,
         });

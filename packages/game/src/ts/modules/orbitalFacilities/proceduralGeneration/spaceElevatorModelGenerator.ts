@@ -22,7 +22,6 @@ import {
     km2ToM2,
     kwhPerYearToWatts,
     kelvin,
-    kilograms,
     meters,
     wattsPerSquareMeter,
     radians,
@@ -75,7 +74,7 @@ export function generateSpaceElevatorModel(
 
     const parentSiderealDayDuration = parentBody.spin.siderealPeriod;
 
-    const orbitRadius = getOrbitRadiusFromPeriod(parentSiderealDayDuration, kilograms(parentBody.mass));
+    const orbitRadius = getOrbitRadiusFromPeriod(parentSiderealDayDuration, parentBody.mass);
 
     const orbit: Orbit = {
         parentIds: [parentBody.id],

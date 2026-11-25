@@ -15,7 +15,15 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { astronomicalUnitToMeters, getWaterIceFrostLine, JupiterMass, kelvin, meters } from "@cosmos-journeyer/physics";
+import {
+    astronomicalUnitToMeters,
+    getWaterIceFrostLine,
+    JupiterMass,
+    kelvin,
+    kilograms,
+    meters,
+} from "@cosmos-journeyer/physics";
+import type { Kilograms } from "@cosmos-journeyer/physics";
 
 const GenerationSteps = {
     HOT_JUPITER_CHECK: 2564,
@@ -71,7 +79,7 @@ export function getGasPlanetOrbitRadius(
  * @param rng Indexed random source used for reproducible sampling.
  * @returns A sampled gas planet mass in the model's mass units.
  */
-export function sampleGasPlanetMass(rng: (step: number) => number): number {
+export function sampleGasPlanetMass(rng: (step: number) => number): Kilograms {
     const minMass = 0.08 * JupiterMass;
     const maxMass = 8.0 * JupiterMass;
 
@@ -79,5 +87,5 @@ export function sampleGasPlanetMass(rng: (step: number) => number): number {
     const logMin = Math.log10(minMass);
     const logMax = Math.log10(maxMass);
 
-    return 10 ** (logMin + (logMax - logMin) * t);
+    return kilograms(10 ** (logMin + (logMax - logMin) * t));
 }

@@ -29,7 +29,6 @@ import {
     getStellarWind,
     getStellarWindDynamicPressure,
     ampereSquareMeters,
-    kilograms,
     meters,
     pascals,
     radians,
@@ -104,7 +103,7 @@ export class Aurora implements SystemContent {
         let dominantPressure = -1;
         for (const source of sources) {
             const distance = Vector3.Distance(position, source.position);
-            const wind = getStellarWind(kilograms(source.mass), meters(source.radius), meters(distance));
+            const wind = getStellarWind(source.mass, meters(source.radius), meters(distance));
             const sourcePressure = getStellarWindDynamicPressure(wind);
             // Approximate multiple winds by adding their scalar dynamic pressures.
             pressure += sourcePressure;

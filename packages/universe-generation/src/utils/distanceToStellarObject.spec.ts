@@ -19,6 +19,7 @@ import { ScaledEarthRadius } from "#/constants";
 import {
     astronomicalUnitToMeters,
     EarthMass,
+    kilograms,
     meters,
     radians,
     seconds,
@@ -97,7 +98,7 @@ describe("distanceToStellarObject", () => {
                 },
                 seed: 0,
                 radius: ScaledEarthRadius * 10,
-                mass: EarthMass * 10000,
+                mass: kilograms(EarthMass * 10000),
                 rings: null,
                 atmosphere: {
                     greenHouseEffectFactor: 1,

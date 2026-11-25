@@ -28,7 +28,6 @@ import {
     getStellarWind,
     getStellarWindDynamicPressure,
     ampereSquareMeters,
-    kilograms,
     meters,
     pascals,
     radians,
@@ -124,7 +123,7 @@ export class MagnetosphereGizmo implements SystemContent {
         for (const source of sources) {
             const distance = Vector3.Distance(position, source.position);
             pressure += getStellarWindDynamicPressure(
-                getStellarWind(kilograms(source.mass), meters(source.radius), meters(distance)),
+                getStellarWind(source.mass, meters(source.radius), meters(distance)),
             );
         }
 

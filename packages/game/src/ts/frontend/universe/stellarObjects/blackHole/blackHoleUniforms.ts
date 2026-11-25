@@ -20,7 +20,7 @@ import type { CubeTexture } from "@babylonjs/core/Materials/Textures/cubeTexture
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { G, getKerrMetricA, getSchwarzschildRadius, kilograms } from "@cosmos-journeyer/physics";
+import { G, getKerrMetricA, getSchwarzschildRadius } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { BlackHoleModel } from "@cosmos-journeyer/universe-model";
 
@@ -63,8 +63,8 @@ export class BlackHoleUniforms {
     constructor(blackHoleModel: DeepReadonly<BlackHoleModel>, backgroundLinear: CubeTexture) {
         this.accretionDiskRadius = blackHoleModel.accretionDiskRadius;
         this.warpingMinkowskiFactor = 2.0;
-        this.schwarzschildRadius = getSchwarzschildRadius(kilograms(blackHoleModel.mass));
-        const kerrMetricA = getKerrMetricA(kilograms(blackHoleModel.mass), blackHoleModel.spin.siderealPeriod);
+        this.schwarzschildRadius = getSchwarzschildRadius(blackHoleModel.mass);
+        const kerrMetricA = getKerrMetricA(blackHoleModel.mass, blackHoleModel.spin.siderealPeriod);
         this.frameDraggingFactor = kerrMetricA / blackHoleModel.mass;
         this.standardGravitationalParameter = G * blackHoleModel.mass;
         this.backgroundLinear = backgroundLinear;

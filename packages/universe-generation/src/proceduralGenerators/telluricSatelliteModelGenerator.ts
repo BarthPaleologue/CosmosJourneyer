@@ -33,6 +33,7 @@ import {
     pascals,
     radians,
 } from "@cosmos-journeyer/physics";
+import type { Kilograms } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom } from "@cosmos-journeyer/random";
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
@@ -82,11 +83,11 @@ export function generateTelluricSatelliteModel(
         throw new Error("Satellite is not around telluric or gas planet. Something is missing!");
     }
 
-    let mass;
+    let mass: Kilograms;
     if (isSatelliteOfTelluric) {
-        mass = MoonMass * (radius / 1_735e3) ** 3;
+        mass = kilograms(MoonMass * (radius / 1_735e3) ** 3);
     } else {
-        mass = EarthMass * (radius / 6_371e3) ** 3;
+        mass = kilograms(EarthMass * (radius / 6_371e3) ** 3);
     }
 
     let pressure = Math.max(

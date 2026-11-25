@@ -20,6 +20,7 @@ import {
     durationToSeconds,
     EarthSeaLevelPressure,
     JupiterMagneticDipoleMoment,
+    kilograms,
     meters,
     radians,
 } from "@cosmos-journeyer/physics";
@@ -35,7 +36,7 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
         name: "Jupiter",
         type: "gasPlanet",
         radius: 69_911e3,
-        mass: 1.898e27,
+        mass: kilograms(1.898e27),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 9, minutes: 55, seconds: 30 }),
             axialTilt: degreesToRadians(3.13),

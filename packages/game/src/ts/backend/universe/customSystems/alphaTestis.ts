@@ -20,7 +20,6 @@ import {
     degreesToRadians,
     EarthSeaLevelPressure,
     getOrbitRadiusFromPeriod,
-    kilograms,
     meters,
     radians,
 } from "@cosmos-journeyer/physics";
@@ -61,7 +60,7 @@ export function getAlphaTestisSystemModel(): StarSystemContentModel {
 
     const manaleth = generateTelluricSatelliteModel("hecate->manaleth", 23, "Manaleth", [hecate], [weierstrass]);
     manaleth.orbit.plane.inclination = degreesToRadians(45);
-    manaleth.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(manaleth.spin.siderealPeriod, kilograms(hecate.mass));
+    manaleth.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(manaleth.spin.siderealPeriod, hecate.mass);
 
     const ares = generateTelluricPlanetModel("ares", 0.3725, "Ares", [weierstrass]);
     ares.ocean = null;

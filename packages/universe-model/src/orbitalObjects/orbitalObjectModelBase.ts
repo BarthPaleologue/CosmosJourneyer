@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Kilograms } from "@cosmos-journeyer/physics";
+
 import type { OrbitalObjectType } from "./index";
 import type { Orbit } from "./orbit";
 import type { OrbitalObjectId } from "./orbitalObjectId";
@@ -44,7 +46,7 @@ export type OrbitalObjectModelBase<T extends OrbitalObjectType> = {
     /**
      * Mass of the object in kilograms
      */
-    mass: number;
+    mass: Kilograms;
 
     /** Rotational elements of the object */
     spin: SpinModel;

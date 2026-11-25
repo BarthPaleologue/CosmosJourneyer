@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Kilograms } from "@cosmos-journeyer/physics";
 
 import type { SystemView } from "@/frontend/universe/systemView";
 
@@ -25,7 +26,7 @@ import type { SystemView } from "@/frontend/universe/systemView";
  */
 export type StellarWindSource = {
     /** Stellar mass in kilograms. */
-    mass: number;
+    mass: Kilograms;
     /** Stellar radius in meters. */
     radius: number;
     /** Current world-space position of the star in meters. */
