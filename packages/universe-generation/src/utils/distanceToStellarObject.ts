@@ -26,7 +26,9 @@ import type { Orbit, StellarObjectModel, StarSystemModel } from "@cosmos-journey
  * @returns Distances keyed by the stellar objects that parent the orbit.
  */
 export function getDistancesToStellarObjects(
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     orbit: DeepReadonly<Orbit>,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     systemModel: DeepReadonly<StarSystemModel>,
 ): DeepReadonly<Map<StellarObjectModel, number>> {
     const distances = new Map<DeepReadonly<StellarObjectModel>, number>();

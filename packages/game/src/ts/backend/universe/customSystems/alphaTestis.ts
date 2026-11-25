@@ -20,6 +20,10 @@ import {
     degreesToRadians,
     EarthSeaLevelPressure,
     getOrbitRadiusFromPeriod,
+    kilograms,
+    seconds,
+    meters,
+    radians,
 } from "@cosmos-journeyer/physics";
 import {
     generateGasPlanetModel,
@@ -54,11 +58,13 @@ export function getAlphaTestisSystemModel(): StarSystemContentModel {
     hecate.temperature.min = celsiusToKelvin(-40);
     hecate.temperature.max = celsiusToKelvin(30);
 
-    hecate.orbit.semiMajorAxis = 21000 * hecate.radius;
+    hecate.orbit.semiMajorAxis = meters(21000 * hecate.radius);
 
     const manaleth = generateTelluricSatelliteModel("hecate->manaleth", 23, "Manaleth", [hecate], [weierstrass]);
-    manaleth.orbit.plane.inclination = degreesToRadians(45);
-    manaleth.orbit.semiMajorAxis = getOrbitRadiusFromPeriod(manaleth.spin.siderealPeriod, hecate.mass);
+    manaleth.orbit.plane.inclination = radians(degreesToRadians(45));
+    manaleth.orbit.semiMajorAxis = meters(
+        getOrbitRadiusFromPeriod(seconds(manaleth.spin.siderealPeriod), kilograms(hecate.mass)),
+    );
 
     const ares = generateTelluricPlanetModel("ares", 0.3725, "Ares", [weierstrass]);
     ares.ocean = null;
@@ -69,10 +75,10 @@ export function getAlphaTestisSystemModel(): StarSystemContentModel {
         ares.atmosphere.pressure = EarthSeaLevelPressure * 0.5;
     }
 
-    ares.orbit.semiMajorAxis = 25100 * hecate.radius;
+    ares.orbit.semiMajorAxis = meters(25100 * hecate.radius);
 
     const andromaque = generateGasPlanetModel("andromaque", 0.28711440474126226, "Andromaque", [weierstrass]);
-    andromaque.orbit.semiMajorAxis = 25300 * hecate.radius;
+    andromaque.orbit.semiMajorAxis = meters(25300 * hecate.radius);
     andromaque.orbit.eccentricity = 0.8;
 
     const model: StarSystemModel = {
@@ -85,7 +91,7 @@ export function getAlphaTestisSystemModel(): StarSystemContentModel {
     };
 
     const spaceStation = generateSpaceStationModel("hecate->station", 0, hecate, model);
-    spaceStation.placement.orbit.initialMeanAnomaly = Math.PI / 2; // avoid spawning in the planet's shadow
+    spaceStation.placement.orbit.initialMeanAnomaly = radians(Math.PI / 2); // avoid spawning in the planet's shadow
 
     return { system: model, entities: [spaceStation] };
 }

@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
-import { getStellarTypeFromTemperature } from "@cosmos-journeyer/physics";
+import { getStellarTypeFromTemperature, kelvin } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { OrbitalObjectId, StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
@@ -111,7 +111,7 @@ export function createOrbitalObjectTarget(orbitalObject: OrbitalObject): Target 
         return {
             ...baseTarget,
             type: TargetType.STAR,
-            stellarType: getStellarTypeFromTemperature(orbitalObject.model.blackBodyTemperature),
+            stellarType: getStellarTypeFromTemperature(kelvin(orbitalObject.model.blackBodyTemperature)),
         };
     }
 

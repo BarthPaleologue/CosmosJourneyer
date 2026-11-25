@@ -197,7 +197,7 @@ export class Vehicle {
 
     setTargetSpeed(speed: number): void {
         const speedUpperBound = this.boostEnabled ? this.maxSpeed.forwardBoost : this.maxSpeed.forward;
-        this.targetLongitudinalSpeed = clamp(speed, -this.maxSpeed.reverse, speedUpperBound);
+        this.targetLongitudinalSpeed = clamp(speed, this.maxSpeed.reverse * -1, speedUpperBound);
         this.setDriveMotorTargets(this.targetLongitudinalSpeed, this.boostEnabled ? 15_000 : 5_000);
     }
 

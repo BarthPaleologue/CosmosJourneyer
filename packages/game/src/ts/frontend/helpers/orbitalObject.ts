@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getStellarTypeFromTemperature } from "@cosmos-journeyer/physics";
+import { getStellarTypeFromTemperature, kelvin } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectModel } from "@cosmos-journeyer/universe-model";
@@ -46,7 +46,7 @@ export function getOrbitalObjectTypeToI18nString(model: DeepReadonly<OrbitalObje
             return t("objectTypes:telluricMoon");
         case "star":
             return t("objectTypes:star", {
-                stellarType: getStellarTypeFromTemperature(model.blackBodyTemperature),
+                stellarType: getStellarTypeFromTemperature(kelvin(model.blackBodyTemperature)),
             });
         case "neutronStar":
             return t("objectTypes:neutronStar");

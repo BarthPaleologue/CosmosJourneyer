@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getSilicateRockSublimationLine, getWaterIceFrostLine } from "@cosmos-journeyer/physics";
+import { getSilicateRockSublimationLine, getWaterIceFrostLine, kelvin, meters } from "@cosmos-journeyer/physics";
 
 /**
  * Uses stellar luminosity to determine a plausible semi-major axis range for a Telluric planet then samples it
@@ -30,11 +30,11 @@ export function getTelluricPlanetOrbitRadius(
     rng: () => number,
 ): number {
     // Telluric worlds cannot exist where silicate rocks sublimate
-    const lowerBound = getSilicateRockSublimationLine(stellarTemperature, stellarRadius);
+    const lowerBound = getSilicateRockSublimationLine(kelvin(stellarTemperature), meters(stellarRadius));
 
     // Telluric worlds are unlikely to form beyond the water ice frost line
     // Beyond the frost line => more solid material (ice is stable) => bigger planets => trap large quantities of gas => gas giants
-    const upperBound = getWaterIceFrostLine(stellarTemperature, stellarRadius);
+    const upperBound = getWaterIceFrostLine(kelvin(stellarTemperature), meters(stellarRadius));
 
     // Log-uniform sample in [aMin, aMax] (from empirical Kepler data as found in https://www.pnas.org/doi/10.1073/pnas.1319909110)
     const uniformRandom = rng();

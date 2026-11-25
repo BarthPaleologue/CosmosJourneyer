@@ -19,7 +19,7 @@ import { DefaultAnomalyMass } from "#/constants";
 import { hsvToRgb } from "#/utils/colors";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { clamp } from "#/utils/math";
-import { degreesToRadians } from "@cosmos-journeyer/physics";
+import { degreesToRadians, meters, radians, seconds } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom, randRange } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { SierpinskiPyramidModel, OrbitalObjectModel, Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
@@ -35,6 +35,7 @@ export function generateSierpinskiPyramidModel(
     id: string,
     seed: number,
     name: string,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     parentBodies: DeepReadonly<Array<OrbitalObjectModel>>,
 ): SierpinskiPyramidModel {
     const rng = getRngFromSeed(seed);
@@ -55,24 +56,24 @@ export function generateSierpinskiPyramidModel(
 
     const orbit: Orbit = {
         parentIds: parentIds,
-        semiMajorAxis: orbitRadius,
+        semiMajorAxis: meters(orbitRadius),
         p: orbitalP,
         plane: {
-            inclination: degreesToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
-            longitudeOfAscendingNode: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 320),
+            inclination: radians(degreesToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160))),
+            longitudeOfAscendingNode: radians(randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 320)),
         },
         eccentricity: randRange(0.1, 0.9, rng, GenerationSteps.ORBIT + 240),
-        argumentOfPeriapsis: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400),
-        initialMeanAnomaly: randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480),
+        argumentOfPeriapsis: radians(randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 400)),
+        initialMeanAnomaly: radians(randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 480)),
     };
 
     const mass = DefaultAnomalyMass;
 
     const spin: SpinModel = {
-        siderealPeriod: 0,
-        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
-        axisAzimuth: 0,
-        initialRotationAngle: 0,
+        siderealPeriod: seconds(0),
+        axialTilt: radians(normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
     };
 
     return {

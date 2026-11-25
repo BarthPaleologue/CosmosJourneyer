@@ -18,7 +18,15 @@
 import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGenerator";
 import { hsvToRgb } from "#/utils/colors";
 import { GenerationSteps } from "#/utils/generationSteps";
-import { degreesToRadians, EarthSeaLevelPressure, getCoolGasGiantRadiusFromMass } from "@cosmos-journeyer/physics";
+import {
+    degreesToRadians,
+    EarthSeaLevelPressure,
+    getCoolGasGiantRadiusFromMass,
+    kilograms,
+    meters,
+    radians,
+    seconds,
+} from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
@@ -37,13 +45,14 @@ export function generateGasPlanetModel(
     id: string,
     seed: number,
     name: string,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     parentBodies: DeepReadonly<Array<StellarObjectModel>>,
 ): GasPlanetModel {
     const rng = getRngFromSeed(seed);
 
     const mass = sampleGasPlanetMass(rng);
 
-    const radius = getCoolGasGiantRadiusFromMass(mass);
+    const radius = getCoolGasGiantRadiusFromMass(kilograms(mass));
 
     const orbitRadiuses: Array<number> = [];
     for (const parent of parentBodies) {
@@ -72,25 +81,26 @@ export function generateGasPlanetModel(
 
     const orbit: Orbit = {
         parentIds: parentIds,
-        semiMajorAxis: orbitRadius,
+        semiMajorAxis: meters(orbitRadius),
         p: 2,
         plane: {
-            inclination:
+            inclination: radians(
                 parentAverageInclination +
-                parentAverageAxialTilt +
-                degreesToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
-            longitudeOfAscendingNode: 0,
+                    parentAverageAxialTilt +
+                    degreesToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
+            ),
+            longitudeOfAscendingNode: radians(0),
         },
         eccentricity: 0,
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0,
+        argumentOfPeriapsis: radians(0),
+        initialMeanAnomaly: radians(0),
     };
 
     const spin: SpinModel = {
-        siderealPeriod: (24 * 60 * 60) / 10,
-        axialTilt: normalRandom(0, degreesToRadians(25), rng, GenerationSteps.AXIAL_TILT),
-        axisAzimuth: 0,
-        initialRotationAngle: 0,
+        siderealPeriod: seconds((24 * 60 * 60) / 10),
+        axialTilt: radians(normalRandom(0, degreesToRadians(25), rng, GenerationSteps.AXIAL_TILT)),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
     };
 
     const rings = uniformRandBool(0.8, rng, GenerationSteps.RINGS) ? generateSeededRingsModel(radius, rng) : null;

@@ -291,7 +291,7 @@ describe("vehicle steering inputs and Ackermann", () => {
         const angles = lastAngles();
         expect(angles[0]).toBeCloseTo(Math.atan2(curvature * 2.6, 1 - curvature * 2.2));
         expect(angles[1]).toBeCloseTo(Math.atan2(curvature * 2.6, 1 + curvature * 2.2));
-        fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: -speed });
+        fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: speed * -1 });
         expect(lastAngles()).toEqual(angles);
         fixture.vehicle.setTargetSteeringAngle(-1, { horizontalSpeed: speed });
         expect(lastAngles()[0]).toBeCloseTo(-(angles[1] ?? 0));
@@ -390,7 +390,7 @@ describe("vehicle throttle and braking", () => {
         fixture.vehicle.accelerate(100, 1);
         expect(driveTargets()[1]).toBeCloseTo(kmhToMetersPerSecond(40));
         fixture.vehicle.accelerate(-100, 1);
-        expect(driveTargets()[1]).toBeCloseTo(-kmhToMetersPerSecond(20));
+        expect(driveTargets()[1]).toBeCloseTo(kmhToMetersPerSecond(-20));
     });
 });
 

@@ -1,5 +1,5 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { lightYearsToMeters } from "@cosmos-journeyer/physics";
+import { lightYears, lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
@@ -67,7 +67,7 @@ export function getGoToSystemInstructions(
 
         return t("missions:common:travelToNextSystem", {
             systemName: nextSystemModel.system.name,
-            distance: parseDistance(lightYearsToMeters(distanceToNextSystemLy), t),
+            distance: parseDistance(lightYearsToMeters(lightYears(distanceToNextSystemLy)), t),
             nbJumps: itinerary.length - 1,
         });
     }

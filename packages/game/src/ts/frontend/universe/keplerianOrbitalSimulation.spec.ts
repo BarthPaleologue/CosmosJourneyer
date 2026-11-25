@@ -19,6 +19,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
+import { meters, radians, seconds } from "@cosmos-journeyer/physics";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { KeplerianObject } from "./keplerianOrbitalSimulation";
@@ -59,21 +60,21 @@ function createTestOrbitalObject(
         mass: 1,
         orbit: {
             parentIds,
-            argumentOfPeriapsis: 0,
-            semiMajorAxis,
-            initialMeanAnomaly: 0,
+            argumentOfPeriapsis: radians(0),
+            semiMajorAxis: meters(semiMajorAxis),
+            initialMeanAnomaly: radians(0),
             plane: {
-                inclination: 0,
-                longitudeOfAscendingNode: 0,
+                inclination: radians(0),
+                longitudeOfAscendingNode: radians(0),
             },
             eccentricity: 0,
             p: 2,
         },
         spin: {
-            axialTilt: 0,
-            axisAzimuth: 0,
-            siderealPeriod: siderealPeriod ?? 0,
-            initialRotationAngle: 0,
+            axialTilt: radians(0),
+            axisAzimuth: radians(0),
+            siderealPeriod: seconds(siderealPeriod ?? 0),
+            initialRotationAngle: radians(0),
         },
         getTransform: () => transform,
     };
@@ -97,7 +98,7 @@ describe("KeplerianOrbitalSimulation", () => {
         const star = createTestOrbitalObject(scene, {
             id: "star",
             parentIds: [],
-            semiMajorAxis: 0,
+            semiMajorAxis: meters(0),
             position: new Vector3(100, 0, 0),
         });
         const planet = createTestOrbitalObject(scene, { id: "planet", parentIds: ["star"], semiMajorAxis: 10 });
@@ -123,8 +124,8 @@ describe("KeplerianOrbitalSimulation", () => {
         const reference = createTestOrbitalObject(scene, {
             id: "reference",
             parentIds: [],
-            semiMajorAxis: 0,
-            siderealPeriod: 4,
+            semiMajorAxis: meters(0),
+            siderealPeriod: seconds(4),
         });
 
         const simulation = new KeplerianOrbitalSimulation([reference]);
@@ -148,13 +149,13 @@ describe("KeplerianOrbitalSimulation", () => {
         const reference = createTestOrbitalObject(scene, {
             id: "reference",
             parentIds: [],
-            semiMajorAxis: 0,
-            siderealPeriod: 4,
+            semiMajorAxis: meters(0),
+            siderealPeriod: seconds(4),
         });
         const target = createTestOrbitalObject(scene, {
             id: "target",
             parentIds: [],
-            semiMajorAxis: 0,
+            semiMajorAxis: meters(0),
             position: new Vector3(1, 0, 0),
         });
 

@@ -28,7 +28,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import { EarthG, getRotationPeriodForArtificialGravity } from "@cosmos-journeyer/physics";
+import { EarthG, getRotationPeriodForArtificialGravity, meters } from "@cosmos-journeyer/physics";
 
 import { createHelix } from "@/frontend/assets/procedural/helpers/helixBuilder";
 import type { Textures } from "@/frontend/assets/textures";
@@ -336,7 +336,10 @@ export class HelixHabitat implements Transformable {
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number): void {
-        this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, EarthG));
+        this.getTransform().rotate(
+            Axis.Y,
+            deltaSeconds / getRotationPeriodForArtificialGravity(meters(this.radius), EarthG),
+        );
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 

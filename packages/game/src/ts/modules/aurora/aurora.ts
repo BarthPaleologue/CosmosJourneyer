@@ -28,6 +28,11 @@ import {
     getPolarCapLatitude,
     getStellarWind,
     getStellarWindDynamicPressure,
+    ampereSquareMeters,
+    kilograms,
+    meters,
+    pascals,
+    radians,
 } from "@cosmos-journeyer/physics";
 import type { LocalStellarWindModel } from "@cosmos-journeyer/physics";
 import type { IndexedRng } from "@cosmos-journeyer/random";
@@ -99,7 +104,7 @@ export class Aurora implements SystemContent {
         let dominantPressure = -1;
         for (const source of sources) {
             const distance = Vector3.Distance(position, source.position);
-            const wind = getStellarWind(source.mass, source.radius, distance);
+            const wind = getStellarWind(kilograms(source.mass), meters(source.radius), meters(distance));
             const sourcePressure = getStellarWindDynamicPressure(wind);
             // Approximate multiple winds by adding their scalar dynamic pressures.
             pressure += sourcePressure;
@@ -109,7 +114,7 @@ export class Aurora implements SystemContent {
             }
         }
 
-        const standoffDistance = getMagnetopauseStandoffDistance(this.moment, pressure);
+        const standoffDistance = getMagnetopauseStandoffDistance(ampereSquareMeters(this.moment), pascals(pressure));
         if (pressure <= 0 || standoffDistance <= this.planetRadius) {
             // A crushed magnetosphere has no closed dipole field lines above the surface.
             this.root.setEnabled(false);
@@ -120,15 +125,21 @@ export class Aurora implements SystemContent {
 
         let energyFlux = 0;
         if (dominantWind !== null) {
-            const capLatitude = getPolarCapLatitude(this.planetRadius, this.moment, dominantWind);
-            energyFlux = getAuroralVisibleEnergyFlux(this.planetRadius, this.moment, dominantWind, [
-                0.8 * capLatitude,
-                capLatitude,
-            ]);
+            const capLatitude = getPolarCapLatitude(
+                meters(this.planetRadius),
+                ampereSquareMeters(this.moment),
+                dominantWind,
+            );
+            energyFlux = getAuroralVisibleEnergyFlux(
+                meters(this.planetRadius),
+                ampereSquareMeters(this.moment),
+                dominantWind,
+                [radians(0.8 * capLatitude), capLatitude],
+            );
         }
         this.material.setEnergyFlux(energyFlux);
 
-        const latitudeNorthPolward = getDipoleFieldLineLatitude(standoffDistance, this.planetRadius);
+        const latitudeNorthPolward = getDipoleFieldLineLatitude(standoffDistance, meters(this.planetRadius));
         const latitudeNorthEquatorward = latitudeNorthPolward - degreesToRadians(3);
         const latitudeCircumference = this.planetRadius * Math.sin(latitudeNorthPolward);
         const ribbonCountPerHemisphere = Math.min(Math.ceil(latitudeCircumference / 40e3), maxRibbonCountPerHemisphere);
@@ -144,7 +155,7 @@ export class Aurora implements SystemContent {
         );
 
         createRibbonMatrixBuffer(
-            [-latitudeNorthPolward, -latitudeNorthEquatorward],
+            [latitudeNorthPolward * -1, latitudeNorthEquatorward * -1],
             this.planetRadius,
             ribbonCountPerHemisphere,
             this.matrixBuffer,
@@ -208,7 +219,7 @@ function createRibbonMatrixBuffer(
 
         Quaternion.RotationAxisToRef(
             localUp,
-            randRange(-tangentialMaxDivergence, tangentialMaxDivergence, rng, baseRngIndex + 2),
+            randRange(tangentialMaxDivergence * -1, tangentialMaxDivergence, rng, baseRngIndex + 2),
             localYaw,
         );
 

@@ -66,6 +66,7 @@ export type StarSystemModel = {
  */
 export function getObjectModelById(
     id: OrbitalObjectId,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     starSystem: DeepReadonly<StarSystemModel>,
 ): DeepReadonly<OrbitalObjectModel> | null {
     const stellarObject = starSystem.stellarObjects.find((object) => object.id === id);

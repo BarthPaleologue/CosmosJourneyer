@@ -136,7 +136,7 @@ describe("curvature budget", () => {
             const curvature = curvatureAt(2.6, speed, 1.2);
             expect(Number.isFinite(curvature)).toBe(true);
             expect(getWheelSteeringAngle(curvature, 2.6, mechanicalLimit, 0)).toBeCloseTo(mechanicalLimit);
-            expect(getWheelSteeringAngle(curvature, -2.6, mechanicalLimit, 0)).toBeCloseTo(-mechanicalLimit);
+            expect(getWheelSteeringAngle(curvature, -2.6, mechanicalLimit, 0)).toBeCloseTo(0 - mechanicalLimit);
         }
     });
 
@@ -151,7 +151,7 @@ describe("curvature budget", () => {
 
     it("preserves turning signs in reverse and when changing direction", () => {
         expect(curvatureAt(2.6, -20, mechanicalLimit)).toBe(curvatureAt(2.6, 20, mechanicalLimit));
-        expect(curvatureAt(2.6, 20, -mechanicalLimit)).toBe(-curvatureAt(2.6, 20, mechanicalLimit));
+        expect(curvatureAt(2.6, 20, 0 - mechanicalLimit)).toBe(0 - curvatureAt(2.6, 20, mechanicalLimit));
     });
 });
 

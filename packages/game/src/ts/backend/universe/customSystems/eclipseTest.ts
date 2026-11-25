@@ -14,7 +14,7 @@
 //
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+import { radians } from "@cosmos-journeyer/physics";
 import {
     generateStarModel,
     generateTelluricPlanetModel,
@@ -39,12 +39,12 @@ export function getEclipseTestSystemModel(): StarSystemModel {
     const star = generateStarModel("star0", 420, "Star", []);
 
     const planet = generateTelluricPlanetModel("planet", 12, "Planet", [star]);
-    planet.orbit.plane.inclination = 0;
-    planet.orbit.initialMeanAnomaly = 0;
+    planet.orbit.plane.inclination = radians(0);
+    planet.orbit.initialMeanAnomaly = radians(0);
 
     const moon = generateTelluricSatelliteModel("moon", 6, "Moon", [planet], [star]);
-    moon.orbit.plane.inclination = 0;
-    moon.orbit.initialMeanAnomaly = Math.PI;
+    moon.orbit.plane.inclination = radians(0);
+    moon.orbit.initialMeanAnomaly = radians(Math.PI);
 
     return {
         name: systemName,

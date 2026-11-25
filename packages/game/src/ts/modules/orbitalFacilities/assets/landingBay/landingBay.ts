@@ -29,7 +29,13 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import { degreesToRadians, EarthG, getRotationPeriodForArtificialGravity } from "@cosmos-journeyer/physics";
+import {
+    degreesToRadians,
+    EarthG,
+    getRotationPeriodForArtificialGravity,
+    meters,
+    metersPerSecondSquared,
+} from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
@@ -287,7 +293,8 @@ export class LandingBay {
     update(cameraWorldPosition: Vector3, deltaSeconds: number): void {
         this.getTransform().rotate(
             Axis.Y,
-            deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, EarthG * 0.1),
+            deltaSeconds /
+                getRotationPeriodForArtificialGravity(meters(this.radius), metersPerSecondSquared(EarthG * 0.1)),
         );
 
         this.landingPads.forEach((landingPad) => {

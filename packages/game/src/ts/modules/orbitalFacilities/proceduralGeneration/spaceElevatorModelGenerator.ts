@@ -21,6 +21,12 @@ import {
     getSphereIrradianceAtDistance,
     km2ToM2,
     kwhPerYearToWatts,
+    kelvin,
+    kilograms,
+    meters,
+    seconds,
+    wattsPerSquareMeter,
+    radians,
 } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, randomPieChart, wheelOfFortune } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
@@ -70,19 +76,19 @@ export function generateSpaceElevatorModel(
 
     const parentSiderealDayDuration = parentBody.spin.siderealPeriod;
 
-    const orbitRadius = getOrbitRadiusFromPeriod(parentSiderealDayDuration, parentBody.mass);
+    const orbitRadius = getOrbitRadiusFromPeriod(seconds(parentSiderealDayDuration), kilograms(parentBody.mass));
 
     const orbit: Orbit = {
         parentIds: [parentBody.id],
-        semiMajorAxis: orbitRadius,
+        semiMajorAxis: meters(orbitRadius),
         p: 2,
         plane: {
-            inclination: parentBody.orbit.plane.inclination + parentBody.spin.axialTilt,
-            longitudeOfAscendingNode: 0,
+            inclination: radians(0),
+            longitudeOfAscendingNode: radians(0),
         },
         eccentricity: 0,
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0,
+        argumentOfPeriapsis: radians(0),
+        initialMeanAnomaly: radians(0),
     };
 
     const tetherLength = orbitRadius - parentBody.radius;
@@ -90,10 +96,10 @@ export function generateSpaceElevatorModel(
     const mass = DefaultOrbitalFacilityMass;
 
     const spin: SpinModel = {
-        siderealPeriod: parentSiderealDayDuration,
-        axialTilt: 0,
-        axisAzimuth: 0,
-        initialRotationAngle: 0,
+        siderealPeriod: seconds(parentSiderealDayDuration),
+        axialTilt: radians(0),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
     };
 
     const population = 2_000_000;
@@ -182,9 +188,9 @@ export function generateSpaceElevatorModel(
     let totalIrradiance = 0;
     for (const [model, distance] of distancesToStellarObjects) {
         totalIrradiance += getSphereIrradianceAtDistance(
-            model.blackBodyTemperature,
-            getCelestialBodyRadius(model),
-            distance,
+            kelvin(model.blackBodyTemperature),
+            meters(getCelestialBodyRadius(model)),
+            meters(distance),
         );
     }
 
@@ -193,7 +199,7 @@ export function generateSpaceElevatorModel(
     const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
         solarPanelEfficiency,
         totalPowerRequirementW,
-        totalIrradiance,
+        wattsPerSquareMeter(totalIrradiance),
     );
 
     const maxSolarPanelSurfaceM2 = km2ToM2(150);

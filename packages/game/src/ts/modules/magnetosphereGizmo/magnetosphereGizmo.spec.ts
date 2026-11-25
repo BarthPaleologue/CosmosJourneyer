@@ -27,6 +27,7 @@ import {
     getStellarWindDynamicPressure,
     SolarMass,
     SolarRadius,
+    ampereSquareMeters,
 } from "@cosmos-journeyer/physics";
 import type { MagneticFieldModel } from "@cosmos-journeyer/universe-model";
 import { describe, expect, it } from "vitest";
@@ -57,7 +58,7 @@ describe("MagnetosphereGizmo", () => {
 
             const wind = getStellarWind(SolarMass, SolarRadius, astronomicalUnitToMeters(1));
             const standoff = getMagnetopauseStandoffDistance(
-                magneticField.magnitude,
+                ampereSquareMeters(magneticField.magnitude),
                 getStellarWindDynamicPressure(wind),
             );
 

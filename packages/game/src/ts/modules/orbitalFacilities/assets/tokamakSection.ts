@@ -25,7 +25,7 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import { getRadiatorAreaForHeat } from "@cosmos-journeyer/physics";
+import { getRadiatorAreaForHeat, kelvin, watts } from "@cosmos-journeyer/physics";
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -136,7 +136,12 @@ export class TokamakSection implements StationSection {
         // see DOI 10.1140/epja/i2008-10666-6 "Emissivity measurements of opaque gray bodies up to 2000 ◦C by a dual-frequency pyrometer"
         const radiatorTargetTemperature = 1300;
         const emissivity = 0.8;
-        const radiatorArea = getRadiatorAreaForHeat(heatOutput, radiatorTargetTemperature, emissivity, true);
+        const radiatorArea = getRadiatorAreaForHeat(
+            watts(heatOutput),
+            kelvin(radiatorTargetTemperature),
+            emissivity,
+            true,
+        );
         const radiatorEmissiveColor = getRgbFromTemperature(radiatorTargetTemperature);
 
         this.radiatorMaterial = new PBRMaterial("RadiatorMaterial", scene);

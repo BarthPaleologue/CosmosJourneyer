@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { lightYearsToMeters } from "@cosmos-journeyer/physics";
+import { lightYears, lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { TFunction } from "i18next";
 
@@ -208,7 +208,7 @@ function getTargetProximityOpacity(target: Target, distance: number): number {
             minDistance = 0;
             break;
         case TargetType.STAR_SYSTEM:
-            minDistance = lightYearsToMeters(2);
+            minDistance = lightYearsToMeters(lightYears(2));
             break;
         case TargetType.SPACESHIP:
             minDistance = radius * 15;

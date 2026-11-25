@@ -19,7 +19,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
-import { astronomicalUnitToMeters, SolarMass } from "@cosmos-journeyer/physics";
+import { astronomicalUnitToMeters, meters, radians, seconds, SolarMass } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     generateJuliaSetModel,
@@ -75,17 +75,22 @@ describe("orbital reference selection", () => {
             getTransform: () => transform,
             orbit: {
                 parentIds: [],
-                semiMajorAxis: 0,
+                semiMajorAxis: meters(0),
                 eccentricity: 0,
                 plane: {
-                    inclination: 0,
-                    longitudeOfAscendingNode: 0,
+                    inclination: radians(0),
+                    longitudeOfAscendingNode: radians(0),
                 },
-                argumentOfPeriapsis: 0,
-                initialMeanAnomaly: 0,
+                argumentOfPeriapsis: radians(0),
+                initialMeanAnomaly: radians(0),
                 p: 2,
             },
-            spin: { axialTilt: 0, axisAzimuth: 0, siderealPeriod: 0, initialRotationAngle: 0 },
+            spin: {
+                axialTilt: radians(0),
+                axisAzimuth: radians(0),
+                siderealPeriod: seconds(0),
+                initialRotationAngle: radians(0),
+            },
         };
     }
 

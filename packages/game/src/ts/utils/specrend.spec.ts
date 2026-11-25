@@ -1,3 +1,4 @@
+import { kelvin } from "@cosmos-journeyer/physics";
 import { assert, describe, expect, it } from "vitest";
 
 import {
@@ -59,7 +60,7 @@ describe("stellar spectral colorimetry", () => {
             xy: [0.28063376, 0.28828833] as const,
         },
     ])("matches independent Planck integration at $temperature K", ({ temperature, xyz: reference, xy }) => {
-        const xyz = integrateBlackBodySpectrum(temperature);
+        const xyz = integrateBlackBodySpectrum(kelvin(temperature));
 
         for (const [index, component] of Object.values(xyz).entries()) {
             const expected = reference[index];
@@ -148,7 +149,7 @@ describe("stellar spectral colorimetry", () => {
     });
 
     it.each([100, 1000, 5778, 100000, 1e6, 1e9])("returns finite XYZ and compatibility RGB at %s K", (temperature) => {
-        const xyz = integrateBlackBodySpectrum(temperature);
+        const xyz = integrateBlackBodySpectrum(kelvin(temperature));
 
         for (const component of Object.values(xyz)) {
             expect(Number.isFinite(component)).toBe(true);

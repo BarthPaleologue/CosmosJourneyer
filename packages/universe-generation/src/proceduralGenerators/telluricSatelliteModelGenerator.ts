@@ -26,7 +26,13 @@ import {
     getOceanDepth,
     getOrbitalPeriod,
     hasLiquidWater,
+    kelvin,
+    kilograms,
+    meters,
     MoonMass,
+    pascals,
+    radians,
+    seconds,
 } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom } from "@cosmos-journeyer/random";
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
@@ -58,7 +64,9 @@ export function generateTelluricSatelliteModel(
     id: string,
     seed: number,
     name: string,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     parentBodies: DeepReadonly<NonEmptyArray<PlanetModel>>,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     stellarObjects: DeepReadonly<Array<StellarObjectModel>>,
 ): TelluricSatelliteModel {
     const rng = getRngFromSeed(seed);
@@ -107,9 +115,9 @@ export function generateTelluricSatelliteModel(
 
     const effectiveTemperature = computeEffectiveTemperature(
         stellarParents.map(({ stellarObject, distance }) => ({
-            temperature: stellarObject.blackBodyTemperature,
-            radius: getCelestialBodyRadius(stellarObject),
-            distance: distance,
+            temperature: kelvin(stellarObject.blackBodyTemperature),
+            radius: meters(getCelestialBodyRadius(stellarObject)),
+            distance: meters(distance),
         })),
         0.3,
     );
@@ -126,7 +134,11 @@ export function generateTelluricSatelliteModel(
               }
             : null;
 
-    const canHaveLiquidWater = hasLiquidWater(pressure, temperatureRange.min, temperatureRange.max);
+    const canHaveLiquidWater = hasLiquidWater(
+        pascals(pressure),
+        kelvin(temperatureRange.min),
+        kelvin(temperatureRange.max),
+    );
 
     let oceanCoverage = clamp(normalRandom(0.8, 0.1, rng, GenerationSteps.TERRAIN), 0.1, 0.95);
     if (pressure === 0) {
@@ -135,7 +147,7 @@ export function generateTelluricSatelliteModel(
 
     const ocean: OceanModel | null = canHaveLiquidWater
         ? {
-              depth: getOceanDepth(radius, mass, waterAmount, oceanCoverage),
+              depth: getOceanDepth(meters(radius), kilograms(mass), waterAmount, oceanCoverage),
           }
         : null;
 
@@ -164,25 +176,26 @@ export function generateTelluricSatelliteModel(
 
     const orbit: Orbit = {
         parentIds: parentIds,
-        semiMajorAxis: orbitRadius,
+        semiMajorAxis: meters(orbitRadius),
         p: 2,
         plane: {
-            inclination:
+            inclination: radians(
                 parentAverageInclination +
-                parentAverageAxialTilt +
-                degreesToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
-            longitudeOfAscendingNode: 0,
+                    parentAverageAxialTilt +
+                    degreesToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
+            ),
+            longitudeOfAscendingNode: radians(0),
         },
         eccentricity: 0,
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0,
+        argumentOfPeriapsis: radians(0),
+        initialMeanAnomaly: radians(0),
     };
 
     const spin: SpinModel = {
-        siderealPeriod: getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum),
-        axialTilt: 0,
-        axisAzimuth: 0,
-        initialRotationAngle: 0,
+        siderealPeriod: seconds(getOrbitalPeriod(meters(orbit.semiMajorAxis), kilograms(parentMassSum))),
+        axialTilt: radians(0),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
     };
 
     const averageTemperature = (temperatureRange.min + temperatureRange.max) / 2;

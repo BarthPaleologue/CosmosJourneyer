@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { astronomicalUnitToMeters, getWaterIceFrostLine, JupiterMass } from "@cosmos-journeyer/physics";
+import { astronomicalUnitToMeters, getWaterIceFrostLine, JupiterMass, kelvin, meters } from "@cosmos-journeyer/physics";
 
 const GenerationSteps = {
     HOT_JUPITER_CHECK: 2564,
@@ -35,7 +35,7 @@ export function getGasPlanetOrbitRadius(
     stellarRadius: number,
     rng: (step: number) => number,
 ): number {
-    const snowLine = getWaterIceFrostLine(stellarTemperature, stellarRadius);
+    const snowLine = getWaterIceFrostLine(kelvin(stellarTemperature), meters(stellarRadius));
 
     // Hot Jupiter modeling: around 1% chance (see https://academic.oup.com/mnras/article/516/1/75/6654884)
     const pHotJupiter = 0.01;

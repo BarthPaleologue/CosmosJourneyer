@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
-import { getOrbitalPeriod } from "@cosmos-journeyer/physics";
+import { getOrbitalPeriod, kilograms, meters } from "@cosmos-journeyer/physics";
 import { getObjectModelById } from "@cosmos-journeyer/universe-model";
 import type { TFunction } from "i18next";
 
@@ -172,7 +172,7 @@ export class DiscoveryDetails {
         const parentModels = parentIds.map((id) => getObjectModelById(id, systemModel.system));
         const parentMass = parentModels.reduce((acc, model) => acc + (model?.mass ?? 0), 0);
 
-        const orbitalPeriod = getOrbitalPeriod(objectModel.object.orbit.semiMajorAxis, parentMass);
+        const orbitalPeriod = getOrbitalPeriod(meters(objectModel.object.orbit.semiMajorAxis), kilograms(parentMass));
         this.orbitDuration.innerText = this.t("orbit:period", {
             value: parseSecondsPrecise(orbitalPeriod, this.t),
         });

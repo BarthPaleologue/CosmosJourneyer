@@ -21,6 +21,7 @@ import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import { Scene } from "@babylonjs/core/scene";
+import { meters, radians, seconds } from "@cosmos-journeyer/physics";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DefaultControls } from "@/frontend/controls/defaultControls/defaultControls";
@@ -59,22 +60,22 @@ export async function createOrbitalDemoScene(
         name: "Sun",
         orbit: {
             parentIds: [],
-            argumentOfPeriapsis: 0,
-            semiMajorAxis: 0,
-            initialMeanAnomaly: 0,
+            argumentOfPeriapsis: radians(0),
+            semiMajorAxis: meters(0),
+            initialMeanAnomaly: radians(0),
             plane: {
-                inclination: 0,
-                longitudeOfAscendingNode: 0,
+                inclination: radians(0),
+                longitudeOfAscendingNode: radians(0),
             },
             eccentricity: 0,
             p: 2,
         },
         type: "custom",
         spin: {
-            siderealPeriod: 0,
-            axialTilt: 0,
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            siderealPeriod: seconds(0),
+            axialTilt: radians(0),
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         mass: 1e12,
     });
@@ -84,22 +85,22 @@ export async function createOrbitalDemoScene(
         name: "Earth",
         orbit: {
             parentIds: [sun.model.id],
-            argumentOfPeriapsis: 0,
-            semiMajorAxis: 10,
-            initialMeanAnomaly: 0,
+            argumentOfPeriapsis: radians(0),
+            semiMajorAxis: meters(10),
+            initialMeanAnomaly: radians(0),
             plane: {
-                inclination: Tools.ToRadians(23.5),
-                longitudeOfAscendingNode: 1.7,
+                inclination: radians(Tools.ToRadians(23.5)),
+                longitudeOfAscendingNode: radians(1.7),
             },
             eccentricity: 0.5,
             p: 2,
         },
         type: "custom",
         spin: {
-            siderealPeriod: 0,
-            axialTilt: Tools.ToRadians(23.5),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            siderealPeriod: seconds(0),
+            axialTilt: radians(Tools.ToRadians(23.5)),
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         mass: 1e11,
     });
@@ -109,12 +110,12 @@ export async function createOrbitalDemoScene(
         name: "Moon",
         orbit: {
             parentIds: [earth.model.id],
-            argumentOfPeriapsis: 0,
-            semiMajorAxis: 3,
-            initialMeanAnomaly: 0,
+            argumentOfPeriapsis: radians(0),
+            semiMajorAxis: meters(3),
+            initialMeanAnomaly: radians(0),
             plane: {
-                inclination: earth.model.orbit.plane.inclination + earth.model.spin.axialTilt,
-                longitudeOfAscendingNode: 0,
+                inclination: radians(earth.model.orbit.plane.inclination + earth.model.spin.axialTilt),
+                longitudeOfAscendingNode: radians(0),
             },
             eccentricity: 0.7,
             p: 2,
@@ -122,10 +123,10 @@ export async function createOrbitalDemoScene(
         type: "custom",
         mass: 1e10,
         spin: {
-            siderealPeriod: 0,
-            axialTilt: 0,
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            siderealPeriod: seconds(0),
+            axialTilt: radians(0),
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
     });
 

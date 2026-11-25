@@ -20,6 +20,9 @@ import {
     durationToSeconds,
     EarthSeaLevelPressure,
     SaturnMagneticDipoleMoment,
+    meters,
+    radians,
+    seconds,
 } from "@cosmos-journeyer/physics";
 import type { GasPlanetModel, OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
@@ -35,21 +38,21 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
         radius: 58_232e3,
         mass: 5.683e26,
         spin: {
-            siderealPeriod: durationToSeconds({ hours: 10, minutes: 33, seconds: 38 }),
-            axialTilt: degreesToRadians(26.73),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            siderealPeriod: seconds(durationToSeconds({ hours: 10, minutes: 33, seconds: 38 })),
+            axialTilt: radians(degreesToRadians(26.73)),
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         orbit: {
             parentIds: [...parentIds],
-            semiMajorAxis: 1_433_449_370e3,
+            semiMajorAxis: meters(1_433_449_370e3),
             eccentricity: 0.0565,
             plane: {
-                inclination: degreesToRadians(2.49),
-                longitudeOfAscendingNode: degreesToRadians(113.715),
+                inclination: radians(degreesToRadians(2.49)),
+                longitudeOfAscendingNode: radians(degreesToRadians(113.715)),
             },
-            argumentOfPeriapsis: degreesToRadians(336.092),
-            initialMeanAnomaly: 0,
+            argumentOfPeriapsis: radians(degreesToRadians(336.092)),
+            initialMeanAnomaly: radians(0),
             p: 2,
         },
         atmosphere: {

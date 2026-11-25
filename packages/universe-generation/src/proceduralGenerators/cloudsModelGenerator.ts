@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getWaterSaturationPressure } from "@cosmos-journeyer/physics";
+import { getWaterSaturationPressure, kelvin } from "@cosmos-journeyer/physics";
 import type { CloudsModel } from "@cosmos-journeyer/universe-model";
 
 /**
@@ -33,7 +33,7 @@ export function generateCloudsModel(
     averageTemperature: number,
     pressure: number,
 ): CloudsModel {
-    const waterSaturationPressure = getWaterSaturationPressure(averageTemperature);
+    const waterSaturationPressure = getWaterSaturationPressure(kelvin(averageTemperature));
     const calibrationCoefficient = 30;
     const maxCoverage = 0.8;
     const coverage =

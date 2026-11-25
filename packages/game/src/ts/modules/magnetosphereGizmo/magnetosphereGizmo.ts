@@ -27,6 +27,11 @@ import {
     getMagnetopauseStandoffDistance,
     getStellarWind,
     getStellarWindDynamicPressure,
+    ampereSquareMeters,
+    kilograms,
+    meters,
+    pascals,
+    radians,
 } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { MagneticFieldModel } from "@cosmos-journeyer/universe-model";
@@ -85,7 +90,7 @@ export class MagnetosphereGizmo implements SystemContent {
                 const shape = new Float32Array(pointsPerLine * 3);
                 for (let i = 0; i < pointsPerLine; i++) {
                     const theta = (Math.PI * (i + 0.5)) / pointsPerLine;
-                    const r = getDipoleFieldLineRadius(1, theta);
+                    const r = getDipoleFieldLineRadius(meters(1), radians(theta));
                     const x = r * Math.sin(theta);
                     const y = r * Math.cos(theta);
                     shape[i * 3] = x * cosPhi;
@@ -118,10 +123,12 @@ export class MagnetosphereGizmo implements SystemContent {
         let pressure = 0;
         for (const source of sources) {
             const distance = Vector3.Distance(position, source.position);
-            pressure += getStellarWindDynamicPressure(getStellarWind(source.mass, source.radius, distance));
+            pressure += getStellarWindDynamicPressure(
+                getStellarWind(kilograms(source.mass), meters(source.radius), meters(distance)),
+            );
         }
 
-        const standoffDistance = getMagnetopauseStandoffDistance(this.moment, pressure);
+        const standoffDistance = getMagnetopauseStandoffDistance(ampereSquareMeters(this.moment), pascals(pressure));
         if (pressure <= 0 || standoffDistance <= this.planetRadius) {
             // A crushed magnetosphere has no closed field lines above the surface.
             this.root.setEnabled(false);

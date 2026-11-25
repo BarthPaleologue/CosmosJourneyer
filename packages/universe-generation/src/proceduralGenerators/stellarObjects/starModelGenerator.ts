@@ -17,7 +17,7 @@
 
 import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGenerator";
 import { GenerationSteps } from "#/utils/generationSteps";
-import { SolarRadius } from "@cosmos-journeyer/physics";
+import { meters, radians, seconds, SolarRadius } from "@cosmos-journeyer/physics";
 import type { StellarType } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, wheelOfFortune, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
@@ -35,6 +35,7 @@ export function generateStarModel(
     id: string,
     seed: number,
     name: string,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     parentBodies: DeepReadonly<Array<OrbitalObjectModel>>,
 ): StarModel {
     const rng = getRngFromSeed(seed);
@@ -47,10 +48,10 @@ export function generateStarModel(
     const mass = 1.9885e30;
 
     const spin: SpinModel = {
-        siderealPeriod: 24 * 60 * 60,
-        axialTilt: 0,
-        axisAzimuth: 0,
-        initialRotationAngle: 0,
+        siderealPeriod: seconds(24 * 60 * 60),
+        axialTilt: radians(0),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
     };
 
     const radius = getRandomRadiusFromStellarType(stellarType, rng);
@@ -61,15 +62,15 @@ export function generateStarModel(
 
     const orbit: Orbit = {
         parentIds: parentIds,
-        semiMajorAxis: parentBodies.length > 0 ? orbitRadius : 0,
+        semiMajorAxis: meters(parentBodies.length > 0 ? orbitRadius : 0),
         eccentricity: 0,
         p: 2,
         plane: {
-            inclination: 0,
-            longitudeOfAscendingNode: 0,
+            inclination: radians(0),
+            longitudeOfAscendingNode: radians(0),
         },
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0,
+        argumentOfPeriapsis: radians(0),
+        initialMeanAnomaly: radians(0),
     };
 
     const rings = uniformRandBool(RING_PROPORTION, rng, GenerationSteps.RINGS)

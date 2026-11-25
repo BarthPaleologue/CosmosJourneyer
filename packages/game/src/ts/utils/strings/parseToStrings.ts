@@ -21,6 +21,8 @@ import {
     metersToLightMinutes,
     metersToLightSeconds,
     metersToLightYears,
+    lightYears,
+    meters,
 } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
@@ -55,12 +57,12 @@ export function parseDistance(distance: number, t: TFunction): string {
     } else if (distance < 300_000_000) {
         return t("units:shortMm", { value: (distance / 1_000_000).toFixed(2) });
     } else if (distance < C * 120) {
-        return t("units:shortLs", { value: metersToLightSeconds(distance).toFixed(2) });
-    } else if (distance < lightYearsToMeters(0.1)) {
-        return t("units:shortLm", { value: metersToLightMinutes(distance).toFixed(2) });
+        return t("units:shortLs", { value: metersToLightSeconds(meters(distance)).toFixed(2) });
+    } else if (distance < lightYearsToMeters(lightYears(0.1))) {
+        return t("units:shortLm", { value: metersToLightMinutes(meters(distance)).toFixed(2) });
     } else {
         return t("units:shortLy", {
-            value: metersToLightYears(distance).toFixed(2),
+            value: metersToLightYears(meters(distance)).toFixed(2),
         });
     }
 }

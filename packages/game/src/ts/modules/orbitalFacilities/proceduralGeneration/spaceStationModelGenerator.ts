@@ -21,6 +21,11 @@ import {
     getSphereIrradianceAtDistance,
     km2ToM2,
     kwhPerYearToWatts,
+    kelvin,
+    meters,
+    wattsPerSquareMeter,
+    radians,
+    seconds,
 } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, randomPieChart, wheelOfFortune, normalRandom } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
@@ -88,24 +93,24 @@ export function generateSpaceStationModel(
 
     const orbit: Orbit = {
         parentIds: [parentBody.id],
-        semiMajorAxis: orbitRadius,
+        semiMajorAxis: meters(orbitRadius),
         p: 2,
         plane: {
-            inclination: degreesToRadians(normalRandom(0, 10, rng, GenerationSteps.ORBIT + 10)),
-            longitudeOfAscendingNode: 0,
+            inclination: radians(degreesToRadians(normalRandom(0, 10, rng, GenerationSteps.ORBIT + 10))),
+            longitudeOfAscendingNode: radians(0),
         },
         eccentricity: 0,
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0,
+        argumentOfPeriapsis: radians(0),
+        initialMeanAnomaly: radians(0),
     };
 
     const mass = DefaultOrbitalFacilityMass;
 
     const spin: SpinModel = {
-        siderealPeriod: 0,
-        axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI,
-        axisAzimuth: 0,
-        initialRotationAngle: 0,
+        siderealPeriod: seconds(0),
+        axialTilt: radians(2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
     };
 
     const population = 250_000 + Math.floor(rng(GenerationSteps.POPULATION) * 500_000);
@@ -138,18 +143,18 @@ export function generateSpaceStationModel(
     let totalIrradiance = 0;
     if (parentBody.type === "star" || parentBody.type === "neutronStar" || parentBody.type === "blackHole") {
         totalIrradiance = getSphereIrradianceAtDistance(
-            parentBody.blackBodyTemperature,
-            getCelestialBodyRadius(parentBody),
-            orbit.semiMajorAxis,
+            kelvin(parentBody.blackBodyTemperature),
+            meters(getCelestialBodyRadius(parentBody)),
+            meters(orbit.semiMajorAxis),
         );
     } else {
         const distancesToStellarObjects = getDistancesToStellarObjects(parentBody.orbit, systemModel);
 
         for (const [model, distance] of distancesToStellarObjects) {
             totalIrradiance += getSphereIrradianceAtDistance(
-                model.blackBodyTemperature,
-                getCelestialBodyRadius(model),
-                distance,
+                kelvin(model.blackBodyTemperature),
+                meters(getCelestialBodyRadius(model)),
+                meters(distance),
             );
         }
     }
@@ -159,7 +164,7 @@ export function generateSpaceStationModel(
     const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
         solarPanelEfficiency,
         totalPowerRequirementW,
-        totalIrradiance,
+        wattsPerSquareMeter(totalIrradiance),
     );
 
     const maxSolarPanelSurfaceM2 = km2ToM2(150);

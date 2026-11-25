@@ -33,6 +33,7 @@ import { PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape"
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
+import { meters, radians, seconds } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { StarSystemModel, StellarObjectModel } from "@cosmos-journeyer/universe-model";
 import { createInstance } from "i18next";
@@ -270,14 +271,19 @@ const blackHoleModel: StellarObjectModel = {
     blackBodyTemperature: 0,
     orbit: {
         parentIds: [],
-        semiMajorAxis: 0,
+        semiMajorAxis: meters(0),
         eccentricity: 0,
-        plane: { inclination: 0, longitudeOfAscendingNode: 0 },
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0,
+        plane: { inclination: radians(0), longitudeOfAscendingNode: radians(0) },
+        argumentOfPeriapsis: radians(0),
+        initialMeanAnomaly: radians(0),
         p: 2,
     },
-    spin: { siderealPeriod: 0, axialTilt: 0, axisAzimuth: 0, initialRotationAngle: 0 },
+    spin: {
+        siderealPeriod: seconds(0),
+        axialTilt: radians(0),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
+    },
 };
 
 const blackHoleSystemModel: StarSystemModel = {
