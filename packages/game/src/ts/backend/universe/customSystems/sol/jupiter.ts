@@ -60,7 +60,7 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
             greenHouseEffectFactor: 0.7,
         },
         magneticField: {
-            north: { latitude: degreesToRadians(80), longitude: 0 },
+            north: { latitude: degreesToRadians(80), longitude: radians(0) },
             magnitude: JupiterMagneticDipoleMoment,
         },
         colorPalette: {

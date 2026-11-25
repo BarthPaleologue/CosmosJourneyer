@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getWaterSaturationPressure, kelvin } from "@cosmos-journeyer/physics";
+import { getWaterSaturationPressure, meters } from "@cosmos-journeyer/physics";
+import type { Kelvin, Meters, Pascals } from "@cosmos-journeyer/physics";
 import type { CloudsModel } from "@cosmos-journeyer/universe-model";
 
 /**
@@ -27,20 +28,20 @@ import type { CloudsModel } from "@cosmos-journeyer/universe-model";
  * @returns A cloud layer model sized and colored for the planet conditions.
  */
 export function generateCloudsModel(
-    planetRadius: number,
-    cloudLayerHeight: number,
+    planetRadius: Meters,
+    cloudLayerHeight: Meters,
     oceanCoverage: number,
-    averageTemperature: number,
-    pressure: number,
+    averageTemperature: Kelvin,
+    pressure: Pascals,
 ): CloudsModel {
-    const waterSaturationPressure = getWaterSaturationPressure(kelvin(averageTemperature));
+    const waterSaturationPressure = getWaterSaturationPressure(averageTemperature);
     const calibrationCoefficient = 30;
     const maxCoverage = 0.8;
     const coverage =
         maxCoverage * (1.0 - Math.exp((-calibrationCoefficient * oceanCoverage * waterSaturationPressure) / pressure));
 
     return {
-        layerRadius: planetRadius + cloudLayerHeight,
+        layerRadius: meters(planetRadius + cloudLayerHeight),
         smoothness: 0.7,
         specularPower: 2,
         frequency: 4,

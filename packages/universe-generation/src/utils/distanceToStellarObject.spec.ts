@@ -17,11 +17,13 @@
 
 import { ScaledEarthRadius } from "#/constants";
 import {
+    ampereSquareMeters,
     astronomicalUnitToMeters,
     EarthMass,
     kelvin,
     kilograms,
     meters,
+    pascals,
     radians,
     seconds,
     SolarMass,
@@ -103,11 +105,11 @@ describe("distanceToStellarObject", () => {
                 rings: null,
                 atmosphere: {
                     greenHouseEffectFactor: 1,
-                    pressure: 1,
+                    pressure: pascals(1),
                 },
                 magneticField: {
-                    north: { latitude: Math.PI / 2, longitude: 0 },
-                    magnitude: 1e27,
+                    north: { latitude: radians(Math.PI / 2), longitude: radians(0) },
+                    magnitude: ampereSquareMeters(1e27),
                 },
                 colorPalette: {
                     type: "textured",

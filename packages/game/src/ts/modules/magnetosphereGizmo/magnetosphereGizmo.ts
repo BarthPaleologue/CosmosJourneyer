@@ -22,12 +22,12 @@ import { CreateLines } from "@babylonjs/core/Meshes/Builders/linesBuilder";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
+import type { AmpereSquareMeters } from "@cosmos-journeyer/physics";
 import {
     getDipoleFieldLineRadius,
     getMagnetopauseStandoffDistance,
     getStellarWind,
     getStellarWindDynamicPressure,
-    ampereSquareMeters,
     meters,
     pascals,
     radians,
@@ -62,7 +62,7 @@ type FieldLine = {
 export class MagnetosphereGizmo implements SystemContent {
     private readonly root: TransformNode;
     private readonly planetRadius: number;
-    private readonly moment: number;
+    private readonly moment: AmpereSquareMeters;
     private readonly lines: Array<FieldLine> = [];
 
     constructor(planetRadius: number, magneticField: DeepReadonly<MagneticFieldModel>, scene: Scene) {
@@ -125,7 +125,7 @@ export class MagnetosphereGizmo implements SystemContent {
             pressure += getStellarWindDynamicPressure(getStellarWind(source.mass, source.radius, meters(distance)));
         }
 
-        const standoffDistance = getMagnetopauseStandoffDistance(ampereSquareMeters(this.moment), pascals(pressure));
+        const standoffDistance = getMagnetopauseStandoffDistance(this.moment, pascals(pressure));
         if (pressure <= 0 || standoffDistance <= this.planetRadius) {
             // A crushed magnetosphere has no closed field lines above the surface.
             this.root.setEnabled(false);

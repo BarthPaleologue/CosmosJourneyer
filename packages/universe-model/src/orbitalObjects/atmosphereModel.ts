@@ -15,11 +15,13 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Pascals } from "@cosmos-journeyer/physics";
+
 export type AtmosphereModel = {
     /**
      * The pressure of the atmosphere in Pa
      */
-    pressure: number;
+    pressure: Pascals;
 
     /**
      * The amount of greenhouse gases in the atmosphere (between 0 and 1)

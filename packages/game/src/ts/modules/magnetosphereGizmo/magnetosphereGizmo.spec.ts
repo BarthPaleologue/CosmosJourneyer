@@ -28,6 +28,7 @@ import {
     SolarMass,
     SolarRadius,
     ampereSquareMeters,
+    radians,
 } from "@cosmos-journeyer/physics";
 import type { MagneticFieldModel } from "@cosmos-journeyer/universe-model";
 import { describe, expect, it } from "vitest";
@@ -36,8 +37,8 @@ import { MagnetosphereGizmo } from "./magnetosphereGizmo";
 
 const planetRadius = 1000e3;
 const magneticField: MagneticFieldModel = {
-    north: { latitude: Math.PI / 2, longitude: 0 },
-    magnitude: EarthMagneticDipoleMoment / 6 ** 3,
+    north: { latitude: radians(Math.PI / 2), longitude: radians(0) },
+    magnitude: ampereSquareMeters(EarthMagneticDipoleMoment / 6 ** 3),
 };
 
 const sunSource = {
@@ -58,7 +59,7 @@ describe("MagnetosphereGizmo", () => {
 
             const wind = getStellarWind(SolarMass, SolarRadius, astronomicalUnitToMeters(1));
             const standoff = getMagnetopauseStandoffDistance(
-                ampereSquareMeters(magneticField.magnitude),
+                magneticField.magnitude,
                 getStellarWindDynamicPressure(wind),
             );
 

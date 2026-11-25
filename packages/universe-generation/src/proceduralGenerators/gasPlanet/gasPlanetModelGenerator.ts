@@ -22,6 +22,7 @@ import {
     degreesToRadians,
     EarthSeaLevelPressure,
     getCoolGasGiantRadiusFromMass,
+    ampereSquareMeters,
     meters,
     radians,
     seconds,
@@ -135,10 +136,10 @@ export function generateGasPlanetModel(
         },
         magneticField: {
             north: {
-                latitude: Math.PI / 2 - randRange(0, Math.PI / 3, rng, GenerationSteps.MAGNETIC_FIELD),
-                longitude: randRange(0, 2 * Math.PI, rng, GenerationSteps.MAGNETIC_FIELD + 1),
+                latitude: radians(Math.PI / 2 - randRange(0, Math.PI / 3, rng, GenerationSteps.MAGNETIC_FIELD)),
+                longitude: radians(randRange(0, 2 * Math.PI, rng, GenerationSteps.MAGNETIC_FIELD + 1)),
             },
-            magnitude: 10 ** randRange(24, 28, rng, GenerationSteps.MAGNETIC_FIELD + 2),
+            magnitude: ampereSquareMeters(10 ** randRange(24, 28, rng, GenerationSteps.MAGNETIC_FIELD + 2)),
         },
         rings,
         colorPalette: {

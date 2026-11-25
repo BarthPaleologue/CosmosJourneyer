@@ -22,6 +22,7 @@ import {
     getOrbitRadiusFromPeriod,
     kelvin,
     meters,
+    pascals,
     radians,
 } from "@cosmos-journeyer/physics";
 import {
@@ -69,7 +70,7 @@ export function getAlphaTestisSystemModel(): StarSystemContentModel {
         ares.clouds.coverage = 1;
     }
     if (ares.atmosphere !== null) {
-        ares.atmosphere.pressure = EarthSeaLevelPressure * 0.5;
+        ares.atmosphere.pressure = pascals(EarthSeaLevelPressure * 0.5);
     }
 
     ares.orbit.semiMajorAxis = meters(25100 * hecate.radius);

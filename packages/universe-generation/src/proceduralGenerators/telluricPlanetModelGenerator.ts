@@ -25,6 +25,7 @@ import {
     EarthSeaLevelPressure,
     getOceanDepth,
     hasLiquidWater,
+    kelvin,
     kilograms,
     meters,
     pascals,
@@ -120,7 +121,7 @@ export function generateTelluricPlanetModel(
     const atmosphere: AtmosphereModel | null =
         pressure > 0
             ? {
-                  pressure,
+                  pressure: pascals(pressure),
                   greenHouseEffectFactor: 0.5,
               }
             : null;
@@ -164,7 +165,13 @@ export function generateTelluricPlanetModel(
     const averageTemperature = (temperatureRange.min + temperatureRange.max) / 2;
     const clouds: CloudsModel | null =
         ocean !== null
-            ? generateCloudsModel(radius + ocean.depth, CloudLayerHeight, oceanCoverage, averageTemperature, pressure)
+            ? generateCloudsModel(
+                  meters(radius + ocean.depth),
+                  CloudLayerHeight,
+                  oceanCoverage,
+                  kelvin(averageTemperature),
+                  pascals(pressure),
+              )
             : null;
 
     const terrainSettings = {
@@ -173,9 +180,9 @@ export function generateTelluricPlanetModel(
 
         bumps_frequency: (30 * radius) / ScaledEarthRadius,
 
-        max_bump_height: 1.5e3,
-        max_mountain_height: 10e3,
-        continent_base_height: ocean !== null ? ocean.depth : 0,
+        max_bump_height: meters(1.5e3),
+        max_mountain_height: meters(10e3),
+        continent_base_height: meters(ocean !== null ? ocean.depth : 0),
 
         mountains_frequency: (60 * radius) / ScaledEarthRadius,
     };

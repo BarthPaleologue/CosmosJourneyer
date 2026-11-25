@@ -26,6 +26,7 @@ import {
     getOceanDepth,
     getOrbitalPeriod,
     hasLiquidWater,
+    kelvin,
     kilograms,
     meters,
     MoonMass,
@@ -128,7 +129,7 @@ export function generateTelluricSatelliteModel(
     const atmosphere: AtmosphereModel | null =
         pressure > 0
             ? {
-                  pressure: pressure,
+                  pressure: pascals(pressure),
                   greenHouseEffectFactor: 0.5,
               }
             : null;
@@ -196,7 +197,13 @@ export function generateTelluricSatelliteModel(
     const averageTemperature = (temperatureRange.min + temperatureRange.max) / 2;
     const clouds: CloudsModel | null =
         ocean !== null
-            ? generateCloudsModel(radius + ocean.depth, CloudLayerHeight, oceanCoverage, averageTemperature, pressure)
+            ? generateCloudsModel(
+                  meters(radius + ocean.depth),
+                  CloudLayerHeight,
+                  oceanCoverage,
+                  kelvin(averageTemperature),
+                  pascals(pressure),
+              )
             : null;
 
     const terrainSettings = {
@@ -204,9 +211,9 @@ export function generateTelluricSatelliteModel(
         continents_fragmentation: oceanCoverage,
         bumps_frequency: (30 * radius) / ScaledEarthRadius,
 
-        max_bump_height: 1.5e3,
-        max_mountain_height: 10e3,
-        continent_base_height: 5e3 + (ocean?.depth ?? 0),
+        max_bump_height: meters(1.5e3),
+        max_mountain_height: meters(10e3),
+        continent_base_height: meters(5e3 + (ocean?.depth ?? 0)),
 
         mountains_frequency: (60 * radius) / ScaledEarthRadius,
     };

@@ -52,7 +52,7 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Mercury",
         type: "telluricPlanet",
         magneticField: {
-            north: { latitude: Math.PI / 2, longitude: 0 },
+            north: { latitude: radians(Math.PI / 2), longitude: radians(0) },
             magnitude: MercuryMagneticDipoleMoment,
         },
         radius: meters(2_439.7e3),
@@ -87,10 +87,10 @@ export function getSolSystemModel(): StarSystemModel {
             continents_frequency: 1,
 
             bumps_frequency: 10,
-            max_bump_height: 15e3,
+            max_bump_height: meters(15e3),
 
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
+            max_mountain_height: meters(0e3),
+            continent_base_height: meters(0),
 
             mountains_frequency: 0,
         },
@@ -138,10 +138,10 @@ export function getSolSystemModel(): StarSystemModel {
             continents_frequency: 1,
 
             bumps_frequency: 10,
-            max_bump_height: 15e3,
+            max_bump_height: meters(15e3),
 
-            max_mountain_height: 20e3,
-            continent_base_height: 0,
+            max_mountain_height: meters(20e3),
+            continent_base_height: meters(0),
 
             mountains_frequency: 5,
         },
@@ -151,7 +151,7 @@ export function getSolSystemModel(): StarSystemModel {
             greenHouseEffectFactor: 0.99,
         },
         clouds: {
-            layerRadius: 6_051.8e3 + 10e3,
+            layerRadius: meters(6_051.8e3 + 10e3),
             smoothness: 0.7,
             specularPower: 2,
             frequency: 4,
@@ -171,7 +171,7 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Earth",
         type: "telluricPlanet",
         magneticField: {
-            north: { latitude: degreesToRadians(79), longitude: 0 },
+            north: { latitude: degreesToRadians(79), longitude: radians(0) },
             magnitude: EarthMagneticDipoleMoment,
         },
         radius: meters(6_371e3),
@@ -208,9 +208,9 @@ export function getSolSystemModel(): StarSystemModel {
 
             bumps_frequency: 30,
 
-            max_bump_height: 1.5e3,
-            max_mountain_height: 10e3,
-            continent_base_height: 10e3 * 1.9,
+            max_bump_height: meters(1.5e3),
+            max_mountain_height: meters(10e3),
+            continent_base_height: meters(10e3 * 1.9),
 
             mountains_frequency: 360,
         },
@@ -220,7 +220,7 @@ export function getSolSystemModel(): StarSystemModel {
             greenHouseEffectFactor: 0.5,
         },
         clouds: {
-            layerRadius: 6_371e3 + 30e3,
+            layerRadius: meters(6_371e3 + 30e3),
             smoothness: 0.7,
             specularPower: 2,
             frequency: 4,
@@ -232,7 +232,7 @@ export function getSolSystemModel(): StarSystemModel {
             detailSpeed: 0.003,
         },
         ocean: {
-            depth: 10e3,
+            depth: meters(10e3),
         },
         seed: 0,
     };
@@ -274,10 +274,10 @@ export function getSolSystemModel(): StarSystemModel {
             continents_frequency: 1,
 
             bumps_frequency: 10,
-            max_bump_height: 15e3,
+            max_bump_height: meters(15e3),
 
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
+            max_mountain_height: meters(0e3),
+            continent_base_height: meters(0),
 
             mountains_frequency: 0,
         },
@@ -324,10 +324,10 @@ export function getSolSystemModel(): StarSystemModel {
             continents_frequency: 1,
 
             bumps_frequency: 10,
-            max_bump_height: 15e3,
+            max_bump_height: meters(15e3),
 
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
+            max_mountain_height: meters(0e3),
+            continent_base_height: meters(0),
 
             mountains_frequency: 0,
         },
@@ -370,7 +370,7 @@ export function getSolSystemModel(): StarSystemModel {
             p: 2,
         },
         magneticField: {
-            north: { latitude: degreesToRadians(31), longitude: 0 },
+            north: { latitude: degreesToRadians(31), longitude: radians(0) },
             magnitude: UranusMagneticDipoleMoment,
         },
         colorPalette: {
@@ -415,7 +415,7 @@ export function getSolSystemModel(): StarSystemModel {
             p: 2,
         },
         magneticField: {
-            north: { latitude: degreesToRadians(43), longitude: 0 },
+            north: { latitude: degreesToRadians(43), longitude: radians(0) },
             magnitude: NeptuneMagneticDipoleMoment,
         },
         colorPalette: {

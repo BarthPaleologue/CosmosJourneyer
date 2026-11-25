@@ -28,12 +28,11 @@ import {
     getPolarCapLatitude,
     getStellarWind,
     getStellarWindDynamicPressure,
-    ampereSquareMeters,
     meters,
     pascals,
     radians,
 } from "@cosmos-journeyer/physics";
-import type { LocalStellarWindModel } from "@cosmos-journeyer/physics";
+import type { AmpereSquareMeters, LocalStellarWindModel } from "@cosmos-journeyer/physics";
 import type { IndexedRng } from "@cosmos-journeyer/random";
 import { randRange, seededSquirrelNoise } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
@@ -53,7 +52,7 @@ const maxRibbonCountPerHemisphere = 500;
 export class Aurora implements SystemContent {
     private readonly root: Mesh;
     private readonly planetRadius: number;
-    private readonly moment: number;
+    private readonly moment: AmpereSquareMeters;
     private readonly matrixBuffer: Float32Array;
     private readonly material: AuroraMaterial;
     private readonly rng: IndexedRng;
@@ -113,7 +112,7 @@ export class Aurora implements SystemContent {
             }
         }
 
-        const standoffDistance = getMagnetopauseStandoffDistance(ampereSquareMeters(this.moment), pascals(pressure));
+        const standoffDistance = getMagnetopauseStandoffDistance(this.moment, pascals(pressure));
         if (pressure <= 0 || standoffDistance <= this.planetRadius) {
             // A crushed magnetosphere has no closed dipole field lines above the surface.
             this.root.setEnabled(false);
@@ -124,17 +123,11 @@ export class Aurora implements SystemContent {
 
         let energyFlux = 0;
         if (dominantWind !== null) {
-            const capLatitude = getPolarCapLatitude(
-                meters(this.planetRadius),
-                ampereSquareMeters(this.moment),
-                dominantWind,
-            );
-            energyFlux = getAuroralVisibleEnergyFlux(
-                meters(this.planetRadius),
-                ampereSquareMeters(this.moment),
-                dominantWind,
-                [radians(0.8 * capLatitude), capLatitude],
-            );
+            const capLatitude = getPolarCapLatitude(meters(this.planetRadius), this.moment, dominantWind);
+            energyFlux = getAuroralVisibleEnergyFlux(meters(this.planetRadius), this.moment, dominantWind, [
+                radians(0.8 * capLatitude),
+                capLatitude,
+            ]);
         }
         this.material.setEnergyFlux(energyFlux);
 

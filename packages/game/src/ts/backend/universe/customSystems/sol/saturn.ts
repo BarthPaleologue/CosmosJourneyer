@@ -60,7 +60,7 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
             greenHouseEffectFactor: 0.5,
         },
         magneticField: {
-            north: { latitude: degreesToRadians(90), longitude: 0 },
+            north: { latitude: degreesToRadians(90), longitude: radians(0) },
             magnitude: SaturnMagneticDipoleMoment,
         },
         colorPalette: {

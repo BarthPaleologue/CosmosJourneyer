@@ -15,16 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Meters } from "@cosmos-journeyer/physics";
+
 // Interface ayant vocation à remplacer toutes les interfaces de paramétrisation du terrain
 
 export interface TerrainSettings {
     continents_frequency: number;
     continents_fragmentation: number; // entre 0 et 1 : 0=pangée 1=ilots
-    continent_base_height: number; // élévation du plateau continental
+    continent_base_height: Meters; // élévation du plateau continental
 
-    max_mountain_height: number;
+    max_mountain_height: Meters;
     mountains_frequency: number;
 
-    max_bump_height: number;
+    max_bump_height: Meters;
     bumps_frequency: number;
 }
