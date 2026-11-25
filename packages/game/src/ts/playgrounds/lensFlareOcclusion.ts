@@ -17,9 +17,11 @@
 
 import { Color3, FreeCamera, MeshBuilder, Scene, StandardMaterial, TransformNode, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core";
+import type { NonEmptyArray } from "@cosmos-journeyer/typescript";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
+import type { LensFlareSource } from "@/frontend/helpers/stellarLightSystem";
 import { LensFlarePostProcess } from "@/frontend/postProcesses/lensFlarePostProcess";
 
 const SOURCE_POSITION = new Vector3(120, 0, 220);
@@ -79,13 +81,22 @@ export async function createLensFlareOcclusionScene(
     }
     occluder.position.copyFrom(occluderEntry[1]);
 
-    const lensFlare = new LensFlarePostProcess(
-        flareTarget,
-        5,
-        new Color3(1.0, 0.92, 0.68),
-        depthRendererManager,
-        scene,
-    );
+    const firstSource = { transform: flareTarget, boundingRadius: 5, color: sourceMaterial.emissiveColor };
+    const flares = urlParams.get("flares");
+    const sources: NonEmptyArray<LensFlareSource> = [firstSource];
+    if (flares !== null) {
+        const secondSourceMesh = sourceMesh.clone("secondLensFlareOcclusionSource", null);
+        secondSourceMesh.parent = null;
+        secondSourceMesh.position.set(-SOURCE_POSITION.x, SOURCE_POSITION.y, SOURCE_POSITION.z);
+        const secondSource = { transform: secondSourceMesh, boundingRadius: 5, color: new Color3(0.5, 0.7, 1) };
+        if (flares === "second") {
+            sources[0] = secondSource;
+        } else if (flares === "both") {
+            sources.push(secondSource);
+        }
+    }
+    const lensFlare = new LensFlarePostProcess([], depthRendererManager, scene);
+    lensFlare.setSources(sources);
     camera.attachPostProcess(lensFlare.get());
 
     let frameCounter = 0;

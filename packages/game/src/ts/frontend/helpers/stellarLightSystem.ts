@@ -26,15 +26,29 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
+import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 import type { AtmosphereUniforms } from "../postProcesses/atmosphere/atmosphereUniforms";
 import type { CelestialBody } from "../universe/architecture/orbitalObject";
 
-export class StellarLightSystem {
+export type LensFlareSource = {
+    transform: TransformNode;
+    /** Radius of the sphere enclosing the emitter, in meters. */
+    boundingRadius: number;
+    color: Readonly<LinearSrgbColor>;
+};
+
+export interface StellarLightSources {
+    getLights(): ReadonlyArray<DirectionalLight>;
+    getLensFlareSources(): ReadonlyArray<Readonly<LensFlareSource>>;
+}
+
+export class StellarLightSystem implements StellarLightSources {
     private readonly stellarObjects: Array<{
         transform: TransformNode;
         light: DirectionalLight;
         shadowGenerator: CascadedShadowGenerator;
+        boundingRadius: number;
     }> = [];
 
     private readonly lights: Array<DirectionalLight> = [];
@@ -54,7 +68,7 @@ export class StellarLightSystem {
         this.ambientLight.intensity = 0.02;
     }
 
-    public registerStellarObject(transform: TransformNode, color: Color3): void {
+    public registerStellarObject(transform: TransformNode, color: Color3, boundingRadius: number): void {
         const light = new DirectionalLight(`${transform.name}Light`, Vector3.Down(), this.scene);
         light.diffuse.copyFrom(color);
 
@@ -64,7 +78,7 @@ export class StellarLightSystem {
         shadowGenerator.usePercentageCloserFiltering = true;
         shadowGenerator.filteringQuality = CascadedShadowGenerator.QUALITY_HIGH;
 
-        this.stellarObjects.push({ transform, light, shadowGenerator });
+        this.stellarObjects.push({ transform, light, shadowGenerator, boundingRadius });
         this.lights.push(light);
     }
 
@@ -138,6 +152,14 @@ export class StellarLightSystem {
 
     public getLights(): Array<DirectionalLight> {
         return this.lights;
+    }
+
+    public getLensFlareSources(): Array<LensFlareSource> {
+        return this.stellarObjects.map(({ transform, light, boundingRadius }) => ({
+            transform,
+            boundingRadius,
+            color: light.diffuse,
+        }));
     }
 
     public dispose(): void {
