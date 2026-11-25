@@ -16,13 +16,15 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { JupiterMass, JupiterRadius } from "./constants/astrophysics";
+import type { Kilograms, Meters } from "./units";
+import { meters } from "./units";
 
 /**
  * @param mass The mass of the gas giant in kilograms.
  * @returns An estimate of the radius of the gas giant in meters. Works best for cool gas giants (below 1000 K).
  * @see https://arxiv.org/pdf/1909.09207
  */
-export function getCoolGasGiantRadiusFromMass(mass: number): number {
+export function getCoolGasGiantRadiusFromMass(mass: Kilograms): Meters {
     const c0 = 0.96;
     const c1 = 0.21;
     const c2 = -0.2;
@@ -30,5 +32,5 @@ export function getCoolGasGiantRadiusFromMass(mass: number): number {
     const logRelativeMass = Math.log10(mass / JupiterMass);
     const radiusInJupiterRadii = c0 + c1 * logRelativeMass + c2 * logRelativeMass ** 2;
 
-    return radiusInJupiterRadii * JupiterRadius;
+    return meters(radiusInJupiterRadii * JupiterRadius);
 }

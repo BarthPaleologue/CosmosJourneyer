@@ -24,7 +24,6 @@ import {
     kelvin,
     kilograms,
     meters,
-    seconds,
     wattsPerSquareMeter,
     radians,
 } from "@cosmos-journeyer/physics";
@@ -76,11 +75,11 @@ export function generateSpaceElevatorModel(
 
     const parentSiderealDayDuration = parentBody.spin.siderealPeriod;
 
-    const orbitRadius = getOrbitRadiusFromPeriod(seconds(parentSiderealDayDuration), kilograms(parentBody.mass));
+    const orbitRadius = getOrbitRadiusFromPeriod(parentSiderealDayDuration, kilograms(parentBody.mass));
 
     const orbit: Orbit = {
         parentIds: [parentBody.id],
-        semiMajorAxis: meters(orbitRadius),
+        semiMajorAxis: orbitRadius,
         p: 2,
         plane: {
             inclination: radians(0),
@@ -96,7 +95,7 @@ export function generateSpaceElevatorModel(
     const mass = DefaultOrbitalFacilityMass;
 
     const spin: SpinModel = {
-        siderealPeriod: seconds(parentSiderealDayDuration),
+        siderealPeriod: parentSiderealDayDuration,
         axialTilt: radians(0),
         axisAzimuth: radians(0),
         initialRotationAngle: radians(0),

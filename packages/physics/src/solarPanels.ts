@@ -15,17 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { SquareMeters, Watts, WattsPerSquareMeter } from "./units";
+import { squareMeters } from "./units";
+
 /**
  * Calculates the surface area of a solar panel required to meet a given energy requirement, efficiency, and star
- * @param efficiency The efficiency of the solar panel between 0 and 1.
+ * @param efficiency The efficiency of the solar panel between 0 and 1 (dimensionless).
  * @param energyRequirement The energy requirement in watts.
  * @param stellarEnergyFlux The incoming average energy flux from the stars in watts per square meter.
  * @returns Required panel surface area in square meters.
  */
 export function getSolarPanelSurfaceFromEnergyRequirement(
     efficiency: number,
-    energyRequirement: number,
-    stellarEnergyFlux: number,
-): number {
-    return energyRequirement / (efficiency * stellarEnergyFlux);
+    energyRequirement: Watts,
+    stellarEnergyFlux: WattsPerSquareMeter,
+): SquareMeters {
+    return squareMeters(energyRequirement / (efficiency * stellarEnergyFlux));
 }

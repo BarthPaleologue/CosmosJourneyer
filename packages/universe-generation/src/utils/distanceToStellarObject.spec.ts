@@ -79,7 +79,7 @@ describe("distanceToStellarObject", () => {
                 name: "Planet",
                 orbit: {
                     p: 2,
-                    semiMajorAxis: meters(astronomicalUnitToMeters(1)),
+                    semiMajorAxis: astronomicalUnitToMeters(1),
                     parentIds: ["star"],
                     argumentOfPeriapsis: radians(0),
                     plane: {

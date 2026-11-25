@@ -27,25 +27,27 @@ import {
     hasNakedSingularity,
 } from "./blackHole";
 import { C, G, SolarMass, SolarRadius } from "./constants";
+import type { Kilograms, Seconds } from "./units";
+import { kilograms, meters, radians, seconds } from "./units";
 
-const cygnusX1Mass = 21.2 * SolarMass; // Miller-Jones et al. 2021, 21.2 ± 2.2 M☉
+const cygnusX1Mass = kilograms(21.2 * SolarMass); // Miller-Jones et al. 2021, 21.2 ± 2.2 M☉
 const cygnusX1Spin = 0.95; // Dimensionless spin parameter a* ≳ 0.95
 
-const sagittariusAMass = 4.297e6 * SolarMass; // Gravity Collaboration 2019, 4.297 ± 0.012 × 10^6 M☉
+const sagittariusAMass = kilograms(4.297e6 * SolarMass); // Gravity Collaboration 2019, 4.297 ± 0.012 × 10^6 M☉
 const sagittariusASpin = 0.1; // Low spin estimates from GRAVITY+EHT joint analyses
 
-const rotationPeriodFromSpin = (mass: number, dimensionlessSpin: number): number => {
+const rotationPeriodFromSpin = (mass: Kilograms, dimensionlessSpin: number): Seconds => {
     if (dimensionlessSpin === 0) {
-        return Infinity;
+        return seconds(Infinity);
     }
 
     const estimatedRadius = Math.pow(mass / SolarMass, 0.78) * SolarRadius;
-    return (((4 * Math.PI) / 5) * estimatedRadius ** 2 * C) / (dimensionlessSpin * G * mass);
+    return seconds((((4 * Math.PI) / 5) * estimatedRadius ** 2 * C) / (dimensionlessSpin * G * mass));
 };
 
 describe("getSchwarzschildRadius", () => {
     it("should be about 3km for the mass of our sun", () => {
-        const solarMass = 1.989e30;
+        const solarMass = kilograms(1.989e30);
         const schwarzschildRadius = getSchwarzschildRadius(solarMass);
 
         expect(schwarzschildRadius).toBeGreaterThan(2.95e3);
@@ -53,7 +55,7 @@ describe("getSchwarzschildRadius", () => {
     });
 
     it("should be about the size of a grain of rice for earth mass", () => {
-        const earthMass = 5.972e24;
+        const earthMass = kilograms(5.972e24);
         const schwarzschildRadius = getSchwarzschildRadius(earthMass);
 
         expect(schwarzschildRadius).toBeGreaterThan(8.85e-3);
@@ -69,7 +71,7 @@ describe("getMassFromSchwarzschildRadius", () => {
     });
 
     it("handles kilometer-sized radius", () => {
-        const radius = 1_000;
+        const radius = meters(1_000);
         const expectedMass = (radius * C ** 2) / (2 * G);
         expect(getMassFromSchwarzschildRadius(radius)).toBeCloseTo(expectedMass, 6);
     });
@@ -77,7 +79,7 @@ describe("getMassFromSchwarzschildRadius", () => {
 
 describe("getShadowRadius", () => {
     it("returns 3sqrt(3)/2 times the Schwarzschild radius", () => {
-        const mass = 400 * SolarMass;
+        const mass = kilograms(400 * SolarMass);
         const expectedShadowRadius = (3 * Math.sqrt(3) * getSchwarzschildRadius(mass)) / 2;
 
         expect(getShadowRadius(mass)).toBeCloseTo(expectedShadowRadius, 12);
@@ -94,7 +96,7 @@ describe("getShadowRadius", () => {
 describe("estimateBlackHoleAngularMomentum", () => {
     it("returns zero when rotation period is zero", () => {
         const mass = SolarMass;
-        expect(estimateBlackHoleAngularMomentum(mass, 0)).toBe(0);
+        expect(estimateBlackHoleAngularMomentum(mass, seconds(0))).toBe(0);
     });
 
     it("matches Cygnus X-1 angular momentum estimate", () => {
@@ -123,9 +125,9 @@ describe("hasNakedSingularity", () => {
 
     it("flags overextreme solutions", () => {
         const estimatedRadius = Math.pow(sagittariusAMass / SolarMass, 0.78) * SolarRadius;
-        const thresholdPeriod = (((4 * Math.PI) / 5) * estimatedRadius ** 2) / (sagittariusAMass * C);
+        const thresholdPeriod = seconds((((4 * Math.PI) / 5) * estimatedRadius ** 2) / (sagittariusAMass * C) / 10);
 
-        expect(hasNakedSingularity(sagittariusAMass, thresholdPeriod / 10)).toBe(true);
+        expect(hasNakedSingularity(sagittariusAMass, thresholdPeriod)).toBe(true);
     });
 });
 
@@ -134,22 +136,22 @@ describe("getErgosphereRadius", () => {
         const rotationPeriod = rotationPeriodFromSpin(sagittariusAMass, sagittariusASpin);
         const m = (G * sagittariusAMass) / C ** 2;
 
-        expect(getErgosphereRadius(sagittariusAMass, rotationPeriod, Math.PI / 2)).toBeCloseTo(2 * m, 6);
+        expect(getErgosphereRadius(sagittariusAMass, rotationPeriod, radians(Math.PI / 2))).toBeCloseTo(2 * m, 6);
     });
 
     it("is smaller at the poles when rotating", () => {
         const rotationPeriod = rotationPeriodFromSpin(sagittariusAMass, sagittariusASpin);
         const m = (G * sagittariusAMass) / C ** 2;
         const a = getKerrMetricA(sagittariusAMass, rotationPeriod);
-        const polarRadius = getErgosphereRadius(sagittariusAMass, rotationPeriod, 0);
+        const polarRadius = getErgosphereRadius(sagittariusAMass, rotationPeriod, radians(0));
         const expectedPolarRadius = m + Math.sqrt(m * m - a * a);
         expect(polarRadius).toBeCloseTo(expectedPolarRadius, 6);
         expect(polarRadius).toBeLessThan(2 * m);
     });
 
     it("throws when the solution is overextreme", () => {
-        const rotationPeriod = rotationPeriodFromSpin(sagittariusAMass, sagittariusASpin) / 100;
+        const rotationPeriod = seconds(rotationPeriodFromSpin(sagittariusAMass, sagittariusASpin) / 100);
 
-        expect(() => getErgosphereRadius(sagittariusAMass, rotationPeriod, Math.PI / 3)).toThrow();
+        expect(() => getErgosphereRadius(sagittariusAMass, rotationPeriod, radians(Math.PI / 3))).toThrow();
     });
 });

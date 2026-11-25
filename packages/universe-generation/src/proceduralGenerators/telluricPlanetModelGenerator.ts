@@ -130,7 +130,7 @@ export function generateTelluricPlanetModel(
         parentBodies.map((body) => ({
             temperature: kelvin(body.blackBodyTemperature),
             radius: meters(getCelestialBodyRadius(body)),
-            distance: meters(orbit.semiMajorAxis),
+            distance: orbit.semiMajorAxis,
         })),
         0.3,
     );

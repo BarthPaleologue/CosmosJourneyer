@@ -95,8 +95,8 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
                 semiMajorAxis: meters(chronos.accretionDiskRadius * 4),
                 eccentricity: 0,
                 plane: {
-                    inclination: radians(degreesToRadians(40)),
-                    longitudeOfAscendingNode: radians(degreesToRadians(120)),
+                    inclination: degreesToRadians(40),
+                    longitudeOfAscendingNode: degreesToRadians(120),
                 },
                 argumentOfPeriapsis: radians(0),
                 initialMeanAnomaly: radians(Math.PI),
@@ -129,7 +129,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
                 semiMajorAxis: meters(chronos.accretionDiskRadius * 2),
                 eccentricity: 0,
                 plane: {
-                    inclination: radians(degreesToRadians(70)),
+                    inclination: degreesToRadians(70),
                     longitudeOfAscendingNode: radians(0),
                 },
                 argumentOfPeriapsis: radians(0),
@@ -220,8 +220,8 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
                 semiMajorAxis: meters(chronos.accretionDiskRadius * 6),
                 eccentricity: 0,
                 plane: {
-                    inclination: radians(degreesToRadians(20)),
-                    longitudeOfAscendingNode: radians(degreesToRadians(240)),
+                    inclination: degreesToRadians(20),
+                    longitudeOfAscendingNode: degreesToRadians(240),
                 },
                 argumentOfPeriapsis: radians(0),
                 initialMeanAnomaly: radians(Math.PI / 2),
@@ -264,8 +264,8 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
                 semiMajorAxis: meters(chronos.accretionDiskRadius * 4),
                 eccentricity: 0,
                 plane: {
-                    inclination: radians(degreesToRadians(40)),
-                    longitudeOfAscendingNode: radians(degreesToRadians(120)),
+                    inclination: degreesToRadians(40),
+                    longitudeOfAscendingNode: degreesToRadians(120),
                 },
                 argumentOfPeriapsis: radians(0),
                 initialMeanAnomaly: radians(0),

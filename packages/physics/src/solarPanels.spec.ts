@@ -19,6 +19,7 @@ import { describe, expect, it } from "vitest";
 
 import { getSolarPanelSurfaceFromEnergyRequirement } from "./solarPanels";
 import { getSphereIrradianceAtDistance } from "./thermodynamics";
+import { kelvin, meters, watts, wattsPerSquareMeter } from "./units";
 
 describe("solarPanelSurfaceCalculation", () => {
     it("should calculate the solar panel surface needed for the ISS", () => {
@@ -30,9 +31,16 @@ describe("solarPanelSurfaceCalculation", () => {
         const sunRadius = 6.9634e8;
         const energyRequirement = 120000;
 
-        const solarFlux = getSphereIrradianceAtDistance(sunTemperature, sunRadius, distanceToSun) * sunExposure;
+        const solarFlux = wattsPerSquareMeter(
+            getSphereIrradianceAtDistance(kelvin(sunTemperature), meters(sunRadius), meters(distanceToSun)) *
+                sunExposure,
+        );
 
-        const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(efficiency, energyRequirement, solarFlux);
+        const solarPanelSurface = getSolarPanelSurfaceFromEnergyRequirement(
+            efficiency,
+            watts(energyRequirement),
+            solarFlux,
+        );
         expect(solarPanelSurface).toBeGreaterThanOrEqual(2400);
         expect(solarPanelSurface).toBeLessThanOrEqual(2600);
     });

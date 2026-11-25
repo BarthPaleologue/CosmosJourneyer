@@ -8,9 +8,11 @@ import {
     getRadiatorAreaForHeat,
     getSphereIrradianceAtDistance,
 } from "./thermodynamics";
+import { kelvin, meters, watts } from "./units";
 
 describe("Planck's law", () => {
-    it.each([300, 5778])("integrates to the Stefan-Boltzmann flux at %s K", (temperature) => {
+    it.each([300, 5778])("integrates to the Stefan-Boltzmann flux at %s K", (temperatureInKelvin) => {
+        const temperature = kelvin(temperatureInKelvin);
         const intervals = 4096;
         const minimum = Math.log(1e-9);
         const maximum = Math.log(0.1);
@@ -20,7 +22,7 @@ describe("Planck's law", () => {
             const lower = Math.exp(minimum + i * step);
             const upper = Math.exp(minimum + (i + 1) * step);
             const midpoint = (lower + upper) / 2;
-            flux += getBlackBodySpectralExitance(temperature, midpoint) * (upper - lower);
+            flux += getBlackBodySpectralExitance(temperature, meters(midpoint)) * (upper - lower);
         }
         expect(Math.abs(flux / getBlackBodyRadiatedFlux(temperature) - 1)).toBeLessThan(1e-5);
     });
@@ -33,7 +35,7 @@ describe("Stefan-Boltzmann Law Functions", () => {
         it("should calculate the energy flux correctly", () => {
             const temperature = 300; // in Kelvin
             const expectedFlux = expectedStefanBoltzmannConstant * temperature ** 4;
-            const flux = getBlackBodyRadiatedFlux(300);
+            const flux = getBlackBodyRadiatedFlux(kelvin(300));
             expect(flux).toBeCloseTo(expectedFlux, 5);
         });
     });
@@ -43,7 +45,7 @@ describe("Stefan-Boltzmann Law Functions", () => {
             const temperature = 5778; // in Kelvin
             const radius = 6.9634e8; // in meters
             const expectedTotalEnergy = expectedStefanBoltzmannConstant * temperature ** 4 * 4 * Math.PI * radius ** 2;
-            const totalEnergy = getBlackBodyLuminosity(temperature, radius);
+            const totalEnergy = getBlackBodyLuminosity(kelvin(temperature), meters(radius));
             expect(totalEnergy / expectedTotalEnergy).toBeCloseTo(1, 10);
         });
     });
@@ -54,7 +56,11 @@ describe("Stefan-Boltzmann Law Functions", () => {
             const radiusSun = 6.9634e8; // in meters
             const distanceSun = 1.496e11; // in meters
             const expectedFluxAtDistance = 1360; // in W/m^2
-            const fluxAtDistance = getSphereIrradianceAtDistance(temperatureSun, radiusSun, distanceSun);
+            const fluxAtDistance = getSphereIrradianceAtDistance(
+                kelvin(temperatureSun),
+                meters(radiusSun),
+                meters(distanceSun),
+            );
             expect(fluxAtDistance).toBeGreaterThanOrEqual(expectedFluxAtDistance - 100);
             expect(fluxAtDistance).toBeLessThanOrEqual(expectedFluxAtDistance + 100);
         });
@@ -64,13 +70,13 @@ describe("Stefan-Boltzmann Law Functions", () => {
         it("should scale black body flux by emissivity", () => {
             const temperature = 450; // in Kelvin
             const emissivity = 0.6;
-            const expectedFlux = getBlackBodyRadiatedFlux(temperature) * emissivity;
-            expect(getRadiatedFlux(temperature, emissivity)).toBeCloseTo(expectedFlux, 8);
+            const expectedFlux = getBlackBodyRadiatedFlux(kelvin(temperature)) * emissivity;
+            expect(getRadiatedFlux(kelvin(temperature), emissivity)).toBeCloseTo(expectedFlux, 8);
         });
 
         it("should return zero for a perfect reflector", () => {
             const temperature = 1200; // in Kelvin
-            expect(getRadiatedFlux(temperature, 0)).toBe(0);
+            expect(getRadiatedFlux(kelvin(temperature), 0)).toBe(0);
         });
     });
 
@@ -79,20 +85,29 @@ describe("Stefan-Boltzmann Law Functions", () => {
             const heatToDissipate = 1500; // in W
             const targetTemperature = 350; // in K
             const emissivity = 0.85;
-            const radiatorFlux = getRadiatedFlux(targetTemperature, emissivity);
+            const radiatorFlux = getRadiatedFlux(kelvin(targetTemperature), emissivity);
             const expectedArea = heatToDissipate / radiatorFlux;
-            expect(getRadiatorAreaForHeat(heatToDissipate, targetTemperature, emissivity, false)).toBeCloseTo(
-                expectedArea,
-                8,
-            );
+            expect(
+                getRadiatorAreaForHeat(watts(heatToDissipate), kelvin(targetTemperature), emissivity, false),
+            ).toBeCloseTo(expectedArea, 8);
         });
 
         it("should halve the area for double-sided radiators", () => {
             const heatToDissipate = 2000; // in W
             const targetTemperature = 400; // in K
             const emissivity = 0.9;
-            const singleSidedArea = getRadiatorAreaForHeat(heatToDissipate, targetTemperature, emissivity, false);
-            const doubleSidedArea = getRadiatorAreaForHeat(heatToDissipate, targetTemperature, emissivity, true);
+            const singleSidedArea = getRadiatorAreaForHeat(
+                watts(heatToDissipate),
+                kelvin(targetTemperature),
+                emissivity,
+                false,
+            );
+            const doubleSidedArea = getRadiatorAreaForHeat(
+                watts(heatToDissipate),
+                kelvin(targetTemperature),
+                emissivity,
+                true,
+            );
             expect(doubleSidedArea).toBeCloseTo(singleSidedArea / 2, 8);
         });
     });

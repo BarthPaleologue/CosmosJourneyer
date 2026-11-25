@@ -32,7 +32,6 @@ import {
     MoonMass,
     pascals,
     radians,
-    seconds,
 } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom } from "@cosmos-journeyer/random";
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
@@ -192,7 +191,7 @@ export function generateTelluricSatelliteModel(
     };
 
     const spin: SpinModel = {
-        siderealPeriod: seconds(getOrbitalPeriod(meters(orbit.semiMajorAxis), kilograms(parentMassSum))),
+        siderealPeriod: getOrbitalPeriod(orbit.semiMajorAxis, kilograms(parentMassSum)),
         axialTilt: radians(0),
         axisAzimuth: radians(0),
         initialRotationAngle: radians(0),

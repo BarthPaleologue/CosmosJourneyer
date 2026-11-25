@@ -1,4 +1,6 @@
 import { getBlackBodySpectralExitance } from "../thermodynamics";
+import type { Kelvin, Meters } from "../units";
+import { meters } from "../units";
 import { cie1931 } from "./cie1931";
 import type { LinearSrgbColor, XyzColor } from "./types";
 
@@ -10,13 +12,13 @@ import type { LinearSrgbColor, XyzColor } from "./types";
  * @param spectrum The spectral density per metre, evaluated at wavelengths in metres.
  * @returns Unnormalized XYZ in the integrated spectrum's units (observer-weighted W/m² for W/m²/m input), without the 683 lm/W factor.
  */
-export function integrateSpectrum(spectrum: (wavelength: number) => number): XyzColor {
+export function integrateSpectrum(spectrum: (wavelength: Meters) => number): XyzColor {
     const step = 5e-9;
     let x = 0;
     let y = 0;
     let z = 0;
     for (const [index, [xBar, yBar, zBar]] of cie1931.entries()) {
-        const wavelength = (360 + index * 5) * 1e-9;
+        const wavelength = meters((360 + index * 5) * 1e-9);
         const density = spectrum(wavelength);
         const endpointWeight = index === 0 || index === cie1931.length - 1 ? 0.5 : 1;
         const weightedDensity = density * step * endpointWeight;
@@ -33,7 +35,7 @@ export function integrateSpectrum(spectrum: (wavelength: number) => number): Xyz
  * @param temperature The positive black body temperature in kelvin.
  * @returns Unnormalized XYZ in observer-weighted W/m², without the 683 lm/W factor.
  */
-export function integrateBlackBodySpectrum(temperature: number): XyzColor {
+export function integrateBlackBodySpectrum(temperature: Kelvin): XyzColor {
     return integrateSpectrum((wavelength) => getBlackBodySpectralExitance(temperature, wavelength));
 }
 

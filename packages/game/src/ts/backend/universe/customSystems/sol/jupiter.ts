@@ -22,7 +22,6 @@ import {
     JupiterMagneticDipoleMoment,
     meters,
     radians,
-    seconds,
 } from "@cosmos-journeyer/physics";
 import type { GasPlanetModel, OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
@@ -38,8 +37,8 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
         radius: 69_911e3,
         mass: 1.898e27,
         spin: {
-            siderealPeriod: seconds(durationToSeconds({ hours: 9, minutes: 55, seconds: 30 })),
-            axialTilt: radians(degreesToRadians(3.13)),
+            siderealPeriod: durationToSeconds({ hours: 9, minutes: 55, seconds: 30 }),
+            axialTilt: degreesToRadians(3.13),
             axisAzimuth: radians(0),
             initialRotationAngle: radians(0),
         },
@@ -48,10 +47,10 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
             semiMajorAxis: meters(778_547_200e3),
             eccentricity: 0.0934,
             plane: {
-                inclination: radians(degreesToRadians(1.85)),
-                longitudeOfAscendingNode: radians(degreesToRadians(49.558)),
+                inclination: degreesToRadians(1.85),
+                longitudeOfAscendingNode: degreesToRadians(49.558),
             },
-            argumentOfPeriapsis: radians(degreesToRadians(286.502)),
+            argumentOfPeriapsis: degreesToRadians(286.502),
             initialMeanAnomaly: radians(0),
             p: 2,
         },

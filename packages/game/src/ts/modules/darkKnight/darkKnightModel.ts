@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { astronomicalUnitToMeters, meters, radians, seconds } from "@cosmos-journeyer/physics";
+import { astronomicalUnitToMeters, radians, seconds } from "@cosmos-journeyer/physics";
 import type { OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
 import type { InOrbitPlacementModel, SystemContentModel } from "@/backend/systemEntity/systemEntityModel";
@@ -39,7 +39,7 @@ export function createDarkKnightOrbitalPlacementModel(parentIds: Iterable<Orbita
                 inclination: radians(0),
                 longitudeOfAscendingNode: radians(0),
             },
-            semiMajorAxis: meters(astronomicalUnitToMeters(100)),
+            semiMajorAxis: astronomicalUnitToMeters(100),
             initialMeanAnomaly: radians(0),
         },
         attitude: {

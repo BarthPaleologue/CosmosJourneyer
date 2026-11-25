@@ -11,13 +11,14 @@ import {
 import type { LocalStellarWindModel } from "./aurora";
 import { EarthMagneticDipoleMoment, SolarMass, SolarRadius } from "./constants/astrophysics";
 import { astronomicalUnitToMeters, degreesToRadians } from "./unitConversions";
+import { kilograms, meters, metersPerSecond, perCubicMeter, radians } from "./units";
 
 // values from https://hdrl.gsfc.nasa.gov/LWS_Space_Weather/ACE_description.html
 const solarWind: LocalStellarWindModel = {
-    speed: 400_000,
-    protonNumberDensity: 5e6,
+    speed: metersPerSecond(400_000),
+    protonNumberDensity: perCubicMeter(5e6),
 };
-const earthRadius = 6_371e3;
+const earthRadius = meters(6_371e3);
 
 describe("getStellarWind", () => {
     it("keeps the solar mass loss calibration while using surface escape speed", () => {
@@ -38,7 +39,7 @@ describe("getStellarWind", () => {
 
     it("scales mass loss with stellar surface area at equal escape speed", () => {
         const solar = getStellarWind(SolarMass, SolarRadius, astronomicalUnitToMeters(1));
-        const larger = getStellarWind(2 * SolarMass, 2 * SolarRadius, astronomicalUnitToMeters(1));
+        const larger = getStellarWind(kilograms(2 * SolarMass), meters(2 * SolarRadius), astronomicalUnitToMeters(1));
 
         expect(larger.speed).toBe(solar.speed);
         expect(larger.protonNumberDensity).toBeCloseTo(4 * solar.protonNumberDensity);
@@ -46,7 +47,7 @@ describe("getStellarWind", () => {
 
     it("reduces density when a faster wind carries the same mass loss", () => {
         const solar = getStellarWind(SolarMass, SolarRadius, astronomicalUnitToMeters(1));
-        const massive = getStellarWind(4 * SolarMass, SolarRadius, astronomicalUnitToMeters(1));
+        const massive = getStellarWind(kilograms(4 * SolarMass), SolarRadius, astronomicalUnitToMeters(1));
 
         expect(massive.speed).toBe(2 * solar.speed);
         expect(massive.protonNumberDensity).toBeCloseTo(solar.protonNumberDensity / 2);
@@ -73,7 +74,7 @@ describe("getMagnetopauseStandoffDistance", () => {
 
 describe("getDipoleFieldLineLatitude", () => {
     it("predicts the latitude at which Earth's magnetopause standoff distance field line will intersect the atmosphere", () => {
-        const magnetopauseStandoffDistance = 6.45e7;
+        const magnetopauseStandoffDistance = meters(6.45e7);
         const latitude = getDipoleFieldLineLatitude(magnetopauseStandoffDistance, earthRadius);
         expect(latitude).toBeCloseTo(degreesToRadians(71.69));
     });
@@ -86,7 +87,7 @@ describe("getDipoleFieldLineLatitude", () => {
     });
 
     it("returns 60 degrees for a field line extending to 4 planetary radii", () => {
-        const latitude = getDipoleFieldLineLatitude(4 * earthRadius, earthRadius);
+        const latitude = getDipoleFieldLineLatitude(meters(4 * earthRadius), earthRadius);
         expect(latitude).toBeCloseTo(Math.PI / 3);
     });
 });
@@ -100,22 +101,22 @@ describe("getPolarCapLatitude", () => {
 
 describe("getDipoleFieldLineRadius", () => {
     it("reaches L at the magnetic equator and vanishes at the poles", () => {
-        expect(getDipoleFieldLineRadius(4 * earthRadius, Math.PI / 2)).toBeCloseTo(4 * earthRadius, 6);
-        expect(getDipoleFieldLineRadius(4 * earthRadius, 0)).toBe(0);
-        expect(getDipoleFieldLineRadius(4 * earthRadius, Math.PI)).toBeCloseTo(0, 6);
+        expect(getDipoleFieldLineRadius(meters(4 * earthRadius), radians(Math.PI / 2))).toBeCloseTo(4 * earthRadius, 6);
+        expect(getDipoleFieldLineRadius(meters(4 * earthRadius), radians(0))).toBe(0);
+        expect(getDipoleFieldLineRadius(meters(4 * earthRadius), radians(Math.PI))).toBeCloseTo(0, 6);
     });
 
     it("is symmetric about the equator", () => {
-        const theta = 0.7;
-        expect(getDipoleFieldLineRadius(10 * earthRadius, theta)).toBeCloseTo(
-            getDipoleFieldLineRadius(10 * earthRadius, Math.PI - theta),
+        const theta = radians(0.7);
+        expect(getDipoleFieldLineRadius(meters(10 * earthRadius), theta)).toBeCloseTo(
+            getDipoleFieldLineRadius(meters(10 * earthRadius), radians(Math.PI - theta)),
             6,
         );
     });
 
     it("scales linearly with L", () => {
-        expect(getDipoleFieldLineRadius(2 * earthRadius, 1)).toBeCloseTo(
-            2 * getDipoleFieldLineRadius(earthRadius, 1),
+        expect(getDipoleFieldLineRadius(meters(2 * earthRadius), radians(1))).toBeCloseTo(
+            2 * getDipoleFieldLineRadius(earthRadius, radians(1)),
             6,
         );
     });

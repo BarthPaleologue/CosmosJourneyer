@@ -59,7 +59,7 @@ export function generateJuliaSetModel(
         semiMajorAxis: meters(orbitRadius),
         p: orbitalP,
         plane: {
-            inclination: radians(degreesToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160))),
+            inclination: degreesToRadians(normalRandom(90, 20, rng, GenerationSteps.ORBIT + 160)),
             longitudeOfAscendingNode: radians(randRange(0, 2 * Math.PI, rng, GenerationSteps.ORBIT + 320)),
         },
         eccentricity: randRange(0.1, 0.9, rng, GenerationSteps.ORBIT + 240),

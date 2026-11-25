@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Kelvin } from "./units";
+
 export type StellarType = "O" | "B" | "A" | "F" | "G" | "K" | "M";
 
 /**
@@ -22,7 +24,7 @@ export type StellarType = "O" | "B" | "A" | "F" | "G" | "K" | "M";
  * @param temperature Effective stellar temperature in kelvins.
  * @returns The corresponding coarse stellar spectral class.
  */
-export function getStellarTypeFromTemperature(temperature: number): StellarType {
+export function getStellarTypeFromTemperature(temperature: Kelvin): StellarType {
     if (temperature < 3500) {
         return "M";
     } else if (temperature < 5000) {

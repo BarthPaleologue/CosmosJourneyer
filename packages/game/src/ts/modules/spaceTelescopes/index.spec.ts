@@ -23,7 +23,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
-import { astronomicalUnitToMeters, getOrbitalPeriod, kilograms, meters, radians } from "@cosmos-journeyer/physics";
+import { astronomicalUnitToMeters, getOrbitalPeriod, kilograms, radians } from "@cosmos-journeyer/physics";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CrateMaterial } from "@/frontend/assets/materials/crate";
@@ -142,7 +142,7 @@ describe("space telescope module in Vesta", () => {
                 mass: 100_000,
                 orbit: {
                     parentIds: ["vesta"],
-                    semiMajorAxis: meters(astronomicalUnitToMeters(3)),
+                    semiMajorAxis: astronomicalUnitToMeters(3),
                     eccentricity: 0,
                     plane: {
                         inclination: radians(0),
