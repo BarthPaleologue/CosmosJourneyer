@@ -16,7 +16,6 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
-import type { Color3 } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
@@ -153,19 +152,22 @@ export class StarSystemController {
         this.orbitalSimulation = orbitalSimulation;
 
         for (const stellarObject of this.stellarObjects) {
-            let color: Color3 | null;
             if (stellarObject.type === "blackHole") {
                 const accretionDisk = stellarObject.accretionDisk;
-                if (accretionDisk === null) {
-                    continue;
+                if (accretionDisk !== null) {
+                    this.stellarLightSystem.registerStellarObject(
+                        stellarObject.getTransform(),
+                        accretionDisk.getEmissiveColor(),
+                        stellarObject.model.accretionDiskRadius,
+                    );
                 }
-
-                color = accretionDisk.getEmissiveColor();
             } else {
-                color = stellarObject.getEmissiveColor();
+                this.stellarLightSystem.registerStellarObject(
+                    stellarObject.getTransform(),
+                    stellarObject.getEmissiveColor(),
+                    stellarObject.getBoundingRadius(),
+                );
             }
-
-            this.stellarLightSystem.registerStellarObject(stellarObject.getTransform(), color);
         }
     }
 

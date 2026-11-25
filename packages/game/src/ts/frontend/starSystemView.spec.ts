@@ -34,7 +34,7 @@ import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
 import { err, ok } from "@cosmos-journeyer/typescript";
-import type { StarSystemModel, StellarObjectModel } from "@cosmos-journeyer/universe-model";
+import type { BlackHoleModel, StarSystemModel } from "@cosmos-journeyer/universe-model";
 import { createInstance } from "i18next";
 import type { TFunction } from "i18next";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
@@ -60,6 +60,7 @@ import { CharacterControls } from "@/frontend/controls/characterControls/charact
 import { HumanoidAvatar } from "@/frontend/controls/characterControls/humanoidAvatar";
 import type { ClusteredLightingRegion } from "@/frontend/helpers/clusteredLightingSystem";
 import { createHavokForTests } from "@/frontend/helpers/havokTest";
+import { StellarLightSystem } from "@/frontend/helpers/stellarLightSystem";
 import { Player } from "@/frontend/player/player";
 import { ShipControls } from "@/frontend/spaceship/shipControls";
 import { Spaceship } from "@/frontend/spaceship/spaceship";
@@ -261,7 +262,7 @@ async function createTestView(options?: { useHighPrecisionMatrix?: boolean }): P
     };
 }
 
-const blackHoleModel: StellarObjectModel = {
+const blackHoleModel: BlackHoleModel = {
     type: "blackHole",
     id: "blackHole",
     name: "Black Hole",
@@ -293,11 +294,26 @@ const blackHoleSystemModel: StarSystemModel = {
  * Loads a real star system controller for a minimal black hole system.
  * @param scene Scene the star system is loaded into.
  * @param assets Rendering assets used by the loaders.
+ * @param options Fixture options.
+ * @param options.accretionDiskRadius Outer radius of the disk in meters.
  * @returns The loaded controller.
  */
-async function createBlackHoleStarSystem(scene: Scene, assets: RenderingAssets): Promise<StarSystemController> {
+async function createBlackHoleStarSystem(
+    scene: Scene,
+    assets: RenderingAssets,
+    options?: { accretionDiskRadius: number },
+): Promise<StarSystemController> {
+    const model: StarSystemModel = {
+        ...blackHoleSystemModel,
+        stellarObjects: [
+            {
+                ...blackHoleModel,
+                accretionDiskRadius: options?.accretionDiskRadius ?? blackHoleModel.accretionDiskRadius,
+            },
+        ],
+    };
     const result = await StarSystemController.CreateAsync(
-        blackHoleSystemModel,
+        model,
         new StarSystemLoader(),
         [],
         new SystemEntityLoader(),
@@ -313,6 +329,27 @@ async function createBlackHoleStarSystem(scene: Scene, assets: RenderingAssets):
     }
     return result.value;
 }
+
+it("registers a black hole's accretion disk with the outer disk radius", async () => {
+    const { scene, engine, assets } = await createTestView();
+    const register = vi.spyOn(StellarLightSystem.prototype, "registerStellarObject").mockReturnValue(undefined);
+    const accretionDiskRadius = 12_000;
+    try {
+        const starSystem = await createBlackHoleStarSystem(scene, assets, { accretionDiskRadius });
+        const [blackHole] = starSystem.getStellarObjects();
+        if (blackHole.type !== "blackHole" || blackHole.accretionDisk === null) {
+            throw new Error("Expected a black hole with an accretion disk");
+        }
+        expect(register).toHaveBeenCalledExactlyOnceWith(
+            blackHole.getTransform(),
+            blackHole.accretionDisk.getEmissiveColor(),
+            accretionDiskRadius,
+        );
+    } finally {
+        scene.dispose();
+        engine.dispose();
+    }
+});
 
 /**
  * Deserializes a real spaceship through the real `Spaceship.Deserialize` factory.

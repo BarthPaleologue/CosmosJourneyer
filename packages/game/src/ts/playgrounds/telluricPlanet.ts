@@ -86,7 +86,11 @@ export async function createTelluricPlanetScene(
     sunTransform.position = new Vector3(7, 5, -10).scale(10_000e3);
 
     const sunColor = getRgbFromTemperature(sunModel.blackBodyTemperature);
-    stellarLightSystem.registerStellarObject(sunTransform, new Color3(sunColor.r, sunColor.g, sunColor.b));
+    stellarLightSystem.registerStellarObject(
+        sunTransform,
+        new Color3(sunColor.r, sunColor.g, sunColor.b),
+        sunModel.radius,
+    );
 
     const urlParams = new URLSearchParams(window.location.search);
     const seed = Number(urlParams.get("seed") ?? Math.floor(Math.random() * 1000));
