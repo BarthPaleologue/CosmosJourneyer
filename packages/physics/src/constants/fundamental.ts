@@ -15,26 +15,28 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { kilograms, metersPerSecond, quantity } from "../units";
+
 /**
  * Speed of light in meters per second.
  * @see https://en.wikipedia.org/wiki/Speed_of_light
  */
-export const C = 299_792_458;
+export const C = metersPerSecond(299_792_458);
 
-/** The gravitational constant in m^3 kg^-1 s^-2. */
-export const G = 6.6743e-11;
+/** The gravitational constant in m³/(kg·s²). */
+export const G = quantity<"m³/(kg·s²)">(6.6743e-11);
 
-/** Pi constant. */
+/** Pi constant. Dimensionless. */
 export const Pi = Math.PI;
 
 /** Planck constant in J·s. */
-export const PlanckConstant = 6.626_070_15e-34;
+export const PlanckConstant = quantity<"J·s">(6.626_070_15e-34);
 
 /** Boltzmann constant in J/K. */
-export const BoltzmannConstant = 1.380_649e-23;
+export const BoltzmannConstant = quantity<"J/K">(1.380_649e-23);
 
 /** Mass of a proton in kg */
-export const ProtonMass = 1.672_621_925_95e-27;
+export const ProtonMass = kilograms(1.672_621_925_95e-27);
 
 /** mu0 in H/m */
-export const VacuumPermeability = 1.256_637_061_27e-6;
+export const VacuumPermeability = quantity<"H/m">(1.256_637_061_27e-6);

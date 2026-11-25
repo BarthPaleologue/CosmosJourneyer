@@ -15,13 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { meters, quantity } from "../units";
 import { BoltzmannConstant, C, Pi, PlanckConstant } from "./fundamental";
 
 /** Reduced Planck constant in J·s. */
-export const ReducedPlanckConstant = PlanckConstant / (2 * Pi);
+export const ReducedPlanckConstant = quantity<"J·s">(PlanckConstant / (2 * Pi));
 
-/** Stefan-Boltzmann constant in W·m⁻²·K⁻⁴. */
-export const StefanBoltzmannConstant = (2 * Pi ** 5 * BoltzmannConstant ** 4) / (15 * PlanckConstant ** 3 * C ** 2);
+/** Stefan-Boltzmann constant in W/(m²·K⁴). */
+export const StefanBoltzmannConstant = quantity<"W/(m²·K⁴)">(
+    (2 * Pi ** 5 * BoltzmannConstant ** 4) / (15 * PlanckConstant ** 3 * C ** 2),
+);
 
 /** The number of meters in a light year. */
-export const LightYearInMeters = C * 60 * 60 * 24 * 365.25;
+export const LightYearInMeters = meters(C * 60 * 60 * 24 * 365.25);
