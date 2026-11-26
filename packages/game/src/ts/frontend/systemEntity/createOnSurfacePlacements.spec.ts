@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { meters, radians } from "@cosmos-journeyer/physics";
 import { describe, expect, it } from "vitest";
 
 import { createSurfaceTransform } from "./createOnSurfacePlacements";
@@ -31,7 +32,11 @@ describe("createSurfaceTransform", () => {
     ])(
         "preserves geographic heading, pitch and intrinsic roll at %s, %s",
         (latitude, longitude, heading, pitch, roll) => {
-            const { position, rotation } = createSurfaceTransform(latitude, longitude, 100, { heading, pitch, roll });
+            const { position, rotation } = createSurfaceTransform(radians(latitude), radians(longitude), meters(100), {
+                heading: radians(heading),
+                pitch: radians(pitch),
+                roll: radians(roll),
+            });
             const radial = new Vector3(
                 Math.cos(latitude) * Math.cos(longitude),
                 Math.sin(latitude),
@@ -48,7 +53,11 @@ describe("createSurfaceTransform", () => {
             expect(Vector3.Dot(forward, north)).toBeCloseTo(Math.cos(heading) * Math.cos(pitch), 6);
             expect(Vector3.Dot(forward, east)).toBeCloseTo(Math.sin(heading) * Math.cos(pitch), 6);
             expect(Vector3.Dot(forward, radial)).toBeCloseTo(Math.sin(pitch), 6);
-            const unrolled = createSurfaceTransform(latitude, longitude, 100, { heading, pitch, roll: 0 }).rotation;
+            const unrolled = createSurfaceTransform(radians(latitude), radians(longitude), meters(100), {
+                heading: radians(heading),
+                pitch: radians(pitch),
+                roll: radians(0),
+            }).rotation;
             const expectedUp = Vector3.Up()
                 .applyRotationQuaternion(unrolled)
                 .applyRotationQuaternion(Quaternion.RotationAxis(forward, roll));

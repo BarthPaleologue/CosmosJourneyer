@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Kilograms, Meters, Radians } from "@cosmos-journeyer/physics";
 import type { Orbit, OrbitalObjectId, SpinModel } from "@cosmos-journeyer/universe-model";
 
 export type SystemEntityModel<
@@ -35,7 +36,7 @@ export type SystemEntityPlacementModel = InOrbitPlacementModel | OnSurfacePlacem
 
 export type InOrbitPlacementModel = {
     type: "inOrbit";
-    mass: number;
+    mass: Kilograms;
     orbit: Orbit;
     attitude: AttitudeModel;
 };
@@ -44,9 +45,9 @@ export type AttitudeModel = {
     spin: SpinModel;
     /** Model orientation relative to the spinning frame, in radians. */
     localFrameOrientation: {
-        yaw: number;
-        pitch: number;
-        roll: number;
+        yaw: Radians;
+        pitch: Radians;
+        roll: Radians;
     };
 };
 
@@ -54,20 +55,20 @@ export type OnSurfacePlacementModel = {
     type: "onSurface";
     parentId: OrbitalObjectId;
     position: {
-        longitude: number;
-        latitude: number;
-        heightAboveGround: number;
+        longitude: Radians;
+        latitude: Radians;
+        heightAboveGround: Meters;
     };
     rotation: OnSurfacePlacementRotation;
 };
 
 export type OnSurfacePlacementRotation = {
     /** 0 = geographic north, +π/2 = east */
-    heading: number;
+    heading: Radians;
     /** Positive = nose up */
-    pitch: number;
+    pitch: Radians;
     /** Rotation around the forward axis */
-    roll: number;
+    roll: Radians;
 };
 
 /** Placement in the parent's rotating local frame, with a coincident origin and axes. */

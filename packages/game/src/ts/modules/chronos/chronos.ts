@@ -19,6 +19,7 @@ import {
     degreesToRadians,
     getShadowRadius,
     kelvin,
+    kilograms,
     meters,
     radians,
     seconds,
@@ -124,7 +125,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
                     axisAzimuth: radians(0),
                     initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };
@@ -137,7 +138,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         },
         placement: {
             type: "inOrbit",
-            mass: 1e15,
+            mass: kilograms(1e15),
             orbit: {
                 parentIds: ["chronos"],
                 semiMajorAxis: meters(chronos.accretionDiskRadius * 2),
@@ -157,7 +158,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
                     axisAzimuth: radians(0),
                     initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };
@@ -207,7 +208,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
                     axisAzimuth: radians(0),
                     initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };
@@ -257,7 +258,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
                     axisAzimuth: radians(0),
                     initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };
@@ -301,7 +302,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
                     axisAzimuth: radians(0),
                     initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };

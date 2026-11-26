@@ -387,7 +387,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
                     axialTilt: radians(0),
                     initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };
@@ -449,12 +449,12 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             position: {
                 latitude: radians(0.02151829597894311),
                 longitude: radians(2.426090777615558),
-                heightAboveGround: -0.3,
+                heightAboveGround: meters(-0.3),
             },
             rotation: {
-                roll: 0,
-                pitch: 0,
-                heading: 0,
+                roll: radians(0),
+                pitch: radians(0),
+                heading: radians(0),
             },
         },
     };
@@ -486,7 +486,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
                     initialRotationAngle: radians(0),
                     siderealPeriod: getOrbitalPeriod(spaceTelescopeOrbitRadius, vesta.mass),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: -Math.PI / 2 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(-Math.PI / 2) },
             },
         },
     };
@@ -520,9 +520,9 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
                     siderealPeriod: durationToSeconds({ minutes: 4, seconds: 23 }),
                 },
                 localFrameOrientation: {
-                    yaw: 0,
-                    pitch: 0,
-                    roll: 0,
+                    yaw: radians(0),
+                    pitch: radians(0),
+                    roll: radians(0),
                 },
             },
         },

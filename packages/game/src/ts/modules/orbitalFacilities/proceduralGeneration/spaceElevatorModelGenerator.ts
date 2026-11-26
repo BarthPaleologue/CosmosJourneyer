@@ -234,7 +234,7 @@ export function generateSpaceElevatorModel(
             mass,
             attitude: {
                 spin,
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: -Math.PI / 2 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(-Math.PI / 2) },
             },
         },
     };

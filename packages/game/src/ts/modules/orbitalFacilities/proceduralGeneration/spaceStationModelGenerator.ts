@@ -255,7 +255,7 @@ export function generateSpaceStationModel(
             mass,
             attitude: {
                 spin,
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };

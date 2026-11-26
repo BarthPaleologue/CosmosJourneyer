@@ -57,7 +57,7 @@ describe("system entity content factories", () => {
                     siderealPeriod: seconds(0),
                     initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0.2, pitch: 0.3, roll: 0.4 },
+                localFrameOrientation: { yaw: radians(0.2), pitch: radians(0.3), roll: radians(0.4) },
             },
         },
     };
@@ -266,8 +266,8 @@ describe("system entity content factories", () => {
                     placement: {
                         type: "onSurface",
                         parentId: "missing",
-                        position: { latitude: 0, longitude: 0, heightAboveGround: 0 },
-                        rotation: { heading: 0, pitch: 0, roll: 0 },
+                        position: { latitude: radians(0), longitude: radians(0), heightAboveGround: meters(0) },
+                        rotation: { heading: radians(0), pitch: radians(0), roll: radians(0) },
                     },
                 },
             ],
