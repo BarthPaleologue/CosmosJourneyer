@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { lightYears } from "@cosmos-journeyer/physics";
+import type { LightYears } from "@cosmos-journeyer/physics";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
@@ -34,9 +36,9 @@ import { Settings } from "@/settings";
  */
 export function getNeighborStarSystemCoordinates(
     starSystemCoordinates: StarSystemCoordinates,
-    radius: number,
+    radius: LightYears,
     universeBackend: UniverseBackend,
-): Array<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }> {
+): Array<{ coordinates: StarSystemCoordinates; position: Vector3; distance: LightYears }> {
     const currentSystemPosition = wrapVector3(universeBackend.getSystemGalacticPosition(starSystemCoordinates));
     const starSectorSize = Settings.STAR_SECTOR_SIZE;
     const starSectorRadius = Math.ceil(radius / starSectorSize);
@@ -72,8 +74,8 @@ export function getNeighborStarSystemCoordinates(
             starSector.z,
         );
         return starPositions
-            .map<{ coordinates: StarSystemCoordinates; position: Vector3; distance: number }>((position, index) => {
-                const distance = Vector3.Distance(position, currentSystemPosition);
+            .map<{ coordinates: StarSystemCoordinates; position: Vector3; distance: LightYears }>((position, index) => {
+                const distance = lightYears(Vector3.Distance(position, currentSystemPosition));
                 const coordinates = systemCoordinates[index];
                 if (coordinates === undefined) {
                     throw new Error("Coordinates not found for the given index");

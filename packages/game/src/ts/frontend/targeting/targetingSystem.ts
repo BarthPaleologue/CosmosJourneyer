@@ -18,6 +18,8 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Observable } from "@babylonjs/core/Misc/observable";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 
 import type { Transformable } from "../universe/architecture/transformable";
 import type { Target } from "./target";
@@ -31,8 +33,8 @@ export const sensorRangeFactor = 100;
  * @param target Target whose size determines its sensor range.
  * @returns Detection distance in world units.
  */
-export function getSensorRange(target: Target): number {
-    return target.getBoundingRadius() * sensorRangeFactor;
+export function getSensorRange(target: Target): Meters {
+    return meters(target.getBoundingRadius() * sensorRangeFactor);
 }
 
 export class TargetingSystem {

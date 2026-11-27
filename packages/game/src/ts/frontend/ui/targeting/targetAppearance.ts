@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { lightYears, lightYearsToMeters } from "@cosmos-journeyer/physics";
+import { lightYears, lightYearsToMeters, meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { TFunction } from "i18next";
 
@@ -177,8 +178,8 @@ export function getTargetCursorAppearance(target: Target): TargetCursorAppearanc
  */
 export function getTargetCursorOpacity(
     target: Target,
-    distance: number,
-    sensorRange: number | null,
+    distance: Meters,
+    sensorRange: Meters | null,
     isSelected: boolean,
     hasKnownOverride: boolean,
 ): number {
@@ -200,18 +201,18 @@ export function getTargetCursorOpacity(
  * @param distance Distance from the viewer to the target.
  * @returns Proximity-based opacity from zero (hidden) to one (fully visible).
  */
-function getTargetProximityOpacity(target: Target, distance: number): number {
+function getTargetProximityOpacity(target: Target, distance: Meters): number {
     const radius = target.getBoundingRadius();
-    let minDistance: number;
+    let minDistance: Meters;
     switch (target.type) {
         case TargetType.CUSTOM:
-            minDistance = 0;
+            minDistance = meters(0);
             break;
         case TargetType.STAR_SYSTEM:
             minDistance = lightYearsToMeters(lightYears(2));
             break;
         case TargetType.SPACESHIP:
-            minDistance = radius * 15;
+            minDistance = meters(radius * 15);
             break;
         case TargetType.VEHICLE:
         case TargetType.STAR:
@@ -221,20 +222,20 @@ function getTargetProximityOpacity(target: Target, distance: number): number {
         case TargetType.TELLURIC_PLANET:
         case TargetType.TELLURIC_SATELLITE:
         case TargetType.ANOMALY:
-            minDistance = radius * 10;
+            minDistance = meters(radius * 10);
             break;
         case TargetType.SPACE_STATION:
         case TargetType.SPACE_ELEVATOR:
-            minDistance = radius * 6;
+            minDistance = meters(radius * 6);
             break;
         case TargetType.SPACE_ELEVATOR_CLIMBER:
-            minDistance = radius * 7;
+            minDistance = meters(radius * 7);
             break;
         case TargetType.LANDING_BAY:
-            minDistance = 8000;
+            minDistance = meters(8000);
             break;
         case TargetType.LANDING_PAD:
-            minDistance = radius * 4;
+            minDistance = meters(radius * 4);
             break;
         default:
             return assertUnreachable(target);

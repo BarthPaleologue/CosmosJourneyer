@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { lightYears } from "@cosmos-journeyer/physics";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import { expect, test } from "vitest";
 
@@ -30,7 +31,7 @@ test("getNeighborStarSystemCoordinates", () => {
     const systemCoordinates = universeBackend.getSystemCoordinatesFromSeed(0.0, 0.0, 0.0, 0);
 
     for (let i = 0; i < 10; i++) {
-        const searchRadius = 5 * i;
+        const searchRadius = lightYears(5 * i);
 
         const neighbors = getNeighborStarSystemCoordinates(systemCoordinates, searchRadius, universeBackend);
         neighbors.forEach((neighbor) => {

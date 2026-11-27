@@ -18,7 +18,7 @@
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Observer } from "@babylonjs/core/Misc/observable";
-import { radians } from "@cosmos-journeyer/physics";
+import { meters, radians } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import type { Target } from "../../targeting/target";
@@ -111,7 +111,7 @@ export class TargetCursorLayer {
                 projected.x <= camera.viewport.x + camera.viewport.width &&
                 projected.y >= camera.viewport.y &&
                 projected.y <= camera.viewport.y + camera.viewport.height;
-            const distance = offset.length();
+            const distance = meters(offset.length());
             const opacity =
                 isOnScreen && this.targetingSystem.isAvailable(target)
                     ? getTargetCursorOpacity(

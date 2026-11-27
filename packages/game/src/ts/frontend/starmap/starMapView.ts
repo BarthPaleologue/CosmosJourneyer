@@ -30,6 +30,7 @@ import { GreasedLineTools } from "@babylonjs/core/Misc/greasedLineTools";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { DefaultRenderingPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/Pipelines/defaultRenderingPipeline";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters, seconds } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
@@ -402,7 +403,7 @@ export class StarMapView implements View {
         );
 
         const cameraToStarDir = starSystemPosition.subtract(this.controls.thirdPersonCamera.globalPosition).normalize();
-        const animationDurationSeconds = 1;
+        const animationDurationSeconds = seconds(1);
 
         if (skipAnimation) {
             lookAt(this.controls.getTransform(), starSystemPosition, this.scene.useRightHandedSystem);
@@ -443,12 +444,12 @@ export class StarMapView implements View {
             );
         }
 
-        const targetRadius = 10;
+        const targetRadius = meters(10);
         if (skipAnimation) {
             this.controls.thirdPersonCamera.radius = targetRadius;
         } else {
             this.radiusAnimation = CustomAnimation.FromTo(
-                this.controls.thirdPersonCamera.radius,
+                meters(this.controls.thirdPersonCamera.radius),
                 targetRadius,
                 lerp,
                 animationDurationSeconds,

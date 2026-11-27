@@ -18,6 +18,8 @@
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
+import { lightYears } from "@cosmos-journeyer/physics";
+import type { LightYears } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
@@ -71,7 +73,7 @@ export class StarMapUI {
 
     readonly onSystemFocusObservable = new Observable<StarSystemCoordinates>();
 
-    private formatLyDistance(distanceInLy: number): string {
+    private formatLyDistance(distanceInLy: LightYears): string {
         return distanceInLy.toLocaleString(undefined, {
             minimumFractionDigits: 1,
             maximumFractionDigits: 1,
@@ -330,7 +332,7 @@ export class StarMapUI {
             this.shortHandUIDistanceFromCurrent.textContent = `${this.t("starMap:distanceFromCurrent")}: ${this.t(
                 "units:shortLy",
                 {
-                    value: this.formatLyDistance(Vector3.Distance(currentPosition, targetPosition)),
+                    value: this.formatLyDistance(lightYears(Vector3.Distance(currentPosition, targetPosition))),
                 },
             )}`;
         }
