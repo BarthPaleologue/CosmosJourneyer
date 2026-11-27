@@ -19,6 +19,7 @@ import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { SpaceDiscoveryData } from "@/backend/encyclopaedia/encyclopaediaGalactica";
+import { AsteroidFieldMissionState } from "@/backend/missions/missionAsteroidFieldNodeSerialized";
 import { FlyByState } from "@/backend/missions/missionFlyByNodeSerialized";
 import { MissionType } from "@/backend/missions/missionSerialized";
 import type { MissionSerialized } from "@/backend/missions/missionSerialized";
@@ -243,17 +244,16 @@ describe("Player", () => {
                 throw new Error("No default spaceship found for test");
             }
 
-            // Add a corrupted spaceship to serializedSpaceships
-            const corruptedSpaceship = { ...getDefaultSerializedSpaceship() };
-            // @ts-expect-error - Intentionally corrupt the data
-            delete corruptedSpaceship.components;
+            const spaceship = getDefaultSerializedSpaceship();
+            const corruptedSpaceship = {
+                ...spaceship,
+                toJSON: () => ({ ...spaceship, components: undefined }),
+            };
             player.serializedSpaceships.push(corruptedSpaceship);
 
             const serialized = Player.Serialize(player);
 
-            // Should only contain the valid spaceships (the default one)
-            expect(serialized.spaceShips).toHaveLength(1);
-            expect(serialized.spaceShips[0]).toMatchObject(playerSpaceship);
+            expect(serialized.spaceShips).toEqual([playerSpaceship]);
         });
 
         it("should handle mission serialization/deserialization", () => {
@@ -624,33 +624,38 @@ describe("Player", () => {
             expect(player.spareSpaceshipComponents.size).toBe(0);
         });
 
-        it("should handle invalid mission data gracefully", () => {
-            const player = Player.Default(universeBackend);
-
-            const serializedData: SerializedPlayer = {
-                ...Player.Serialize(player),
-                currentMissions: [
-                    // @ts-expect-error - Invalid mission data for testing
-                    { invalid: "mission", data: "test" },
-                ],
-                completedMissions: [
-                    // @ts-expect-error - Invalid mission data for testing
-                    { another: "invalid", mission: true },
-                ],
+        it("drops missions whose asteroid field is missing and restores the other missions", () => {
+            const { system } = getLoneStarSystem();
+            universeBackend.registerAuthoredSystem(system);
+            const star = { systemCoordinates: system.coordinates, idInSystem: system.stellarObjects[0].id };
+            const flyBy: MissionSerialized = {
+                missionGiver: star,
+                tree: { type: "fly_by", objectId: star, state: FlyByState.NOT_IN_SYSTEM },
+                reward: 1000,
+                type: MissionType.SIGHT_SEEING_FLY_BY,
             };
+            const missingAsteroidField: MissionSerialized = {
+                missionGiver: star,
+                tree: {
+                    type: "asteroid_field",
+                    objectId: { systemCoordinates: system.coordinates, idInSystem: "removed-planet" },
+                    state: AsteroidFieldMissionState.NOT_IN_SYSTEM,
+                },
+                reward: 1000,
+                type: MissionType.SIGHT_SEEING_ASTEROID_FIELD,
+            };
+            const savedPlayer = Player.Serialize(Player.Default(universeBackend));
+            const player = Player.Deserialize(
+                {
+                    ...savedPlayer,
+                    currentMissions: [flyBy, missingAsteroidField],
+                    completedMissions: [missingAsteroidField, flyBy],
+                },
+                universeBackend,
+            );
 
-            // Should not throw an error during deserialization
-            let deserializedPlayer: Player | undefined;
-            expect(() => {
-                deserializedPlayer = Player.Deserialize(serializedData, universeBackend);
-            }).not.toThrow();
-
-            // Invalid missions should be filtered out
-            expect(deserializedPlayer).toBeDefined();
-            if (deserializedPlayer) {
-                expect(deserializedPlayer.currentMissions).toEqual([]);
-                expect(deserializedPlayer.completedMissions).toEqual([]);
-            }
+            expect(player.currentMissions.map((mission) => mission.serialize())).toEqual([flyBy]);
+            expect(player.completedMissions.map((mission) => mission.serialize())).toEqual([flyBy]);
         });
 
         it("should preserve exact floating point precision where possible", () => {

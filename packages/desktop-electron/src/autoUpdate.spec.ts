@@ -1,21 +1,22 @@
 import { EventEmitter } from "node:events";
 
-import type { CancellationToken, ProgressInfo, UpdateInfo } from "electron-updater";
+import type { ProgressInfo, UpdateInfo } from "electron-updater";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { DesktopAutoUpdateService } from "./autoUpdate.js";
+import type { AutoUpdaterClient } from "./autoUpdate.js";
 import type { DesktopUpdateState } from "./updateContract.js";
 
-// eslint-disable-next-line cosmos/no-class-inheritance -- test mock must satisfy the EventEmitter-based updater contract
-class MockUpdater extends EventEmitter {
-    public autoDownload = true;
-    public autoInstallOnAppQuit = true;
-    public isUpdateSupported: (info: UpdateInfo) => boolean | Promise<boolean> = () => true;
-    public readonly checkForUpdates = vi.fn<() => Promise<null>>(async () => Promise.resolve(null));
-    public readonly downloadUpdate = vi.fn<(token: CancellationToken) => Promise<Array<string>>>(async () =>
-        Promise.resolve(["update"]),
-    );
-    public readonly quitAndInstall = vi.fn();
+/** @returns An updater double with real event delivery and stubbed network operations. */
+function createUpdater() {
+    return Object.assign(new EventEmitter(), {
+        autoDownload: true,
+        autoInstallOnAppQuit: true,
+        isUpdateSupported: vi.fn<AutoUpdaterClient["isUpdateSupported"]>().mockReturnValue(true),
+        checkForUpdates: vi.fn<AutoUpdaterClient["checkForUpdates"]>().mockResolvedValue(null),
+        downloadUpdate: vi.fn<AutoUpdaterClient["downloadUpdate"]>().mockResolvedValue(["update"]),
+        quitAndInstall: vi.fn<AutoUpdaterClient["quitAndInstall"]>(),
+    });
 }
 
 describe("DesktopAutoUpdateService", () => {
@@ -25,7 +26,7 @@ describe("DesktopAutoUpdateService", () => {
     });
 
     it("installs the minimum release age check on the updater", async () => {
-        const updater = new MockUpdater();
+        const updater = createUpdater();
         const now = Date.parse("2026-11-07T12:00:00.000Z");
         vi.spyOn(Date, "now").mockReturnValue(now);
         const release = {
@@ -39,7 +40,7 @@ describe("DesktopAutoUpdateService", () => {
     });
 
     it("waits for explicit consent before downloading and installing", async () => {
-        const updater = new MockUpdater();
+        const updater = createUpdater();
         const states: Array<DesktopUpdateState> = [];
         const service = new DesktopAutoUpdateService(updater, (state) => states.push(state));
 
@@ -63,7 +64,7 @@ describe("DesktopAutoUpdateService", () => {
     });
 
     it("publishes download progress", async () => {
-        const updater = new MockUpdater();
+        const updater = createUpdater();
         const service = new DesktopAutoUpdateService(updater, () => {});
         service.start();
         updater.emit("update-available", createUpdateInfo());
@@ -87,7 +88,7 @@ describe("DesktopAutoUpdateService", () => {
     });
 
     it("returns to the available state when the player cancels a download", async () => {
-        const updater = new MockUpdater();
+        const updater = createUpdater();
         updater.downloadUpdate.mockImplementationOnce(
             async (token) =>
                 new Promise((_resolve, reject) => {
