@@ -266,7 +266,6 @@ export default defineConfig([
     {
         files: ["**/*.{spec,test}.{ts,tsx,mts,cts}"],
         rules: {
-            "@typescript-eslint/dot-notation": ["error", { allowPrivateClassPropertyAccess: true }],
             "@typescript-eslint/no-empty-function": "off",
         },
     },
