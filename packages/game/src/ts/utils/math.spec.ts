@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { quantity, radians } from "@cosmos-journeyer/physics";
+import { radians } from "@cosmos-journeyer/physics";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -90,7 +90,7 @@ describe("math utilities", () => {
 
     describe("findMinimumNewtonRaphson", () => {
         it("finds a zero of the provided function", () => {
-            const result = findMinimumNewtonRaphson((x) => x * x - 9, quantity<"rad">(4), 100);
+            const result = findMinimumNewtonRaphson((x) => x * x - 9, 4, 100);
 
             expect(result).toBeCloseTo(3);
         });
