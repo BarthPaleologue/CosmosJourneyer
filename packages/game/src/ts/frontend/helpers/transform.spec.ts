@@ -15,8 +15,6 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import { TransformNode } from "@babylonjs/core/Meshes";
@@ -38,7 +36,7 @@ describe("BasicTransform", () => {
     it("can rotate around a pivot", () => {
         transform.setAbsolutePosition(new Vector3(1, 0, 0));
         transform.rotateAround(new Vector3(0, 0, 0), new Vector3(0, 1, 0), Math.PI / 2);
-        expect(transform.getAbsolutePosition().equals(new Vector3(0, 0, -1))).to.be.true;
+        expect(transform.getAbsolutePosition().equals(new Vector3(0, 0, -1))).toBe(true);
     });
 
     it("initializes an unrotated transform with the identity quaternion", () => {
