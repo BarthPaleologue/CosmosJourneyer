@@ -16,10 +16,11 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Kilograms } from "@cosmos-journeyer/physics";
 
 /** Mass and principal inertia properties required to compute attitude torque, without center of mass. */
 export type AngularMassProperties = {
-    mass: number;
+    mass: Kilograms;
     inertia: Vector3;
     inertiaOrientation: Quaternion;
 };

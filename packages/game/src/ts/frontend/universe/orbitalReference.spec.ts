@@ -19,7 +19,8 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
-import { astronomicalUnitToMeters, meters, radians, seconds, SolarMass } from "@cosmos-journeyer/physics";
+import { astronomicalUnitToMeters, kilograms, meters, radians, seconds, SolarMass } from "@cosmos-journeyer/physics";
+import type { Kilograms } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import {
     generateJuliaSetModel,
@@ -42,7 +43,7 @@ import { getMostInfluentialObject, getNavigationReferenceFrame } from "./orbital
 
 type KeplerianObjectSummary = {
     readonly id: string;
-    readonly mass: number;
+    readonly mass: Kilograms;
     readonly orbit: DeepReadonly<Orbit>;
     readonly spin: DeepReadonly<SpinModel>;
 };
@@ -66,7 +67,7 @@ describe("orbital reference selection", () => {
      * @param position - World-space position of the orbital object.
      * @returns An orbital test object with the requested mass and transform.
      */
-    function object(id: string, mass: number, position: Vector3): KeplerianObject {
+    function object(id: string, mass: Kilograms, position: Vector3): KeplerianObject {
         const transform = new TransformNode(id, scene);
         transform.position.copyFrom(position);
         return {
@@ -118,23 +119,23 @@ describe("orbital reference selection", () => {
     });
 
     it("prefers mass at equal distance and keeps the first candidate on ties", () => {
-        const light = object("light", 1, new Vector3(-10, 0, 0));
-        const heavy = object("heavy", 2, new Vector3(10, 0, 0));
+        const light = object("light", kilograms(1), new Vector3(-10, 0, 0));
+        const heavy = object("heavy", kilograms(2), new Vector3(10, 0, 0));
         expect(getMostInfluentialObject([light, heavy], Vector3.Zero())).toBe(heavy);
-        const tied = object("tied", 2, new Vector3(-10, 0, 0));
+        const tied = object("tied", kilograms(2), new Vector3(-10, 0, 0));
         expect(getMostInfluentialObject([heavy, tied], Vector3.Zero())).toBe(heavy);
     });
 
     it("handles an observer exactly at a candidate without dividing by zero", () => {
         const star = object("star", SolarMass, Vector3.Zero());
-        const telescope = object("telescope", 100_000, new Vector3(100, 0, 0));
+        const telescope = object("telescope", kilograms(100_000), new Vector3(100, 0, 0));
         expect(getMostInfluentialObject([star, telescope], new Vector3(100, 0, 0))).toBe(telescope);
     });
 
     it("uses world positions for parented objects", () => {
         const parent = new TransformNode("parent", scene);
         parent.position.x = 1e12;
-        const telescope = object("telescope", 100_000, new Vector3(100, 0, 0));
+        const telescope = object("telescope", kilograms(100_000), new Vector3(100, 0, 0));
         telescope.getTransform().parent = parent;
         const star = object("star", SolarMass, Vector3.Zero());
         expect(getMostInfluentialObject([star, telescope], new Vector3(1e12 + 101, 0, 0))).toBe(telescope);
@@ -142,7 +143,7 @@ describe("orbital reference selection", () => {
 
     it("selects the telescope at a million km where a sixth-power score still selects the star", () => {
         const star = object("star", SolarMass, Vector3.Zero());
-        const telescope = object("telescope", 100_000, new Vector3(astronomicalUnitToMeters(3), 0, 0));
+        const telescope = object("telescope", kilograms(100_000), new Vector3(astronomicalUnitToMeters(3), 0, 0));
         const observer = telescope.getTransform().position.add(new Vector3(0, 1e9, 0));
         const sixthPower = (entry: KeplerianObject) =>
             entry.mass / Vector3.DistanceSquared(entry.getTransform().getAbsolutePosition(), observer) ** 3;
@@ -157,8 +158,8 @@ describe("orbital reference selection", () => {
         [1_800e3, "teapot"],
         [1_900e3, "giant"],
     ] as const)("at %s meters from a 1 kg teapot, selects %s using mass and distance", (distance, expected) => {
-        const giant = object("giant", 2e27, Vector3.Zero());
-        const teapot = object("teapot", 1, new Vector3(1e9, 0, 0));
+        const giant = object("giant", kilograms(2e27), Vector3.Zero());
+        const teapot = object("teapot", kilograms(1), new Vector3(1e9, 0, 0));
         const observer = teapot.getTransform().position.subtract(new Vector3(distance, 0, 0));
         expect(Vector3.Distance(observer, teapot.getTransform().position)).toBeLessThan(
             Vector3.Distance(observer, giant.getTransform().position),

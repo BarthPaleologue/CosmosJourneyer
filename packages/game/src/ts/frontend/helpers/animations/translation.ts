@@ -17,6 +17,7 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes";
+import type { Seconds } from "@cosmos-journeyer/physics";
 
 import { translate } from "../transform";
 import { CustomAnimation } from "./customAnimation";
@@ -27,7 +28,7 @@ export class TransformTranslationAnimation {
     private lastValue: Vector3;
     private readonly animation: CustomAnimation<Vector3>;
 
-    constructor(transform: TransformNode, targetPosition: Vector3, duration: number) {
+    constructor(transform: TransformNode, targetPosition: Vector3, duration: Seconds) {
         this.transform = transform;
         this.lastValue = transform.getAbsolutePosition().clone();
         this.animation = CustomAnimation.FromTo(

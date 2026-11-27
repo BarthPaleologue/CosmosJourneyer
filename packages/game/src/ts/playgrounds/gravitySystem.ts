@@ -28,6 +28,7 @@ import {
     Vector3,
 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core";
+import { kilograms, meters } from "@cosmos-journeyer/physics";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { DepthRendererManager } from "@/frontend/helpers/depthRendererManager";
@@ -55,11 +56,11 @@ export async function createGravitySystemScene(
     const hemi = new HemisphericLight("hemi", Vector3.Up(), scene);
     hemi.intensity = 0.1;
 
-    const sphere1Radius = 10;
+    const sphere1Radius = meters(10);
 
     const sphere1 = MeshBuilder.CreateSphere("ground", { diameter: sphere1Radius * 2 }, scene);
 
-    const sphere2Radius = sphere1Radius / 3;
+    const sphere2Radius = meters(sphere1Radius / 3);
     const sphere2 = MeshBuilder.CreateSphere("sphere2", { diameter: sphere2Radius * 2 }, scene);
     sphere2.position.x = sphere1Radius * 4;
 
@@ -132,13 +133,13 @@ export async function createGravitySystemScene(
         gravitySystem.update([
             {
                 name: "sphere1",
-                mass: 1,
+                mass: kilograms(1),
                 radius: sphere1Radius,
                 position: sphere1.position,
             },
             {
                 name: "sphere2",
-                mass: 1,
+                mass: kilograms(1),
                 radius: sphere2Radius,
                 position: sphere2.position,
             },

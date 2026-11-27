@@ -25,7 +25,8 @@ import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResu
 import { PhysicsAggregate, PhysicsShapeCapsule } from "@babylonjs/core/Physics/v2";
 import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { Scene } from "@babylonjs/core/scene";
-import { degreesToRadians } from "@cosmos-journeyer/physics";
+import { degreesToRadians, meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 
 import type { HumanoidInstance } from "@/frontend/assets/objects/humanoids";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
@@ -48,12 +49,12 @@ class AnimationState {
 
 type GroundSurfaceInfo = {
     type: "ground";
-    distance: number;
+    distance: Meters;
 };
 
 type WaterSurfaceInfo = {
     type: "water";
-    distance: number;
+    distance: Meters;
 };
 
 export type SurfaceInfo = GroundSurfaceInfo | WaterSurfaceInfo;
@@ -267,14 +268,14 @@ export class HumanoidAvatar implements Transformable {
         if (this.upwardRaycastResult.hasHit) {
             if ((this.upwardRaycastResult.body?.shape?.filterMembershipMask ?? 0) & CollisionMask.WATER) {
                 // keep distance referenced to feet so swimming threshold remains meaningful
-                const waterDistance = -this.upwardRaycastResult.hitDistance - rayOffset;
+                const waterDistance = meters(0 - this.upwardRaycastResult.hitDistance - rayOffset);
                 return {
                     type: "water" as const,
                     distance: waterDistance,
                 };
             } else if (!this.downwardRaycastResult.hasHit) {
                 // no ground below but ground above, could be falling under the ground
-                const groundDistance = rayOffset - this.upwardRaycastResult.hitDistance;
+                const groundDistance = meters(rayOffset - this.upwardRaycastResult.hitDistance);
                 return {
                     type: "ground" as const,
                     distance: groundDistance,
@@ -293,11 +294,11 @@ export class HumanoidAvatar implements Transformable {
             // water below, we are falling towards the water
             return {
                 type: "water" as const,
-                distance: this.downwardRaycastResult.hitDistance - rayOffset,
+                distance: meters(this.downwardRaycastResult.hitDistance - rayOffset),
             };
         }
 
-        const groundDistance = this.downwardRaycastResult.hitDistance - rayOffset;
+        const groundDistance = meters(this.downwardRaycastResult.hitDistance - rayOffset);
         return {
             type: "ground" as const,
             distance: groundDistance,

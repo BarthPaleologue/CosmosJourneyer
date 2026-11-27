@@ -20,6 +20,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import { Scene } from "@babylonjs/core/scene";
+import { seconds } from "@cosmos-journeyer/physics";
 import { afterAll, describe, expect, it } from "vitest";
 
 import { FloatingOriginSystem } from "../floatingOriginSystem";
@@ -46,7 +47,7 @@ describe("TransformTranslationAnimation", () => {
 
     it("applies the final remaining displacement at the end of the animation", () => {
         const transform = new TransformNode("animatedTransform", scene);
-        const animation = new TransformTranslationAnimation(transform, new Vector3(10, 0, 0), 1);
+        const animation = new TransformTranslationAnimation(transform, new Vector3(10, 0, 0), seconds(1));
 
         animation.update(0.4);
 
@@ -65,7 +66,7 @@ describe("TransformTranslationAnimation", () => {
         const camera = new FreeCamera("controllerCamera", new Vector3(2, 0, 0), scene);
         camera.parent = transform;
 
-        const animation = new TransformTranslationAnimation(transform, new Vector3(100, 0, 0), 1);
+        const animation = new TransformTranslationAnimation(transform, new Vector3(100, 0, 0), seconds(1));
         const floatingOriginSystem = new FloatingOriginSystem(scene, 1);
 
         animation.update(0.5);

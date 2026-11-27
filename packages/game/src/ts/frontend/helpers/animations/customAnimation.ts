@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Seconds } from "@cosmos-journeyer/physics";
+
 import { clamp } from "@/utils/math";
 
 type AnimationSampler<T> = (progress: number) => T;
@@ -24,11 +26,11 @@ type Easing = (progress: number) => number;
 export class CustomAnimation<T> {
     private readonly sampler: AnimationSampler<T>;
 
-    readonly durationSeconds: number;
+    readonly durationSeconds: Seconds;
 
     private elapsedSeconds = 0;
 
-    constructor(sampler: AnimationSampler<T>, durationSeconds: number) {
+    constructor(sampler: AnimationSampler<T>, durationSeconds: Seconds) {
         this.sampler = sampler;
         this.durationSeconds = durationSeconds;
     }
@@ -37,7 +39,7 @@ export class CustomAnimation<T> {
         from: T,
         to: T,
         linearInterpolation: (from: T, to: T, progress: number) => T,
-        durationSeconds: number,
+        durationSeconds: Seconds,
         options?: Partial<{
             easing: Easing;
         }>,

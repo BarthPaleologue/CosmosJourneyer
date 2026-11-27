@@ -28,7 +28,8 @@ import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { Scene } from "@babylonjs/core/scene";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import { lightYears, meters, metersToLightYears } from "@cosmos-journeyer/physics";
+import { lightYears, meters, metersToLightYears, seconds } from "@cosmos-journeyer/physics";
+import type { Seconds } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
@@ -625,7 +626,7 @@ export class StarSystemView implements View {
      * As it initializes the post processes using `initPostProcesses`, it returns a promise that resolves when the post processes are initialized.
      * @param timestampSeconds Simulation time in seconds used to initialize orbital positions.
      */
-    public initStarSystem(timestampSeconds: number): void {
+    public initStarSystem(timestampSeconds: Seconds): void {
         const starSystem = this.getStarSystem();
         starSystem.initPositions(2, timestampSeconds);
 
@@ -650,10 +651,10 @@ export class StarSystemView implements View {
             this.postProcessManager.sphereShadows.addShadowCaster(sphereOccluder);
         }
 
-        const currentJumpRange = spaceship.getInternals().getWarpDrive()?.rangeLY ?? 0;
+        const currentJumpRange = spaceship.getInternals().getWarpDrive()?.rangeLY ?? lightYears(0);
         for (const neighbor of getNeighborStarSystemCoordinates(
             starSystem.model.coordinates,
-            Math.min(currentJumpRange, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY),
+            lightYears(Math.min(currentJumpRange, Settings.VISIBLE_NEIGHBORHOOD_MAX_RADIUS_LY)),
             this.universeBackend,
         )) {
             starSystem.addSystemTarget(neighbor.coordinates, this.universeBackend);
@@ -1164,7 +1165,7 @@ export class StarSystemView implements View {
             initialRotation,
             finalRotation,
             (from, to, progress) => Quaternion.Slerp(from, to, progress),
-            rotationAngle / rotationSpeed,
+            seconds(rotationAngle / rotationSpeed),
             { easing: easeInOutCubic },
         );
 
@@ -1205,7 +1206,7 @@ export class StarSystemView implements View {
         }
 
         this.scene.onBeforeRenderObservable.addOnce(() => {
-            this.initStarSystem(Date.now() / 1000);
+            this.initStarSystem(seconds(Date.now() / 1000));
 
             spaceship.hyperSpaceTunnel.setEnabled(false);
             spaceship.spaceDots.getTransform().setEnabled(true);

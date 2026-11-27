@@ -19,6 +19,8 @@ import type { AbstractSound } from "@babylonjs/core/AudioV2/abstractAudio/abstra
 import type { AudioEngineV2 } from "@babylonjs/core/AudioV2/abstractAudio/audioEngineV2";
 import { SoundState } from "@babylonjs/core/AudioV2/soundState";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import type { Musics } from "@/frontend/assets/audio/musics";
@@ -27,7 +29,7 @@ import type { StarSystemView } from "@/frontend/starSystemView";
 import type { ErasedSystemEntityProcessor } from "../systemEntity/systemEntityProcessor";
 
 export type SystemEntityMusicContext = {
-    distance: number;
+    distance: Meters;
 };
 
 export type SystemEntityMusicProcessor = ErasedSystemEntityProcessor<SystemEntityMusicContext, Array<keyof Musics>>;
@@ -152,9 +154,8 @@ export class MusicSystem {
         const playerPosition = controls.getTransform().getAbsolutePosition();
         const closestOrbitalObject = this.starSystemView.getStarSystem().getNearestOrbitalObject(playerPosition);
 
-        const distanceToClosestObject = Vector3.Distance(
-            playerPosition,
-            closestOrbitalObject.getTransform().getAbsolutePosition(),
+        const distanceToClosestObject = meters(
+            Vector3.Distance(playerPosition, closestOrbitalObject.getTransform().getAbsolutePosition()),
         );
 
         if (!isInStarSystemView) {
@@ -185,9 +186,8 @@ export class MusicSystem {
         }
 
         for (const systemEntity of this.starSystemView.getStarSystem().getSystemEntities()) {
-            const distance = Vector3.Distance(
-                systemEntity.placement.getTransform().getAbsolutePosition(),
-                playerPosition,
+            const distance = meters(
+                Vector3.Distance(systemEntity.placement.getTransform().getAbsolutePosition(), playerPosition),
             );
             const selection = this.systemEntityProcessor(systemEntity, { distance });
             if (selection.length > 0) {

@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Kilograms, MetersPerSecond, MetersPerSecondSquared } from "@cosmos-journeyer/physics";
 
 export class PositionPDController {
     /**
@@ -58,9 +59,9 @@ export class PositionPDController {
     computeForceToRef(
         current: { position: Vector3; velocity: Vector3 },
         target: { position: Vector3; velocity: Vector3 },
-        mass: number,
+        mass: Kilograms,
         ref: Vector3,
-        options?: Partial<{ max?: { closingSpeed: number; acceleration: number } }>,
+        options?: Partial<{ max?: { closingSpeed: MetersPerSecond; acceleration: MetersPerSecondSquared } }>,
     ): Vector3 {
         const positionError = target.position.subtractToRef(current.position, this.tmpPositionError);
         const velocityError = target.velocity.subtractToRef(current.velocity, this.tmpVelocityError);

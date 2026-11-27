@@ -18,6 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { kilograms, seconds } from "@cosmos-journeyer/physics";
+import type { Kilograms } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
 
@@ -35,7 +36,7 @@ export type RelativeTransformFrame = "reference" | "inertial";
 export type KeplerianObject = Transformable &
     Readonly<{
         readonly id: string;
-        readonly mass: number;
+        readonly mass: Kilograms;
         readonly orbit: DeepReadonly<Orbit>;
         readonly spin: DeepReadonly<SpinModel>;
     }>;

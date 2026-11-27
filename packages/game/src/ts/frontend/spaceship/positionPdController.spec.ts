@@ -1,4 +1,5 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { kilograms, metersPerSecond, metersPerSecondSquared } from "@cosmos-journeyer/physics";
 import { describe, expect, it } from "vitest";
 
 import { PositionPDController } from "./positionPdController";
@@ -17,7 +18,7 @@ describe("PositionPDController", () => {
         const force = controller.computeForceToRef(
             { position: Vector3.Zero(), velocity: Vector3.Zero() },
             { position: Vector3.Zero(), velocity: Vector3.Zero() },
-            5,
+            kilograms(5),
             ref,
         );
 
@@ -32,7 +33,7 @@ describe("PositionPDController", () => {
         const force = controller.computeForceToRef(
             { position: new Vector3(1, -2, 0.5), velocity: Vector3.Zero() },
             { position: new Vector3(4, 0, -1.5), velocity: Vector3.Zero() },
-            2,
+            kilograms(2),
             ref,
         );
 
@@ -47,7 +48,7 @@ describe("PositionPDController", () => {
         const force = controller.computeForceToRef(
             { position: Vector3.Zero(), velocity: new Vector3(2, -1, 0) },
             { position: Vector3.Zero(), velocity: new Vector3(-1, 3, 1) },
-            2,
+            kilograms(2),
             ref,
         );
 
@@ -62,7 +63,7 @@ describe("PositionPDController", () => {
         const force = controller.computeForceToRef(
             { position: new Vector3(0, 0, 0), velocity: new Vector3(1, 0, -1) },
             { position: new Vector3(3, -2, 1), velocity: new Vector3(0, 2, 1) },
-            1,
+            kilograms(1),
             ref,
         );
 
@@ -78,9 +79,9 @@ describe("PositionPDController", () => {
         const force = controller.computeForceToRef(
             { position: new Vector3(0, 0, 0), velocity: new Vector3(2, 0, -1) },
             { position: new Vector3(0.005, 0, 0), velocity: new Vector3(-1, 2, 3) },
-            2,
+            kilograms(2),
             ref,
-            { max: { closingSpeed: 10, acceleration: 5 } },
+            { max: { closingSpeed: metersPerSecond(10), acceleration: metersPerSecondSquared(5) } },
         );
 
         const expected = new Vector3(-3, 2, 4).scaleInPlace(4);
@@ -94,9 +95,9 @@ describe("PositionPDController", () => {
         const force = controller.computeForceToRef(
             { position: Vector3.Zero(), velocity: Vector3.Zero() },
             { position: new Vector3(8, 0, 0), velocity: Vector3.Zero() },
-            1,
+            kilograms(1),
             ref,
-            { max: { closingSpeed: 100, acceleration: 2 } },
+            { max: { closingSpeed: metersPerSecond(100), acceleration: metersPerSecondSquared(2) } },
         );
 
         const expected = new Vector3(Math.sqrt(32), 0, 0);
@@ -110,9 +111,9 @@ describe("PositionPDController", () => {
         const force = controller.computeForceToRef(
             { position: Vector3.Zero(), velocity: Vector3.Zero() },
             { position: new Vector3(100, 0, 0), velocity: Vector3.Zero() },
-            1,
+            kilograms(1),
             ref,
-            { max: { closingSpeed: 5, acceleration: 2 } },
+            { max: { closingSpeed: metersPerSecond(5), acceleration: metersPerSecondSquared(2) } },
         );
 
         const expected = new Vector3(5, 0, 0);

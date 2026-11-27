@@ -18,6 +18,7 @@
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
+import { seconds } from "@cosmos-journeyer/physics";
 
 import { EncyclopaediaGalacticaManager } from "@/backend/encyclopaedia/encyclopaediaGalacticaManager";
 import { SystemEntityBackend } from "@/backend/systemEntity/systemEntityBackend";
@@ -130,7 +131,7 @@ export async function createStarSystemViewScene(
         throw loadResult.error;
     }
 
-    starSystemView.initStarSystem(0);
+    starSystemView.initStarSystem(seconds(0));
 
     const shipControls = starSystemView.getSpaceshipControls();
 

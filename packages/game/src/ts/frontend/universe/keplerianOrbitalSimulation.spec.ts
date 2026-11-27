@@ -19,7 +19,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
-import { meters, radians, seconds } from "@cosmos-journeyer/physics";
+import { kilograms, meters, radians, seconds } from "@cosmos-journeyer/physics";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { KeplerianObject } from "./keplerianOrbitalSimulation";
@@ -57,7 +57,7 @@ function createTestOrbitalObject(
 
     return {
         id,
-        mass: 1,
+        mass: kilograms(1),
         orbit: {
             parentIds,
             argumentOfPeriapsis: radians(0),

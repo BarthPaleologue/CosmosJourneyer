@@ -16,55 +16,57 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { meters, radians } from "@cosmos-journeyer/physics";
+import type { Meters, Radians } from "@cosmos-journeyer/physics";
 
 export type ThirdPersonCameraPreset = {
-    radius: number;
-    alpha: number;
-    beta: number;
+    radius: Meters;
+    alpha: Radians;
+    beta: Radians;
     target: Vector3;
 };
 
 export const thirdPersonCameraPresets = {
     behindCentered: {
-        radius: 60,
-        alpha: Math.PI / 2,
-        beta: Math.PI / 2.2,
+        radius: meters(60),
+        alpha: radians(Math.PI / 2),
+        beta: radians(Math.PI / 2.2),
         target: Vector3.Zero(),
     },
     frontCentered: {
-        radius: 60,
-        alpha: -Math.PI / 2,
-        beta: Math.PI / 2.2,
+        radius: meters(60),
+        alpha: radians(-Math.PI / 2),
+        beta: radians(Math.PI / 2.2),
         target: Vector3.Zero(),
     },
     onRightWing: {
-        radius: 24,
-        alpha: 1.4,
-        beta: 1.4,
+        radius: meters(24),
+        alpha: radians(1.4),
+        beta: radians(1.4),
         target: new Vector3(11, 0, -11),
     },
     onLeftWing: {
-        radius: 24,
-        alpha: Math.PI - 1.4,
-        beta: 1.4,
+        radius: meters(24),
+        alpha: radians(Math.PI - 1.4),
+        beta: radians(1.4),
         target: new Vector3(-11, 0, -11),
     },
     underBelly: {
-        radius: 45.37510024434761,
-        alpha: -1.6200480258800203,
-        beta: 2.0127308430713713,
+        radius: meters(45.37510024434761),
+        alpha: radians(-1.6200480258800203),
+        beta: radians(2.0127308430713713),
         target: new Vector3(2.7245544396057473, 11.891621134326973, 22.92345975874762),
     },
     cockpitSelfie: {
-        radius: 29.318232551394654,
-        alpha: -1.5998467158450924,
-        beta: 1.1911982911165055,
+        radius: meters(29.318232551394654),
+        alpha: radians(-1.5998467158450924),
+        beta: radians(1.1911982911165055),
         target: new Vector3(0.9415595170643695, -5.6552997142865005, 14.77185995314097),
     },
     rearBelow: {
-        radius: 23.764277458190918,
-        alpha: Math.PI / 2,
-        beta: 1.7225208911739405,
+        radius: meters(23.764277458190918),
+        alpha: radians(Math.PI / 2),
+        beta: radians(1.7225208911739405),
         target: new Vector3(-0.12075920328015212, -0.8323935529838505, -11.079838477701394),
     },
 } as const satisfies Record<string, ThirdPersonCameraPreset>;

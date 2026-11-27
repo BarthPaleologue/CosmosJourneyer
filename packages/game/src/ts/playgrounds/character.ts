@@ -29,6 +29,7 @@ import {
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
+import { kilograms, meters } from "@cosmos-journeyer/physics";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadHumanoidPrefabs } from "@/frontend/assets/objects/humanoids";
@@ -68,7 +69,7 @@ export async function createCharacterDemoScene(
     const hemi = new HemisphericLight("hemi", new Vector3(0, 1, 0), scene);
     hemi.intensity = 0.5;
 
-    const groundRadius = 40;
+    const groundRadius = meters(40);
     const ground = MeshBuilder.CreateIcoSphere("ground", { radius: groundRadius }, scene);
 
     new PhysicsAggregate(ground, PhysicsShapeType.MESH, { mass: 0, restitution: 0.2 }, scene);
@@ -142,7 +143,7 @@ export async function createCharacterDemoScene(
         gravitySystem.update([
             {
                 name: "Planet",
-                mass: 100000,
+                mass: kilograms(100000),
                 position: ground.position,
                 radius: groundRadius,
             },

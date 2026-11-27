@@ -24,7 +24,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import type { Scene } from "@babylonjs/core/scene";
-import { metersPerSecond, radians, seconds } from "@cosmos-journeyer/physics";
+import { meters, metersPerSecond, radians, seconds } from "@cosmos-journeyer/physics";
 import type { Radians } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
@@ -260,19 +260,19 @@ export class ShipControls implements Controls {
         this.resetCameraHandler = (presetName: ThirdPersonCameraPresetNames): void => {
             this.thirdPersonCameraAnimation = CustomAnimation.FromTo(
                 {
-                    alpha: this.thirdPersonCamera.alpha,
-                    beta: this.thirdPersonCamera.beta,
-                    radius: this.thirdPersonCamera.radius,
+                    alpha: radians(this.thirdPersonCamera.alpha),
+                    beta: radians(this.thirdPersonCamera.beta),
+                    radius: meters(this.thirdPersonCamera.radius),
                     target: this.thirdPersonCamera.target.clone(),
                 },
                 thirdPersonCameraPresets[presetName],
                 (from, to, progress) => ({
-                    alpha: lerpAngle(radians(from.alpha), radians(to.alpha), progress),
-                    beta: lerpAngle(radians(from.beta), radians(to.beta), progress),
-                    radius: lerp(from.radius, to.radius, progress),
+                    alpha: lerpAngle(from.alpha, to.alpha, progress),
+                    beta: lerpAngle(from.beta, to.beta, progress),
+                    radius: meters(lerp(from.radius, to.radius, progress)),
                     target: Vector3.Lerp(from.target, to.target, progress),
                 }),
-                1.0,
+                seconds(1.0),
                 {
                     easing: easeInOutCubic,
                 },
