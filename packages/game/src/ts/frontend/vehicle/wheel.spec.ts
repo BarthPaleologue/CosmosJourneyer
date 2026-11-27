@@ -27,6 +27,7 @@ import {
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Wheel } from "./wheel";
@@ -78,7 +79,7 @@ function createWheels(layout: ReadonlyArray<TestWheelLayout>) {
     const frame = new PhysicsAggregate(frameMesh, PhysicsShapeType.BOX, { mass: 1 }, scene);
     const models = layout.map(({ z, steerable, powered }) => ({
         position: new Vector3(0, -1, z),
-        geometry: { radius: 1, thickness: 0.3 },
+        geometry: { radius: meters(1), thickness: meters(0.3) },
         behavior: { powered: powered ?? false, steerable },
     }));
     const wheels = models.map((model) => {

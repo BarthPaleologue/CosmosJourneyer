@@ -15,7 +15,17 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { degreesToRadians, EarthG, kmhToMetersPerSecond } from "@cosmos-journeyer/physics";
+import {
+    degreesToRadians,
+    EarthG,
+    kmhToMetersPerSecond,
+    meters,
+    metersPerSecond,
+    metersPerSecondSquared,
+    quantity,
+    radians,
+} from "@cosmos-journeyer/physics";
+import type { Radians } from "@cosmos-journeyer/physics";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -25,11 +35,13 @@ import {
     computeSpeedLimitedCurvature,
 } from "./steeringGeometry";
 
-const wheel = (z: number, steerable: boolean) => ({ position: { x: 0, z }, steerable });
+const wheel = (z: number, steerable: boolean) => ({ position: { x: meters(0), z: meters(z) }, steerable });
 const mechanicalLimit = degreesToRadians(45);
-const acceleration = 0.5 * EarthG;
+const acceleration = metersPerSecondSquared(0.5 * EarthG);
 const curvatureAt = (arm: number, speed: number, angle: number) =>
-    computeSpeedLimitedCurvature(angle, arm, speed, acceleration, mechanicalLimit);
+    computeSpeedLimitedCurvature(radians(angle), meters(arm), metersPerSecond(speed), acceleration, mechanicalLimit);
+const steeringAngle = (curvature: number, leverArm: number, limit: Radians, lateral: number): Radians =>
+    getWheelSteeringAngle(quantity<"1/m">(curvature), meters(leverArm), limit, meters(lateral));
 
 describe("steering geometry", () => {
     it("anchors front steering at the fixed rear axle using the full wheelbase", () => {
@@ -42,7 +54,7 @@ describe("steering geometry", () => {
                 minCurvature: -Math.tan(mechanicalLimit) / 5.2,
             },
         });
-        const angle = getWheelSteeringAngle(
+        const angle = steeringAngle(
             curvatureAt(5.2, kmhToMetersPerSecond(40), mechanicalLimit),
             5.2,
             mechanicalLimit,
@@ -56,7 +68,7 @@ describe("steering geometry", () => {
             steeringReferenceZ: 2.6,
             referenceLeverArm: 5.2,
         });
-        expect(getWheelSteeringAngle(curvatureAt(5.2, 0, 0.3), -5.2, mechanicalLimit, 0)).toBeCloseTo(-0.3);
+        expect(steeringAngle(curvatureAt(5.2, 0, 0.3), -5.2, mechanicalLimit, 0)).toBeCloseTo(-0.3);
     });
 
     it("gives the Wolf Mk2 centerline equal opposite angles of about 5.9 degrees at 40 km/h", () => {
@@ -67,10 +79,10 @@ describe("steering geometry", () => {
             referenceLeverArm: 2.6,
         });
         const curvature = curvatureAt(2.6, kmhToMetersPerSecond(40), mechanicalLimit);
-        const front = getWheelSteeringAngle(curvature, 2.6, mechanicalLimit, 0);
-        const rear = getWheelSteeringAngle(curvature, -2.6, mechanicalLimit, 0);
+        const front = steeringAngle(curvature, 2.6, mechanicalLimit, 0);
+        const rear = steeringAngle(curvature, -2.6, mechanicalLimit, 0);
         expect(front / degreesToRadians(1)).toBeCloseTo(5.9, 1);
-        expect(rear).toBe(-front);
+        expect(rear).toBe(front * -1);
     });
 
     it("averages approximately coincident fixed wheels", () => {
@@ -90,8 +102,8 @@ describe("steering geometry", () => {
             referenceLeverArm: 4,
         });
         const curvature = curvatureAt(4, 0, 0.4);
-        expect(getWheelSteeringAngle(curvature, 4, mechanicalLimit, 0)).toBeCloseTo(0.4);
-        expect(getWheelSteeringAngle(curvature, -2, mechanicalLimit, 0)).toBeCloseTo(-Math.atan(Math.tan(0.4) / 2));
+        expect(steeringAngle(curvature, 4, mechanicalLimit, 0)).toBeCloseTo(0.4);
+        expect(steeringAngle(curvature, -2, mechanicalLimit, 0)).toBeCloseTo(-Math.atan(Math.tan(0.4) / 2));
     });
 
     it("infers a symmetric midpoint with no fixed axle or accepts an explicit reference", () => {
@@ -100,7 +112,9 @@ describe("steering geometry", () => {
             steeringReferenceZ: 2,
             referenceLeverArm: 3,
         });
-        expect(deriveSteeringGeometry(wheels, mechanicalLimit, { steeringReferenceZOverride: 0 })).toMatchObject({
+        expect(
+            deriveSteeringGeometry(wheels, mechanicalLimit, { steeringReferenceZOverride: meters(0) }),
+        ).toMatchObject({
             steeringReferenceZ: 0,
             referenceLeverArm: 5,
         });
@@ -109,7 +123,9 @@ describe("steering geometry", () => {
     it("requires an override for incompatible fixed axles", () => {
         const wheels = [wheel(4, true), wheel(0, false), wheel(-2, false)];
         expect(deriveSteeringGeometry(wheels, mechanicalLimit)).toBeUndefined();
-        expect(deriveSteeringGeometry(wheels, mechanicalLimit, { steeringReferenceZOverride: -1 })).toMatchObject({
+        expect(
+            deriveSteeringGeometry(wheels, mechanicalLimit, { steeringReferenceZOverride: meters(-1) }),
+        ).toMatchObject({
             steeringReferenceZ: -1,
             referenceLeverArm: 5,
         });
@@ -121,10 +137,10 @@ describe("steering geometry", () => {
         expect(deriveSteeringGeometry([wheel(0, true), wheel(0, false)], mechanicalLimit)).toBeUndefined();
         expect(deriveSteeringGeometry([wheel(0, true), wheel(0, true)], mechanicalLimit)).toBeUndefined();
         expect(
-            deriveSteeringGeometry([wheel(0, true)], mechanicalLimit, { steeringReferenceZOverride: 0 }),
+            deriveSteeringGeometry([wheel(0, true)], mechanicalLimit, { steeringReferenceZOverride: meters(0) }),
         ).toBeUndefined();
         expect(
-            deriveSteeringGeometry([wheel(0, true)], mechanicalLimit, { steeringReferenceZOverride: NaN }),
+            deriveSteeringGeometry([wheel(0, true)], mechanicalLimit, { steeringReferenceZOverride: meters(NaN) }),
         ).toBeUndefined();
         expect(curvatureAt(0, 0, mechanicalLimit)).toBe(0);
     });
@@ -135,8 +151,8 @@ describe("curvature budget", () => {
         for (const speed of [0, 0.00001, 0.001, 0.01]) {
             const curvature = curvatureAt(2.6, speed, 1.2);
             expect(Number.isFinite(curvature)).toBe(true);
-            expect(getWheelSteeringAngle(curvature, 2.6, mechanicalLimit, 0)).toBeCloseTo(mechanicalLimit);
-            expect(getWheelSteeringAngle(curvature, -2.6, mechanicalLimit, 0)).toBeCloseTo(0 - mechanicalLimit);
+            expect(steeringAngle(curvature, 2.6, mechanicalLimit, 0)).toBeCloseTo(mechanicalLimit);
+            expect(steeringAngle(curvature, -2.6, mechanicalLimit, 0)).toBeCloseTo(0 - mechanicalLimit);
         }
     });
 
@@ -145,7 +161,13 @@ describe("curvature budget", () => {
         expect(curvatureAt(2.6, speed, mechanicalLimit)).toBeCloseTo(acceleration / speed ** 2);
         expect(curvatureAt(2.6, speed * 2, mechanicalLimit)).toBeCloseTo(curvatureAt(2.6, speed, mechanicalLimit) / 4);
         expect(
-            computeSpeedLimitedCurvature(mechanicalLimit, 2.6, speed, acceleration * 2, mechanicalLimit),
+            computeSpeedLimitedCurvature(
+                mechanicalLimit,
+                meters(2.6),
+                speed,
+                metersPerSecondSquared(acceleration * 2),
+                mechanicalLimit,
+            ),
         ).toBeCloseTo(curvatureAt(2.6, speed, mechanicalLimit) * 2);
     });
 
@@ -157,14 +179,14 @@ describe("curvature budget", () => {
 
 describe("Ackermann steering", () => {
     const positionedWheel = (x: number, z: number, steerable: boolean) => ({
-        position: { x, z },
+        position: { x: meters(x), z: meters(z) },
         steerable,
     });
 
     it("steers the inside wheel further and gives both wheels the same turning center", () => {
         const curvature = 0.1;
-        const inner = getWheelSteeringAngle(curvature, 5.2, mechanicalLimit, 1);
-        const outer = getWheelSteeringAngle(curvature, 5.2, mechanicalLimit, -1);
+        const inner = steeringAngle(curvature, 5.2, mechanicalLimit, 1);
+        const outer = steeringAngle(curvature, 5.2, mechanicalLimit, -1);
         expect(inner).toBeGreaterThan(outer);
         expect(1 + 5.2 / Math.tan(inner)).toBeCloseTo(1 / curvature);
         expect(-1 + 5.2 / Math.tan(outer)).toBeCloseTo(1 / curvature);
@@ -172,10 +194,10 @@ describe("Ackermann steering", () => {
 
     it("mirrors left/right turns and reverses rear steering with the same center", () => {
         for (const x of [-2.2, 2.2]) {
-            const front = getWheelSteeringAngle(0.1, 2.6, mechanicalLimit, x);
-            const rear = getWheelSteeringAngle(0.1, -2.6, mechanicalLimit, x);
-            expect(rear).toBe(-front);
-            expect(getWheelSteeringAngle(-0.1, 2.6, mechanicalLimit, -x)).toBe(-front);
+            const front = steeringAngle(0.1, 2.6, mechanicalLimit, x);
+            const rear = steeringAngle(0.1, -2.6, mechanicalLimit, x);
+            expect(rear).toBe(front * -1);
+            expect(steeringAngle(-0.1, 2.6, mechanicalLimit, -x)).toBe(front * -1);
             expect(x - 2.6 / Math.tan(rear)).toBeCloseTo(10);
         }
     });
@@ -187,13 +209,13 @@ describe("Ackermann steering", () => {
             positionedWheel(2.2, -2.6, true),
             positionedWheel(-2.2, -2.6, true),
         ];
-        const limits = getMechanicalCurvatureLimits(wheels, 0, mechanicalLimit);
+        const limits = getMechanicalCurvatureLimits(wheels, meters(0), mechanicalLimit);
         expect(limits.maxCurvature).toBeCloseTo(1 / 4.8);
-        expect(limits.minCurvature).toBeCloseTo(-limits.maxCurvature);
-        expect(getWheelSteeringAngle(limits.maxCurvature, 2.6, mechanicalLimit, 2.2)).toBeCloseTo(mechanicalLimit);
-        expect(getWheelSteeringAngle(limits.maxCurvature, 2.6, mechanicalLimit, -2.2)).toBeCloseTo(Math.atan(2.6 / 7));
+        expect(limits.minCurvature).toBeCloseTo(limits.maxCurvature * -1);
+        expect(steeringAngle(limits.maxCurvature, 2.6, mechanicalLimit, 2.2)).toBeCloseTo(mechanicalLimit);
+        expect(steeringAngle(limits.maxCurvature, 2.6, mechanicalLimit, -2.2)).toBeCloseTo(Math.atan(2.6 / 7));
         for (const positioned of wheels) {
-            const angle = getWheelSteeringAngle(
+            const angle = steeringAngle(
                 limits.maxCurvature,
                 positioned.position.z,
                 mechanicalLimit,
@@ -212,13 +234,13 @@ describe("Ackermann steering", () => {
                 positionedWheel(-1, -2.6, !frontSteering),
             ];
             const reference = frontSteering ? -2.6 : 2.6;
-            const limits = getMechanicalCurvatureLimits(wheels, reference, mechanicalLimit);
+            const limits = getMechanicalCurvatureLimits(wheels, meters(reference), mechanicalLimit);
             expect(limits.maxCurvature).toBeCloseTo(1 / 6.2);
-            expect(limits.minCurvature).toBeCloseTo(-limits.maxCurvature);
+            expect(limits.minCurvature).toBeCloseTo(limits.maxCurvature * -1);
         }
         const asymmetric = getMechanicalCurvatureLimits(
             [positionedWheel(2, 4, true), positionedWheel(-1, -2, true)],
-            0,
+            meters(0),
             mechanicalLimit,
         );
         expect(asymmetric.maxCurvature).toBeCloseTo(1 / 6);
@@ -226,10 +248,10 @@ describe("Ackermann steering", () => {
     });
 
     it("does not divide by zero at the turning center or for wheels on the reference axle", () => {
-        expect(getWheelSteeringAngle(0.5, 2.6, mechanicalLimit, 2)).toBe(mechanicalLimit);
-        expect(getWheelSteeringAngle(0.5, 0, mechanicalLimit, 2)).toBe(0);
-        expect(getWheelSteeringAngle(0, 2.6, mechanicalLimit, 2)).toBe(0);
-        expect(getMechanicalCurvatureLimits([], 0, mechanicalLimit)).toEqual({
+        expect(steeringAngle(0.5, 2.6, mechanicalLimit, 2)).toBe(mechanicalLimit);
+        expect(steeringAngle(0.5, 0, mechanicalLimit, 2)).toBe(0);
+        expect(steeringAngle(0, 2.6, mechanicalLimit, 2)).toBe(0);
+        expect(getMechanicalCurvatureLimits([], meters(0), mechanicalLimit)).toEqual({
             maxCurvature: Infinity,
             minCurvature: -Infinity,
         });

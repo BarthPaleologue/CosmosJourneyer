@@ -21,6 +21,7 @@ import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import type { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { Radians } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import type { Interaction } from "../inputs/interaction/interactionSystem";
@@ -33,14 +34,14 @@ export class HingedDoor implements Door {
 
     private state: DoorState = "closed";
 
-    private readonly closedAngle: number;
-    private readonly openedAngle: number;
+    private readonly closedAngle: Radians;
+    private readonly openedAngle: Radians;
 
     constructor(
         doorAggregate: PhysicsAggregate,
         hinge: Physics6DoFConstraint,
         axis: PhysicsConstraintAxis,
-        angles: { closed: number; opened: number },
+        angles: { closed: Radians; opened: Radians },
     ) {
         this.doorAggregate = doorAggregate;
         this.axis = axis;

@@ -22,7 +22,16 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsConstraintAxis, PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Scene } from "@babylonjs/core/scene";
-import { degreesToRadians, EarthG, kmhToMetersPerSecond } from "@cosmos-journeyer/physics";
+import {
+    degreesToRadians,
+    EarthG,
+    kmhToMetersPerSecond,
+    meters,
+    metersPerSecond,
+    metersPerSecondSquared,
+    quantity,
+    radians,
+} from "@cosmos-journeyer/physics";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { Vehicle } from "./vehicle";
@@ -85,7 +94,7 @@ function createVehicle(layout: ReadonlyArray<TestWheelLayout>, options?: Partial
     const frame = new PhysicsAggregate(frameMesh, PhysicsShapeType.BOX, { mass: 1 }, scene);
     const models = layout.map(({ x, z, steerable, powered, radius }) => ({
         position: new Vector3(x ?? 0, -1, z),
-        geometry: { radius: radius ?? 1, thickness: 0.3 },
+        geometry: { radius: meters(radius ?? 1), thickness: meters(0.3) },
         behavior: { powered: powered ?? false, steerable },
     }));
     const wheels = models.map((model) => {
@@ -134,7 +143,7 @@ const lastAngles = () => fixture.targets.map((target) => target.mock.lastCall?.[
 describe("vehicle steering", () => {
     it("sends equal opposite targets through the original position motors", () => {
         fixture = createVehicle(defaultWheelLayout);
-        fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: kmhToMetersPerSecond(40) });
+        fixture.vehicle.setTargetSteeringAngle(radians(1), { horizontalSpeed: kmhToMetersPerSecond(40) });
         const expected = Math.atan((EarthG * 2.6) / kmhToMetersPerSecond(40) ** 2);
         expect(lastAngles()[0]).toBeCloseTo(expected);
         expect(lastAngles()[1]).toBeCloseTo(-expected);
@@ -144,39 +153,39 @@ describe("vehicle steering", () => {
     it("does not accumulate a hidden command while constrained, then slowing down", () => {
         fixture = createVehicle(defaultWheelLayout);
         for (let i = 0; i < 100; i++) {
-            fixture.vehicle.turn(1.8, 0.016, { horizontalSpeed: 30 });
+            fixture.vehicle.turn(quantity<"rad/s">(1.8), 0.016, { horizontalSpeed: metersPerSecond(30) });
         }
         const limitedAngle = lastAngles()[0] ?? 0;
-        fixture.vehicle.turn(0, 0.016, { horizontalSpeed: 0 });
+        fixture.vehicle.turn(quantity<"rad/s">(0), 0.016, { horizontalSpeed: metersPerSecond(0) });
         expect(Math.abs(lastAngles()[0] ?? 0)).toBeLessThanOrEqual(limitedAngle);
         expect(Math.abs(lastAngles()[0] ?? 0)).toBeGreaterThan(0);
     });
 
     it("keeps keyboard rate, return to center, and direction changes", () => {
         fixture = createVehicle(defaultWheelLayout);
-        fixture.vehicle.turn(1.8, 0.01, { horizontalSpeed: 0 });
+        fixture.vehicle.turn(quantity<"rad/s">(1.8), 0.01, { horizontalSpeed: metersPerSecond(0) });
         expect(lastAngles()[0]).toBeCloseTo(0.018);
-        fixture.vehicle.turn(0, 0.01, { horizontalSpeed: 0 });
+        fixture.vehicle.turn(quantity<"rad/s">(0), 0.01, { horizontalSpeed: metersPerSecond(0) });
         expect(lastAngles()[0]).toBeCloseTo(0.018 * 2 ** (-0.01 / 0.225));
-        fixture.vehicle.turn(-1.8, 0.1, { horizontalSpeed: 0 });
+        fixture.vehicle.turn(quantity<"rad/s">(-1.8), 0.1, { horizontalSpeed: metersPerSecond(0) });
         expect(lastAngles()[0]).toBeLessThan(0);
         expect(lastAngles()[1]).toBeGreaterThan(0);
     });
 
     it("clears commands on mode changes and preserves legacy in-phase limits", () => {
         fixture = createVehicle(defaultWheelLayout);
-        fixture.vehicle.setTargetSteeringAngle(0.4, { horizontalSpeed: 0 });
+        fixture.vehicle.setTargetSteeringAngle(radians(0.4), { horizontalSpeed: metersPerSecond(0) });
         fixture.vehicle.setSteeringMode("inPhase");
         expect(lastAngles().every((angle) => angle === 0)).toBe(true);
-        fixture.vehicle.turn(0, 0.016, { horizontalSpeed: 0 });
+        fixture.vehicle.turn(quantity<"rad/s">(0), 0.016, { horizontalSpeed: metersPerSecond(0) });
         expect(lastAngles().every((angle) => angle === 0)).toBe(true);
-        fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: kmhToMetersPerSecond(40) });
+        fixture.vehicle.setTargetSteeringAngle(radians(1), { horizontalSpeed: kmhToMetersPerSecond(40) });
         const legacyLimit = degreesToRadians(7 + (45 - 7) / 16);
         expect(lastAngles()[0]).toBeCloseTo(legacyLimit);
         expect(lastAngles()[1]).toBeCloseTo(legacyLimit);
         fixture.vehicle.setSteeringMode("counterPhase");
         expect(lastAngles().every((angle) => angle === 0)).toBe(true);
-        fixture.vehicle.setTargetSteeringAngle(0.2, { horizontalSpeed: 0 });
+        fixture.vehicle.setTargetSteeringAngle(radians(0.2), { horizontalSpeed: metersPerSecond(0) });
         expect(lastAngles()[0]).toBeCloseTo(0.2);
         expect(lastAngles()[1]).toBeCloseTo(-0.2);
     });
@@ -184,9 +193,9 @@ describe("vehicle steering", () => {
     it("accepts horizontal speed explicitly while retaining the 3D fallback", () => {
         fixture = createVehicle(defaultWheelLayout);
         vi.spyOn(fixture.frame.body, "getLinearVelocity").mockReturnValue(new Vector3(0, -50, 0));
-        fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: 0 });
+        fixture.vehicle.setTargetSteeringAngle(radians(1), { horizontalSpeed: metersPerSecond(0) });
         expect(lastAngles()[0]).toBeCloseTo(degreesToRadians(45));
-        fixture.vehicle.setTargetSteeringAngle(1);
+        fixture.vehicle.setTargetSteeringAngle(radians(1));
         expect(lastAngles()[0]).toBeCloseTo(Math.atan((EarthG * 2.6) / 50 ** 2));
     });
 
@@ -212,23 +221,23 @@ describe("vehicle steering", () => {
         ];
         const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
         fixture = createVehicle(layout);
-        fixture.vehicle.setTargetSteeringAngle(0.3, { horizontalSpeed: 0 });
+        fixture.vehicle.setTargetSteeringAngle(radians(0.3), { horizontalSpeed: metersPerSecond(0) });
         expect(fixture.vehicle.steeringGeometry).toBeUndefined();
         expect(lastAngles()[0]).toBe(0.3);
         expect(warning).toHaveBeenCalledOnce();
         warning.mockRestore();
         const overridden = new Vehicle("override", fixture.frame, [], fixture.wheels, [], [], {
-            steeringReferenceZ: -1,
-            maxLateralAcceleration: 0.5 * EarthG,
+            steeringReferenceZ: meters(-1),
+            maxLateralAcceleration: metersPerSecondSquared(0.5 * EarthG),
         });
-        overridden.setTargetSteeringAngle(1, { horizontalSpeed: 20 });
+        overridden.setTargetSteeringAngle(radians(1), { horizontalSpeed: metersPerSecond(20) });
         expect(lastAngles()[0]).toBeCloseTo(Math.atan((0.5 * EarthG * 5) / 400));
     });
 
     it("handles vehicles without steering wheels", () => {
         fixture = createVehicle([{ z: 0, steerable: false }]);
         expect(() => {
-            fixture.vehicle.turn(1.8, 0.016, { horizontalSpeed: 0 });
+            fixture.vehicle.turn(quantity<"rad/s">(1.8), 0.016, { horizontalSpeed: metersPerSecond(0) });
         }).not.toThrow();
         expect(lastAngles()).toEqual([]);
     });
@@ -247,19 +256,19 @@ describe("vehicle steering inputs and Ackermann", () => {
     it("reaches full lock under held input instead of fighting return-to-center", () => {
         fixture = createVehicle(defaultWheelLayout);
         for (let i = 0; i < 120; i++) {
-            fixture.vehicle.turn(1.8, 1 / 60, { horizontalSpeed: 0 });
+            fixture.vehicle.turn(quantity<"rad/s">(1.8), 1 / 60, { horizontalSpeed: metersPerSecond(0) });
         }
         expect(lastAngles()[0]).toBeCloseTo(degreesToRadians(45));
-        fixture.vehicle.turn(0, 0.225, { horizontalSpeed: 0 });
+        fixture.vehicle.turn(quantity<"rad/s">(0), 0.225, { horizontalSpeed: metersPerSecond(0) });
         expect(lastAngles()[0]).toBeCloseTo(degreesToRadians(22.5));
     });
 
     it("integrates held input consistently at different frame rates", () => {
         fixture = createVehicle(defaultWheelLayout);
         for (const fps of [30, 60, 120]) {
-            fixture.vehicle.setTargetSteeringAngle(0, { horizontalSpeed: 0 });
+            fixture.vehicle.setTargetSteeringAngle(radians(0), { horizontalSpeed: metersPerSecond(0) });
             for (let i = 0; i < fps; i++) {
-                fixture.vehicle.turn(0.3, 1 / fps, { horizontalSpeed: 0 });
+                fixture.vehicle.turn(quantity<"rad/s">(0.3), 1 / fps, { horizontalSpeed: metersPerSecond(0) });
             }
             expect(lastAngles()[0]).toBeCloseTo(0.3);
         }
@@ -267,7 +276,7 @@ describe("vehicle steering inputs and Ackermann", () => {
 
     it("limits the Wolf's inside wheels to 45 degrees while sharing one turning center", () => {
         fixture = createVehicle(wolfLayout);
-        fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: 0 });
+        fixture.vehicle.setTargetSteeringAngle(radians(1), { horizontalSpeed: metersPerSecond(0) });
         const angles = lastAngles();
         expect(angles[0]).toBeCloseTo(degreesToRadians(45));
         expect(angles[1]).toBeCloseTo(Math.atan(2.6 / 7));
@@ -278,7 +287,7 @@ describe("vehicle steering inputs and Ackermann", () => {
             expect(wheel.frameLocalPosition.x + wheel.frameLocalPosition.z / Math.tan(angles[i] ?? 0)).toBeCloseTo(4.8);
         });
         // The stored command also respects the Ackermann mechanical limit.
-        fixture.vehicle.turn(0, 0.225, { horizontalSpeed: 0 });
+        fixture.vehicle.turn(quantity<"rad/s">(0), 0.225, { horizontalSpeed: metersPerSecond(0) });
         const centerAngle = Math.atan(2.6 / 4.8) / 2;
         expect(lastAngles()[0]).toBeCloseTo(Math.atan2(Math.tan(centerAngle), 1 - (Math.tan(centerAngle) * 2.2) / 2.6));
     });
@@ -287,17 +296,17 @@ describe("vehicle steering inputs and Ackermann", () => {
         fixture = createVehicle(wolfLayout);
         const speed = kmhToMetersPerSecond(40);
         const curvature = EarthG / speed ** 2;
-        fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: speed });
+        fixture.vehicle.setTargetSteeringAngle(radians(1), { horizontalSpeed: speed });
         const angles = lastAngles();
         expect(angles[0]).toBeCloseTo(Math.atan2(curvature * 2.6, 1 - curvature * 2.2));
         expect(angles[1]).toBeCloseTo(Math.atan2(curvature * 2.6, 1 + curvature * 2.2));
-        fixture.vehicle.setTargetSteeringAngle(1, { horizontalSpeed: speed * -1 });
+        fixture.vehicle.setTargetSteeringAngle(radians(1), { horizontalSpeed: metersPerSecond(speed * -1) });
         expect(lastAngles()).toEqual(angles);
-        fixture.vehicle.setTargetSteeringAngle(-1, { horizontalSpeed: speed });
+        fixture.vehicle.setTargetSteeringAngle(radians(-1), { horizontalSpeed: speed });
         expect(lastAngles()[0]).toBeCloseTo(-(angles[1] ?? 0));
         expect(lastAngles()[1]).toBeCloseTo(-(angles[0] ?? 0));
         fixture.vehicle.setSteeringMode("inPhase");
-        fixture.vehicle.setTargetSteeringAngle(0.2, { horizontalSpeed: 0 });
+        fixture.vehicle.setTargetSteeringAngle(radians(0.2), { horizontalSpeed: metersPerSecond(0) });
         expect(lastAngles().every((angle) => angle === 0.2)).toBe(true);
     });
 });
@@ -323,9 +332,9 @@ describe("vehicle throttle and braking", () => {
         fixture = createVehicle(driveLayout);
         setLongitudinalVelocity(8);
         for (const fps of [30, 60, 120]) {
-            fixture.vehicle.setTargetSpeed(0);
+            fixture.vehicle.setTargetSpeed(metersPerSecond(0));
             for (let i = 0; i < fps; i++) {
-                fixture.vehicle.accelerate(5, 1 / fps);
+                fixture.vehicle.accelerate(metersPerSecondSquared(5), 1 / fps);
             }
             expect(driveTargets()[0]).toBeCloseTo(10);
             expect(driveTargets()[1]).toBeCloseTo(5);
@@ -340,17 +349,17 @@ describe("vehicle throttle and braking", () => {
             throw new Error("Expected a free wheel");
         }
         const freeTarget = vi.spyOn(freeWheel.wheelAxleConstraint, "setAxisMotorTarget");
-        fixture.vehicle.setTargetSpeed(10);
-        fixture.vehicle.accelerate(0, 0.016);
+        fixture.vehicle.setTargetSpeed(metersPerSecond(10));
+        fixture.vehicle.accelerate(metersPerSecondSquared(0), 0.016);
         expect(driveTorques()).toEqual([0, 0]);
         expect(driveTargets()).toEqual([0, 0]);
         expect(freeTarget).not.toHaveBeenCalled();
     });
 
     it("makes engine braking configurable independently of service braking and boost", () => {
-        fixture = createVehicle(driveLayout, { engineBrakeTorque: 500 });
+        fixture = createVehicle(driveLayout, { engineBrakeTorque: quantity<"N·m">(500) });
         fixture.vehicle.setBoostEnabled(true);
-        fixture.vehicle.setTargetSpeed(5);
+        fixture.vehicle.setTargetSpeed(metersPerSecond(5));
         expect(driveTorques()).toEqual([15000, 15000]);
         fixture.vehicle.releaseThrottle();
         expect(driveTorques()).toEqual([500, 500]);
@@ -363,33 +372,33 @@ describe("vehicle throttle and braking", () => {
 
     it("resumes from actual signed motion after coasting or braking without restoring stale commands", () => {
         fixture = createVehicle(driveLayout);
-        fixture.vehicle.setTargetSpeed(20);
+        fixture.vehicle.setTargetSpeed(metersPerSecond(20));
         fixture.vehicle.releaseThrottle();
         setLongitudinalVelocity(8);
-        fixture.vehicle.accelerate(2, 0.1);
+        fixture.vehicle.accelerate(metersPerSecondSquared(2), 0.1);
         expect(driveTargets()[1]).toBeCloseTo(8.2);
         fixture.vehicle.brake();
         setLongitudinalVelocity(4);
-        fixture.vehicle.accelerate(2, 0.1);
+        fixture.vehicle.accelerate(metersPerSecondSquared(2), 0.1);
         expect(driveTargets()[1]).toBeCloseTo(4.2);
         fixture.vehicle.releaseThrottle();
         setLongitudinalVelocity(-3);
-        fixture.vehicle.accelerate(-2, 0.1);
+        fixture.vehicle.accelerate(metersPerSecondSquared(-2), 0.1);
         expect(driveTargets()[1]).toBeCloseTo(-3.2);
         expect(driveTorques()).toEqual([5000, 5000]);
     });
 
     it("retains forward, reverse and boost limits", () => {
         fixture = createVehicle(driveLayout);
-        fixture.vehicle.accelerate(100, 1);
+        fixture.vehicle.accelerate(metersPerSecondSquared(100), 1);
         expect(driveTargets()[1]).toBeCloseTo(kmhToMetersPerSecond(40));
         fixture.vehicle.setBoostEnabled(true);
-        fixture.vehicle.accelerate(100, 1);
+        fixture.vehicle.accelerate(metersPerSecondSquared(100), 1);
         expect(driveTargets()[1]).toBeCloseTo(kmhToMetersPerSecond(80));
         fixture.vehicle.setBoostEnabled(false);
-        fixture.vehicle.accelerate(100, 1);
+        fixture.vehicle.accelerate(metersPerSecondSquared(100), 1);
         expect(driveTargets()[1]).toBeCloseTo(kmhToMetersPerSecond(40));
-        fixture.vehicle.accelerate(-100, 1);
+        fixture.vehicle.accelerate(metersPerSecondSquared(-100), 1);
         expect(driveTargets()[1]).toBeCloseTo(kmhToMetersPerSecond(-20));
     });
 });

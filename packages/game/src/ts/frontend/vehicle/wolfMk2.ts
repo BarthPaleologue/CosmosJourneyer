@@ -22,6 +22,7 @@ import type { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { Scene } from "@babylonjs/core/scene";
+import { kilograms, meters, radians } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { Result } from "@cosmos-journeyer/typescript";
 import earcut from "earcut";
@@ -271,8 +272,8 @@ export function createWolfMk2(
 
     const vehicleBuilder = new VehicleBuilder(frame, assets, scene);
 
-    const wheelRadius = 0.7;
-    const wheelThickness = 0.8;
+    const wheelRadius = meters(0.7);
+    const wheelThickness = meters(0.8);
     const poweredSteerable: WheelModel["behavior"] = { powered: true, steerable: true };
     const freeFixed: WheelModel["behavior"] = { powered: false, steerable: false };
 
@@ -314,8 +315,8 @@ export function createWolfMk2(
                 0.05 + (heightOfMaxWidth + frameHeight) / 2,
                 roofSolarPanelZOffset,
             ),
-            100,
-            { rotation: { z: -roofSolarPanelRotationAngle } },
+            kilograms(100),
+            { rotation: { z: radians(roofSolarPanelRotationAngle * -1) } },
         )
         .addFixedPart(
             roofSolarPanel2,
@@ -324,19 +325,19 @@ export function createWolfMk2(
                 0.05 + (heightOfMaxWidth + frameHeight) / 2,
                 roofSolarPanelZOffset,
             ),
-            100,
-            { rotation: { z: roofSolarPanelRotationAngle } },
+            kilograms(100),
+            { rotation: { z: radians(roofSolarPanelRotationAngle) } },
         )
-        .addFixedPart(roofSolarPanel3, new Vector3(0, frameHeight + 0.02, roofSolarPanelZOffset), 100, {})
-        .addFixedPart(canopyFrame, new Vector3(0, 0, frameLength / 2), 100, {})
+        .addFixedPart(roofSolarPanel3, new Vector3(0, frameHeight + 0.02, roofSolarPanelZOffset), kilograms(100), {})
+        .addFixedPart(canopyFrame, new Vector3(0, 0, frameLength / 2), kilograms(100), {})
         .addHingedDoor(
             backDoor,
             new Vector3(0, 0, -frameLength / 2 - backDoorThickness),
-            100,
+            kilograms(100),
             PhysicsConstraintAxis.ANGULAR_X,
             {
-                closed: Math.PI / 2 - sheerAngle,
-                opened: -Math.PI / 4,
+                closed: radians(Math.PI / 2 - sheerAngle),
+                opened: radians(-Math.PI / 4),
             },
         )
         .translateSpawn(spawnPosition)

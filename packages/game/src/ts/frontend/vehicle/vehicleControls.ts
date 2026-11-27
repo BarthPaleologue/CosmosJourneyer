@@ -21,7 +21,7 @@ import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
-import { EarthG, radians } from "@cosmos-journeyer/physics";
+import { EarthG, metersPerSecond, metersPerSecondSquared, quantity, radians } from "@cosmos-journeyer/physics";
 
 import { lerp, lerpAngle, lerpSmooth, smoothstep } from "@/utils/math";
 
@@ -221,7 +221,7 @@ export class VehicleControls implements Controls {
             Vector3.Dot(velocity, this.thirdPersonTransform.up),
         );
         const horizontalVelocity = velocity.subtract(verticalVelocity);
-        const horizontalSpeed = horizontalVelocity.length();
+        const horizontalSpeed = metersPerSecond(horizontalVelocity.length());
         if (horizontalSpeed > 0.1) {
             const horizontalDirection = horizontalVelocity.normalizeToNew();
 
@@ -251,7 +251,7 @@ export class VehicleControls implements Controls {
 
         this.getActiveCamera().getViewMatrix(true);
 
-        const steeringRate = VehicleInputs.map.steer.value * 1.8;
+        const steeringRate = quantity<"rad/s">(VehicleInputs.map.steer.value * 1.8);
         vehicle.turn(steeringRate, deltaSeconds, { horizontalSpeed });
         vehicle.setBoostEnabled(VehicleInputs.map.boost.value > 0);
 
@@ -260,7 +260,7 @@ export class VehicleControls implements Controls {
             vehicle.brake();
         } else {
             const vehicleMaxAcceleration = 0.7 * EarthG;
-            const vehicleAcceleration = throttle * vehicleMaxAcceleration;
+            const vehicleAcceleration = metersPerSecondSquared(throttle * vehicleMaxAcceleration);
             vehicle.accelerate(vehicleAcceleration, deltaSeconds);
         }
 
