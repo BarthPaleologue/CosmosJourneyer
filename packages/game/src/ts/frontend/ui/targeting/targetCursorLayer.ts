@@ -18,6 +18,7 @@
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Observer } from "@babylonjs/core/Misc/observable";
+import { radians } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import type { Target } from "../../targeting/target";
@@ -131,7 +132,7 @@ export class TargetCursorLayer {
             origin: camera.globalPosition,
             direction: forward,
         } satisfies Ray;
-        this.hoveredTarget = findBestTarget(candidates, ray, camera.fov, 0.7);
+        this.hoveredTarget = findBestTarget(candidates, ray, radians(camera.fov), 0.7);
         for (const { target, cursor, opacity } of frame) {
             cursor.setTarget(target === selected);
             cursor.setInformationEnabled(target === selected || target === this.hoveredTarget);

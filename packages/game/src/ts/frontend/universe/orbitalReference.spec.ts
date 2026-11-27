@@ -304,6 +304,6 @@ describe("navigation rotation frame", () => {
         [-600.001, "reference"],
         [86400, "reference"],
     ] as const)("uses the %s-second rotation period to select the %s frame", (period, expected) => {
-        expect(getNavigationReferenceFrame(period)).toBe(expected);
+        expect(getNavigationReferenceFrame(seconds(period))).toBe(expected);
     });
 });

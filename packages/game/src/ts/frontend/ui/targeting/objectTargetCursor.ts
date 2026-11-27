@@ -18,7 +18,7 @@
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { meters, metersPerSecond, seconds } from "@cosmos-journeyer/physics";
+import { meters, metersPerSecond, radians, seconds } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import { getProjectedDiameter01 } from "@/frontend/helpers/isObjectVisibleOnScreen";
@@ -147,7 +147,7 @@ export class ObjectTargetCursor {
             this.object.getTransform().getAbsolutePosition(),
             this.object.getBoundingRadius(),
             camera.globalPosition,
-            camera.fov,
+            radians(camera.fov),
         );
 
         let size = 100 * Math.min(screenSize * 1.3, 1);

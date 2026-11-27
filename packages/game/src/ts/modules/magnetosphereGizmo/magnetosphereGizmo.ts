@@ -22,7 +22,6 @@ import { CreateLines } from "@babylonjs/core/Meshes/Builders/linesBuilder";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
-import type { AmpereSquareMeters } from "@cosmos-journeyer/physics";
 import {
     getDipoleFieldLineRadius,
     getMagnetopauseStandoffDistance,
@@ -32,6 +31,7 @@ import {
     pascals,
     radians,
 } from "@cosmos-journeyer/physics";
+import type { AmpereSquareMeters, Meters, Radians } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { MagneticFieldModel } from "@cosmos-journeyer/universe-model";
 
@@ -61,11 +61,11 @@ type FieldLine = {
  */
 export class MagnetosphereGizmo implements SystemContent {
     private readonly root: TransformNode;
-    private readonly planetRadius: number;
+    private readonly planetRadius: Meters;
     private readonly moment: AmpereSquareMeters;
     private readonly lines: Array<FieldLine> = [];
 
-    constructor(planetRadius: number, magneticField: DeepReadonly<MagneticFieldModel>, scene: Scene) {
+    constructor(planetRadius: Meters, magneticField: DeepReadonly<MagneticFieldModel>, scene: Scene) {
         this.root = new TransformNode("MagnetosphereGizmo", scene);
         this.planetRadius = planetRadius;
         this.moment = magneticField.magnitude;
@@ -134,7 +134,7 @@ export class MagnetosphereGizmo implements SystemContent {
         this.root.setEnabled(true);
 
         for (const line of this.lines) {
-            const scaled = scaleShapeToRef(line.shape, line.fraction * standoffDistance, line.positions);
+            const scaled = scaleShapeToRef(line.shape, meters(line.fraction * standoffDistance), line.positions);
             line.mesh.updateVerticesData(VertexBuffer.PositionKind, scaled, true, false);
         }
     }
@@ -154,7 +154,7 @@ export class MagnetosphereGizmo implements SystemContent {
  * @param ref Buffer to write the scaled positions into, reused across updates.
  * @returns The same buffer as `ref`, filled with the scaled positions, 3 floats per point.
  */
-function scaleShapeToRef(shape: Float32Array, lineMaxDistance: number, ref: Float32Array): Float32Array {
+function scaleShapeToRef(shape: Float32Array, lineMaxDistance: Meters, ref: Float32Array): Float32Array {
     for (let i = 0; i < shape.length; i++) {
         ref[i] = (shape[i] ?? 0) * lineMaxDistance;
     }
@@ -178,7 +178,7 @@ function toVector3Array(positions: Float32Array): Array<Vector3> {
  * @param longitude Longitude in radians.
  * @returns The unit direction as a vector.
  */
-function geographicToCartesian(latitude: number, longitude: number): Vector3 {
+function geographicToCartesian(latitude: Radians, longitude: Radians): Vector3 {
     const cosLatitude = Math.cos(latitude);
     return new Vector3(cosLatitude * Math.cos(longitude), Math.sin(latitude), cosLatitude * Math.sin(longitude));
 }

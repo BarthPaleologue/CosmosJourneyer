@@ -32,7 +32,7 @@ import {
     pascals,
     radians,
 } from "@cosmos-journeyer/physics";
-import type { AmpereSquareMeters, LocalStellarWindModel } from "@cosmos-journeyer/physics";
+import type { AmpereSquareMeters, LocalStellarWindModel, Meters, Radians } from "@cosmos-journeyer/physics";
 import type { IndexedRng } from "@cosmos-journeyer/random";
 import { randRange, seededSquirrelNoise } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
@@ -51,13 +51,13 @@ const maxRibbonCountPerHemisphere = 500;
  */
 export class Aurora implements SystemContent {
     private readonly root: Mesh;
-    private readonly planetRadius: number;
+    private readonly planetRadius: Meters;
     private readonly moment: AmpereSquareMeters;
     private readonly matrixBuffer: Float32Array;
     private readonly material: AuroraMaterial;
     private readonly rng: IndexedRng;
 
-    constructor(planetRadius: number, magneticField: DeepReadonly<MagneticFieldModel>, seed: number, scene: Scene) {
+    constructor(planetRadius: Meters, magneticField: DeepReadonly<MagneticFieldModel>, seed: number, scene: Scene) {
         const ribbons = new Mesh("Ribbons", scene);
         ribbons.isUnIndexed = true;
         ribbons.isPickable = false;
@@ -123,21 +123,21 @@ export class Aurora implements SystemContent {
 
         let energyFlux = 0;
         if (dominantWind !== null) {
-            const capLatitude = getPolarCapLatitude(meters(this.planetRadius), this.moment, dominantWind);
-            energyFlux = getAuroralVisibleEnergyFlux(meters(this.planetRadius), this.moment, dominantWind, [
+            const capLatitude = getPolarCapLatitude(this.planetRadius, this.moment, dominantWind);
+            energyFlux = getAuroralVisibleEnergyFlux(this.planetRadius, this.moment, dominantWind, [
                 radians(0.8 * capLatitude),
                 capLatitude,
             ]);
         }
         this.material.setEnergyFlux(energyFlux);
 
-        const latitudeNorthPolward = getDipoleFieldLineLatitude(standoffDistance, meters(this.planetRadius));
+        const latitudeNorthPolward = getDipoleFieldLineLatitude(standoffDistance, this.planetRadius);
         const latitudeNorthEquatorward = latitudeNorthPolward - degreesToRadians(3);
         const latitudeCircumference = this.planetRadius * Math.sin(latitudeNorthPolward);
         const ribbonCountPerHemisphere = Math.min(Math.ceil(latitudeCircumference / 40e3), maxRibbonCountPerHemisphere);
 
         createRibbonMatrixBuffer(
-            [latitudeNorthEquatorward, latitudeNorthPolward],
+            [radians(latitudeNorthEquatorward), latitudeNorthPolward],
             this.planetRadius,
             ribbonCountPerHemisphere,
             this.matrixBuffer,
@@ -147,7 +147,7 @@ export class Aurora implements SystemContent {
         );
 
         createRibbonMatrixBuffer(
-            [latitudeNorthPolward * -1, latitudeNorthEquatorward * -1],
+            [radians(latitudeNorthPolward * -1), radians(latitudeNorthEquatorward * -1)],
             this.planetRadius,
             ribbonCountPerHemisphere,
             this.matrixBuffer,
@@ -181,8 +181,8 @@ export class Aurora implements SystemContent {
  * @param indexOffset Base index offset into the rng, so each hemisphere samples different values.
  */
 function createRibbonMatrixBuffer(
-    latitudeRange: [number, number],
-    planetRadius: number,
+    latitudeRange: [Radians, Radians],
+    planetRadius: Meters,
     ribbonCount: number,
     target: Float32Array,
     offset: number,
@@ -202,7 +202,7 @@ function createRibbonMatrixBuffer(
         // ribbon longitudes instead of only jittering a regular ring.
         const longitude = randRange(0, 2 * Math.PI, rng, baseRngIndex);
         const latitude = randRange(latitudeRange[0], latitudeRange[1], rng, baseRngIndex + 1);
-        geographicToCartesianToRef(latitude, longitude, localUp);
+        geographicToCartesianToRef(radians(latitude), radians(longitude), localUp);
 
         localUp.scaleToRef(planetRadius, position);
 
@@ -259,7 +259,7 @@ function createRibbonVertexData(): VertexData {
  * @param ref Vector receiving the unit direction.
  * @returns The supplied vector.
  */
-function geographicToCartesianToRef(latitude: number, longitude: number, ref: Vector3) {
+function geographicToCartesianToRef(latitude: Radians, longitude: Radians, ref: Vector3) {
     const cosLatitude = Math.cos(latitude);
     ref.set(cosLatitude * Math.cos(longitude), Math.sin(latitude), cosLatitude * Math.sin(longitude));
     return ref;

@@ -27,24 +27,24 @@ import { createSpaceTelescopeModel } from "./spaceTelescopeModel";
 
 describe("conic primary mirror", () => {
     it("reduces to the parabola for K = -1", () => {
-        const sample = sampleConic(3, 4, 5, -1);
+        const sample = sampleConic(meters(3), meters(4), meters(5), -1);
         expect(sample.height).toBeCloseTo(1.25);
         expect(sample.normal.equalsWithEpsilon(new Vector3(-0.3, 1, -0.4).normalize())).toBe(true);
     });
 
     it("matches spherical sag and has an upward normal at the vertex", () => {
-        expect(sampleConic(3, 0, 2.5, 0).height).toBeCloseTo(1);
-        expect(sampleConic(0, 0, 2.5, 0).normal.equals(Vector3.Up())).toBe(true);
+        expect(sampleConic(meters(3), meters(0), meters(2.5), 0).height).toBeCloseTo(1);
+        expect(sampleConic(meters(0), meters(0), meters(2.5), 0).normal.equals(Vector3.Up())).toBe(true);
     });
 
     it.each([-2, -1, -0.9967, 0, 1])("matches the implicit conic and numerical derivatives for K = %s", (k) => {
-        const sample = sampleConic(3, 4, 10, k);
+        const sample = sampleConic(meters(3), meters(4), meters(10), k);
         expect(40 * sample.height - (1 + k) * sample.height ** 2).toBeCloseTo(25);
         const epsilon = 1e-4;
-        const left = sampleConic(3 - epsilon, 4, 10, k);
-        const right = sampleConic(3 + epsilon, 4, 10, k);
-        const front = sampleConic(3, 4 - epsilon, 10, k);
-        const back = sampleConic(3, 4 + epsilon, 10, k);
+        const left = sampleConic(meters(3 - epsilon), meters(4), meters(10), k);
+        const right = sampleConic(meters(3 + epsilon), meters(4), meters(10), k);
+        const front = sampleConic(meters(3), meters(4 - epsilon), meters(10), k);
+        const back = sampleConic(meters(3), meters(4 + epsilon), meters(10), k);
         expect(-sample.normal.x / sample.normal.y).toBeCloseTo((right.height - left.height) / (2 * epsilon), 7);
         expect(-sample.normal.z / sample.normal.y).toBeCloseTo((back.height - front.height) / (2 * epsilon), 7);
         expect(sample.normal.length()).toBeCloseTo(1);
@@ -109,7 +109,12 @@ describe("conic primary mirror", () => {
         const positions = new Set<string>();
         for (const { position: center, rotation } of segments) {
             const matrix = Matrix.Compose(Vector3.OneReadOnly, rotation, center);
-            const sample = sampleConic(center.x, center.z, model.shape.focalLength, model.shape.conicConstant);
+            const sample = sampleConic(
+                meters(center.x),
+                meters(center.z),
+                model.shape.focalLength,
+                model.shape.conicConstant,
+            );
             expect(center.y).toBeCloseTo(sample.height, 5);
             expect(Vector3.TransformNormal(Vector3.Up(), matrix).equalsWithEpsilon(sample.normal, 1e-6)).toBe(true);
             expect(matrix.determinant()).toBeCloseTo(1);

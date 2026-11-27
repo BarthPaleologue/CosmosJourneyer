@@ -17,6 +17,8 @@
 
 import type { ArcRotateCamera } from "@babylonjs/core/Cameras/arcRotateCamera";
 import { Vector2 } from "@babylonjs/core/Maths/math.vector";
+import { hertz, radians } from "@cosmos-journeyer/physics";
+import type { Hertz, Radians, Seconds } from "@cosmos-journeyer/physics";
 
 import { CustomAnimation } from "./customAnimation";
 
@@ -26,7 +28,7 @@ import { CustomAnimation } from "./customAnimation";
  * @param phase - Phase offset in radians.
  * @returns The normalized sum of the four sine octaves.
  */
-function sumOfSines(elapsedSeconds: number, baseFrequency: number, phase: number): number {
+function sumOfSines(elapsedSeconds: number, baseFrequency: Hertz, phase: Radians): number {
     let sum = 0;
     let normalization = 0;
 
@@ -59,15 +61,15 @@ function burstEnvelope(progress: number): number {
 export function createCameraShakeAnimation(
     camera: ArcRotateCamera,
     baseIntensity: number,
-    durationSeconds: number,
+    durationSeconds: Seconds,
 ): CustomAnimation<Vector2> {
     const baseAlpha = camera.alpha;
     const baseBeta = camera.beta;
     return new CustomAnimation((progress) => {
         const intensity = burstEnvelope(progress) * baseIntensity;
         return new Vector2(
-            baseAlpha + sumOfSines(progress, 10, 0) * intensity,
-            baseBeta + sumOfSines(progress, 10, 0.38) * intensity,
+            baseAlpha + sumOfSines(progress, hertz(10), radians(0)) * intensity,
+            baseBeta + sumOfSines(progress, hertz(10), radians(0.38)) * intensity,
         );
     }, durationSeconds);
 }

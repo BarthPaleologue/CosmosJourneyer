@@ -24,7 +24,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import type { Scene } from "@babylonjs/core/scene";
-import { metersPerSecond, radians } from "@cosmos-journeyer/physics";
+import { metersPerSecond, radians, seconds } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -161,10 +161,10 @@ export class ShipControls implements Controls {
             if (warpDrive.isEnabled()) {
                 tts.sayNow("Charlotte", "engaging_warp_drive");
                 spaceship.setMainEngineThrottle(0);
-                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, 1.0);
+                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, seconds(1.0));
             } else {
                 tts.sayNow("Charlotte", "warp_drive_disengaged");
-                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, 0.5);
+                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, seconds(0.5));
 
                 if (this.closestLandableFacility !== null) {
                     const distanceToLandingFacility = Vector3.Distance(

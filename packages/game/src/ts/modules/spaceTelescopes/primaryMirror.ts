@@ -22,6 +22,8 @@ import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateCylinder } from "@babylonjs/core/Meshes/Builders/cylinderBuilder";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
@@ -83,10 +85,10 @@ export function createPrimaryMirrorSegments(model: DeepReadonly<PrimaryMirrorMod
             }
             const x = tileRadius * 1.5 * q * spacingScale;
             const z = tileRadius * Math.sqrt(3) * (r + q / 2) * spacingScale;
-            if (!isSegmentSelected(x, z, tileRadius, model.apertureRadius)) {
+            if (!isSegmentSelected(meters(x), meters(z), tileRadius, model.apertureRadius)) {
                 continue;
             }
-            const sample = sampleConic(x, z, model.shape.focalLength, model.shape.conicConstant);
+            const sample = sampleConic(meters(x), meters(z), model.shape.focalLength, model.shape.conicConstant);
             const rotation = Quaternion.FromUnitVectorsToRef(Vector3.UpReadOnly, sample.normal, Quaternion.Identity());
             segments.push({ position: new Vector3(x, sample.height, z), rotation });
         }
@@ -101,7 +103,7 @@ export function createPrimaryMirrorSegments(model: DeepReadonly<PrimaryMirrorMod
  * @param apertureRadius - Mirror aperture radius, in meters.
  * @returns Whether the tile center or a corner lies inside the aperture.
  */
-function isSegmentSelected(x: number, z: number, tileRadius: number, apertureRadius: number): boolean {
+function isSegmentSelected(x: Meters, z: Meters, tileRadius: Meters, apertureRadius: Meters): boolean {
     if (x * x + z * z <= apertureRadius ** 2) {
         return true;
     }
@@ -123,16 +125,16 @@ function isSegmentSelected(x: number, z: number, tileRadius: number, apertureRad
  * @returns Sag in meters and unit surface normal.
  */
 export function sampleConic(
-    x: number,
-    z: number,
-    focalLength: number,
+    x: Meters,
+    z: Meters,
+    focalLength: Meters,
     conicConstant: number,
-): { height: number; normal: Vector3 } {
+): { height: Meters; normal: Vector3 } {
     const radius = 2 * focalLength;
     const radialSquared = x * x + z * z;
     const discriminant = 1 - ((1 + conicConstant) * radialSquared) / (radius * radius);
     const root = Math.sqrt(discriminant);
     const height = radialSquared / (radius * (1 + root));
-    const normal = new Vector3(-x / (radius * root), 1, -z / (radius * root)).normalize();
-    return { height, normal };
+    const normal = new Vector3((x * -1) / (radius * root), 1, (z * -1) / (radius * root)).normalize();
+    return { height: meters(height), normal };
 }

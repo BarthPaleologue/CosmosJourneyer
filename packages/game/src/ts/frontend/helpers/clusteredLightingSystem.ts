@@ -19,6 +19,7 @@ import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { ClusteredLightContainer } from "@babylonjs/core/Lights/Clustered/clusteredLightContainer";
 import type { Light } from "@babylonjs/core/Lights/light";
 import type { Scene } from "@babylonjs/core/scene";
+import { radians } from "@cosmos-journeyer/physics";
 
 import type { HasBoundingSphere } from "../universe/architecture/hasBoundingSphere";
 import type { Transformable } from "../universe/architecture/transformable";
@@ -74,7 +75,7 @@ export class ClusteredLightingSystem {
                 region.getTransform().getAbsolutePosition(),
                 region.getBoundingRadius(),
                 camera.globalPosition,
-                camera.fov,
+                radians(camera.fov),
             );
 
             if (!state.isActive) {

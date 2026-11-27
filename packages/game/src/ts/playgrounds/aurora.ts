@@ -23,6 +23,7 @@ import {
     astronomicalUnitToMeters,
     degreesToRadians,
     EarthMagneticDipoleMoment,
+    meters,
     radians,
     SolarMass,
     SolarRadius,
@@ -56,7 +57,7 @@ export async function createAuroraScene(
     scene.clearColor.set(0, 0, 0, 1);
     scene.useRightHandedSystem = true;
 
-    const planetRadius = 1000e3;
+    const planetRadius = meters(1000e3);
 
     const controls = new DefaultControls(scene);
     controls.speed = 500e3;

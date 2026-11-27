@@ -20,6 +20,8 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
+import { radians } from "@cosmos-journeyer/physics";
+import type { Radians } from "@cosmos-journeyer/physics";
 
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
 
@@ -200,7 +202,7 @@ function projectOntoPlaneToRef(vector: Vector3, normal: Vector3, ref: Vector3): 
  * @param tmpCross Scratch vector for the cross product.
  * @returns Signed angle in radians.
  */
-function computeSignedAngleAroundAxis(from: Vector3, to: Vector3, axis: Vector3, tmpCross: Vector3): number {
+function computeSignedAngleAroundAxis(from: Vector3, to: Vector3, axis: Vector3, tmpCross: Vector3): Radians {
     Vector3.CrossToRef(from, to, tmpCross);
-    return Math.atan2(Vector3.Dot(axis, tmpCross), Vector3.Dot(from, to));
+    return radians(Math.atan2(Vector3.Dot(axis, tmpCross), Vector3.Dot(from, to)));
 }
