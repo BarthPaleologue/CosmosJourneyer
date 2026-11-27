@@ -18,7 +18,7 @@
 import { generateSeededRingsModel } from "#/proceduralGenerators/ringsModelGenerator";
 import { GenerationSteps } from "#/utils/generationSteps";
 import { kelvin, kilograms, meters, radians, seconds, SolarRadius } from "@cosmos-journeyer/physics";
-import type { StellarType } from "@cosmos-journeyer/physics";
+import type { Kelvin, Meters, StellarType } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, wheelOfFortune, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
@@ -44,7 +44,7 @@ export function generateStarModel(
 
     const stellarType = getRandomStellarType(rng);
 
-    const temperature = kelvin(getRandomTemperatureFromStellarType(stellarType, rng));
+    const temperature = getRandomTemperatureFromStellarType(stellarType, rng);
     const mass = kilograms(1.9885e30);
 
     const spin: SpinModel = {
@@ -54,7 +54,7 @@ export function generateStarModel(
         initialRotationAngle: radians(0),
     };
 
-    const radius = meters(getRandomRadiusFromStellarType(stellarType, rng));
+    const radius = getRandomRadiusFromStellarType(stellarType, rng);
 
     const orbitRadius = rng(GenerationSteps.ORBIT) * 5000000e3;
 
@@ -115,22 +115,22 @@ export function getRandomStellarType(rng: (step: number) => number): StellarType
  * @param rng Indexed random source for reproducible sampling.
  * @returns A sampled temperature in kelvins.
  */
-export function getRandomTemperatureFromStellarType(stellarType: StellarType, rng: (step: number) => number): number {
+export function getRandomTemperatureFromStellarType(stellarType: StellarType, rng: (step: number) => number): Kelvin {
     switch (stellarType) {
         case "M":
-            return randRangeInt(2100, 3400, rng, GenerationSteps.TEMPERATURE);
+            return kelvin(randRangeInt(2100, 3400, rng, GenerationSteps.TEMPERATURE));
         case "K":
-            return randRangeInt(3400, 4900, rng, GenerationSteps.TEMPERATURE);
+            return kelvin(randRangeInt(3400, 4900, rng, GenerationSteps.TEMPERATURE));
         case "G":
-            return randRangeInt(4900, 5700, rng, GenerationSteps.TEMPERATURE);
+            return kelvin(randRangeInt(4900, 5700, rng, GenerationSteps.TEMPERATURE));
         case "F":
-            return randRangeInt(5700, 7200, rng, GenerationSteps.TEMPERATURE);
+            return kelvin(randRangeInt(5700, 7200, rng, GenerationSteps.TEMPERATURE));
         case "A":
-            return randRangeInt(7200, 9700, rng, GenerationSteps.TEMPERATURE);
+            return kelvin(randRangeInt(7200, 9700, rng, GenerationSteps.TEMPERATURE));
         case "B":
-            return randRangeInt(9700, 30000, rng, GenerationSteps.TEMPERATURE);
+            return kelvin(randRangeInt(9700, 30000, rng, GenerationSteps.TEMPERATURE));
         case "O":
-            return randRangeInt(30000, 52000, rng, GenerationSteps.TEMPERATURE);
+            return kelvin(randRangeInt(30000, 52000, rng, GenerationSteps.TEMPERATURE));
         default:
             return assertUnreachable(stellarType);
     }
@@ -141,22 +141,22 @@ export function getRandomTemperatureFromStellarType(stellarType: StellarType, rn
  * @param rng Indexed random source for reproducible sampling.
  * @returns A sampled stellar radius in meters.
  */
-export function getRandomRadiusFromStellarType(stellarType: StellarType, rng: (step: number) => number): number {
+export function getRandomRadiusFromStellarType(stellarType: StellarType, rng: (step: number) => number): Meters {
     switch (stellarType) {
         case "M":
-            return randRange(0.5, 0.7, rng, GenerationSteps.RADIUS) * SolarRadius;
+            return meters(randRange(0.5, 0.7, rng, GenerationSteps.RADIUS) * SolarRadius);
         case "K":
-            return randRange(0.7, 0.9, rng, GenerationSteps.RADIUS) * SolarRadius;
+            return meters(randRange(0.7, 0.9, rng, GenerationSteps.RADIUS) * SolarRadius);
         case "G":
-            return randRange(0.9, 1.1, rng, GenerationSteps.RADIUS) * SolarRadius;
+            return meters(randRange(0.9, 1.1, rng, GenerationSteps.RADIUS) * SolarRadius);
         case "F":
-            return randRange(1.1, 1.4, rng, GenerationSteps.RADIUS) * SolarRadius;
+            return meters(randRange(1.1, 1.4, rng, GenerationSteps.RADIUS) * SolarRadius);
         case "A":
-            return randRange(1.4, 1.8, rng, GenerationSteps.RADIUS) * SolarRadius;
+            return meters(randRange(1.4, 1.8, rng, GenerationSteps.RADIUS) * SolarRadius);
         case "B":
-            return randRange(1.8, 6.6, rng, GenerationSteps.RADIUS) * SolarRadius;
+            return meters(randRange(1.8, 6.6, rng, GenerationSteps.RADIUS) * SolarRadius);
         case "O":
-            return randRange(6.6, 15.0, rng, GenerationSteps.RADIUS) * SolarRadius;
+            return meters(randRange(6.6, 15.0, rng, GenerationSteps.RADIUS) * SolarRadius);
         default:
             return assertUnreachable(stellarType);
     }

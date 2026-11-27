@@ -32,6 +32,7 @@ import {
     radians,
     seconds,
 } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom, uniformRandBool } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
@@ -73,7 +74,7 @@ export function generateTelluricPlanetModel(
 
     const mass = kilograms(EarthMass * (radius / 6_371e3) ** 3);
 
-    const orbitRadiuses: Array<number> = [];
+    const orbitRadiuses: Array<Meters> = [];
     for (const parent of parentBodies) {
         const orbitRadius = getTelluricPlanetOrbitRadius(
             parent.blackBodyTemperature,
@@ -83,7 +84,7 @@ export function generateTelluricPlanetModel(
         orbitRadiuses.push(orbitRadius);
     }
 
-    const orbitRadius = parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0;
+    const orbitRadius = meters(parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0);
 
     let parentAverageInclination = 0;
     let parentAverageAxialTilt = 0;
@@ -98,7 +99,7 @@ export function generateTelluricPlanetModel(
 
     const orbit: Orbit = {
         parentIds: parentIds,
-        semiMajorAxis: meters(orbitRadius),
+        semiMajorAxis: orbitRadius,
         p: 2,
         plane: {
             inclination: radians(
@@ -113,15 +114,15 @@ export function generateTelluricPlanetModel(
         initialMeanAnomaly: radians(0),
     };
 
-    let pressure = Math.max(normalRandom(0.8, 0.4, rng, GenerationSteps.PRESSURE) * EarthSeaLevelPressure, 0);
+    let pressure = pascals(Math.max(normalRandom(0.8, 0.4, rng, GenerationSteps.PRESSURE) * EarthSeaLevelPressure, 0));
     if (radius <= 0.3 * ScaledEarthRadius) {
-        pressure = 0;
+        pressure = pascals(0);
     }
 
     const atmosphere: AtmosphereModel | null =
         pressure > 0
             ? {
-                  pressure: pascals(pressure),
+                  pressure: pressure,
                   greenHouseEffectFactor: 0.5,
               }
             : null;
@@ -135,7 +136,7 @@ export function generateTelluricPlanetModel(
         0.3,
     );
 
-    const temperatureRange = getTemperatureRange(effectiveTemperature, 40, pressure);
+    const temperatureRange = getTemperatureRange(effectiveTemperature, kelvin(40), pressure);
 
     const spin: SpinModel = {
         siderealPeriod: seconds((60 * 60 * 24) / 10),
@@ -145,7 +146,7 @@ export function generateTelluricPlanetModel(
     };
 
     const waterAmount = clamp(normalRandom(0.02, 0.01, rng, GenerationSteps.WATER_AMOUNT), 0, 0.2);
-    const canHaveLiquidWater = hasLiquidWater(pascals(pressure), temperatureRange.min, temperatureRange.max);
+    const canHaveLiquidWater = hasLiquidWater(pressure, temperatureRange.min, temperatureRange.max);
 
     let oceanCoverage = clamp(normalRandom(0.8, 0.1, rng, GenerationSteps.TERRAIN), 0.1, 0.95);
     if (pressure === 0) {
@@ -170,7 +171,7 @@ export function generateTelluricPlanetModel(
                   CloudLayerHeight,
                   oceanCoverage,
                   kelvin(averageTemperature),
-                  pascals(pressure),
+                  pressure,
               )
             : null;
 

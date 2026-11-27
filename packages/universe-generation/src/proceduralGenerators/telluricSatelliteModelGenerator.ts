@@ -90,15 +90,14 @@ export function generateTelluricSatelliteModel(
         mass = kilograms(EarthMass * (radius / 6_371e3) ** 3);
     }
 
-    let pressure = Math.max(
-        normalRandom(EarthSeaLevelPressure, 0.2 * EarthSeaLevelPressure, rng, GenerationSteps.PRESSURE),
-        0,
+    let pressure = pascals(
+        Math.max(normalRandom(EarthSeaLevelPressure, 0.2 * EarthSeaLevelPressure, rng, GenerationSteps.PRESSURE), 0),
     );
     if (isSatelliteOfTelluric || radius <= 0.3 * ScaledEarthRadius) {
-        pressure = 0;
+        pressure = pascals(0);
     }
 
-    const stellarParents: Array<{ stellarObject: DeepReadonly<StellarObjectModel>; distance: number }> = [];
+    const stellarParents: Array<{ stellarObject: DeepReadonly<StellarObjectModel>; distance: Meters }> = [];
     for (const stellarObject of stellarObjects) {
         let averageSemiMajorAxis = 0;
         let count = 0;
@@ -109,7 +108,7 @@ export function generateTelluricSatelliteModel(
             }
         }
         if (count > 0) {
-            stellarParents.push({ stellarObject, distance: averageSemiMajorAxis / count });
+            stellarParents.push({ stellarObject, distance: meters(averageSemiMajorAxis / count) });
         }
     }
 
@@ -117,24 +116,24 @@ export function generateTelluricSatelliteModel(
         stellarParents.map(({ stellarObject, distance }) => ({
             temperature: stellarObject.blackBodyTemperature,
             radius: getCelestialBodyRadius(stellarObject),
-            distance: meters(distance),
+            distance,
         })),
         0.3,
     );
 
-    const temperatureRange = getTemperatureRange(effectiveTemperature, 40, pressure);
+    const temperatureRange = getTemperatureRange(effectiveTemperature, kelvin(40), pressure);
 
     const waterAmount = clamp(normalRandom(0.5, 0.1, rng, GenerationSteps.WATER_AMOUNT), 0, 1);
 
     const atmosphere: AtmosphereModel | null =
         pressure > 0
             ? {
-                  pressure: pascals(pressure),
+                  pressure: pressure,
                   greenHouseEffectFactor: 0.5,
               }
             : null;
 
-    const canHaveLiquidWater = hasLiquidWater(pascals(pressure), temperatureRange.min, temperatureRange.max);
+    const canHaveLiquidWater = hasLiquidWater(pressure, temperatureRange.min, temperatureRange.max);
 
     let oceanCoverage = clamp(normalRandom(0.8, 0.1, rng, GenerationSteps.TERRAIN), 0.1, 0.95);
     if (pressure === 0) {

@@ -19,11 +19,10 @@ import {
     astronomicalUnitToMeters,
     getWaterIceFrostLine,
     JupiterMass,
-    kelvin,
     kilograms,
     meters,
 } from "@cosmos-journeyer/physics";
-import type { Kilograms } from "@cosmos-journeyer/physics";
+import type { Kelvin, Kilograms, Meters } from "@cosmos-journeyer/physics";
 
 const GenerationSteps = {
     HOT_JUPITER_CHECK: 2564,
@@ -39,11 +38,11 @@ const GenerationSteps = {
  * @returns Semi-major axis in meters
  */
 export function getGasPlanetOrbitRadius(
-    stellarTemperature: number,
-    stellarRadius: number,
+    stellarTemperature: Kelvin,
+    stellarRadius: Meters,
     rng: (step: number) => number,
-): number {
-    const snowLine = getWaterIceFrostLine(kelvin(stellarTemperature), meters(stellarRadius));
+): Meters {
+    const snowLine = getWaterIceFrostLine(stellarTemperature, stellarRadius);
 
     // Hot Jupiter modeling: around 1% chance (see https://academic.oup.com/mnras/article/516/1/75/6654884)
     const pHotJupiter = 0.01;
@@ -56,7 +55,7 @@ export function getGasPlanetOrbitRadius(
 
         // Log-uniform inside this narrow inner region
         const u = rng(GenerationSteps.ORBIT_RADIUS);
-        return aMin * Math.exp(Math.log(upper / aMin) * u);
+        return meters(aMin * Math.exp(Math.log(upper / aMin) * u));
     }
 
     const innerFactor = 1.3;
@@ -72,7 +71,7 @@ export function getGasPlanetOrbitRadius(
     const sqrtMin = Math.sqrt(aMin);
     const sqrtMax = Math.sqrt(aMax);
     const sqrtA = sqrtMin + (sqrtMax - sqrtMin) * u;
-    return sqrtA * sqrtA;
+    return meters(sqrtA * sqrtA);
 }
 
 /**

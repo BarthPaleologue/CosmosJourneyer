@@ -17,7 +17,7 @@
 
 import { clamp, lerp } from "#/utils/math";
 import { EarthSeaLevelPressure, kelvin } from "@cosmos-journeyer/physics";
-import type { Kelvin } from "@cosmos-journeyer/physics";
+import type { Kelvin, Pascals } from "@cosmos-journeyer/physics";
 
 /**
  * @param effectiveTemperature Effective temperature in kelvins.
@@ -27,8 +27,8 @@ import type { Kelvin } from "@cosmos-journeyer/physics";
  */
 export function getTemperatureRange(
     effectiveTemperature: Kelvin,
-    greenHouseOffset: number,
-    atmospherePressure: number,
+    greenHouseOffset: Kelvin,
+    atmospherePressure: Pascals,
 ): { min: Kelvin; max: Kelvin } {
     const heatRedistribution = clamp(atmospherePressure / (2 * EarthSeaLevelPressure), 0, 1);
     const meanSurfaceTemperature = kelvin(effectiveTemperature + greenHouseOffset);

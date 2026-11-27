@@ -27,6 +27,7 @@ import {
     radians,
     seconds,
 } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom, randRange, randRangeInt, uniformRandBool } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
@@ -54,7 +55,7 @@ export function generateGasPlanetModel(
 
     const radius = getCoolGasGiantRadiusFromMass(mass);
 
-    const orbitRadiuses: Array<number> = [];
+    const orbitRadiuses: Array<Meters> = [];
     for (const parent of parentBodies) {
         const parentOrbitRadius = getGasPlanetOrbitRadius(
             parent.blackBodyTemperature,
@@ -64,7 +65,7 @@ export function generateGasPlanetModel(
         orbitRadiuses.push(parentOrbitRadius);
     }
 
-    const orbitRadius = parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0;
+    const orbitRadius = meters(parentBodies.length > 0 ? Math.max(...orbitRadiuses) : 0);
 
     let parentAverageInclination = 0;
     let parentAverageAxialTilt = 0;
@@ -81,7 +82,7 @@ export function generateGasPlanetModel(
 
     const orbit: Orbit = {
         parentIds: parentIds,
-        semiMajorAxis: meters(orbitRadius),
+        semiMajorAxis: orbitRadius,
         p: 2,
         plane: {
             inclination: radians(
