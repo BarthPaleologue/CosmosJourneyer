@@ -28,7 +28,7 @@ import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { Scene } from "@babylonjs/core/scene";
 import { AxisComposite } from "@brianchirls/game-input/browser";
 import DPadComposite from "@brianchirls/game-input/controls/DPadComposite";
-import { meters, metersToLightYears } from "@cosmos-journeyer/physics";
+import { lightYears, meters, metersToLightYears } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
@@ -1135,7 +1135,7 @@ export class StarSystemView implements View {
         );
 
         const distanceLY = Vector3.Distance(currentSystemPosition, targetSystemPosition);
-        const fuelForJump = warpDrive.getHyperJumpFuelConsumption(distanceLY);
+        const fuelForJump = warpDrive.getHyperJumpFuelConsumption(lightYears(distanceLY));
 
         if (spaceship.getRemainingFuel() < fuelForJump) {
             this.notificationManager.create("spaceship", "error", this.t("notifications:notEnoughFuel"), 5000);
@@ -1345,7 +1345,7 @@ export class StarSystemView implements View {
                           ),
                       ),
                   )
-                : 0;
+                : lightYears(0);
 
         const warpDrive = spaceship.getInternals().getWarpDrive();
         const fuelRequiredForJump = warpDrive?.getHyperJumpFuelConsumption(distanceLY) ?? 0;

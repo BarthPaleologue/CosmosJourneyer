@@ -22,6 +22,7 @@ import type { TransformNode } from "@babylonjs/core/Meshes";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { NeutronStarModel } from "@cosmos-journeyer/universe-model";
 
@@ -117,11 +118,11 @@ export class NeutronStar implements CelestialBodyBase<"neutronStar">, Cullable, 
         this.material.update(deltaTime);
     }
 
-    public getRadius(): number {
+    public getRadius(): Meters {
         return this.model.radius;
     }
 
-    public getBoundingRadius(): number {
+    public getBoundingRadius(): Meters {
         return this.getRadius();
     }
 

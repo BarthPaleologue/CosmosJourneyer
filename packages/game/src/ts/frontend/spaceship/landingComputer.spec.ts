@@ -10,6 +10,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
+import { meters } from "@cosmos-journeyer/physics";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createHavokForTests } from "@/frontend/helpers/havokTest";
@@ -73,10 +74,10 @@ describe("LandingComputer", () => {
         padTransform.position.set(0, 10, 0);
         return {
             getTransform: () => padTransform,
-            getBoundingRadius: () => 10,
+            getBoundingRadius: () => meters(10),
             getIdentifier: () => "landingPad",
             getPadSize: () => LandingPadSize.SMALL,
-            getPadHeight: () => 2,
+            getPadHeight: () => meters(2),
         };
     }
 

@@ -18,6 +18,7 @@
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import type { Scene } from "@babylonjs/core/scene";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
 import type { CelestialBodyModel, OrbitalObjectType } from "@cosmos-journeyer/universe-model";
@@ -51,11 +52,11 @@ export class EmptyCelestialBody<TObjectType extends OrbitalObjectType> implement
         return this.transform;
     }
 
-    getRadius(): number {
+    getRadius(): Meters {
         return getCelestialBodyRadius(this.model);
     }
 
-    getBoundingRadius(): number {
+    getBoundingRadius(): Meters {
         return this.getRadius();
     }
 

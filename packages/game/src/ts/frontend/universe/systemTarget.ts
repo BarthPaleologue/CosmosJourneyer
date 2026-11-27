@@ -2,6 +2,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Matrix } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
@@ -36,7 +38,7 @@ export class SystemTarget {
         this.getTransform().dispose();
     }
 
-    getBoundingRadius(): number {
-        return 0;
+    getBoundingRadius(): Meters {
+        return meters(0);
     }
 }

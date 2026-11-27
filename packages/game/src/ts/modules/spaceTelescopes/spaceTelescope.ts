@@ -26,6 +26,7 @@ import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import { PhysicsShapeContainer, PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
 import type { FoilMaterial } from "@/frontend/assets/materials/foil";
@@ -42,7 +43,7 @@ export class SpaceTelescope implements SystemContent {
     private readonly primaryMirror: TelescopePrimaryMirror;
     private readonly materials: ReadonlyArray<PBRMaterial>;
     private physics: { aggregate: PhysicsAggregate; shapes: ReadonlyArray<PhysicsShape> } | null = null;
-    readonly radius: number;
+    readonly radius: Meters;
 
     /**
      * Requires a model validated by the content factory.

@@ -17,6 +17,8 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters, MetersPerSecond } from "@cosmos-journeyer/physics";
 
 import type { SpaceObject } from "@/frontend/universe/systemObject";
 
@@ -32,8 +34,8 @@ import { isInsideRingRadialBounds, isPositionInsideRingVolume, projectPositionOn
  */
 export function canEngageWarpDrive(
     shipTransform: TransformNode,
-    altitude: number | null,
-    currentVelocity: number,
+    altitude: Meters | null,
+    currentVelocity: MetersPerSecond,
     nearestObject: SpaceObject,
 ): boolean {
     const object = nearestObject.object;
@@ -42,10 +44,10 @@ export function canEngageWarpDrive(
 
     const distanceToObjectCenter = Vector3.Distance(shipPosition, nearestObjectPosition);
 
-    const roughDistance = distanceToObjectCenter - object.getBoundingRadius();
-    const distanceToObject = altitude !== null ? Math.min(altitude, roughDistance) : roughDistance;
+    const roughDistance = meters(distanceToObjectCenter - object.getBoundingRadius());
+    const distanceToObject = altitude !== null ? meters(Math.min(altitude, roughDistance)) : roughDistance;
 
-    const emergencyMargin = 0.03 * object.getBoundingRadius();
+    const emergencyMargin = meters(0.03 * object.getBoundingRadius());
     if (distanceToObject <= emergencyMargin) {
         return false;
     }
@@ -54,8 +56,8 @@ export function canEngageWarpDrive(
     const directionToObject = nearestObjectPosition.subtract(shipPosition).normalize();
 
     const nbSecondsPrediction = 0.3;
-    const predictedTraveledDistance = currentVelocity * nbSecondsPrediction;
-    const predictedDistanceToObject = distanceToObject - predictedTraveledDistance; // worst case scenario
+    const predictedTraveledDistance = meters(currentVelocity * nbSecondsPrediction);
+    const predictedDistanceToObject = meters(distanceToObject - predictedTraveledDistance); // worst case scenario
     const willBeTooClose = predictedDistanceToObject < emergencyMargin;
     const isGettingCloser = shipForward.dot(directionToObject) > 0;
     if (willBeTooClose && isGettingCloser) {

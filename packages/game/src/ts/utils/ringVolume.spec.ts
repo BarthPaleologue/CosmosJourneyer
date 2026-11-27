@@ -1,4 +1,5 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { meters } from "@cosmos-journeyer/physics";
 import { describe, expect, it } from "vitest";
 
 import { distanceToRingVolume, getNearestPointOnRingVolume, isPositionInsideRingVolume } from "./ringVolume";
@@ -7,9 +8,9 @@ import type { RingVolume } from "./ringVolume";
 const ring: RingVolume = {
     center: Vector3.Zero(),
     normal: Vector3.Up(),
-    innerRadius: 1_000,
-    outerRadius: 2_000,
-    halfThickness: 100,
+    innerRadius: meters(1_000),
+    outerRadius: meters(2_000),
+    halfThickness: meters(100),
 };
 
 describe("ringVolume", () => {

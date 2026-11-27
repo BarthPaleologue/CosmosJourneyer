@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Meters } from "@cosmos-journeyer/physics";
+
 /**
  * Describes all object that have a physical extent: they can be enclosed in a sphere of a certain radius
  */
@@ -22,5 +24,5 @@ export interface HasBoundingSphere {
     /**
      * Returns the radius describing the max extent of the object from its center
      */
-    getBoundingRadius(): number;
+    getBoundingRadius(): Meters;
 }

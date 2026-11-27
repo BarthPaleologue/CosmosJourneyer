@@ -475,7 +475,7 @@ describe("StarSystemView", () => {
             const regionTransform = new TransformNode("node", scene);
             const oldRegion: ClusteredLightingRegion = {
                 getTransform: () => regionTransform,
-                getBoundingRadius: () => 1,
+                getBoundingRadius: () => meters(1),
                 getLights: () => [],
             };
             const registeredRegions = view["entityLightingRegions"];
@@ -501,7 +501,7 @@ describe("StarSystemView", () => {
 
             const newRegion: ClusteredLightingRegion = {
                 getTransform: () => newEntityTransform,
-                getBoundingRadius: () => 1,
+                getBoundingRadius: () => meters(1),
                 getLights: () => [],
             };
             const lightingRegionsDispatchSpy = vi
@@ -630,7 +630,7 @@ describe("entity save locations", () => {
                 id: "station",
                 name: "Station",
                 getTransform: () => stationTransform,
-                getBoundingRadius: () => 100,
+                getBoundingRadius: () => meters(100),
             };
             vi.spyOn(starSystem, "getNearestSystemObject").mockReturnValue(object);
             vi.spyOn(starSystem, "getSystemObjectById").mockImplementation((id: string) =>
@@ -682,7 +682,7 @@ describe("entity save locations", () => {
                     id: "station",
                     name: "Station",
                     getTransform: () => station,
-                    getBoundingRadius: () => 100,
+                    getBoundingRadius: () => meters(100),
                 };
                 vi.spyOn(starSystem, "getSystemObjectById").mockReturnValue(object);
                 const camera = new FreeCamera("controls camera", Vector3.Zero(), scene);
@@ -733,7 +733,7 @@ describe("station save loading", () => {
                 view["starSystem"] = starSystem;
                 const stellarObjects = starSystem.getStellarObjects();
                 const blackHole = stellarObjects[0];
-                vi.spyOn(blackHole, "getBoundingRadius").mockReturnValue(100);
+                vi.spyOn(blackHole, "getBoundingRadius").mockReturnValue(meters(100));
                 const starTransform = blackHole.getTransform();
                 starTransform.position.set(1000, 2000, 3000);
                 starTransform.computeWorldMatrix(true);
@@ -787,17 +787,17 @@ describe("station save loading", () => {
             const transform = new TransformNode("node", scene);
             const pad: ILandingPad = {
                 getTransform: () => transform,
-                getBoundingRadius: () => 10,
+                getBoundingRadius: () => meters(10),
                 getIdentifier: () => "A",
                 getPadSize: () => LandingPadSize.SMALL,
-                getPadHeight: () => 1,
+                getPadHeight: () => meters(1),
             };
             const provider = new LandingPadProvider([pad]);
             const station: LandableFacility = {
                 id: "station",
                 name: "Station",
                 getTransform: () => transform,
-                getBoundingRadius: () => 100,
+                getBoundingRadius: () => meters(100),
                 getLandingPadProvider: () => provider,
             };
             vi.spyOn(starSystem, "getLandableFacilityById").mockImplementation((id: string) =>

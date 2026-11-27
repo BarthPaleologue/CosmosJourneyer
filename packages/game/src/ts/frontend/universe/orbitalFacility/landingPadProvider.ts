@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Observable } from "@babylonjs/core/Misc/observable";
+import type { Meters } from "@cosmos-journeyer/physics";
 
 import type { HasBoundingSphere } from "../architecture/hasBoundingSphere";
 import type { Transformable } from "../architecture/transformable";
@@ -34,7 +35,7 @@ export type LandingRequest = {
 export interface ILandingPad extends Transformable, HasBoundingSphere {
     getIdentifier(): string;
     getPadSize(): LandingPadSize;
-    getPadHeight(): number;
+    getPadHeight(): Meters;
 }
 
 export const LandingPadStatus = {

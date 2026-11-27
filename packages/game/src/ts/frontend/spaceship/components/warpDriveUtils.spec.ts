@@ -3,7 +3,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
-import { meters } from "@cosmos-journeyer/physics";
+import { meters, metersPerSecond } from "@cosmos-journeyer/physics";
 import type { StarModel } from "@cosmos-journeyer/universe-model";
 import { describe, expect, it, vi } from "vitest";
 
@@ -77,11 +77,11 @@ describe("warp clearance near entity geometry", () => {
                 id: "station",
                 name: "Station",
                 getTransform: () => station,
-                getBoundingRadius: () => 100,
+                getBoundingRadius: () => meters(100),
             },
         };
         try {
-            expect(canEngageWarpDrive(ship, null, speed, object)).toBe(allowed);
+            expect(canEngageWarpDrive(ship, null, metersPerSecond(speed), object)).toBe(allowed);
         } finally {
             scene.dispose();
             engine.dispose();
@@ -114,16 +114,16 @@ describe("warp clearance near entity geometry", () => {
         vi.spyOn(asteroidField, "getRingVolume").mockReturnValue({
             center: Vector3.Zero(),
             normal: Vector3.Up(),
-            innerRadius: 200,
-            outerRadius: 300,
-            halfThickness: 10,
+            innerRadius: meters(200),
+            outerRadius: meters(300),
+            halfThickness: meters(10),
         });
         const object: SpaceObject = {
             kind: "orbitalObject",
             object: planet,
         };
         try {
-            expect(canEngageWarpDrive(ship, null, speed, object)).toBe(allowed);
+            expect(canEngageWarpDrive(ship, null, metersPerSecond(speed), object)).toBe(allowed);
         } finally {
             scene.dispose();
             engine.dispose();

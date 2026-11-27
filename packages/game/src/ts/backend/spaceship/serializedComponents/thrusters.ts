@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { metersPerSecond } from "@cosmos-journeyer/physics";
+import type { MetersPerSecond } from "@cosmos-journeyer/physics";
 import { z } from "zod";
 
 export const SerializedThrustersSchema = z.object({
@@ -29,8 +31,8 @@ export type SerializedThrusters = z.infer<typeof SerializedThrustersSchema>;
  * @param serializedThrusters - Serialized thruster size and quality values.
  * @returns Maximum speed in metres per second.
  */
-export function getThrustersSpec(serializedThrusters: SerializedThrusters): { maxSpeed: number } {
+export function getThrustersSpec(serializedThrusters: SerializedThrusters): { maxSpeed: MetersPerSecond } {
     return {
-        maxSpeed: 1e3 * (1.0 + serializedThrusters.size / 7.0 + serializedThrusters.quality / 20.0),
+        maxSpeed: metersPerSecond(1e3 * (1.0 + serializedThrusters.size / 7.0 + serializedThrusters.quality / 20.0)),
     };
 }

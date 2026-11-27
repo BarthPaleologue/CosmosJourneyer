@@ -105,7 +105,7 @@ export async function createRingsScene(
             shadowCasters: [
                 {
                     getTransform: (): TransformNode => sphere,
-                    getBoundingRadius: (): number => scalingFactor,
+                    getBoundingRadius: () => meters(scalingFactor),
                 },
             ],
         },

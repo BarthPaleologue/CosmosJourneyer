@@ -21,6 +21,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { PhysicsShape, PhysicsShapeContainer } from "@babylonjs/core/Physics/v2/physicsShape";
 import { PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { Result } from "@cosmos-journeyer/typescript";
 
@@ -46,7 +47,7 @@ export class RussellTeaPot implements SystemContent {
     private readonly shapeContainer: PhysicsShapeContainer;
     private readonly shapes: ReadonlyArray<PhysicsShape>;
     private aggregate: PhysicsAggregate | null = null;
-    readonly radius: number;
+    readonly radius: Meters;
 
     /**
      * @param moduleAssets Assets loaded for the game modules.

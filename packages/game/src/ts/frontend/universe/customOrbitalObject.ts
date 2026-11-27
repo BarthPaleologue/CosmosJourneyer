@@ -17,6 +17,8 @@
 
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectModelBase } from "@cosmos-journeyer/universe-model";
 
@@ -26,7 +28,7 @@ export class CustomOrbitalObject implements OrbitalObjectBase<"custom"> {
     private readonly _transform: TransformNode;
     readonly model: DeepReadonly<OrbitalObjectModelBase<"custom">>;
     readonly type: "custom";
-    private readonly boundingRadius: number;
+    private readonly boundingRadius: Meters;
 
     constructor(transform: TransformNode, model: DeepReadonly<OrbitalObjectModelBase<"custom">>) {
         this._transform = transform;
@@ -36,14 +38,14 @@ export class CustomOrbitalObject implements OrbitalObjectBase<"custom"> {
         this.type = model.type;
 
         const boundingVectors = this.getTransform().getHierarchyBoundingVectors();
-        this.boundingRadius = boundingVectors.max.subtract(boundingVectors.min).length() / 2;
+        this.boundingRadius = meters(boundingVectors.max.subtract(boundingVectors.min).length() / 2);
     }
 
     getTransform(): TransformNode {
         return this._transform;
     }
 
-    getBoundingRadius(): number {
+    getBoundingRadius(): Meters {
         return this.boundingRadius;
     }
 

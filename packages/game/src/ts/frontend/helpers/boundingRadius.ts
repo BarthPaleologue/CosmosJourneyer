@@ -16,18 +16,22 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { TransformNode } from "@babylonjs/core/pure";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 
 /**
  * Bounds the whole transform hierarchy with a sphere centered on its absolute position.
  * @param transform - Transform whose hierarchy is measured.
- * @returns The enclosing radius in world units.
+ * @returns The enclosing radius in meters.
  */
-export function getBoundingRadius(transform: TransformNode): number {
+export function getBoundingRadius(transform: TransformNode): Meters {
     const { min: boundingMin, max: boundingMax } = transform.getHierarchyBoundingVectors();
     const origin = transform.getAbsolutePosition();
-    return Math.hypot(
-        Math.max(Math.abs(boundingMin.x - origin.x), Math.abs(boundingMax.x - origin.x)),
-        Math.max(Math.abs(boundingMin.y - origin.y), Math.abs(boundingMax.y - origin.y)),
-        Math.max(Math.abs(boundingMin.z - origin.z), Math.abs(boundingMax.z - origin.z)),
+    return meters(
+        Math.hypot(
+            Math.max(Math.abs(boundingMin.x - origin.x), Math.abs(boundingMax.x - origin.x)),
+            Math.max(Math.abs(boundingMin.y - origin.y), Math.abs(boundingMax.y - origin.y)),
+            Math.max(Math.abs(boundingMin.z - origin.z), Math.abs(boundingMax.z - origin.z)),
+        ),
     );
 }

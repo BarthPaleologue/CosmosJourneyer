@@ -1,4 +1,6 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { meters, metersPerSecond } from "@cosmos-journeyer/physics";
+import type { Meters, MetersPerSecond } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { clamp, lerp, remap } from "@/utils/math";
@@ -7,7 +9,7 @@ import type { RingVolume } from "@/utils/ringVolume";
 
 type SolidVolume = {
     readonly center: Vector3;
-    readonly radius: number;
+    readonly radius: Meters;
 };
 
 export type SolidWarpInfluence = {
@@ -30,15 +32,15 @@ export type WarpInfluence = SolidWarpInfluence | RingWarpInfluence;
  * @returns A target speed within the supplied bounds.
  */
 function computeTargetSpeedFromCollisionDistance(
-    collisionDistance: number,
-    minWarpSpeed: number,
-    maxWarpSpeed: number,
-): number {
-    const speedThreshold = 10e3;
+    collisionDistance: Meters,
+    minWarpSpeed: MetersPerSecond,
+    maxWarpSpeed: MetersPerSecond,
+): MetersPerSecond {
+    const speedThreshold = metersPerSecond(10e3);
 
     const closeSpeed = (speedThreshold * 0.1 * collisionDistance) / speedThreshold;
     const deepSpaceSpeed = speedThreshold * ((0.1 * collisionDistance) / speedThreshold) ** 1.2;
-    return clamp(Math.max(closeSpeed, deepSpaceSpeed), minWarpSpeed, maxWarpSpeed);
+    return metersPerSecond(clamp(Math.max(closeSpeed, deepSpaceSpeed), minWarpSpeed, maxWarpSpeed));
 }
 
 /**
@@ -52,12 +54,11 @@ function computeTargetSpeedFromCollisionDistance(
 function computeSolidInfluenceTargetSpeed(
     influence: SolidWarpInfluence,
     shipPosition: Vector3,
-    minWarpSpeed: number,
-    maxWarpSpeed: number,
-): number {
-    const collisionDistance = Math.max(
-        0,
-        Vector3.Distance(shipPosition, influence.volume.center) - influence.volume.radius,
+    minWarpSpeed: MetersPerSecond,
+    maxWarpSpeed: MetersPerSecond,
+): MetersPerSecond {
+    const collisionDistance = meters(
+        Math.max(0, Vector3.Distance(shipPosition, influence.volume.center) - influence.volume.radius),
     );
     return computeTargetSpeedFromCollisionDistance(collisionDistance, minWarpSpeed, maxWarpSpeed);
 }
@@ -97,16 +98,16 @@ function computeRingInfluenceTargetSpeed(
     influence: RingWarpInfluence,
     shipPosition: Vector3,
     shipForward: Vector3,
-    minWarpSpeed: number,
-    maxWarpSpeed: number,
-): number {
+    minWarpSpeed: MetersPerSecond,
+    maxWarpSpeed: MetersPerSecond,
+): MetersPerSecond {
     const radialTargetSpeed = computeTargetSpeedFromCollisionDistance(
         distanceToRingVolume(shipPosition, influence.volume),
         minWarpSpeed,
         maxWarpSpeed,
     );
     const trajectoryRisk = computeRingTrajectoryRisk(influence, shipPosition, shipForward);
-    return lerp(maxWarpSpeed, radialTargetSpeed, trajectoryRisk);
+    return metersPerSecond(lerp(maxWarpSpeed, radialTargetSpeed, trajectoryRisk));
 }
 
 /**
@@ -122,23 +123,33 @@ export function computeMaxTargetSpeedFromWarpInfluences(
     influences: ReadonlyArray<WarpInfluence>,
     shipPosition: Vector3,
     shipForward: Vector3,
-    minWarpSpeed: number,
-    maxWarpSpeed: number,
-): number {
+    minWarpSpeed: MetersPerSecond,
+    maxWarpSpeed: MetersPerSecond,
+): MetersPerSecond {
     let maxTargetSpeed = maxWarpSpeed;
 
     for (const influence of influences) {
         switch (influence.type) {
             case "solid":
-                maxTargetSpeed = Math.min(
-                    maxTargetSpeed,
-                    computeSolidInfluenceTargetSpeed(influence, shipPosition, minWarpSpeed, maxWarpSpeed),
+                maxTargetSpeed = metersPerSecond(
+                    Math.min(
+                        maxTargetSpeed,
+                        computeSolidInfluenceTargetSpeed(influence, shipPosition, minWarpSpeed, maxWarpSpeed),
+                    ),
                 );
                 break;
             case "ring":
-                maxTargetSpeed = Math.min(
-                    maxTargetSpeed,
-                    computeRingInfluenceTargetSpeed(influence, shipPosition, shipForward, minWarpSpeed, maxWarpSpeed),
+                maxTargetSpeed = metersPerSecond(
+                    Math.min(
+                        maxTargetSpeed,
+                        computeRingInfluenceTargetSpeed(
+                            influence,
+                            shipPosition,
+                            shipForward,
+                            minWarpSpeed,
+                            maxWarpSpeed,
+                        ),
+                    ),
                 );
                 break;
             default:

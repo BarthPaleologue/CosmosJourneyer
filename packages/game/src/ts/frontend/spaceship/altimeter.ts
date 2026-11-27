@@ -18,17 +18,19 @@
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 
 import { CollisionMask } from "@/settings";
 
 export class Altimeter {
     private readonly physicsEngine: PhysicsEngineV2;
 
-    private static readonly MAX_RANGE = 300_000;
+    private static readonly MAX_RANGE = meters(300_000);
 
     private readonly raycastResult = new PhysicsRaycastResult();
 
-    private lastAltitude: number | null = null;
+    private lastAltitude: Meters | null = null;
 
     constructor(physicsEngine: PhysicsEngineV2) {
         this.physicsEngine = physicsEngine;
@@ -42,10 +44,10 @@ export class Altimeter {
             collideWith: CollisionMask.ENVIRONMENT,
         });
 
-        this.lastAltitude = this.raycastResult.hasHit ? this.raycastResult.hitDistance : null;
+        this.lastAltitude = this.raycastResult.hasHit ? meters(this.raycastResult.hitDistance) : null;
     }
 
-    public getAltitude(): number | null {
+    public getAltitude(): Meters | null {
         return this.lastAltitude;
     }
 }

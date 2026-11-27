@@ -24,7 +24,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import type { Scene } from "@babylonjs/core/scene";
-import { radians } from "@cosmos-journeyer/physics";
+import { metersPerSecond, radians } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -150,7 +150,7 @@ export class ShipControls implements Controls {
                 return;
             }
 
-            if (warpDrive.isDisabled() && !spaceship.canEngageWarpDrive(0)) {
+            if (warpDrive.isDisabled() && !spaceship.canEngageWarpDrive(metersPerSecond(0))) {
                 tts.sayNow("Charlotte", "cannot_engage_warp_drive");
                 return;
             }

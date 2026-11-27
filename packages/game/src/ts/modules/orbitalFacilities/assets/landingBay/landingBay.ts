@@ -36,6 +36,7 @@ import {
     meters,
     metersPerSecondSquared,
 } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
@@ -56,7 +57,7 @@ import { createLandingBayMaterial } from "./landingBayMaterial";
 export class LandingBay {
     private readonly root: TransformNode;
 
-    private readonly radius: number;
+    private readonly radius: Meters;
 
     private readonly landingBayMaterial: Material;
     private readonly metalSectionMaterial: Material;
@@ -78,7 +79,7 @@ export class LandingBay {
     constructor(model: LandingBayModel, displayName: string, assets: RenderingAssets, scene: Scene) {
         this.root = new TransformNode("LandingBayRoot", scene);
 
-        this.radius = 500;
+        this.radius = meters(500);
         const deltaRadius = this.radius / 3;
 
         this.metalSectionMaterial = createMetalSectionMaterial(
@@ -347,7 +348,7 @@ export class LandingBay {
         return this.root;
     }
 
-    getBoundingRadius(): number {
+    getBoundingRadius(): Meters {
         return this.radius;
     }
 

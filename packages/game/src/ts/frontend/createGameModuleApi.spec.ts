@@ -3,6 +3,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Mock } from "vitest";
 
@@ -86,7 +87,7 @@ describe("module entity capabilities", () => {
             placement: { type: "onSurface", getTransform: () => transform },
         };
         ignored = { ...entity, model: { ...model, id: "ignored", content: { type: "no-capabilities" } } };
-        geometry = { getTransform: () => transform, getBoundingRadius: () => 10 };
+        geometry = { getTransform: () => transform, getBoundingRadius: () => meters(10) };
     });
     afterEach(() => {
         processors.dispose();
@@ -178,10 +179,10 @@ describe("module entity capabilities", () => {
         const padTransform = new TransformNode("pad", scene);
         const pad: ILandingPad = {
             getTransform: () => padTransform,
-            getBoundingRadius: () => 1,
+            getBoundingRadius: () => meters(1),
             getIdentifier: () => "A",
             getPadSize: () => LandingPadSize.SMALL,
-            getPadHeight: () => 1,
+            getPadHeight: () => meters(1),
         };
         const provider = new LandingPadProvider([pad]);
         api.systemEntities.registerSpatialGeometry(type, () => geometry);

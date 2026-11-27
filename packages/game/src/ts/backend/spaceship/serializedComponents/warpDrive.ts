@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { C } from "@cosmos-journeyer/physics";
+import { C, lightYears, metersPerSecond } from "@cosmos-journeyer/physics";
+import type { LightYears, MetersPerSecond } from "@cosmos-journeyer/physics";
 import { z } from "zod";
 
 export const SerializedWarpDriveSchema = z.object({
@@ -30,9 +31,9 @@ export type SerializedWarpDrive = z.infer<typeof SerializedWarpDriveSchema>;
  * @param warpDrive - Serialized warp-drive size and quality values.
  * @returns Maximum speed in multiples of light speed and range in light-years.
  */
-export function getWarpDriveSpec(warpDrive: SerializedWarpDrive): { maxSpeed: number; rangeLy: number } {
+export function getWarpDriveSpec(warpDrive: SerializedWarpDrive): { maxSpeed: MetersPerSecond; rangeLy: LightYears } {
     return {
-        maxSpeed: 15 * C * (warpDrive.size + warpDrive.quality / 10),
-        rangeLy: 6 * (warpDrive.size + warpDrive.quality / 2),
+        maxSpeed: metersPerSecond(15 * C * (warpDrive.size + warpDrive.quality / 10)),
+        rangeLy: lightYears(6 * (warpDrive.size + warpDrive.quality / 2)),
     };
 }

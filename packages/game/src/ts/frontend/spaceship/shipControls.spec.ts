@@ -26,6 +26,7 @@ import { PhysicsMotionType, PhysicsPrestepType } from "@babylonjs/core/Physics/v
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 import { createInstance } from "i18next";
 import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 
@@ -484,17 +485,17 @@ describe("ShipControls camera transforms", () => {
         const transform = new TransformNode(id, scene);
         const pad: ILandingPad = {
             getTransform: () => transform,
-            getBoundingRadius: () => 10,
+            getBoundingRadius: () => meters(10),
             getIdentifier: () => "A",
             getPadSize: () => LandingPadSize.SMALL,
-            getPadHeight: () => 1,
+            getPadHeight: () => meters(1),
         };
         const provider = new LandingPadProvider([pad]);
         return {
             id,
             name: id,
             getTransform: () => transform,
-            getBoundingRadius: () => 100,
+            getBoundingRadius: () => meters(100),
             getLandingPadProvider: () => provider,
         };
     }

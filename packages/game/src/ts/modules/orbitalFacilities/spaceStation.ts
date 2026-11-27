@@ -20,6 +20,8 @@ import type { Light } from "@babylonjs/core/Lights/light";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
 import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
@@ -43,7 +45,7 @@ export class SpaceStation implements SystemContent {
 
     private readonly root: TransformNode;
 
-    private readonly boundingRadius: number;
+    private readonly boundingRadius: Meters;
 
     private readonly landingPadProvider: LandingPadProvider;
 
@@ -88,7 +90,7 @@ export class SpaceStation implements SystemContent {
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
-        this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
+        this.boundingRadius = meters(Math.max(extendSize.x, extendSize.y, extendSize.z));
     }
 
     getLights(): ReadonlyArray<Light> {
@@ -103,7 +105,7 @@ export class SpaceStation implements SystemContent {
         return this.landingBays;
     }
 
-    public getBoundingRadius(): number {
+    public getBoundingRadius(): Meters {
         return this.boundingRadius;
     }
 

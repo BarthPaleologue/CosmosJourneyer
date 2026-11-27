@@ -135,7 +135,7 @@ export class Vehicle {
             );
         }
 
-        this.boundingRadius = meters(getBoundingRadius(this.getTransform()));
+        this.boundingRadius = getBoundingRadius(this.getTransform());
     }
 
     getSteeringMode(): SteeringMode {

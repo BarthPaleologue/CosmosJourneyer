@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { metersPerSecond } from "@cosmos-journeyer/physics";
+import type { LightYears, MetersPerSecond } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { getWarpDriveSpec } from "@/backend/spaceship/serializedComponents/warpDrive";
@@ -54,7 +56,7 @@ export interface ReadonlyWarpDrive {
      * Returns the current speed of the warp drive in m/s.
      * @returns The current speed of the warp drive in m/s.
      */
-    getWarpSpeed(): number;
+    getWarpSpeed(): MetersPerSecond;
 
     /**
      * Returns the current target throttle of the warp drive.
@@ -79,21 +81,21 @@ export class WarpDrive implements ReadonlyWarpDrive {
     /**
      * Maximum speed of the warp drive in m/s. It can be reached when the ship is far from any body and the user throttle is set to 1.
      */
-    readonly maxWarpSpeed: number;
+    readonly maxWarpSpeed: MetersPerSecond;
 
-    private static readonly MIN_WARP_SPEED = 30e3;
+    private static readonly MIN_WARP_SPEED = metersPerSecond(30e3);
 
-    readonly rangeLY: number;
+    readonly rangeLY: LightYears;
 
     /**
      * Target speed of the warp drive in m/s. It is computed based on the distance to the closest body and the user throttle.
      */
-    private maxTargetSpeed = 0;
+    private maxTargetSpeed = metersPerSecond(0);
 
     /**
      * Current speed of the warp drive in m/s.
      */
-    private currentSpeed = 0;
+    private currentSpeed = metersPerSecond(0);
 
     /**
      * Current state of the warp drive.
@@ -149,9 +151,9 @@ export class WarpDrive implements ReadonlyWarpDrive {
      */
     private disable(): void {
         this.state = "disabled";
-        this.maxTargetSpeed = 0;
+        this.maxTargetSpeed = metersPerSecond(0);
         this.throttle = 0;
-        this.currentSpeed = 0;
+        this.currentSpeed = metersPerSecond(0);
     }
 
     public isEnabled(): boolean {
@@ -181,7 +183,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
         influences: ReadonlyArray<WarpInfluence>,
         shipPosition: Vector3,
         shipForward: Vector3,
-    ): number {
+    ): MetersPerSecond {
         this.maxTargetSpeed = computeMaxTargetSpeedFromWarpInfluences(
             influences,
             shipPosition,
@@ -207,7 +209,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
         this.throttle = 0;
     }
 
-    public getWarpSpeed(): number {
+    public getWarpSpeed(): MetersPerSecond {
         return this.currentSpeed;
     }
 
@@ -228,7 +230,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
 
         const hysteresis = -1e3; // Avoid flickering between accelerating and decelerating states
         this.isAcceleratingFlag = newSpeed > this.currentSpeed + hysteresis;
-        this.currentSpeed = newSpeed;
+        this.currentSpeed = metersPerSecond(newSpeed);
     }
 
     /**
@@ -246,8 +248,8 @@ export class WarpDrive implements ReadonlyWarpDrive {
     ): void {
         switch (this.state) {
             case "disengaging":
-                this.maxTargetSpeed *= 0.9;
-                this.currentSpeed *= 0.9;
+                this.maxTargetSpeed = metersPerSecond(this.maxTargetSpeed * 0.9);
+                this.currentSpeed = metersPerSecond(this.currentSpeed * 0.9);
                 if (this.maxTargetSpeed <= WarpDrive.MIN_WARP_SPEED && this.currentSpeed <= WarpDrive.MIN_WARP_SPEED) {
                     this.disable();
                 }
@@ -257,8 +259,8 @@ export class WarpDrive implements ReadonlyWarpDrive {
                 this.updateWarpDriveSpeed(deltaSeconds);
                 break;
             case "disabled":
-                this.maxTargetSpeed = 0;
-                this.currentSpeed = 0;
+                this.maxTargetSpeed = metersPerSecond(0);
+                this.currentSpeed = metersPerSecond(0);
                 this.throttle = 0;
                 break;
             default:
@@ -270,7 +272,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
      * @param speed The speed of the warp drive in m/s.
      * @returns the amount of fuel (L/s) consumed by the warp drive per second based on the current speed.
      */
-    public getFuelConsumptionRate(speed: number): number {
+    public getFuelConsumptionRate(speed: MetersPerSecond): number {
         const speed01 = remap(speed, WarpDrive.MIN_WARP_SPEED, this.maxWarpSpeed, 0, 1);
         return 0.15 * (speed01 - 0.75) ** 2 + 0.08; // minimum of 0.08 L/s at 75% throttle
     }
@@ -280,7 +282,7 @@ export class WarpDrive implements ReadonlyWarpDrive {
      * @param distanceLy Jump distance in light-years.
      * @returns Fuel consumed in liters.
      */
-    public getHyperJumpFuelConsumption(distanceLy: number): number {
+    public getHyperJumpFuelConsumption(distanceLy: LightYears): number {
         return 2 * distanceLy;
     }
 
