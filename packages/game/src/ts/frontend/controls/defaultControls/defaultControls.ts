@@ -21,6 +21,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import type { Scene } from "@babylonjs/core/scene";
+import { radians } from "@cosmos-journeyer/physics";
 
 import { alignRotationToRef } from "@/frontend/helpers/rotation";
 import { getRotationQuaternion, pitch, roll, translate, yaw } from "@/frontend/helpers/transform";
@@ -91,9 +92,9 @@ export class DefaultControls implements Controls {
             deltaSeconds,
         );
 
-        roll(this.transform, this.rotationInertia.x * this.rotationSpeed * deltaSeconds);
-        pitch(this.transform, this.rotationInertia.y * this.rotationSpeed * deltaSeconds);
-        yaw(this.transform, this.rotationInertia.z * this.rotationSpeed * deltaSeconds);
+        roll(this.transform, radians(this.rotationInertia.x * this.rotationSpeed * deltaSeconds));
+        pitch(this.transform, radians(this.rotationInertia.y * this.rotationSpeed * deltaSeconds));
+        yaw(this.transform, radians(this.rotationInertia.z * this.rotationSpeed * deltaSeconds));
 
         const localForward = Vector3.Forward(this.getTransform().getScene().useRightHandedSystem);
 

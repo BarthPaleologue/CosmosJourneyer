@@ -24,6 +24,7 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import type { Scene } from "@babylonjs/core/scene";
+import { radians } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -265,8 +266,8 @@ export class ShipControls implements Controls {
                 },
                 thirdPersonCameraPresets[presetName],
                 (from, to, progress) => ({
-                    alpha: lerpAngle(from.alpha, to.alpha, progress),
-                    beta: lerpAngle(from.beta, to.beta, progress),
+                    alpha: lerpAngle(radians(from.alpha), radians(to.alpha), progress),
+                    beta: lerpAngle(radians(from.beta), radians(to.beta), progress),
                     radius: lerp(from.radius, to.radius, progress),
                     target: Vector3.Lerp(from.target, to.target, progress),
                 }),
@@ -463,9 +464,9 @@ export class ShipControls implements Controls {
             this.rotationInertia.x = lerpSmooth(this.rotationInertia.x, inputRoll, 0.07, deltaSeconds);
             this.rotationInertia.y = lerpSmooth(this.rotationInertia.y, inputPitch, 0.07, deltaSeconds);
 
-            roll(this.getTransform(), this.spaceship.maxRollSpeed * this.rotationInertia.x * deltaSeconds);
-            yaw(this.getTransform(), -this.spaceship.maxYawSpeed * this.rotationInertia.x * deltaSeconds);
-            pitch(this.getTransform(), this.spaceship.maxPitchSpeed * this.rotationInertia.y * deltaSeconds);
+            roll(this.getTransform(), radians(this.spaceship.maxRollSpeed * this.rotationInertia.x * deltaSeconds));
+            yaw(this.getTransform(), radians(-this.spaceship.maxYawSpeed * this.rotationInertia.x * deltaSeconds));
+            pitch(this.getTransform(), radians(this.spaceship.maxPitchSpeed * this.rotationInertia.y * deltaSeconds));
         }
 
         this.thirdPersonCameraTransform.position.copyFrom(this.getTransform().getAbsolutePosition());

@@ -21,7 +21,7 @@ import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
-import { EarthG } from "@cosmos-journeyer/physics";
+import { EarthG, radians } from "@cosmos-journeyer/physics";
 
 import { lerp, lerpAngle, lerpSmooth, smoothstep } from "@/utils/math";
 
@@ -128,8 +128,8 @@ export class VehicleControls implements Controls {
             },
             thirdPersonCameraPresets[presetName],
             (from, to, progress) => ({
-                alpha: lerpAngle(from.alpha, to.alpha, progress),
-                beta: lerpAngle(from.beta, to.beta, progress),
+                alpha: lerpAngle(radians(from.alpha), radians(to.alpha), progress),
+                beta: lerpAngle(radians(from.beta), radians(to.beta), progress),
                 radius: lerp(from.radius, to.radius, progress),
                 target: Vector3.Lerp(from.target, to.target, progress),
             }),

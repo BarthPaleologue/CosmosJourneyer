@@ -17,6 +17,7 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Quaternion } from "@babylonjs/core/Maths/math.vector";
+import { kilograms, seconds } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
 
@@ -52,7 +53,7 @@ export class KeplerianOrbitalSimulation {
 
     private readonly objectsAwaitingParents = new Set<KeplerianObject>();
 
-    private elapsedSeconds = 0;
+    private elapsedSeconds = seconds(0);
 
     public constructor(orbitalObjects: ReadonlyArray<KeplerianObject>) {
         this.addObjects(orbitalObjects);
@@ -104,7 +105,7 @@ export class KeplerianOrbitalSimulation {
     }
 
     public update(elapsedSeconds: number): void {
-        this.elapsedSeconds = elapsedSeconds;
+        this.elapsedSeconds = seconds(elapsedSeconds);
         this.transformCache.clear();
     }
 
@@ -199,7 +200,7 @@ export class KeplerianOrbitalSimulation {
         }
         barycenter.scaleInPlace(1 / sumOfMasses);
 
-        return getPointOnOrbitLocal(orbit, sumOfMasses, this.elapsedSeconds).addInPlace(barycenter);
+        return getPointOnOrbitLocal(orbit, kilograms(sumOfMasses), this.elapsedSeconds).addInPlace(barycenter);
     }
 
     private computeAbsoluteOrientation(object: KeplerianObject): Quaternion {

@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { radians } from "@cosmos-journeyer/physics";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -113,9 +114,9 @@ describe("math utilities", () => {
 
     describe("lerpAngle", () => {
         it("interpolates angles through the shortest path", () => {
-            expect(lerpAngle(0, Math.PI, 0.5)).toBeCloseTo(-Math.PI / 2);
-            expect(lerpAngle(0.1, Tau - 0.1, 0.5)).toBeCloseTo(0);
-            expect(lerpAngle(Tau - 0.1, 0.1, 0.5)).toBeCloseTo(Tau);
+            expect(lerpAngle(radians(0), radians(Math.PI), 0.5)).toBeCloseTo(-Math.PI / 2);
+            expect(lerpAngle(radians(0.1), radians(Tau - 0.1), 0.5)).toBeCloseTo(0);
+            expect(lerpAngle(radians(Tau - 0.1), radians(0.1), 0.5)).toBeCloseTo(Tau);
         });
     });
 

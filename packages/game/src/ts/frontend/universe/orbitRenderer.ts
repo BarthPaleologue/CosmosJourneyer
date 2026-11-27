@@ -19,7 +19,7 @@ import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math";
 import type { Matrix } from "@babylonjs/core/Maths/math";
 import type { Mesh } from "@babylonjs/core/Meshes";
 import type { Scene } from "@babylonjs/core/scene";
-import { getOrbitalPeriod, kilograms } from "@cosmos-journeyer/physics";
+import { getOrbitalPeriod, kilograms, seconds } from "@cosmos-journeyer/physics";
 
 import { getPointOnOrbitLocal } from "@/frontend/helpers/orbit";
 
@@ -67,7 +67,7 @@ export class OrbitRenderer {
 
         for (let step = 0; step < nbSteps; step++) {
             const t = step * timestep;
-            points.push(getPointOnOrbitLocal(orbit, parentMassSum, t));
+            points.push(getPointOnOrbitLocal(orbit, kilograms(parentMassSum), seconds(t)));
         }
 
         // wrap around

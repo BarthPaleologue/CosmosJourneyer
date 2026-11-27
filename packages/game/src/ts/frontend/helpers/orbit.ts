@@ -1,6 +1,7 @@
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Matrix, Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
-import { computeLpFactor, getOrbitalPeriod, keplerEquation, kilograms, radians } from "@cosmos-journeyer/physics";
+import { computeLpFactor, getOrbitalPeriod, keplerEquation, radians } from "@cosmos-journeyer/physics";
+import type { Kilograms, Seconds } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { Orbit, OrbitalPlane, SpinModel } from "@cosmos-journeyer/universe-model";
 
@@ -13,8 +14,8 @@ import { findMinimumNewtonRaphson } from "@/utils/math";
  * @param t - Elapsed simulation time in seconds.
  * @returns Parent-relative position in meters.
  */
-export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: number, t: number): Vector3 {
-    const orbitalPeriod = getOrbitalPeriod(orbit.semiMajorAxis, kilograms(parentMass));
+export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: Kilograms, t: Seconds): Vector3 {
+    const orbitalPeriod = getOrbitalPeriod(orbit.semiMajorAxis, parentMass);
     const meanAnomaly = orbitalPeriod > 0 ? orbit.initialMeanAnomaly - (2 * Math.PI * t) / orbitalPeriod : 0;
 
     const trueAnomaly = findMinimumNewtonRaphson(
@@ -59,14 +60,14 @@ export function getPointOnOrbitLocal(orbit: DeepReadonly<Orbit>, parentMass: num
 export function computeAbsoluteOrientation(
     orbitalPlane: DeepReadonly<OrbitalPlane>,
     spin: DeepReadonly<SpinModel>,
-    elapsedSeconds: number,
+    elapsedSeconds: Seconds,
 ): Quaternion {
     const spinAxisOrientation = computeSpinAxisOrientation(orbitalPlane, spin);
 
-    let rotationAngle: number = spin.initialRotationAngle;
-    if (spin.siderealPeriod !== 0) {
-        rotationAngle += (2 * Math.PI * elapsedSeconds) / spin.siderealPeriod;
-    }
+    const rotationAngle = radians(
+        spin.initialRotationAngle +
+            (spin.siderealPeriod !== 0 ? (2 * Math.PI * elapsedSeconds) / spin.siderealPeriod : 0),
+    );
 
     return spinAxisOrientation.multiply(Quaternion.RotationAxis(Axis.Y, rotationAngle));
 }

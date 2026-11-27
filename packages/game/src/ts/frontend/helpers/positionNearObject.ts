@@ -19,6 +19,7 @@ import { Lerp } from "@babylonjs/core/Maths/math.scalar.functions";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import { radians } from "@cosmos-journeyer/physics";
 
 import type { Controls } from "@/frontend/controls";
 import { lookAt, roll, rotateAround, setRotationQuaternion } from "@/frontend/helpers/transform";
@@ -172,7 +173,7 @@ export function positionNearObjectWithStarVisible(
             transformable.getTransform(),
             object.getTransform().getAbsolutePosition(),
             dirBodyToStar,
-            -Math.PI / 16,
+            radians(-Math.PI / 16),
         );
     }
 
@@ -190,7 +191,7 @@ export function positionNearObjectWithStarVisible(
 
     transformable.getTransform().computeWorldMatrix(true);
 
-    roll(transformable.getTransform(), -Math.PI / 8);
+    roll(transformable.getTransform(), radians(-Math.PI / 8));
 
     transformable.getActiveCamera().getViewMatrix(true);
     transformable.getActiveCamera().getProjectionMatrix(true);

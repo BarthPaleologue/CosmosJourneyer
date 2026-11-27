@@ -6,6 +6,7 @@ import type { TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
+import { radians } from "@cosmos-journeyer/physics";
 
 import type { NoiseTextures } from "@/frontend/assets/textures/noises";
 import { rotate } from "@/frontend/helpers/transform";
@@ -117,7 +118,7 @@ export class HyperSpaceTunnel implements Transformable {
         const rotationAxis = Vector3.Cross(currentForward, targetForward);
         const theta = Math.acos(clamp(Vector3.Dot(currentForward, targetForward), -1, 1));
 
-        rotate(this.hyperTunnel, rotationAxis, theta);
+        rotate(this.hyperTunnel, rotationAxis, radians(theta));
     }
 
     dispose(): void {

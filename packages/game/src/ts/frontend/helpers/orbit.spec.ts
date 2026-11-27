@@ -63,13 +63,13 @@ describe("computeAbsoluteOrientation", () => {
             initialRotationAngle: radians(0.4),
             siderealPeriod: seconds(8),
         };
-        const orientation = computeAbsoluteOrientation(orbitalPlane, spin, time);
+        const orientation = computeAbsoluteOrientation(orbitalPlane, spin, seconds(time));
         const spinAxis = computeSpinAxisOrientation(orbitalPlane, spin);
         expectVectorCloseTo(Axis.Y.applyRotationQuaternion(orientation), Axis.Y.applyRotationQuaternion(spinAxis));
     });
 
     it("returns the identity orientation when the orbit and spin parameters are neutral", () => {
-        const orientation = computeAbsoluteOrientation(baseOrbitalPlane, baseSpin, 0);
+        const orientation = computeAbsoluteOrientation(baseOrbitalPlane, baseSpin, seconds(0));
 
         expectQuaternionCloseTo(orientation, Quaternion.Identity());
     });
@@ -81,7 +81,7 @@ describe("computeAbsoluteOrientation", () => {
                 ...baseSpin,
                 initialRotationAngle: radians(Math.PI / 2),
             },
-            0,
+            seconds(0),
         );
 
         expectVectorCloseTo(Axis.X.applyRotationQuaternion(orientation), new Vector3(0, 0, -1));
@@ -95,7 +95,7 @@ describe("computeAbsoluteOrientation", () => {
                 siderealPeriod: seconds(8),
                 initialRotationAngle: radians(Math.PI / 4),
             },
-            1,
+            seconds(1),
         );
 
         expectVectorCloseTo(Axis.X.applyRotationQuaternion(orientation), new Vector3(0, 0, -1));
@@ -108,7 +108,7 @@ describe("computeAbsoluteOrientation", () => {
                 ...baseSpin,
                 axisAzimuth: radians(Math.PI / 2),
             },
-            0,
+            seconds(0),
         );
 
         expectVectorCloseTo(Axis.X.applyRotationQuaternion(orientation), new Vector3(0, 0, -1));

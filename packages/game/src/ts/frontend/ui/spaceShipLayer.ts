@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { TransformNode } from "@babylonjs/core/Meshes";
+import { meters, metersPerSecond } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import type { UniverseBackend } from "@/backend/universe/universeBackend";
@@ -169,10 +170,10 @@ export class SpaceShipLayer {
         this.throttleStripes.style.height = `${(100 * Math.abs(shipThrottle)).toFixed(0)}%`;
         this.throttleStripes.classList.toggle("reversed", shipThrottle < 0);
 
-        this.speedIndicator.textContent = parseSpeed(spaceship.getSpeed());
+        this.speedIndicator.textContent = parseSpeed(metersPerSecond(spaceship.getSpeed()));
 
         const altitude = spaceship.getAltimeter().getAltitude();
-        this.altimeterIndicator.textContent = altitude !== null ? parseDistance(altitude, this.t) : "";
+        this.altimeterIndicator.textContent = altitude !== null ? parseDistance(meters(altitude), this.t) : "";
 
         const fuelRemainingFraction = spaceship.getRemainingFuel() / spaceship.getTotalFuelCapacity();
         this.fuelIndicator.style.setProperty("--currentFuelLevel", `${(fuelRemainingFraction * 100).toFixed(0)}%`);
