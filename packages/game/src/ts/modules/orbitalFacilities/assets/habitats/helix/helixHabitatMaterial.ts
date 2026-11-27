@@ -17,6 +17,7 @@
 
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Scene } from "@babylonjs/core/scene";
+import type { Meters } from "@cosmos-journeyer/physics";
 import {
     abs,
     builtinAttribute,
@@ -53,8 +54,8 @@ import type { PBRTextures } from "@/frontend/assets/textures/materials";
  * @returns The built node material.
  */
 export function createHelixHabitatMaterial(
-    meanRadius: number,
-    deltaRadius: number,
+    meanRadius: Meters,
+    deltaRadius: Meters,
     thicknessMultiplier: number,
     textures: PBRTextures,
     scene: Scene,

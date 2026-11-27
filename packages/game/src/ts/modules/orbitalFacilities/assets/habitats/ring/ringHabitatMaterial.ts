@@ -18,6 +18,7 @@
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Scene } from "@babylonjs/core/scene";
+import type { Meters } from "@cosmos-journeyer/physics";
 import {
     abs,
     builtinAttribute,
@@ -54,9 +55,9 @@ import type { PBRTextures } from "@/frontend/assets/textures/materials";
  * @returns The built node material.
  */
 export function createRingHabitatMaterial(
-    meanRadius: number,
-    deltaRadius: number,
-    height: number,
+    meanRadius: Meters,
+    deltaRadius: Meters,
+    height: Meters,
     textures: PBRTextures,
     scene: Scene,
 ): NodeMaterial {

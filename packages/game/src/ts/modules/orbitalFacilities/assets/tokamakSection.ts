@@ -25,7 +25,7 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import { getRadiatorAreaForHeat, kelvin, watts } from "@cosmos-journeyer/physics";
+import { cubicMeters, getRadiatorAreaForHeat, kelvin, meters, watts } from "@cosmos-journeyer/physics";
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -79,25 +79,25 @@ export class TokamakSection implements StationSection {
         const requiredEnergyOutput = requiredNetEnergyOutput / efficiency;
 
         // https://www.slac.stanford.edu/slac/sass/talks/simeon_iter.pdf
-        const iterEnergyOutput = 500e6;
-        const iterPlasmaVolume = 840;
+        const iterEnergyOutput = watts(500e6);
+        const iterPlasmaVolume = cubicMeters(840);
 
         const fusionPowerDensity = iterEnergyOutput / iterPlasmaVolume;
-        const plasmaVolume = requiredEnergyOutput / fusionPowerDensity;
+        const plasmaVolume = cubicMeters(requiredEnergyOutput / fusionPowerDensity);
 
         const aspectRatio = 12;
         const elongation = 1.5;
 
-        const minorRadius = Math.cbrt(plasmaVolume / (2 * Math.PI ** 2 * aspectRatio * elongation));
-        const majorRadius = aspectRatio * minorRadius;
+        const minorRadius = meters(Math.cbrt(plasmaVolume / (2 * Math.PI ** 2 * aspectRatio * elongation)));
+        const majorRadius = meters(aspectRatio * minorRadius);
 
         this.tokamak = createRing(majorRadius, 2 * minorRadius, 2 * minorRadius * elongation, 32, scene);
         this.tokamak.convertToFlatShadedMesh();
         this.tokamak.parent = this.getTransform();
         this.tokamak.material = createRingHabitatMaterial(
-            majorRadius - minorRadius,
-            2 * minorRadius,
-            2 * minorRadius * elongation,
+            meters(majorRadius - minorRadius),
+            meters(2 * minorRadius),
+            meters(2 * minorRadius * elongation),
             assets.textures.materials.metalPanels,
             scene,
         );

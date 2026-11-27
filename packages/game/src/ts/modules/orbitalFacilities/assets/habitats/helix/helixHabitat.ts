@@ -28,7 +28,8 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import { EarthG, getRotationPeriodForArtificialGravity, meters } from "@cosmos-journeyer/physics";
+import { EarthG, getRotationPeriodForArtificialGravity, meters, radians } from "@cosmos-journeyer/physics";
+import type { Meters, Radians } from "@cosmos-journeyer/physics";
 
 import { createHelix } from "@/frontend/assets/procedural/helpers/helixBuilder";
 import type { Textures } from "@/frontend/assets/textures";
@@ -44,8 +45,8 @@ import { createHelixHabitatMaterial } from "./helixHabitatMaterial";
 export class HelixHabitat implements Transformable {
     private readonly root: TransformNode;
 
-    private readonly radius: number;
-    private readonly deltaRadius: number;
+    private readonly radius: Meters;
+    private readonly deltaRadius: Meters;
 
     private readonly attachment: Mesh;
     private attachmentAggregate: PhysicsAggregate | null = null;
@@ -70,7 +71,7 @@ export class HelixHabitat implements Transformable {
         const helixCount = model.helixCount;
         const thicknessFactor = model.thicknessFactor;
 
-        const helixThickness = this.deltaRadius * thicknessFactor;
+        const helixThickness = meters(this.deltaRadius * thicknessFactor);
         const perTurnPerimeter = 2 * Math.PI * this.radius;
         const perTurnHabitableSurface = perTurnPerimeter * helixThickness;
 
@@ -79,11 +80,11 @@ export class HelixHabitat implements Transformable {
         const requiredHabitableSurfacePerHelix = requiredHabitableSurface / helixCount;
         const turnCount = Math.ceil(requiredHabitableSurfacePerHelix / perTurnHabitableSurface);
 
-        this.radius = requiredHabitableSurfacePerHelix / (2 * Math.PI * turnCount * helixThickness);
+        this.radius = meters(requiredHabitableSurfacePerHelix / (2 * Math.PI * turnCount * helixThickness));
 
-        const helixPitch = 2 * this.radius * model.helixPitchMultiplier;
+        const helixPitch = meters(2 * this.radius * model.helixPitchMultiplier);
 
-        const helixLength = helixPitch * turnCount;
+        const helixLength = meters(helixPitch * turnCount);
 
         const attachmentTessellation = model.attachmentTessellation;
 
@@ -93,7 +94,7 @@ export class HelixHabitat implements Transformable {
             scene,
         );
 
-        const attachmentLength = helixLength + this.deltaRadius * 4;
+        const attachmentLength = meters(helixLength + this.deltaRadius * 4);
         const attachmentRadius = 50;
         this.attachment = MeshBuilder.CreateCylinder(
             "HelixHabitatAttachment",
@@ -125,7 +126,7 @@ export class HelixHabitat implements Transformable {
         // point lights along attachment
         const lightYStep = 350;
         const attachmentLightPoints: Array<{ position: Vector3; rotation: Quaternion }> = [];
-        for (let y = -attachmentLength / 2 + 50; y <= attachmentLength / 2 - 50; y += lightYStep) {
+        for (let y = attachmentLength * -0.5 + 50; y <= attachmentLength / 2 - 50; y += lightYStep) {
             for (let sideIndex = 0; sideIndex < attachmentTessellation; sideIndex += 2) {
                 const theta = ((2 * Math.PI) / attachmentTessellation) * sideIndex;
                 const position = new Vector3(
@@ -231,13 +232,13 @@ export class HelixHabitat implements Transformable {
     private getLightPoints(
         helixCount: number,
         turnCount: number,
-        helixThickness: number,
-        helixPitch: number,
+        helixThickness: Meters,
+        helixPitch: Meters,
     ): Array<{ position: Vector3; rotation: Quaternion }> {
         const sectionCount = Math.floor((2 * Math.PI * this.radius) / this.deltaRadius);
 
-        const maxRadius = this.radius + this.deltaRadius / 2;
-        const minRadius = this.radius - this.deltaRadius / 2;
+        const maxRadius = meters(this.radius + this.deltaRadius / 2);
+        const minRadius = meters(this.radius - this.deltaRadius / 2);
 
         const thicknessFactor = Math.floor(helixThickness / this.deltaRadius);
 
@@ -246,9 +247,12 @@ export class HelixHabitat implements Transformable {
         for (let helixIndex = 0; helixIndex < helixCount; helixIndex++) {
             for (let turnIndex = 0; turnIndex < turnCount; turnIndex++) {
                 for (let sectionIndex = 0; sectionIndex <= sectionCount; sectionIndex++) {
-                    const angle =
-                        (sectionIndex * Math.PI * 2.0) / sectionCount + (helixIndex * (Math.PI * 2)) / helixCount;
-                    const yBase = (turnIndex + sectionIndex / sectionCount) * helixPitch - (turnCount * helixPitch) / 2;
+                    const angle = radians(
+                        (sectionIndex * Math.PI * 2.0) / sectionCount + (helixIndex * (Math.PI * 2)) / helixCount,
+                    );
+                    const yBase = meters(
+                        (turnIndex + sectionIndex / sectionCount) * helixPitch - (turnCount * helixPitch) / 2,
+                    );
 
                     this.pushHelixSurfaceLightPoints(
                         results,
@@ -269,12 +273,12 @@ export class HelixHabitat implements Transformable {
 
     private pushHelixSurfaceLightPoints(
         results: Array<{ position: Vector3; rotation: Quaternion }>,
-        angle: number,
-        yBase: number,
-        helixThickness: number,
+        angle: Radians,
+        yBase: Meters,
+        helixThickness: Meters,
         thicknessFactor: number,
-        maxRadius: number,
-        minRadius: number,
+        maxRadius: Meters,
+        minRadius: Meters,
     ): void {
         for (const radius of [maxRadius, minRadius]) {
             for (let ring = 0; ring < thicknessFactor; ring++) {
@@ -289,11 +293,11 @@ export class HelixHabitat implements Transformable {
 
     private pushHelixEdgeLightPoints(
         results: Array<{ position: Vector3; rotation: Quaternion }>,
-        angle: number,
-        yBase: number,
-        helixThickness: number,
+        angle: Radians,
+        yBase: Meters,
+        helixThickness: Meters,
     ): void {
-        for (const yOffset of [-helixThickness / 2, helixThickness / 2]) {
+        for (const yOffset of [helixThickness * -0.5, helixThickness / 2]) {
             const position = new Vector3(this.radius * Math.cos(angle), yBase + yOffset, this.radius * Math.sin(angle));
 
             results.push({
@@ -336,10 +340,7 @@ export class HelixHabitat implements Transformable {
     }
 
     update(cameraWorldPosition: Vector3, deltaSeconds: number): void {
-        this.getTransform().rotate(
-            Axis.Y,
-            deltaSeconds / getRotationPeriodForArtificialGravity(meters(this.radius), EarthG),
-        );
+        this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, EarthG));
 
         const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
 

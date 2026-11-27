@@ -4,6 +4,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 import { createOrbitalObjectId } from "@cosmos-journeyer/universe-model";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -75,8 +76,8 @@ describe("orbital facilities module", () => {
         try {
             expect(processors.spatialGeometry.dispatch(entity)).toBe(content);
             expect(processors.landingPadProviders.dispatch(entity)).toBe(pads);
-            expect(processors.music.dispatch(entity, { distance: 999 })).toEqual(["equatorialComplex"]);
-            expect(processors.music.dispatch(entity, { distance: 1000 })).toEqual([]);
+            expect(processors.music.dispatch(entity, { distance: meters(999) })).toEqual(["equatorialComplex"]);
+            expect(processors.music.dispatch(entity, { distance: meters(1000) })).toEqual([]);
             expect(processors.lightingRegions.dispatch(entity)).toBe(content);
             expect(processors.lightingRegions.dispatch(entity)).toBe(content);
             processors.updateEntities([entity], {
