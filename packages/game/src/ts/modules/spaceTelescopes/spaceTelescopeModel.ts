@@ -15,20 +15,21 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { meters, MetersSchema } from "@cosmos-journeyer/physics";
 import { z } from "zod";
 
 import type { SystemContentModel } from "@/backend/systemEntity/systemEntityModel";
 
 export const PrimaryMirrorModelSchema = z
     .object({
-        apertureRadius: z.number().positive(),
+        apertureRadius: z.number().positive().pipe(MetersSchema),
         shape: z.object({
-            focalLength: z.number().positive(),
+            focalLength: z.number().positive().pipe(MetersSchema),
             conicConstant: z.number(),
         }),
         segmentation: z.object({
-            tileRadius: z.number().positive(),
-            gap: z.number().nonnegative(),
+            tileRadius: z.number().positive().pipe(MetersSchema),
+            gap: z.number().nonnegative().pipe(MetersSchema),
         }),
     })
     .refine(
@@ -47,10 +48,10 @@ export const SpaceTelescopeModelSchema = z.object({
     type: z.literal("spaceTelescope"),
     primaryMirror: PrimaryMirrorModelSchema,
     insulationSheets: z.object({
-        size: z.number().positive(),
+        size: z.number().positive().pipe(MetersSchema),
         count: z.number().int().positive(),
-        spacing: z.number().positive(),
-        distance: z.number().positive(),
+        spacing: z.number().positive().pipe(MetersSchema),
+        distance: z.number().positive().pipe(MetersSchema),
     }),
 });
 
@@ -61,10 +62,10 @@ export function createSpaceTelescopeModel(): SpaceTelescopeModel {
     return {
         type: "spaceTelescope",
         primaryMirror: {
-            apertureRadius: 20.25,
-            shape: { focalLength: 15, conicConstant: -0.9967 },
-            segmentation: { tileRadius: 0.75, gap: 0.07 },
+            apertureRadius: meters(20.25),
+            shape: { focalLength: meters(15), conicConstant: -0.9967 },
+            segmentation: { tileRadius: meters(0.75), gap: meters(0.07) },
         },
-        insulationSheets: { size: 100, count: 7, spacing: 5, distance: 45 },
+        insulationSheets: { size: meters(100), count: 7, spacing: meters(5), distance: meters(45) },
     };
 }

@@ -20,7 +20,16 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
 import type { PhysicsEngineV2 } from "@babylonjs/core/Physics/v2";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
-import { EarthG } from "@cosmos-journeyer/physics";
+import {
+    EarthG,
+    kilograms,
+    meters,
+    metersPerSecond,
+    metersPerSecondSquared,
+    quantity,
+    radians,
+} from "@cosmos-journeyer/physics";
+import type { Kilograms, Meters, MetersPerSecond, Quantity, Radians } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import { alignRotationToRef } from "@/frontend/helpers/rotation";
@@ -66,16 +75,16 @@ type LandingPlanStep = {
      * The maximum velocity at any point during the step
      */
     maxVelocity: {
-        linear: number;
-        rotation: number;
+        linear: MetersPerSecond;
+        rotation: Quantity<"rad/s">;
     };
 
     /**
      * The maximum velocity when reaching the target before the step is considered complete
      */
     maxVelocityAtTarget: {
-        linear: number;
-        rotation: number;
+        linear: MetersPerSecond;
+        rotation: Quantity<"rad/s">;
     };
 
     /**
@@ -85,12 +94,12 @@ type LandingPlanStep = {
         /**
          * The maximum distance to the target position
          */
-        position: number;
+        position: Meters;
 
         /**
          * The maximum deviation between the target and current up vectors
          */
-        rotation: number;
+        rotation: Radians;
     };
 };
 
@@ -200,16 +209,16 @@ export class LandingComputer {
                     };
                 },
                 maxVelocityAtTarget: {
-                    linear: 3,
-                    rotation: 0.1,
+                    linear: metersPerSecond(3),
+                    rotation: quantity<"rad/s">(0.1),
                 },
                 maxVelocity: {
-                    linear: 20,
-                    rotation: 0.5,
+                    linear: metersPerSecond(20),
+                    rotation: quantity<"rad/s">(0.5),
                 },
                 tolerance: {
-                    position: 1.5,
-                    rotation: 0.1,
+                    position: meters(1.5),
+                    rotation: radians(0.1),
                 },
             },
             {
@@ -227,16 +236,16 @@ export class LandingComputer {
                     };
                 },
                 maxVelocityAtTarget: {
-                    linear: 3,
-                    rotation: 0.1,
+                    linear: metersPerSecond(3),
+                    rotation: quantity<"rad/s">(0.1),
                 },
                 maxVelocity: {
-                    linear: 5,
-                    rotation: 0.5,
+                    linear: metersPerSecond(5),
+                    rotation: quantity<"rad/s">(0.5),
                 },
                 tolerance: {
-                    position: 0.5,
-                    rotation: 0.1,
+                    position: meters(0.5),
+                    rotation: radians(0.1),
                 },
             },
         ];
@@ -268,16 +277,16 @@ export class LandingComputer {
                     };
                 },
                 maxVelocityAtTarget: {
-                    linear: 5,
-                    rotation: 0.7,
+                    linear: metersPerSecond(5),
+                    rotation: quantity<"rad/s">(0.7),
                 },
                 maxVelocity: {
-                    linear: 10,
-                    rotation: 1,
+                    linear: metersPerSecond(10),
+                    rotation: quantity<"rad/s">(1),
                 },
                 tolerance: {
-                    position: 1,
-                    rotation: 0.2,
+                    position: meters(1),
+                    rotation: radians(0.2),
                 },
             },
         ];
@@ -321,16 +330,16 @@ export class LandingComputer {
                     };
                 },
                 maxVelocityAtTarget: {
-                    linear: 3,
-                    rotation: 0.1,
+                    linear: metersPerSecond(3),
+                    rotation: quantity<"rad/s">(0.1),
                 },
                 maxVelocity: {
-                    linear: 5,
-                    rotation: 0.5,
+                    linear: metersPerSecond(5),
+                    rotation: quantity<"rad/s">(0.5),
                 },
                 tolerance: {
-                    position: 5.0,
-                    rotation: 0.2,
+                    position: meters(5.0),
+                    rotation: radians(0.2),
                 },
             },
         ];
@@ -381,7 +390,7 @@ export class LandingComputer {
         }
 
         const massProps = this.aggregate.body.getMassProperties();
-        const mass = massProps.mass ?? 1;
+        const mass: Kilograms = kilograms(massProps.mass ?? 1);
 
         const force = this.positionController.computeForceToRef(
             {
@@ -397,7 +406,7 @@ export class LandingComputer {
             {
                 max: {
                     closingSpeed: currentAction.maxVelocity.linear,
-                    acceleration: 2 * EarthG,
+                    acceleration: metersPerSecondSquared(2 * EarthG),
                 },
             },
         );

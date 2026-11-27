@@ -20,6 +20,7 @@ import {
     barToPascal,
     celsiusToKelvin,
     degreesToRadians,
+    ampereSquareMeters,
     durationToSeconds,
     EarthMass,
     EarthMagneticDipoleMoment,
@@ -34,6 +35,12 @@ import {
     SolarMass,
     SolarRadius,
     SolarTemperature,
+    kelvin,
+    kilograms,
+    meters,
+    radians,
+    seconds,
+    squareMeters,
 } from "@cosmos-journeyer/physics";
 import type {
     StarSystemCoordinates,
@@ -75,21 +82,21 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         mass: SolarMass,
         seed: 42,
         spin: {
-            axialTilt: 0,
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axialTilt: radians(0),
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
             siderealPeriod: durationToSeconds({ days: 20, hours: 2, minutes: 5 }),
         },
         orbit: {
-            semiMajorAxis: 0,
+            semiMajorAxis: meters(0),
             eccentricity: 0,
-            initialMeanAnomaly: 0,
+            initialMeanAnomaly: radians(0),
             plane: {
-                inclination: 0,
-                longitudeOfAscendingNode: 0,
+                inclination: radians(0),
+                longitudeOfAscendingNode: radians(0),
             },
             parentIds: [],
-            argumentOfPeriapsis: 0,
+            argumentOfPeriapsis: radians(0),
             p: 2,
         },
         rings: null,
@@ -102,18 +109,18 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         name: "Janus",
         id: "janus",
         magneticField: null,
-        radius: EarthRadius * 0.1,
-        mass: EarthMass * 0.1 ** 3,
+        radius: meters(EarthRadius * 0.1),
+        mass: kilograms(EarthMass * 0.1 ** 3),
         seed: 44,
         spin: {
             axialTilt: degreesToRadians(5),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
             siderealPeriod: janusOrbitalPeriod,
         },
         orbit: {
             parentIds: ["vesta"],
-            semiMajorAxis: janusOrbitRadius,
+            semiMajorAxis: meters(janusOrbitRadius),
             eccentricity: 0,
             plane: {
                 inclination: degreesToRadians(8),
@@ -129,10 +136,10 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         clouds: null,
         terrainSettings: {
             continents_fragmentation: 0,
-            continent_base_height: 0,
+            continent_base_height: meters(0),
             continents_frequency: 1.0,
-            max_bump_height: 1e3,
-            max_mountain_height: 10e3,
+            max_bump_height: meters(1e3),
+            max_mountain_height: meters(10e3),
             mountains_frequency: 60,
             bumps_frequency: 30,
         },
@@ -141,27 +148,27 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             rock: 1,
         },
         temperature: {
-            min: 50,
-            max: 400,
+            min: kelvin(50),
+            max: kelvin(400),
         },
     };
 
-    const aphroditeRadius = EarthRadius * 0.2;
+    const aphroditeRadius = meters(EarthRadius * 0.2);
     const aphrodite = {
         type: "telluricPlanet",
         name: "Aphrodite",
         id: "aphrodite",
         magneticField: {
-            north: { latitude: degreesToRadians(80), longitude: 0 },
-            magnitude: EarthMagneticDipoleMoment * 0.2 ** 3,
+            north: { latitude: degreesToRadians(80), longitude: radians(0) },
+            magnitude: ampereSquareMeters(EarthMagneticDipoleMoment * 0.2 ** 3),
         },
         radius: aphroditeRadius,
-        mass: EarthMass * 0.2 ** 3,
+        mass: kilograms(EarthMass * 0.2 ** 3),
         seed: 45,
         spin: {
             axialTilt: degreesToRadians(10),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
             siderealPeriod: durationToSeconds({ hours: 26, minutes: 21, seconds: 48 }),
         },
         orbit: {
@@ -173,7 +180,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
                 longitudeOfAscendingNode: degreesToRadians(157),
             },
             initialMeanAnomaly: degreesToRadians(32),
-            argumentOfPeriapsis: 0,
+            argumentOfPeriapsis: radians(0),
             p: 2,
         },
         rings: {
@@ -182,11 +189,11 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             dustAlbedo: { r: 0.85, g: 0.7, b: 0.65 },
             seed: 0.65,
             frequency: 5,
-            innerRadius: aphroditeRadius * 1.7,
-            outerRadius: aphroditeRadius * 3.0,
+            innerRadius: meters(aphroditeRadius * 1.7),
+            outerRadius: meters(aphroditeRadius * 3.0),
         },
         ocean: {
-            depth: 10e3,
+            depth: meters(10e3),
         },
         atmosphere: {
             pressure: barToPascal(1.2),
@@ -195,7 +202,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         clouds: {
             color: { r: 0.9, g: 0.9, b: 0.9 },
             coverage: 0.4,
-            layerRadius: aphroditeRadius + 20e3,
+            layerRadius: meters(aphroditeRadius + 20e3),
             smoothness: 0.7,
             specularPower: 2,
             frequency: 4,
@@ -206,10 +213,10 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
         terrainSettings: {
             continents_fragmentation: 0.9,
-            continent_base_height: 10e3,
+            continent_base_height: meters(10e3),
             continents_frequency: 1.0,
-            max_bump_height: 1e3,
-            max_mountain_height: 10e3,
+            max_bump_height: meters(1e3),
+            max_mountain_height: meters(10e3),
             mountains_frequency: 60,
             bumps_frequency: 30,
         },
@@ -229,12 +236,12 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         name: "Adonis",
         id: "adonis",
         magneticField: null,
-        radius: EarthRadius * 0.02,
-        mass: EarthMass * 0.02 ** 3,
+        radius: meters(EarthRadius * 0.02),
+        mass: kilograms(EarthMass * 0.02 ** 3),
         seed: 74,
         orbit: {
             parentIds: ["aphrodite"],
-            semiMajorAxis: adonisOrbitRadius,
+            semiMajorAxis: meters(adonisOrbitRadius),
             eccentricity: 0,
             plane: {
                 inclination: degreesToRadians(-4),
@@ -247,15 +254,15 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         spin: {
             axialTilt: degreesToRadians(0.2),
             axisAzimuth: degreesToRadians(22),
-            siderealPeriod: getOrbitalPeriod(adonisOrbitRadius, aphrodite.mass),
+            siderealPeriod: getOrbitalPeriod(meters(adonisOrbitRadius), aphrodite.mass),
             initialRotationAngle: degreesToRadians(18),
         },
         terrainSettings: {
             continents_fragmentation: 0.0,
-            continent_base_height: 0,
+            continent_base_height: meters(0),
             continents_frequency: 0.2,
-            max_bump_height: 1e3,
-            max_mountain_height: 2e3,
+            max_bump_height: meters(1e3),
+            max_mountain_height: meters(2e3),
             mountains_frequency: 60 * 0.2,
             bumps_frequency: 30 * 0.2,
         },
@@ -267,8 +274,8 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             rock: 0.99,
         },
         temperature: {
-            min: 50,
-            max: 350,
+            min: kelvin(50),
+            max: kelvin(350),
         },
     } satisfies TelluricSatelliteModel;
 
@@ -278,12 +285,12 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         name: "Phileas",
         id: "phileas",
         magneticField: null,
-        radius: EarthRadius * 0.1,
-        mass: EarthMass * 0.1 ** 3,
+        radius: meters(EarthRadius * 0.1),
+        mass: kilograms(EarthMass * 0.1 ** 3),
         seed: 62,
         orbit: {
             parentIds: ["aphrodite"],
-            semiMajorAxis: phileasOrbitRadius,
+            semiMajorAxis: meters(phileasOrbitRadius),
             eccentricity: 0,
             plane: {
                 inclination: degreesToRadians(1),
@@ -301,10 +308,10 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
         terrainSettings: {
             continents_fragmentation: 0.0,
-            continent_base_height: 0,
+            continent_base_height: meters(0),
             continents_frequency: 0.6,
-            max_bump_height: 1e3,
-            max_mountain_height: 10e3,
+            max_bump_height: meters(1e3),
+            max_mountain_height: meters(10e3),
             mountains_frequency: 60 * 0.6,
             bumps_frequency: 30 * 0.6,
         },
@@ -316,8 +323,8 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             rock: 0.99,
         },
         temperature: {
-            min: 50,
-            max: 350,
+            min: kelvin(50),
+            max: kelvin(350),
         },
     } satisfies TelluricSatelliteModel;
 
@@ -338,15 +345,18 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
                 { type: "utility", hasTanks: false },
                 { type: "utility", hasTanks: false },
                 { type: "utility", hasTanks: true },
-                { type: "solar", surface: 10_000e3, axisCount: 3, secondaryArmCount: 2 },
+                { type: "solar", surface: squareMeters(10_000e3), axisCount: 3, secondaryArmCount: 2 },
                 { type: "utility", hasTanks: true },
                 { type: "utility", hasTanks: false },
                 { type: "utility", hasTanks: false },
                 { type: "utility", hasTanks: true },
                 {
                     type: "cylinderHabitat",
-                    radius: 3e3,
-                    surface: { housing: km2ToM2(300_000 / 4_000), agriculture: km2ToM2(300_000 / 4_000) * 0.3 },
+                    radius: meters(3e3),
+                    surface: {
+                        housing: km2ToM2(300_000 / 4_000),
+                        agriculture: squareMeters(km2ToM2(300_000 / 4_000) * 0.3),
+                    },
                 },
                 { type: "utility", hasTanks: true },
                 { type: "utility", hasTanks: false },
@@ -360,7 +370,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             mass: DefaultOrbitalFacilityMass,
             orbit: {
                 parentIds: ["aphrodite"],
-                semiMajorAxis: aphrodite.rings.outerRadius * 1.5,
+                semiMajorAxis: meters(aphrodite.rings.outerRadius * 1.5),
                 plane: {
                     inclination: degreesToRadians(30),
                     longitudeOfAscendingNode: degreesToRadians(23),
@@ -372,12 +382,12 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             },
             attitude: {
                 spin: {
-                    siderealPeriod: 0,
-                    axisAzimuth: 0,
-                    axialTilt: 0,
-                    initialRotationAngle: 0,
+                    siderealPeriod: seconds(0),
+                    axisAzimuth: radians(0),
+                    axialTilt: radians(0),
+                    initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };
@@ -388,8 +398,8 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         type: "gasPlanet",
         name: "Melpomene",
         id: "melpomene",
-        radius: JupiterRadius * 0.7,
-        mass: JupiterMass * 0.7 ** 3,
+        radius: meters(JupiterRadius * 0.7),
+        mass: kilograms(JupiterMass * 0.7 ** 3),
         seed: 43,
         spin: {
             axialTilt: degreesToRadians(30),
@@ -399,7 +409,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
         orbit: {
             parentIds: ["vesta"],
-            semiMajorAxis: 1.2 * snowLine,
+            semiMajorAxis: meters(1.2 * snowLine),
             eccentricity: 0.3,
             initialMeanAnomaly: degreesToRadians(254),
             plane: {
@@ -414,8 +424,8 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             greenHouseEffectFactor: 1,
         },
         magneticField: {
-            north: { latitude: degreesToRadians(80), longitude: 0 },
-            magnitude: JupiterMagneticDipoleMoment * 0.7 ** 3,
+            north: { latitude: degreesToRadians(80), longitude: radians(0) },
+            magnitude: ampereSquareMeters(JupiterMagneticDipoleMoment * 0.7 ** 3),
         },
         colorPalette: {
             type: "procedural",
@@ -437,14 +447,14 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             type: "onSurface",
             parentId: phileas.id,
             position: {
-                latitude: 0.02151829597894311,
-                longitude: 2.426090777615558,
-                heightAboveGround: -0.3,
+                latitude: radians(0.02151829597894311),
+                longitude: radians(2.426090777615558),
+                heightAboveGround: meters(-0.3),
             },
             rotation: {
-                roll: 0,
-                pitch: 0,
-                heading: 0,
+                roll: radians(0),
+                pitch: radians(0),
+                heading: radians(0),
             },
         },
     };
@@ -456,27 +466,27 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         content: createSpaceTelescopeModel(),
         placement: {
             type: "inOrbit",
-            mass: 100_000,
+            mass: kilograms(100_000),
             orbit: {
                 parentIds: [vesta.id],
-                semiMajorAxis: spaceTelescopeOrbitRadius,
+                semiMajorAxis: meters(spaceTelescopeOrbitRadius),
                 eccentricity: 0,
                 plane: {
-                    inclination: 0,
-                    longitudeOfAscendingNode: 0,
+                    inclination: radians(0),
+                    longitudeOfAscendingNode: radians(0),
                 },
-                argumentOfPeriapsis: 0,
-                initialMeanAnomaly: 0,
+                argumentOfPeriapsis: radians(0),
+                initialMeanAnomaly: radians(0),
                 p: 2,
             },
             attitude: {
                 spin: {
-                    axialTilt: 0,
-                    axisAzimuth: 0,
-                    initialRotationAngle: 0,
+                    axialTilt: radians(0),
+                    axisAzimuth: radians(0),
+                    initialRotationAngle: radians(0),
                     siderealPeriod: getOrbitalPeriod(spaceTelescopeOrbitRadius, vesta.mass),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: -Math.PI / 2 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(-Math.PI / 2) },
             },
         },
     };
@@ -489,30 +499,30 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
         placement: {
             type: "inOrbit",
-            mass: 0.5,
+            mass: kilograms(0.5),
             orbit: {
                 parentIds: [melpomene.id],
-                semiMajorAxis: 4.2 * melpomene.radius,
+                semiMajorAxis: meters(4.2 * melpomene.radius),
                 eccentricity: 0.2,
                 plane: {
                     inclination: degreesToRadians(22),
-                    longitudeOfAscendingNode: 0,
+                    longitudeOfAscendingNode: radians(0),
                 },
-                argumentOfPeriapsis: 0,
-                initialMeanAnomaly: 0,
+                argumentOfPeriapsis: radians(0),
+                initialMeanAnomaly: radians(0),
                 p: 2,
             },
             attitude: {
                 spin: {
                     axialTilt: degreesToRadians(67),
-                    axisAzimuth: 0,
-                    initialRotationAngle: 0,
+                    axisAzimuth: radians(0),
+                    initialRotationAngle: radians(0),
                     siderealPeriod: durationToSeconds({ minutes: 4, seconds: 23 }),
                 },
                 localFrameOrientation: {
-                    yaw: 0,
-                    pitch: 0,
-                    roll: 0,
+                    yaw: radians(0),
+                    pitch: radians(0),
+                    roll: radians(0),
                 },
             },
         },

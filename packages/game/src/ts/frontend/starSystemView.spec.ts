@@ -33,6 +33,7 @@ import { PhysicsShapeConvexHull } from "@babylonjs/core/Physics/v2/physicsShape"
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
+import { kelvin, kilograms, meters, radians, seconds } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { BlackHoleModel, StarSystemModel } from "@cosmos-journeyer/universe-model";
 import { createInstance } from "i18next";
@@ -266,19 +267,24 @@ const blackHoleModel: BlackHoleModel = {
     type: "blackHole",
     id: "blackHole",
     name: "Black Hole",
-    mass: 1e30,
-    accretionDiskRadius: 0,
-    blackBodyTemperature: 0,
+    mass: kilograms(1e30),
+    accretionDiskRadius: meters(0),
+    blackBodyTemperature: kelvin(0),
     orbit: {
         parentIds: [],
-        semiMajorAxis: 0,
+        semiMajorAxis: meters(0),
         eccentricity: 0,
-        plane: { inclination: 0, longitudeOfAscendingNode: 0 },
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0,
+        plane: { inclination: radians(0), longitudeOfAscendingNode: radians(0) },
+        argumentOfPeriapsis: radians(0),
+        initialMeanAnomaly: radians(0),
         p: 2,
     },
-    spin: { siderealPeriod: 0, axialTilt: 0, axisAzimuth: 0, initialRotationAngle: 0 },
+    spin: {
+        siderealPeriod: seconds(0),
+        axialTilt: radians(0),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
+    },
 };
 
 const blackHoleSystemModel: StarSystemModel = {
@@ -506,7 +512,7 @@ describe("StarSystemView", () => {
             const regionTransform = new TransformNode("node", scene);
             const oldRegion: ClusteredLightingRegion = {
                 getTransform: () => regionTransform,
-                getBoundingRadius: () => 1,
+                getBoundingRadius: () => meters(1),
                 getLights: () => [],
             };
             const registeredRegions = view["entityLightingRegions"];
@@ -532,7 +538,7 @@ describe("StarSystemView", () => {
 
             const newRegion: ClusteredLightingRegion = {
                 getTransform: () => newEntityTransform,
-                getBoundingRadius: () => 1,
+                getBoundingRadius: () => meters(1),
                 getLights: () => [],
             };
             const lightingRegionsDispatchSpy = vi
@@ -661,7 +667,7 @@ describe("entity save locations", () => {
                 id: "station",
                 name: "Station",
                 getTransform: () => stationTransform,
-                getBoundingRadius: () => 100,
+                getBoundingRadius: () => meters(100),
             };
             vi.spyOn(starSystem, "getNearestSystemObject").mockReturnValue(object);
             vi.spyOn(starSystem, "getSystemObjectById").mockImplementation((id: string) =>
@@ -713,7 +719,7 @@ describe("entity save locations", () => {
                     id: "station",
                     name: "Station",
                     getTransform: () => station,
-                    getBoundingRadius: () => 100,
+                    getBoundingRadius: () => meters(100),
                 };
                 vi.spyOn(starSystem, "getSystemObjectById").mockReturnValue(object);
                 const camera = new FreeCamera("controls camera", Vector3.Zero(), scene);
@@ -764,7 +770,7 @@ describe("station save loading", () => {
                 view["starSystem"] = starSystem;
                 const stellarObjects = starSystem.getStellarObjects();
                 const blackHole = stellarObjects[0];
-                vi.spyOn(blackHole, "getBoundingRadius").mockReturnValue(100);
+                vi.spyOn(blackHole, "getBoundingRadius").mockReturnValue(meters(100));
                 const starTransform = blackHole.getTransform();
                 starTransform.position.set(1000, 2000, 3000);
                 starTransform.computeWorldMatrix(true);
@@ -818,17 +824,17 @@ describe("station save loading", () => {
             const transform = new TransformNode("node", scene);
             const pad: ILandingPad = {
                 getTransform: () => transform,
-                getBoundingRadius: () => 10,
+                getBoundingRadius: () => meters(10),
                 getIdentifier: () => "A",
                 getPadSize: () => LandingPadSize.SMALL,
-                getPadHeight: () => 1,
+                getPadHeight: () => meters(1),
             };
             const provider = new LandingPadProvider([pad]);
             const station: LandableFacility = {
                 id: "station",
                 name: "Station",
                 getTransform: () => transform,
-                getBoundingRadius: () => 100,
+                getBoundingRadius: () => meters(100),
                 getLandingPadProvider: () => provider,
             };
             vi.spyOn(starSystem, "getLandableFacilityById").mockImplementation((id: string) =>

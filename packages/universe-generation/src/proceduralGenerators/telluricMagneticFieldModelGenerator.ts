@@ -16,7 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { GenerationSteps } from "#/utils/generationSteps";
-import { EarthMagneticDipoleMoment, EarthRadius } from "@cosmos-journeyer/physics";
+import { ampereSquareMeters, EarthMagneticDipoleMoment, EarthRadius, radians } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { normalRandom, randRange, uniformRandBool } from "@cosmos-journeyer/random";
 import type { IndexedRng } from "@cosmos-journeyer/random";
 import type { MagneticFieldModel } from "@cosmos-journeyer/universe-model";
@@ -28,7 +29,7 @@ import type { MagneticFieldModel } from "@cosmos-journeyer/universe-model";
  * @returns An intrinsic dipole, or null when the dynamo is absent.
  */
 export function generateTelluricMagneticFieldModel(
-    radius: number,
+    radius: Meters,
     dynamoProbability: number,
     rng: IndexedRng,
 ): MagneticFieldModel | null {
@@ -41,9 +42,9 @@ export function generateTelluricMagneticFieldModel(
 
     return {
         north: {
-            latitude: Math.PI / 2 - randRange(0, Math.PI / 3, rng, GenerationSteps.MAGNETIC_FIELD + 3),
-            longitude: randRange(0, 2 * Math.PI, rng, GenerationSteps.MAGNETIC_FIELD + 4),
+            latitude: radians(Math.PI / 2 - randRange(0, Math.PI / 3, rng, GenerationSteps.MAGNETIC_FIELD + 3)),
+            longitude: radians(randRange(0, 2 * Math.PI, rng, GenerationSteps.MAGNETIC_FIELD + 4)),
         },
-        magnitude: EarthMagneticDipoleMoment * relativeStrength * (radius / EarthRadius) ** 3,
+        magnitude: ampereSquareMeters(EarthMagneticDipoleMoment * relativeStrength * (radius / EarthRadius) ** 3),
     };
 }

@@ -19,7 +19,10 @@ import {
     degreesToRadians,
     durationToSeconds,
     EarthSeaLevelPressure,
+    kilograms,
     SaturnMagneticDipoleMoment,
+    meters,
+    radians,
 } from "@cosmos-journeyer/physics";
 import type { GasPlanetModel, OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
@@ -32,24 +35,24 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
         id: "saturn",
         name: "Saturn",
         type: "gasPlanet",
-        radius: 58_232e3,
-        mass: 5.683e26,
+        radius: meters(58_232e3),
+        mass: kilograms(5.683e26),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 10, minutes: 33, seconds: 38 }),
             axialTilt: degreesToRadians(26.73),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         orbit: {
             parentIds: [...parentIds],
-            semiMajorAxis: 1_433_449_370e3,
+            semiMajorAxis: meters(1_433_449_370e3),
             eccentricity: 0.0565,
             plane: {
                 inclination: degreesToRadians(2.49),
                 longitudeOfAscendingNode: degreesToRadians(113.715),
             },
             argumentOfPeriapsis: degreesToRadians(336.092),
-            initialMeanAnomaly: 0,
+            initialMeanAnomaly: radians(0),
             p: 2,
         },
         atmosphere: {
@@ -57,7 +60,7 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
             greenHouseEffectFactor: 0.5,
         },
         magneticField: {
-            north: { latitude: degreesToRadians(90), longitude: 0 },
+            north: { latitude: degreesToRadians(90), longitude: radians(0) },
             magnitude: SaturnMagneticDipoleMoment,
         },
         colorPalette: {
@@ -65,8 +68,8 @@ export function getSaturnModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasPl
             textureId: "saturn",
         },
         rings: {
-            innerRadius: 74_658e3,
-            outerRadius: 136_775e3,
+            innerRadius: meters(74_658e3),
+            outerRadius: meters(136_775e3),
             type: "textured",
             textureId: "saturn",
         },

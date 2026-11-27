@@ -20,6 +20,9 @@ import {
     durationToSeconds,
     EarthSeaLevelPressure,
     JupiterMagneticDipoleMoment,
+    kilograms,
+    meters,
+    radians,
 } from "@cosmos-journeyer/physics";
 import type { GasPlanetModel, OrbitalObjectId } from "@cosmos-journeyer/universe-model";
 
@@ -32,24 +35,24 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
         id: "jupiter",
         name: "Jupiter",
         type: "gasPlanet",
-        radius: 69_911e3,
-        mass: 1.898e27,
+        radius: meters(69_911e3),
+        mass: kilograms(1.898e27),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 9, minutes: 55, seconds: 30 }),
             axialTilt: degreesToRadians(3.13),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         orbit: {
             parentIds: [...parentIds],
-            semiMajorAxis: 778_547_200e3,
+            semiMajorAxis: meters(778_547_200e3),
             eccentricity: 0.0934,
             plane: {
                 inclination: degreesToRadians(1.85),
                 longitudeOfAscendingNode: degreesToRadians(49.558),
             },
             argumentOfPeriapsis: degreesToRadians(286.502),
-            initialMeanAnomaly: 0,
+            initialMeanAnomaly: radians(0),
             p: 2,
         },
         atmosphere: {
@@ -57,7 +60,7 @@ export function getJupiterModel(parentIds: ReadonlyArray<OrbitalObjectId>): GasP
             greenHouseEffectFactor: 0.7,
         },
         magneticField: {
-            north: { latitude: degreesToRadians(80), longitude: 0 },
+            north: { latitude: degreesToRadians(80), longitude: radians(0) },
             magnitude: JupiterMagneticDipoleMoment,
         },
         colorPalette: {

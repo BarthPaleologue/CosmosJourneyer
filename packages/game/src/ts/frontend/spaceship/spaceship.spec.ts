@@ -12,6 +12,7 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import type { HavokPhysicsWithBindings } from "@babylonjs/havok";
+import { meters, metersPerSecond } from "@cosmos-journeyer/physics";
 import type { StarModel } from "@cosmos-journeyer/universe-model";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -163,8 +164,8 @@ async function createTestSpaceship(scene: Scene): Promise<Spaceship> {
 function createRingedStar(scene: Scene, textures: Textures, radius: number): Star {
     const model: StarModel = {
         ...getSunModel(),
-        radius,
-        rings: { type: "textured", textureId: "saturn", innerRadius: 200, outerRadius: 300 },
+        radius: meters(radius),
+        rings: { type: "textured", textureId: "saturn", innerRadius: meters(200), outerRadius: meters(300) },
     };
     const star = new Star(model, textures, scene);
     const asteroidField = star.asteroidField;
@@ -174,9 +175,9 @@ function createRingedStar(scene: Scene, textures: Textures, radius: number): Sta
     vi.spyOn(asteroidField, "getRingVolume").mockReturnValue({
         center: Vector3.Zero(),
         normal: Vector3.Up(),
-        innerRadius: 200,
-        outerRadius: 300,
-        halfThickness: 10,
+        innerRadius: meters(200),
+        outerRadius: meters(300),
+        halfThickness: meters(10),
     });
     return star;
 }
@@ -211,7 +212,7 @@ describe("spaceship warp clearance with entity geometry and celestial rings", ()
                     id: "entity",
                     name: "Entity",
                     getTransform: () => entity,
-                    getBoundingRadius: () => 10,
+                    getBoundingRadius: () => meters(10),
                 },
             };
             const textures = createTestTextures(scene);
@@ -220,10 +221,15 @@ describe("spaceship warp clearance with entity geometry and celestial rings", ()
             ship.setNearestObject(nearestObject);
             ship.setNearestCelestialBody(ringedStar);
             try {
-                expect(canEngageWarpDrive(shipTransform, ship.getAltimeter().getAltitude(), speed, nearestObject)).toBe(
-                    entityDistance > 0,
-                );
-                expect(ship.canEngageWarpDrive(speed)).toBe(allowed);
+                expect(
+                    canEngageWarpDrive(
+                        shipTransform,
+                        ship.getAltimeter().getAltitude(),
+                        metersPerSecond(speed),
+                        nearestObject,
+                    ),
+                ).toBe(entityDistance > 0);
+                expect(ship.canEngageWarpDrive(metersPerSecond(speed))).toBe(allowed);
             } finally {
                 scene.dispose();
                 engine.dispose();
@@ -251,16 +257,16 @@ describe("spaceship warp clearance with entity geometry and celestial rings", ()
                     id: "station",
                     name: "Station",
                     getTransform: () => station,
-                    getBoundingRadius: () => 1000,
+                    getBoundingRadius: () => meters(1000),
                 },
             };
             const textures = createTestTextures(scene);
-            const planet = new Star({ ...getSunModel(), radius: 6_000_000, rings: null }, textures, scene);
-            vi.spyOn(ship.getAltimeter(), "getAltitude").mockReturnValue(altitude);
+            const planet = new Star({ ...getSunModel(), radius: meters(6_000_000), rings: null }, textures, scene);
+            vi.spyOn(ship.getAltimeter(), "getAltitude").mockReturnValue(meters(altitude));
             ship.setNearestObject(nearestObject);
             ship.setNearestCelestialBody(planet);
             try {
-                expect(ship.canEngageWarpDrive(0)).toBe(allowed);
+                expect(ship.canEngageWarpDrive(metersPerSecond(0))).toBe(allowed);
             } finally {
                 scene.dispose();
                 engine.dispose();

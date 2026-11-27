@@ -27,7 +27,8 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import { EarthG, getRotationPeriodForArtificialGravity } from "@cosmos-journeyer/physics";
+import { EarthG, getRotationPeriodForArtificialGravity, meters, squareMeters } from "@cosmos-journeyer/physics";
+import type { Meters, SquareMeters } from "@cosmos-journeyer/physics";
 
 import type { Textures } from "@/frontend/assets/textures";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
@@ -41,14 +42,14 @@ import { createCylinderHabitatMaterial } from "./cylinderHabitatMaterial";
 export class CylinderHabitat implements Transformable {
     private readonly root: TransformNode;
 
-    private readonly radius: number;
+    private readonly radius: Meters;
 
     private readonly cylinderMaterial: Material;
 
     private readonly cylinder: Mesh;
     private cylinderAggregate: PhysicsAggregate | null = null;
 
-    readonly habitableSurface: number;
+    readonly habitableSurface: SquareMeters;
 
     private readonly lights: Array<PointLight> = [];
 
@@ -67,7 +68,7 @@ export class CylinderHabitat implements Transformable {
         const sectorSize = circumference / nbSectors;
         const sectorYCount = Math.ceil(requiredHeight / sectorSize);
         const height = sectorYCount * sectorSize;
-        this.habitableSurface = height * 2 * Math.PI * (this.radius / 2);
+        this.habitableSurface = squareMeters(height * 2 * Math.PI * (this.radius / 2));
 
         this.cylinder = MeshBuilder.CreateCylinder(
             "CylinderHabitat",
@@ -82,7 +83,7 @@ export class CylinderHabitat implements Transformable {
 
         this.cylinderMaterial = createCylinderHabitatMaterial(
             this.radius,
-            height,
+            meters(height),
             tessellation,
             textures.materials.spaceStation,
             scene,

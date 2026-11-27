@@ -16,7 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { GenerationSteps } from "#/utils/generationSteps";
-import { getMassFromSchwarzschildRadius } from "@cosmos-journeyer/physics";
+import { getMassFromSchwarzschildRadius, kelvin, meters, radians, seconds } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
@@ -33,6 +33,7 @@ export function generateBlackHoleModel(
     id: string,
     seed: number,
     name: string,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     parentBodies: DeepReadonly<Array<CelestialBodyModel>>,
 ): BlackHoleModel {
     const rng = getRngFromSeed(seed);
@@ -47,28 +48,28 @@ export function generateBlackHoleModel(
 
     const orbit: Orbit = {
         parentIds: parentIds,
-        semiMajorAxis: parentBodies.length > 0 ? orbitRadius : 0,
+        semiMajorAxis: meters(parentBodies.length > 0 ? orbitRadius : 0),
         eccentricity: 0,
         p: 2,
         plane: {
-            inclination: 0,
-            longitudeOfAscendingNode: 0,
+            inclination: radians(0),
+            longitudeOfAscendingNode: radians(0),
         },
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0,
+        argumentOfPeriapsis: radians(0),
+        initialMeanAnomaly: radians(0),
     };
 
-    const blackHoleMass = getMassFromSchwarzschildRadius(schwarzschildRadius);
+    const blackHoleMass = getMassFromSchwarzschildRadius(meters(schwarzschildRadius));
 
     const spin: SpinModel = {
-        siderealPeriod: 1.5e-19,
-        axialTilt: normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT),
-        axisAzimuth: 0,
-        initialRotationAngle: 0,
+        siderealPeriod: seconds(1.5e-19),
+        axialTilt: radians(normalRandom(0, 0.4, rng, GenerationSteps.AXIAL_TILT)),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
     };
 
-    const blackHoleAccretionDiskRadius = schwarzschildRadius * normalRandom(12, 3, rng, 7777);
-    const blackHoleBlackBodyTemperature = 7_000;
+    const blackHoleAccretionDiskRadius = meters(schwarzschildRadius * normalRandom(12, 3, rng, 7777));
+    const blackHoleBlackBodyTemperature = kelvin(7_000);
 
     return {
         type: "blackHole",

@@ -15,22 +15,28 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { meters, quantity, radians } from "@cosmos-journeyer/physics";
+import type { Meters, MetersPerSecond, MetersPerSecondSquared, Quantity, Radians } from "@cosmos-journeyer/physics";
+
 import { clamp } from "@/utils/math";
+
+/** Signed path curvature, in inverse meters. */
+export type Curvature = Quantity<"1/m">;
 
 /** Frame-local wheel geometry; tire slip is ignored. */
 type SteeringWheelGeometry = {
-    readonly position: { readonly x: number; readonly z: number };
+    readonly position: { readonly x: Meters; readonly z: Meters };
     readonly steerable: boolean;
 };
 
 export type SteeringGeometry = {
-    readonly steeringReferenceZ: number;
-    readonly referenceLeverArm: number;
-    readonly mechanicalCurvatureLimits: { readonly minCurvature: number; readonly maxCurvature: number };
+    readonly steeringReferenceZ: Meters;
+    readonly referenceLeverArm: Meters;
+    readonly mechanicalCurvatureLimits: { readonly minCurvature: Curvature; readonly maxCurvature: Curvature };
 };
 
 type SteeringGeometryOptions = {
-    readonly steeringReferenceZOverride: number | undefined;
+    readonly steeringReferenceZOverride: Meters | undefined;
 };
 
 // Axles within one millimeter are treated as coincident.
@@ -48,7 +54,7 @@ const AxleTolerance = 0.001;
  */
 export function deriveSteeringGeometry(
     wheels: ReadonlyArray<SteeringWheelGeometry>,
-    mechanicalAngleLimit: number,
+    mechanicalAngleLimit: Radians,
     options?: Partial<SteeringGeometryOptions>,
 ): SteeringGeometry | undefined {
     const steeringReferenceZOverride = options?.steeringReferenceZOverride;
@@ -61,7 +67,7 @@ export function deriveSteeringGeometry(
     }
     const steerableWheelZs = steerableWheels.map((wheel) => wheel.position.z);
     const fixedWheelZs = wheels.filter((wheel) => !wheel.steerable).map((wheel) => wheel.position.z);
-    let steeringReferenceZ: number;
+    let steeringReferenceZ: Meters;
     if (steeringReferenceZOverride !== undefined) {
         if (!Number.isFinite(steeringReferenceZOverride)) {
             return undefined;
@@ -71,16 +77,16 @@ export function deriveSteeringGeometry(
         if (Math.max(...fixedWheelZs) - Math.min(...fixedWheelZs) > AxleTolerance) {
             return undefined;
         }
-        steeringReferenceZ = fixedWheelZs.reduce((sum, z) => sum + z, 0) / fixedWheelZs.length;
+        steeringReferenceZ = meters(fixedWheelZs.reduce((sum, z) => sum + z, 0) / fixedWheelZs.length);
     } else {
         const frontZ = Math.max(...steerableWheelZs);
         const rearZ = Math.min(...steerableWheelZs);
         if (frontZ - rearZ <= AxleTolerance) {
             return undefined;
         }
-        steeringReferenceZ = (frontZ + rearZ) / 2;
+        steeringReferenceZ = meters((frontZ + rearZ) / 2);
     }
-    const referenceLeverArm = Math.max(...steerableWheelZs.map((z) => Math.abs(z - steeringReferenceZ)));
+    const referenceLeverArm = meters(Math.max(...steerableWheelZs.map((z) => Math.abs(z - steeringReferenceZ))));
     if (referenceLeverArm <= AxleTolerance) {
         return undefined;
     }
@@ -101,19 +107,19 @@ export function deriveSteeringGeometry(
  * @returns Curvature limited by steering angle and lateral acceleration.
  */
 export function computeSpeedLimitedCurvature(
-    requestedSteeringAngle: number,
-    referenceLeverArm: number,
-    speed: number,
-    maxLateralAcceleration: number,
-    mechanicalAngleLimit: number,
-): number {
+    requestedSteeringAngle: Radians,
+    referenceLeverArm: Meters,
+    speed: MetersPerSecond,
+    maxLateralAcceleration: MetersPerSecondSquared,
+    mechanicalAngleLimit: Radians,
+): Curvature {
     if (referenceLeverArm <= AxleTolerance) {
-        return 0;
+        return quantity<"1/m">(0);
     }
-    const angle = clamp(requestedSteeringAngle, -mechanicalAngleLimit, mechanicalAngleLimit);
+    const angle = clamp(requestedSteeringAngle, mechanicalAngleLimit * -1, mechanicalAngleLimit);
     const requestedCurvature = Math.tan(angle) / referenceLeverArm;
     const maxCurvature = Math.abs(speed) < 0.001 ? Infinity : maxLateralAcceleration / (speed * speed);
-    return clamp(requestedCurvature, -maxCurvature, maxCurvature);
+    return quantity<"1/m">(clamp(requestedCurvature, -maxCurvature, maxCurvature));
 }
 
 /**
@@ -127,9 +133,9 @@ export function computeSpeedLimitedCurvature(
  */
 export function getMechanicalCurvatureLimits(
     wheels: ReadonlyArray<SteeringWheelGeometry>,
-    steeringReferenceZ: number,
-    mechanicalAngleLimit: number,
-): { readonly minCurvature: number; readonly maxCurvature: number } {
+    steeringReferenceZ: Meters,
+    mechanicalAngleLimit: Radians,
+): { readonly minCurvature: Curvature; readonly maxCurvature: Curvature } {
     const tangentLimit = Math.tan(mechanicalAngleLimit);
     let positiveDenominator = 0;
     let negativeDenominator = 0;
@@ -142,8 +148,12 @@ export function getMechanicalCurvatureLimits(
         negativeDenominator = Math.max(negativeDenominator, longitudinalLeverArm - wheel.position.x * tangentLimit);
     }
     return {
-        maxCurvature: positiveDenominator > AxleTolerance ? tangentLimit / positiveDenominator : Infinity,
-        minCurvature: negativeDenominator > AxleTolerance ? -tangentLimit / negativeDenominator : -Infinity,
+        maxCurvature: quantity<"1/m">(
+            positiveDenominator > AxleTolerance ? tangentLimit / positiveDenominator : Infinity,
+        ),
+        minCurvature: quantity<"1/m">(
+            negativeDenominator > AxleTolerance ? -tangentLimit / negativeDenominator : -Infinity,
+        ),
     };
 }
 
@@ -156,17 +166,19 @@ export function getMechanicalCurvatureLimits(
  * @returns Clamped Ackermann steering angle in radians.
  */
 export function getWheelSteeringAngle(
-    curvature: number,
-    leverArm: number,
-    mechanicalAngleLimit: number,
-    lateralPosition: number,
-): number {
+    curvature: Curvature,
+    leverArm: Meters,
+    mechanicalAngleLimit: Radians,
+    lateralPosition: Meters,
+): Radians {
     if (leverArm === 0 || curvature === 0) {
-        return 0;
+        return radians(0);
     }
-    return clamp(
-        Math.atan2(curvature * leverArm, 1 - curvature * lateralPosition),
-        -mechanicalAngleLimit,
-        mechanicalAngleLimit,
+    return radians(
+        clamp(
+            Math.atan2(curvature * leverArm, 1 - curvature * lateralPosition),
+            mechanicalAngleLimit * -1,
+            mechanicalAngleLimit,
+        ),
     );
 }

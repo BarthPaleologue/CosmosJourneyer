@@ -28,8 +28,18 @@ import {
     getPolarCapLatitude,
     getStellarWind,
     getStellarWindDynamicPressure,
+    meters,
+    pascals,
+    radians,
+    wattsPerSquareMeter,
 } from "@cosmos-journeyer/physics";
-import type { LocalStellarWindModel } from "@cosmos-journeyer/physics";
+import type {
+    AmpereSquareMeters,
+    LocalStellarWindModel,
+    Meters,
+    Radians,
+    WattsPerSquareMeter,
+} from "@cosmos-journeyer/physics";
 import type { IndexedRng } from "@cosmos-journeyer/random";
 import { randRange, seededSquirrelNoise } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
@@ -48,13 +58,13 @@ const maxRibbonCountPerHemisphere = 500;
  */
 export class Aurora implements SystemContent {
     private readonly root: Mesh;
-    private readonly planetRadius: number;
-    private readonly moment: number;
+    private readonly planetRadius: Meters;
+    private readonly moment: AmpereSquareMeters;
     private readonly matrixBuffer: Float32Array;
     private readonly material: AuroraMaterial;
     private readonly rng: IndexedRng;
 
-    constructor(planetRadius: number, magneticField: DeepReadonly<MagneticFieldModel>, seed: number, scene: Scene) {
+    constructor(planetRadius: Meters, magneticField: DeepReadonly<MagneticFieldModel>, seed: number, scene: Scene) {
         const ribbons = new Mesh("Ribbons", scene);
         ribbons.isUnIndexed = true;
         ribbons.isPickable = false;
@@ -99,7 +109,7 @@ export class Aurora implements SystemContent {
         let dominantPressure = -1;
         for (const source of sources) {
             const distance = Vector3.Distance(position, source.position);
-            const wind = getStellarWind(source.mass, source.radius, distance);
+            const wind = getStellarWind(source.mass, source.radius, meters(distance));
             const sourcePressure = getStellarWindDynamicPressure(wind);
             // Approximate multiple winds by adding their scalar dynamic pressures.
             pressure += sourcePressure;
@@ -109,20 +119,20 @@ export class Aurora implements SystemContent {
             }
         }
 
-        const standoffDistance = getMagnetopauseStandoffDistance(this.moment, pressure);
+        const standoffDistance = getMagnetopauseStandoffDistance(this.moment, pascals(pressure));
         if (pressure <= 0 || standoffDistance <= this.planetRadius) {
             // A crushed magnetosphere has no closed dipole field lines above the surface.
             this.root.setEnabled(false);
-            this.material.setEnergyFlux(0);
+            this.material.setEnergyFlux(wattsPerSquareMeter(0));
             return;
         }
         this.root.setEnabled(true);
 
-        let energyFlux = 0;
+        let energyFlux: WattsPerSquareMeter = wattsPerSquareMeter(0);
         if (dominantWind !== null) {
             const capLatitude = getPolarCapLatitude(this.planetRadius, this.moment, dominantWind);
             energyFlux = getAuroralVisibleEnergyFlux(this.planetRadius, this.moment, dominantWind, [
-                0.8 * capLatitude,
+                radians(0.8 * capLatitude),
                 capLatitude,
             ]);
         }
@@ -134,7 +144,7 @@ export class Aurora implements SystemContent {
         const ribbonCountPerHemisphere = Math.min(Math.ceil(latitudeCircumference / 40e3), maxRibbonCountPerHemisphere);
 
         createRibbonMatrixBuffer(
-            [latitudeNorthEquatorward, latitudeNorthPolward],
+            [radians(latitudeNorthEquatorward), latitudeNorthPolward],
             this.planetRadius,
             ribbonCountPerHemisphere,
             this.matrixBuffer,
@@ -144,7 +154,7 @@ export class Aurora implements SystemContent {
         );
 
         createRibbonMatrixBuffer(
-            [-latitudeNorthPolward, -latitudeNorthEquatorward],
+            [radians(latitudeNorthPolward * -1), radians(latitudeNorthEquatorward * -1)],
             this.planetRadius,
             ribbonCountPerHemisphere,
             this.matrixBuffer,
@@ -178,8 +188,8 @@ export class Aurora implements SystemContent {
  * @param indexOffset Base index offset into the rng, so each hemisphere samples different values.
  */
 function createRibbonMatrixBuffer(
-    latitudeRange: [number, number],
-    planetRadius: number,
+    latitudeRange: [Radians, Radians],
+    planetRadius: Meters,
     ribbonCount: number,
     target: Float32Array,
     offset: number,
@@ -199,7 +209,7 @@ function createRibbonMatrixBuffer(
         // ribbon longitudes instead of only jittering a regular ring.
         const longitude = randRange(0, 2 * Math.PI, rng, baseRngIndex);
         const latitude = randRange(latitudeRange[0], latitudeRange[1], rng, baseRngIndex + 1);
-        geographicToCartesianToRef(latitude, longitude, localUp);
+        geographicToCartesianToRef(radians(latitude), radians(longitude), localUp);
 
         localUp.scaleToRef(planetRadius, position);
 
@@ -208,7 +218,7 @@ function createRibbonMatrixBuffer(
 
         Quaternion.RotationAxisToRef(
             localUp,
-            randRange(-tangentialMaxDivergence, tangentialMaxDivergence, rng, baseRngIndex + 2),
+            randRange(tangentialMaxDivergence * -1, tangentialMaxDivergence, rng, baseRngIndex + 2),
             localYaw,
         );
 
@@ -256,7 +266,7 @@ function createRibbonVertexData(): VertexData {
  * @param ref Vector receiving the unit direction.
  * @returns The supplied vector.
  */
-function geographicToCartesianToRef(latitude: number, longitude: number, ref: Vector3) {
+function geographicToCartesianToRef(latitude: Radians, longitude: Radians, ref: Vector3) {
     const cosLatitude = Math.cos(latitude);
     ref.set(cosLatitude * Math.cos(longitude), Math.sin(latitude), cosLatitude * Math.sin(longitude));
     return ref;

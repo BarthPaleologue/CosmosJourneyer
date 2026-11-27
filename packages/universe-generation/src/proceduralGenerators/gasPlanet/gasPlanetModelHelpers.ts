@@ -15,7 +15,14 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { astronomicalUnitToMeters, getWaterIceFrostLine, JupiterMass } from "@cosmos-journeyer/physics";
+import {
+    astronomicalUnitToMeters,
+    getWaterIceFrostLine,
+    JupiterMass,
+    kilograms,
+    meters,
+} from "@cosmos-journeyer/physics";
+import type { Kelvin, Kilograms, Meters } from "@cosmos-journeyer/physics";
 
 const GenerationSteps = {
     HOT_JUPITER_CHECK: 2564,
@@ -31,10 +38,10 @@ const GenerationSteps = {
  * @returns Semi-major axis in meters
  */
 export function getGasPlanetOrbitRadius(
-    stellarTemperature: number,
-    stellarRadius: number,
+    stellarTemperature: Kelvin,
+    stellarRadius: Meters,
     rng: (step: number) => number,
-): number {
+): Meters {
     const snowLine = getWaterIceFrostLine(stellarTemperature, stellarRadius);
 
     // Hot Jupiter modeling: around 1% chance (see https://academic.oup.com/mnras/article/516/1/75/6654884)
@@ -48,7 +55,7 @@ export function getGasPlanetOrbitRadius(
 
         // Log-uniform inside this narrow inner region
         const u = rng(GenerationSteps.ORBIT_RADIUS);
-        return aMin * Math.exp(Math.log(upper / aMin) * u);
+        return meters(aMin * Math.exp(Math.log(upper / aMin) * u));
     }
 
     const innerFactor = 1.3;
@@ -64,14 +71,14 @@ export function getGasPlanetOrbitRadius(
     const sqrtMin = Math.sqrt(aMin);
     const sqrtMax = Math.sqrt(aMax);
     const sqrtA = sqrtMin + (sqrtMax - sqrtMin) * u;
-    return sqrtA * sqrtA;
+    return meters(sqrtA * sqrtA);
 }
 
 /**
  * @param rng Indexed random source used for reproducible sampling.
  * @returns A sampled gas planet mass in the model's mass units.
  */
-export function sampleGasPlanetMass(rng: (step: number) => number): number {
+export function sampleGasPlanetMass(rng: (step: number) => number): Kilograms {
     const minMass = 0.08 * JupiterMass;
     const maxMass = 8.0 * JupiterMass;
 
@@ -79,5 +86,5 @@ export function sampleGasPlanetMass(rng: (step: number) => number): number {
     const logMin = Math.log10(minMass);
     const logMax = Math.log10(maxMass);
 
-    return 10 ** (logMin + (logMax - logMin) * t);
+    return kilograms(10 ** (logMin + (logMax - logMin) * t));
 }

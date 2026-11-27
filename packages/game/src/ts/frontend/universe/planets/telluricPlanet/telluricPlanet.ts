@@ -21,6 +21,8 @@ import type { TransformNode } from "@babylonjs/core/Meshes";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
@@ -163,12 +165,12 @@ export class TelluricPlanet implements CelestialBodyBase<"telluricPlanet" | "tel
         this.terrain.updateLOD(camera, terrainSystem, scatteringSystem);
     }
 
-    public getRadius(): number {
+    public getRadius(): Meters {
         return this.model.radius;
     }
 
-    public getBoundingRadius(): number {
-        return this.getRadius() + (this.model.ocean?.depth ?? 0);
+    public getBoundingRadius(): Meters {
+        return meters(this.getRadius() + (this.model.ocean?.depth ?? 0));
     }
 
     public computeCulling(camera: Camera): void {

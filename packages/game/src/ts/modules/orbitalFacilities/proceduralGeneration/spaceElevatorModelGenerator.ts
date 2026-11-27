@@ -21,6 +21,10 @@ import {
     getSphereIrradianceAtDistance,
     km2ToM2,
     kwhPerYearToWatts,
+    meters,
+    squareMeters,
+    wattsPerSquareMeter,
+    radians,
 } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, randomPieChart, wheelOfFortune } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
@@ -77,12 +81,12 @@ export function generateSpaceElevatorModel(
         semiMajorAxis: orbitRadius,
         p: 2,
         plane: {
-            inclination: parentBody.orbit.plane.inclination + parentBody.spin.axialTilt,
-            longitudeOfAscendingNode: 0,
+            inclination: radians(0),
+            longitudeOfAscendingNode: radians(0),
         },
         eccentricity: 0,
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0,
+        argumentOfPeriapsis: radians(0),
+        initialMeanAnomaly: radians(0),
     };
 
     const tetherLength = orbitRadius - parentBody.radius;
@@ -91,9 +95,9 @@ export function generateSpaceElevatorModel(
 
     const spin: SpinModel = {
         siderealPeriod: parentSiderealDayDuration,
-        axialTilt: 0,
-        axisAzimuth: 0,
-        initialRotationAngle: 0,
+        axialTilt: radians(0),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
     };
 
     const population = 2_000_000;
@@ -148,7 +152,7 @@ export function generateSpaceElevatorModel(
             sections.push(
                 generateRingHabitatModel(SeedHalfRange * rng(27), {
                     housing: housingSurface,
-                    agriculture: agricultureSurface,
+                    agriculture: squareMeters(agricultureSurface),
                 }),
             );
             break;
@@ -156,7 +160,7 @@ export function generateSpaceElevatorModel(
             sections.push(
                 generateHelixHabitatModel(SeedHalfRange * rng(19), {
                     housing: housingSurface,
-                    agriculture: agricultureSurface,
+                    agriculture: squareMeters(agricultureSurface),
                 }),
             );
             break;
@@ -164,7 +168,7 @@ export function generateSpaceElevatorModel(
             sections.push(
                 generateCylinderHabitatModel(SeedHalfRange * rng(13), {
                     housing: housingSurface,
-                    agriculture: agricultureSurface,
+                    agriculture: squareMeters(agricultureSurface),
                 }),
             );
             break;
@@ -184,7 +188,7 @@ export function generateSpaceElevatorModel(
         totalIrradiance += getSphereIrradianceAtDistance(
             model.blackBodyTemperature,
             getCelestialBodyRadius(model),
-            distance,
+            meters(distance),
         );
     }
 
@@ -193,7 +197,7 @@ export function generateSpaceElevatorModel(
     const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
         solarPanelEfficiency,
         totalPowerRequirementW,
-        totalIrradiance,
+        wattsPerSquareMeter(totalIrradiance),
     );
 
     const maxSolarPanelSurfaceM2 = km2ToM2(150);
@@ -230,7 +234,7 @@ export function generateSpaceElevatorModel(
             mass,
             attitude: {
                 spin,
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: -Math.PI / 2 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(-Math.PI / 2) },
             },
         },
     };

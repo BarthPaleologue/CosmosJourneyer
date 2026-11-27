@@ -28,6 +28,8 @@ import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { PhysicsShapeMesh } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { TelluricPlanetModel, TelluricSatelliteModel } from "@cosmos-journeyer/universe-model";
 
@@ -60,7 +62,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
     public readonly positionOnCube: Vector3;
     private readonly positionOnSphere: Vector3;
 
-    private readonly sideLength: number;
+    private readonly sideLength: Meters;
 
     private loaded = false;
 
@@ -91,7 +93,7 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
         this.indices = structuredClone(indices);
 
-        this.sideLength = (2 * planetModel.radius) / 2 ** this.indices.lod;
+        this.sideLength = meters((2 * planetModel.radius) / 2 ** this.indices.lod);
 
         this.mesh = new Mesh(this.id, scene);
         this.mesh.setEnabled(false);
@@ -102,9 +104,9 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
         const faceRotation = getQuaternionFromFaceIndex(faceIndex);
         this.positionOnCube = new Vector3(
-            -planetModel.radius + (this.indices.x + 0.5) * this.sideLength,
-            -planetModel.radius + (this.indices.y + 0.5) * this.sideLength,
-            -planetModel.radius,
+            planetModel.radius * -1 + (this.indices.x + 0.5) * this.sideLength,
+            planetModel.radius * -1 + (this.indices.y + 0.5) * this.sideLength,
+            planetModel.radius * -1,
         ).applyRotationQuaternionInPlace(faceRotation);
 
         this.positionOnSphere = this.positionOnCube.normalizeToNew().scaleInPlace(planetModel.radius);
@@ -217,8 +219,8 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
         );
     }
 
-    public getBoundingRadius(): number {
-        return this.sideLength / 2;
+    public getBoundingRadius(): Meters {
+        return meters(this.sideLength / 2);
     }
 
     /**

@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { MetersSchema, RadiansSchema, radians } from "@cosmos-journeyer/physics";
 import { z } from "zod";
 
 import { OrbitalObjectIdSchema } from "./orbitalObjectId";
@@ -27,13 +28,13 @@ export const OrbitalPlaneSchema = z.object({
     /**
      * Vertical tilt of the ellipse with respect to the reference plane, measured at the ascending node
      */
-    inclination: z.number().default(0),
+    inclination: RadiansSchema.default(radians(0)),
 
     /**
      * horizontally orients the ascending node of the ellipse (where the orbit passes from south to north through the reference plane)
      * with respect to the reference frame's vernal point.
      */
-    longitudeOfAscendingNode: z.number().default(0),
+    longitudeOfAscendingNode: RadiansSchema.default(radians(0)),
 });
 
 export type OrbitalPlane = z.infer<typeof OrbitalPlaneSchema>;
@@ -51,7 +52,7 @@ export const OrbitSchema = z.object({
     /**
      * Half the distance between the apoapsis and periapsis
      */
-    semiMajorAxis: z.number(),
+    semiMajorAxis: MetersSchema,
 
     /**
      * Shape of the ellipse, describing how much it is elongated compared to a circle
@@ -66,7 +67,7 @@ export const OrbitSchema = z.object({
     /**
      * Defines the orientation of the ellipse in the orbital plane, as an angle measured from the ascending node to the periapsis
      */
-    argumentOfPeriapsis: z.number().default(0),
+    argumentOfPeriapsis: RadiansSchema.default(radians(0)),
 
     /**
      * The mean anomaly at t=0
@@ -76,7 +77,7 @@ export const OrbitSchema = z.object({
      * It can be converted into the true anomaly ν, which does represent the real geometric angle in the plane of the ellipse,
      * between periapsis (closest approach to the central body) and the position of the orbiting body at any given time
      */
-    initialMeanAnomaly: z.number().default(0),
+    initialMeanAnomaly: RadiansSchema.default(radians(0)),
 
     /**
      * The norm to use for the orbit. 2 for Euclidean space, other numbers for funky shapes.

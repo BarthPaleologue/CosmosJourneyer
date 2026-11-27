@@ -1,6 +1,7 @@
 import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 import type { UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -48,13 +49,13 @@ describe("mission guidance targets", () => {
                 type: TargetType.CUSTOM,
                 properName: model.name,
                 getTransform: () => transform,
-                getBoundingRadius: () => 1,
+                getBoundingRadius: () => meters(1),
             },
             {
                 type: TargetType.LANDING_PAD,
                 padIdentifier: "A",
                 getTransform: () => transform,
-                getBoundingRadius: () => 1,
+                getBoundingRadius: () => meters(1),
             },
         ];
         const factory = vi.fn(() => targets);

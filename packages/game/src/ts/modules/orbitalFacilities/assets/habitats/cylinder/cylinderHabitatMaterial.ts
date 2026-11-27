@@ -18,6 +18,7 @@
 import { NodeMaterialModes } from "@babylonjs/core/Materials/Node/Enums/nodeMaterialModes";
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import type { Scene } from "@babylonjs/core/scene";
+import type { Meters } from "@cosmos-journeyer/physics";
 import {
     abs,
     atan2,
@@ -58,8 +59,8 @@ import type { PBRTextures } from "@/frontend/assets/textures/materials";
  * @returns The built node material.
  */
 export function createCylinderHabitatMaterial(
-    radius: number,
-    height: number,
+    radius: Meters,
+    height: Meters,
     tesselation: number,
     textures: PBRTextures,
     scene: Scene,

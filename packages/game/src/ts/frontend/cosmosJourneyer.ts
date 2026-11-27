@@ -27,6 +27,7 @@ import { VideoRecorder } from "@babylonjs/core/Misc/videoRecorder";
 import { HavokPlugin } from "@babylonjs/core/Physics/v2/Plugins/havokPlugin";
 import { Scene } from "@babylonjs/core/scene";
 import HavokPhysics from "@babylonjs/havok";
+import { seconds } from "@cosmos-journeyer/physics";
 import { err, ok, promiseToResult } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import type { StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
@@ -752,7 +753,7 @@ export class CosmosJourneyer {
                 return;
             }
         }
-        this.starSystemView.initStarSystem(Date.now() / 1000);
+        this.starSystemView.initStarSystem(seconds(Date.now() / 1000));
 
         this.engine.runRenderLoop(() => {
             const deltaSeconds = this.engine.getDeltaTime() / 1000;
@@ -1102,7 +1103,7 @@ export class CosmosJourneyer {
             await alertModal("Could not init main menu.", this.soundPlayer, this.t);
             return;
         }
-        this.starSystemView.initStarSystem(Date.now() / 1000);
+        this.starSystemView.initStarSystem(seconds(Date.now() / 1000));
     }
 
     /**
@@ -1166,7 +1167,7 @@ export class CosmosJourneyer {
         if (this.state === "uninitialized") {
             await this.init(true);
         } else {
-            this.starSystemView.initStarSystem(Date.now() / 1000);
+            this.starSystemView.initStarSystem(seconds(Date.now() / 1000));
         }
 
         if (playerLocation.type === "inSpaceship") {

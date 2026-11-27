@@ -1,4 +1,5 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Meters, Radians } from "@cosmos-journeyer/physics";
 
 import type { Target } from "../../targeting/target";
 
@@ -18,7 +19,7 @@ export type Ray = {
 export function findBestTarget(
     targets: Iterable<Target>,
     ray: Readonly<Ray>,
-    verticalFov: number,
+    verticalFov: Radians,
     minimumScore: number,
 ): Target | null {
     const rayDirection = ray.direction;
@@ -51,7 +52,7 @@ export function findBestTarget(
  * @param verticalFov Camera's vertical field of view in radians.
  * @returns A score where higher values indicate a larger, better-aligned target.
  */
-function computeTargetScore(toTarget: Vector3, rayDirection: Vector3, radius: number, verticalFov: number): number {
+function computeTargetScore(toTarget: Vector3, rayDirection: Vector3, radius: Meters, verticalFov: Radians): number {
     const forwardDistance = Vector3.Dot(toTarget, rayDirection);
     if (forwardDistance <= 0) {
         return 0;

@@ -20,6 +20,7 @@ import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes";
 import type { Scene } from "@babylonjs/core/scene";
 import { getSchwarzschildRadius, getShadowRadius } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { BlackHoleModel } from "@cosmos-journeyer/universe-model";
 
@@ -62,11 +63,11 @@ export class BlackHole implements CelestialBodyBase<"blackHole"> {
         return this.transform;
     }
 
-    public getRadius(): number {
+    public getRadius(): Meters {
         return getSchwarzschildRadius(this.model.mass);
     }
 
-    public getBoundingRadius(): number {
+    public getBoundingRadius(): Meters {
         return getShadowRadius(this.model.mass);
     }
 

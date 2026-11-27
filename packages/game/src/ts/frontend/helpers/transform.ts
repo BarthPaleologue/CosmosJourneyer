@@ -19,6 +19,7 @@ import { Axis, Space } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
+import type { Radians } from "@cosmos-journeyer/physics";
 
 /**
  * Orients a transform toward a world-space target with the scene’s handedness correction.
@@ -50,7 +51,7 @@ export function translate(transformNode: TransformNode, displacement: Vector3): 
  * @param axis - World-space rotation axis.
  * @param amount - Rotation angle in radians.
  */
-export function rotateAround(transformNode: TransformNode, pivot: Vector3, axis: Vector3, amount: number): void {
+export function rotateAround(transformNode: TransformNode, pivot: Vector3, axis: Vector3, amount: Radians): void {
     transformNode.rotateAround(pivot, axis, amount);
     transformNode.computeWorldMatrix(true);
 }
@@ -60,7 +61,7 @@ export function rotateAround(transformNode: TransformNode, pivot: Vector3, axis:
  * @param axis - World-space rotation axis.
  * @param amount - Rotation angle in radians.
  */
-export function rotate(transformNode: TransformNode, axis: Vector3, amount: number): void {
+export function rotate(transformNode: TransformNode, axis: Vector3, amount: Radians): void {
     transformNode.rotate(axis, amount, Space.WORLD);
 }
 
@@ -90,7 +91,7 @@ export function setRotationQuaternion(transformNode: TransformNode, newRotation:
  * @param transformNode - Transform whose pose is read or updated.
  * @param amount - Rotation angle in radians.
  */
-export function roll(transformNode: TransformNode, amount: number): void {
+export function roll(transformNode: TransformNode, amount: Radians): void {
     rotate(transformNode, transformNode.forward, amount);
 }
 
@@ -98,7 +99,7 @@ export function roll(transformNode: TransformNode, amount: number): void {
  * @param transformNode - Transform whose pose is read or updated.
  * @param amount - Rotation angle in radians.
  */
-export function pitch(transformNode: TransformNode, amount: number): void {
+export function pitch(transformNode: TransformNode, amount: Radians): void {
     rotate(transformNode, transformNode.right, amount);
 }
 
@@ -106,7 +107,7 @@ export function pitch(transformNode: TransformNode, amount: number): void {
  * @param transformNode - Transform whose pose is read or updated.
  * @param amount - Rotation angle in radians.
  */
-export function yaw(transformNode: TransformNode, amount: number): void {
+export function yaw(transformNode: TransformNode, amount: Radians): void {
     rotate(transformNode, transformNode.up, amount);
 }
 

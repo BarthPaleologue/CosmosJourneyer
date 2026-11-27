@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import type { Seconds } from "@cosmos-journeyer/physics";
 
 import type { KeplerianObject, RelativeTransformFrame } from "./keplerianOrbitalSimulation";
 
@@ -50,7 +51,7 @@ export function getMostInfluentialObject(
  * @param siderealPeriod - The body’s rotation period in seconds; zero means it does not rotate.
  * @returns The reference-frame policy for the body’s sidereal period.
  */
-export function getNavigationReferenceFrame(siderealPeriod: number): RelativeTransformFrame {
+export function getNavigationReferenceFrame(siderealPeriod: Seconds): RelativeTransformFrame {
     const period = Math.abs(siderealPeriod);
     return period > 0 && period < 10 * 60 ? "inertial" : "reference";
 }

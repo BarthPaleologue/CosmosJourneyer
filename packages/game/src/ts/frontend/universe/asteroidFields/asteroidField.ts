@@ -18,6 +18,8 @@
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { IDisposable, Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { getRngFromSeed } from "@cosmos-journeyer/random";
 
 import type { Asteroid } from "@/frontend/assets/objects/asteroids";
@@ -39,13 +41,13 @@ export class AsteroidField implements IDisposable {
     readonly averageRadius: number;
     readonly spread: number;
 
-    readonly innerRadius: number;
-    readonly outerRadius: number;
+    readonly innerRadius: Meters;
+    readonly outerRadius: Meters;
 
     readonly resolution = 15;
     readonly patchSize = 30000;
 
-    readonly patchThickness = 2000;
+    readonly patchThickness = meters(2000);
 
     readonly neighborCellsRenderRadius = 2;
 
@@ -61,7 +63,7 @@ export class AsteroidField implements IDisposable {
      * @param outerRadius The maximum distance from the parent at which asteroids can spawn
      * @param scene The scene where the asteroid field exists
      */
-    constructor(seed: number, parent: TransformNode, innerRadius: number, outerRadius: number, scene: Scene) {
+    constructor(seed: number, parent: TransformNode, innerRadius: Meters, outerRadius: Meters, scene: Scene) {
         this.seed = seed;
         this.rng = getRngFromSeed(this.seed);
 
@@ -82,7 +84,7 @@ export class AsteroidField implements IDisposable {
             normal: this.parent.up,
             innerRadius: this.innerRadius,
             outerRadius: this.outerRadius,
-            halfThickness: this.patchThickness / 2,
+            halfThickness: meters(this.patchThickness / 2),
         };
     }
 

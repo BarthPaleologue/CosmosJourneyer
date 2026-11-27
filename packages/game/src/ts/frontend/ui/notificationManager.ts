@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { seconds } from "@cosmos-journeyer/physics";
+
 import type { ISoundPlayer } from "../audio/soundPlayer";
 import { Notification } from "./notification";
 import type { NotificationIntent, NotificationOrigin } from "./notification";
@@ -63,7 +65,7 @@ export class NotificationManager implements INotificationManager {
             type,
             intent,
             text,
-            durationMillis / 1000,
+            seconds(durationMillis / 1000),
             this.soundPlayer,
             this.container,
             this.document,

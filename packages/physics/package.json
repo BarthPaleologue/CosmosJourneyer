@@ -21,6 +21,10 @@
         "format": "oxfmt . --write",
         "format:check": "oxfmt . --check"
     },
+    "dependencies": {
+        "@cosmos-journeyer/typescript": "workspace:^",
+        "zod": "catalog:"
+    },
     "devDependencies": {
         "eslint": "catalog:",
         "oxfmt": "catalog:",

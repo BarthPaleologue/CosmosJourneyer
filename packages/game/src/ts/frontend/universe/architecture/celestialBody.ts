@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { OrbitalObjectType } from "@cosmos-journeyer/universe-model";
 
 import type { CanHaveRings } from "./canHaveRings";
@@ -27,5 +28,5 @@ export interface CelestialBodyBase<T extends OrbitalObjectType> extends OrbitalO
     /**
      * Returns the radius of the celestial body
      */
-    getRadius(): number;
+    getRadius(): Meters;
 }

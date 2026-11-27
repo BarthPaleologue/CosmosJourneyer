@@ -14,75 +14,75 @@
 //
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 import { getBlackBodyLuminosity } from "../thermodynamics";
+import { ampereSquareMeters, kelvin, kilograms, meters, metersPerSecondSquared, pascals } from "../units";
 
 /**
  * The mass of the Earth in kilograms.
  */
-export const EarthMass = 5.972e24;
+export const EarthMass = kilograms(5.972e24);
 
 /** The radius of the Earth in meters */
-export const EarthRadius = 6_371e3;
+export const EarthRadius = meters(6_371e3);
 
 /** The magnetic dipole moment of Earth in A·m². */
-export const EarthMagneticDipoleMoment = 7.8e22;
+export const EarthMagneticDipoleMoment = ampereSquareMeters(7.8e22);
 
 /**
  * The magnetic dipole moment of Mercury in A·m², approximated from MESSENGER observations.
  * @see https://pubmed.ncbi.nlm.nih.gov/21960627/
  */
-export const MercuryMagneticDipoleMoment = 2.8e19;
+export const MercuryMagneticDipoleMoment = ampereSquareMeters(2.8e19);
 
 /**
  * The mass of the Moon in kilograms.
  */
-export const MoonMass = 7.348e22;
+export const MoonMass = kilograms(7.348e22);
 
 /**
  * The mass of Jupiter in kilograms.
  */
-export const JupiterMass = 1.898e27;
+export const JupiterMass = kilograms(1.898e27);
 
 /** The radius of Jupiter in meters. */
-export const JupiterRadius = 69_911e3;
+export const JupiterRadius = meters(69_911e3);
 
 /** The magnetic dipole moment of Jupiter in A·m². */
-export const JupiterMagneticDipoleMoment = 1.66e27;
+export const JupiterMagneticDipoleMoment = ampereSquareMeters(1.66e27);
 
 /** The magnetic dipole moment of Saturn in A·m². */
-export const SaturnMagneticDipoleMoment = 4.6e25;
+export const SaturnMagneticDipoleMoment = ampereSquareMeters(4.6e25);
 
 /** The magnetic dipole moment of Uranus in A·m². */
-export const UranusMagneticDipoleMoment = 3.9e24;
+export const UranusMagneticDipoleMoment = ampereSquareMeters(3.9e24);
 
 /** The magnetic dipole moment of Neptune in A·m². */
-export const NeptuneMagneticDipoleMoment = 2.16e24;
+export const NeptuneMagneticDipoleMoment = ampereSquareMeters(2.16e24);
 
 /**
  * The mass of the sun in kilograms.
  */
-export const SolarMass = 1.989e30;
+export const SolarMass = kilograms(1.989e30);
 
 /**
  * The radius of the sun in meters.
  */
-export const SolarRadius = 696340e3;
+export const SolarRadius = meters(696340e3);
 
 /**
  * The surface temperature of the sun in Kelvin.
  */
-export const SolarTemperature = 5778;
+export const SolarTemperature = kelvin(5778);
 
 /**
- * The gravitational acceleration in m/s^2.
+ * The gravitational acceleration in m/s².
  */
-export const EarthG = 9.81;
+export const EarthG = metersPerSecondSquared(9.81);
 
 /**
  * The sea level pressure on Earth in Pascals.
  */
-export const EarthSeaLevelPressure = 101_325;
+export const EarthSeaLevelPressure = pascals(101_325);
 
 /** The solar luminosity in Watts. */
 export const SolarLuminosity = getBlackBodyLuminosity(SolarTemperature, SolarRadius);

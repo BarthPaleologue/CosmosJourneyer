@@ -24,6 +24,7 @@ import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
 import { EarthRadius } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { GasPlanetModel } from "@cosmos-journeyer/universe-model";
 
@@ -143,11 +144,11 @@ export class GasPlanet implements CelestialBodyBase<"gasPlanet">, Cullable {
         }
     }
 
-    public getRadius(): number {
+    public getRadius(): Meters {
         return this.model.radius;
     }
 
-    public getBoundingRadius(): number {
+    public getBoundingRadius(): Meters {
         return this.model.radius;
     }
 

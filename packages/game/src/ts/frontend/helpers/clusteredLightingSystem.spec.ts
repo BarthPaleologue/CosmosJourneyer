@@ -23,6 +23,7 @@ import { PointLight } from "@babylonjs/core/Lights/pointLight";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import type { ClusteredLightingRegion } from "@/frontend/helpers/clusteredLightingSystem";
@@ -69,7 +70,7 @@ describe("ClusteredLightingSystem", () => {
         transform.computeWorldMatrix(true);
         return {
             getTransform: () => transform,
-            getBoundingRadius: () => 1,
+            getBoundingRadius: () => meters(1),
             getLights: () => lights,
         };
     };

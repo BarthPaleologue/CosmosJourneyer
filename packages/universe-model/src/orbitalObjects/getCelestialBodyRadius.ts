@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { getSchwarzschildRadius } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
@@ -25,7 +26,8 @@ import type { CelestialBodyModel } from "./index";
  * @param body Celestial body whose radius is requested.
  * @returns The body's radius in the model's configured distance unit.
  */
-export function getCelestialBodyRadius(body: DeepReadonly<CelestialBodyModel>): number {
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
+export function getCelestialBodyRadius(body: DeepReadonly<CelestialBodyModel>): Meters {
     switch (body.type) {
         case "blackHole":
             return getSchwarzschildRadius(body.mass);

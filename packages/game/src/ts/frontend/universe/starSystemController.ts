@@ -19,7 +19,7 @@ import { Matrix, Quaternion } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
-import { lightYearsToMeters } from "@cosmos-journeyer/physics";
+import { lightYears, lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, NonEmptyArray, Result } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectId, StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
@@ -574,7 +574,7 @@ export class StarSystemController {
         const targetSystemUniversePosition = wrapVector3(universeBackend.getSystemGalacticPosition(targetCoordinates));
 
         const distance = lightYearsToMeters(
-            Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition),
+            lightYears(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition)),
         );
 
         const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();

@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { seconds } from "@cosmos-journeyer/physics";
+import type { Seconds } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 
 import type { ISoundPlayer } from "@/frontend/audio/soundPlayer";
@@ -30,9 +32,9 @@ export type NotificationIntent = "info" | "success" | "warning" | "error";
 
 export class Notification {
     private progressSeconds = 0;
-    private readonly progressDurationSeconds;
+    private readonly progressDurationSeconds: Seconds;
     private removalProgressSeconds = 0;
-    private readonly removalDurationSeconds = 0.5;
+    private readonly removalDurationSeconds = seconds(0.5);
 
     readonly htmlRoot: HTMLDivElement;
 
@@ -42,7 +44,7 @@ export class Notification {
         origin: NotificationOrigin,
         intent: NotificationIntent,
         text: string,
-        durationSeconds: number,
+        durationSeconds: Seconds,
         soundPlayer: ISoundPlayer,
         container: HTMLDivElement,
         documentRef: Document,

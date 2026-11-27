@@ -22,6 +22,8 @@ import { PhysicsConstraintAxis, PhysicsShapeType } from "@babylonjs/core/Physics
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import type { Scene } from "@babylonjs/core/scene";
+import { kilograms } from "@cosmos-journeyer/physics";
+import type { Kilograms, Radians } from "@cosmos-journeyer/physics";
 
 import { CollisionMask } from "@/settings";
 
@@ -36,9 +38,9 @@ import type { WheelModel } from "./wheel";
 
 type FixationModel = {
     rotation?: {
-        x?: number;
-        y?: number;
-        z?: number;
+        x?: Radians;
+        y?: Radians;
+        z?: Radians;
     };
 };
 
@@ -55,15 +57,15 @@ export class VehicleBuilder {
 
     private readonly fixedParts: Array<{
         mesh: Mesh;
-        mass: number;
+        mass: Kilograms;
         connection: FixationModel;
     }> = [];
 
     private readonly hingedDoorParts: Array<{
         doorMesh: Mesh;
-        mass: number;
+        mass: Kilograms;
         axis: PhysicsConstraintAxis;
-        angles: { closed: number; opened: number };
+        angles: { closed: Radians; opened: Radians };
     }> = [];
 
     private spawnPosition = Vector3.Zero();
@@ -117,7 +119,7 @@ export class VehicleBuilder {
         return this;
     }
 
-    addFixedPart(part: Mesh, position: Vector3, mass: number, connection: FixationModel): this {
+    addFixedPart(part: Mesh, position: Vector3, mass: Kilograms, connection: FixationModel): this {
         part.parent = this.frame;
         part.position = position;
 
@@ -129,9 +131,9 @@ export class VehicleBuilder {
     addHingedDoor(
         doorMesh: Mesh,
         position: Vector3,
-        mass: number,
+        mass: Kilograms,
         axis: PhysicsConstraintAxis,
-        angles: { closed: number; opened: number },
+        angles: { closed: Radians; opened: Radians },
     ): this {
         doorMesh.parent = this.frame;
         doorMesh.position = position;
@@ -171,7 +173,7 @@ export class VehicleBuilder {
         allMeshes.push(this.frame);
 
         const frameAggregate = new PhysicsAggregate(this.frame, PhysicsShapeType.MESH, {
-            mass: 2000,
+            mass: kilograms(2000),
             restitution: 0,
             friction: 1,
         });

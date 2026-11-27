@@ -21,6 +21,7 @@ import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Scene } from "@babylonjs/core/scene";
+import type { Radians } from "@cosmos-journeyer/physics";
 import {
     abs,
     add,
@@ -201,13 +202,13 @@ export class SpaceDotsMaterial {
         this.uSteeringUp.value = up;
     }
 
-    public setRollCompensationAngle(angle: number): void {
+    public setRollCompensationAngle(angle: Radians): void {
         this.uRollCompensationAngle.value = angle;
     }
 
-    public setSteeringBend(yaw: number, pitch: number): void {
+    public setSteeringBend(yaw: Radians, pitch: Radians): void {
         this.uBendYaw.value = yaw;
-        this.uBendPitch.value = -pitch;
+        this.uBendPitch.value = pitch * -1;
     }
 
     public dispose(): void {

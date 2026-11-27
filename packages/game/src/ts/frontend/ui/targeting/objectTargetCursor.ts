@@ -18,6 +18,7 @@
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { meters, metersPerSecond, radians, seconds } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import { getProjectedDiameter01 } from "@/frontend/helpers/isObjectVisibleOnScreen";
@@ -41,7 +42,7 @@ export class ObjectTargetCursor {
     readonly object: Target;
     private readonly t: TFunction;
 
-    private lastDistance = 0;
+    private lastDistance = meters(0);
 
     readonly minSize: number;
     readonly maxSize: number;
@@ -111,10 +112,10 @@ export class ObjectTargetCursor {
         this.isInformationEnabled = enabled;
     }
 
-    update(camera: Camera, opacity: number): void {
+    update(camera: Camera, opacity: number, deltaSeconds: number): void {
         this.object.getTransform().computeWorldMatrix(true);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
-        const distance = objectRay.length();
+        const distance = meters(objectRay.length());
         const cameraToObject = objectRay.scale(1 / distance);
         const cameraForward = camera.getDirection(Vector3.Forward(camera.getScene().useRightHandedSystem));
 
@@ -137,14 +138,14 @@ export class ObjectTargetCursor {
         }
 
         const deltaDistance = this.lastDistance - distance;
-        const speed = deltaDistance !== 0 ? deltaDistance / (camera.getScene().getEngine().getDeltaTime() / 1000) : 0;
+        const speed = metersPerSecond(deltaDistance !== 0 ? deltaDistance / deltaSeconds : 0);
         objectRay.scaleInPlace(1 / distance);
 
         const screenSize = getProjectedDiameter01(
             this.object.getTransform().getAbsolutePosition(),
             this.object.getBoundingRadius(),
             camera.globalPosition,
-            camera.fov,
+            radians(camera.fov),
         );
 
         let size = 100 * Math.min(screenSize * 1.3, 1);
@@ -165,7 +166,7 @@ export class ObjectTargetCursor {
             this.distanceText.textContent = parseDistance(distance, this.t);
 
             const nbSeconds = distance / speed;
-            this.etaText.textContent = "ETA: " + (speed > 0 ? parseSecondsRough(nbSeconds, this.t) : "∞");
+            this.etaText.textContent = "ETA: " + (speed > 0 ? parseSecondsRough(seconds(nbSeconds), this.t) : "∞");
         }
 
         this.lastDistance = distance;

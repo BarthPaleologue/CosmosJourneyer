@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { TransformNode } from "@babylonjs/core";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LandingPadProvider, LandingPadSize } from "./landingPadProvider";
@@ -48,8 +50,8 @@ class MockLandingPad implements ILandingPad {
         return this.padSize;
     }
 
-    getPadHeight(): number {
-        return 0;
+    getPadHeight(): Meters {
+        return meters(0);
     }
 
     // Implement other required LandingPad methods with minimal functionality
@@ -59,8 +61,8 @@ class MockLandingPad implements ILandingPad {
     dispose(): void {
         this.transform.dispose();
     }
-    getBoundingRadius(): number {
-        return 0;
+    getBoundingRadius(): Meters {
+        return meters(0);
     }
 }
 

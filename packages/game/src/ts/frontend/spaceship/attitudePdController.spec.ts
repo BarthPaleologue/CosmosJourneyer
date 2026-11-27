@@ -1,4 +1,5 @@
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { kilograms } from "@cosmos-journeyer/physics";
 import { describe, expect, it } from "vitest";
 
 import { AttitudePDController } from "./attitudePdController";
@@ -12,7 +13,7 @@ const expectVectorClose = (actual: Vector3, expected: Vector3): void => {
 
 describe("AttitudePDController", () => {
     const massProps: AngularMassProperties = {
-        mass: 2,
+        mass: kilograms(2),
         inertia: new Vector3(1, 2, 3),
         inertiaOrientation: Quaternion.Identity(),
     };

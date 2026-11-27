@@ -19,9 +19,12 @@ import { CreateIcoSphere, DirectionalLight, Quaternion, Vector3 } from "@babylon
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
 import {
+    ampereSquareMeters,
     astronomicalUnitToMeters,
     degreesToRadians,
     EarthMagneticDipoleMoment,
+    meters,
+    radians,
     SolarMass,
     SolarRadius,
 } from "@cosmos-journeyer/physics";
@@ -54,7 +57,7 @@ export async function createAuroraScene(
     scene.clearColor.set(0, 0, 0, 1);
     scene.useRightHandedSystem = true;
 
-    const planetRadius = 1000e3;
+    const planetRadius = meters(1000e3);
 
     const controls = new DefaultControls(scene);
     controls.speed = 500e3;
@@ -111,10 +114,10 @@ export async function createAuroraScene(
 
     const magneticField: MagneticFieldModel = {
         north: {
-            latitude: Math.PI / 2,
-            longitude: 0,
+            latitude: radians(Math.PI / 2),
+            longitude: radians(0),
         },
-        magnitude: EarthMagneticDipoleMoment / 6 ** 3,
+        magnitude: ampereSquareMeters(EarthMagneticDipoleMoment / 6 ** 3),
     };
 
     const aurora = new Aurora(planetRadius, magneticField, auroraSeed, scene);

@@ -18,6 +18,7 @@
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Observer } from "@babylonjs/core/Misc/observable";
+import { meters, radians } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import type { Target } from "../../targeting/target";
@@ -87,7 +88,7 @@ export class TargetCursorLayer {
         return this.hoveredTarget;
     }
 
-    public update(camera: Camera, controlledObject: Transformable | null): void {
+    public update(camera: Camera, controlledObject: Transformable | null, deltaSeconds: number): void {
         if (!this.isEnabled()) {
             return;
         }
@@ -110,7 +111,7 @@ export class TargetCursorLayer {
                 projected.x <= camera.viewport.x + camera.viewport.width &&
                 projected.y >= camera.viewport.y &&
                 projected.y <= camera.viewport.y + camera.viewport.height;
-            const distance = offset.length();
+            const distance = meters(offset.length());
             const opacity =
                 isOnScreen && this.targetingSystem.isAvailable(target)
                     ? getTargetCursorOpacity(
@@ -131,11 +132,11 @@ export class TargetCursorLayer {
             origin: camera.globalPosition,
             direction: forward,
         } satisfies Ray;
-        this.hoveredTarget = findBestTarget(candidates, ray, camera.fov, 0.7);
+        this.hoveredTarget = findBestTarget(candidates, ray, radians(camera.fov), 0.7);
         for (const { target, cursor, opacity } of frame) {
             cursor.setTarget(target === selected);
             cursor.setInformationEnabled(target === selected || target === this.hoveredTarget);
-            cursor.update(camera, opacity);
+            cursor.update(camera, opacity, deltaSeconds);
         }
     }
 

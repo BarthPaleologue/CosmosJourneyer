@@ -31,6 +31,8 @@ import { PostProcessRenderEffect } from "@babylonjs/core/PostProcesses/RenderPip
 import { PostProcessRenderPipeline } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipeline";
 import type { PostProcessRenderPipelineManager } from "@babylonjs/core/PostProcesses/RenderPipeline/postProcessRenderPipelineManager";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters, radians } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { arraysEqual, assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type {
@@ -65,7 +67,7 @@ import { VolumetricLight } from "./volumetricLight/volumetricLight";
 
 type RenderableBodyEntry = {
     readonly body: Transformable & HasBoundingSphere;
-    readonly visibilityRadius: number;
+    readonly visibilityRadius: Meters;
 };
 
 /**
@@ -242,19 +244,19 @@ export class PostProcessManager {
                 bodyEntry.body.getTransform().getAbsolutePosition(),
                 bodyEntry.visibilityRadius,
                 camera.globalPosition,
-                camera.fov,
+                radians(camera.fov),
             ) * this.engine.getRenderHeight();
         return screenSizePixels >= 2;
     }
 
-    private getRingsPostProcessRadius(ringsUniforms: RingsUniforms | null): number {
-        return ringsUniforms === null ? 0 : ringsUniforms.model.outerRadius;
+    private getRingsPostProcessRadius(ringsUniforms: RingsUniforms | null): Meters {
+        return ringsUniforms === null ? meters(0) : ringsUniforms.model.outerRadius;
     }
 
     private registerBodyPostProcesses(
         body: Transformable & HasBoundingSphere,
         postProcesses: Array<PostProcess>,
-        visibilityRadius: number,
+        visibilityRadius: Meters,
     ): void {
         this.bodyEntries.push({ body, visibilityRadius });
         this.celestialBodyToPostProcesses.set(body, postProcesses);
@@ -294,7 +296,7 @@ export class PostProcessManager {
         this.registerBodyPostProcesses(
             star,
             postProcesses,
-            Math.max(star.getBoundingRadius(), this.getRingsPostProcessRadius(star.ringsUniforms)),
+            meters(Math.max(star.getBoundingRadius(), this.getRingsPostProcessRadius(star.ringsUniforms))),
         );
     }
 
@@ -333,10 +335,12 @@ export class PostProcessManager {
         this.registerBodyPostProcesses(
             neutronStar,
             postProcesses,
-            Math.max(
-                neutronStar.getBoundingRadius(),
-                this.getRingsPostProcessRadius(neutronStar.ringsUniforms),
-                getMatterJetsVisibilityRadius(neutronStar.getBoundingRadius()),
+            meters(
+                Math.max(
+                    neutronStar.getBoundingRadius(),
+                    this.getRingsPostProcessRadius(neutronStar.ringsUniforms),
+                    getMatterJetsVisibilityRadius(neutronStar.getBoundingRadius()),
+                ),
             ),
         );
     }
@@ -390,12 +394,14 @@ export class PostProcessManager {
         this.registerBodyPostProcesses(
             planet,
             postProcesses,
-            Math.max(
-                planet.getBoundingRadius(),
-                planet.atmosphereUniforms?.atmosphereRadius ?? 0,
-                planet.cloudsUniforms?.model.layerRadius ?? 0,
-                planet.oceanUniforms?.oceanRadius ?? 0,
-                this.getRingsPostProcessRadius(planet.ringsUniforms),
+            meters(
+                Math.max(
+                    planet.getBoundingRadius(),
+                    planet.atmosphereUniforms?.atmosphereRadius ?? 0,
+                    planet.cloudsUniforms?.model.layerRadius ?? 0,
+                    planet.oceanUniforms?.oceanRadius ?? 0,
+                    this.getRingsPostProcessRadius(planet.ringsUniforms),
+                ),
             ),
         );
     }
@@ -425,10 +431,12 @@ export class PostProcessManager {
         this.registerBodyPostProcesses(
             planet,
             postProcesses,
-            Math.max(
-                planet.getBoundingRadius(),
-                planet.atmosphereUniforms.atmosphereRadius,
-                this.getRingsPostProcessRadius(planet.ringsUniforms),
+            meters(
+                Math.max(
+                    planet.getBoundingRadius(),
+                    planet.atmosphereUniforms.atmosphereRadius,
+                    this.getRingsPostProcessRadius(planet.ringsUniforms),
+                ),
             ),
         );
     }
@@ -460,7 +468,7 @@ export class PostProcessManager {
         this.registerBodyPostProcesses(
             body,
             [raymarchedBodyPass.get()],
-            Math.max(body.getBoundingRadius(), this.getRingsPostProcessRadius(ringsUniforms)),
+            meters(Math.max(body.getBoundingRadius(), this.getRingsPostProcessRadius(ringsUniforms))),
         );
     }
 

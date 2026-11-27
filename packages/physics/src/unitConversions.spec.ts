@@ -30,6 +30,7 @@ import {
     perHaToPerM2,
     solarMassToKg,
 } from "./unitConversions";
+import { kelvin, meters } from "./units";
 
 test("celsiusToKelvin", () => {
     expect(celsiusToKelvin(0)).toBe(273.15);
@@ -38,9 +39,9 @@ test("celsiusToKelvin", () => {
 });
 
 test("kelvinToCelsius", () => {
-    expect(kelvinToCelsius(0)).toBe(-273.15);
-    expect(kelvinToCelsius(273.15)).toBe(0);
-    expect(kelvinToCelsius(373.15)).toBe(100);
+    expect(kelvinToCelsius(kelvin(0))).toBe(-273.15);
+    expect(kelvinToCelsius(kelvin(273.15))).toBe(0);
+    expect(kelvinToCelsius(kelvin(373.15))).toBe(100);
 });
 
 describe("durationToSeconds", () => {
@@ -67,7 +68,7 @@ describe("durationToSeconds", () => {
 
 describe("metersToLightYears", () => {
     it("converts 0 meters to 0 light years", () => {
-        expect(metersToLightYears(0)).toBe(0);
+        expect(metersToLightYears(meters(0))).toBe(0);
     });
 
     it("converts 1 light year in meters to 1 light year", () => {
@@ -75,21 +76,21 @@ describe("metersToLightYears", () => {
     });
 
     it("converts 2 light years in meters to 2 light years", () => {
-        expect(metersToLightYears(LightYearInMeters * 2)).toBe(2);
+        expect(metersToLightYears(meters(LightYearInMeters * 2))).toBe(2);
     });
 
     it("converts a small distance in meters", () => {
-        const smallDistanceInMeters = 1000; // 1 kilometer
+        const smallDistanceInMeters = meters(1000); // 1 kilometer
         expect(metersToLightYears(smallDistanceInMeters)).toBe(smallDistanceInMeters / LightYearInMeters);
     });
 
     it("converts a large distance in meters", () => {
-        const largeDistanceInMeters = LightYearInMeters * 1000000; // A million light years in meters
+        const largeDistanceInMeters = meters(LightYearInMeters * 1000000); // A million light years in meters
         expect(metersToLightYears(largeDistanceInMeters)).toBeCloseTo(1000000);
     });
 
     it("handles negative distances correctly", () => {
-        expect(metersToLightYears(-LightYearInMeters)).toBe(-1);
+        expect(metersToLightYears(meters(-1 * LightYearInMeters))).toBe(-1);
     });
 });
 

@@ -1,2 +1,4 @@
-/** Provisional mass in kg for kilometer-scale stations, pending structural mass estimates. */
-export const DefaultOrbitalFacilityMass = 1e12;
+import { kilograms } from "@cosmos-journeyer/physics";
+
+/** Provisional mass for kilometer-scale stations, pending structural mass estimates. */
+export const DefaultOrbitalFacilityMass = kilograms(1e12);

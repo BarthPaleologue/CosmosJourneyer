@@ -22,9 +22,13 @@ import {
     degreesToRadians,
     durationToSeconds,
     EarthMagneticDipoleMoment,
+    kelvin,
+    kilograms,
     MercuryMagneticDipoleMoment,
     UranusMagneticDipoleMoment,
     NeptuneMagneticDipoleMoment,
+    meters,
+    radians,
 } from "@cosmos-journeyer/physics";
 import type {
     GasPlanetModel,
@@ -48,23 +52,23 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Mercury",
         type: "telluricPlanet",
         magneticField: {
-            north: { latitude: Math.PI / 2, longitude: 0 },
+            north: { latitude: radians(Math.PI / 2), longitude: radians(0) },
             magnitude: MercuryMagneticDipoleMoment,
         },
-        radius: 2_439.7e3,
-        mass: 3.301e23,
+        radius: meters(2_439.7e3),
+        mass: kilograms(3.301e23),
         spin: {
             siderealPeriod: durationToSeconds({ days: 58.646 }),
             axialTilt: degreesToRadians(0.034),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         composition: {
             rock: 1,
         },
         temperature: {
-            min: 437,
-            max: 437,
+            min: kelvin(437),
+            max: kelvin(437),
         },
         orbit: {
             parentIds: [sun.id],
@@ -76,17 +80,17 @@ export function getSolSystemModel(): StarSystemModel {
                 longitudeOfAscendingNode: degreesToRadians(48.331),
             },
             argumentOfPeriapsis: degreesToRadians(29.124),
-            initialMeanAnomaly: 0,
+            initialMeanAnomaly: radians(0),
         },
         terrainSettings: {
             continents_fragmentation: 0.1,
             continents_frequency: 1,
 
             bumps_frequency: 10,
-            max_bump_height: 15e3,
+            max_bump_height: meters(15e3),
 
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
+            max_mountain_height: meters(0e3),
+            continent_base_height: meters(0),
 
             mountains_frequency: 0,
         },
@@ -102,31 +106,31 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Venus",
         type: "telluricPlanet",
         magneticField: null,
-        radius: 6_051.8e3,
-        mass: 4.8e20,
+        radius: meters(6_051.8e3),
+        mass: kilograms(4.8e20),
         spin: {
             siderealPeriod: durationToSeconds({ days: 243.0226 }),
             axialTilt: degreesToRadians(177.36),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         composition: {
             rock: 1,
         },
         temperature: {
-            min: 719,
-            max: 763,
+            min: kelvin(719),
+            max: kelvin(763),
         },
         orbit: {
             parentIds: [sun.id],
-            semiMajorAxis: 108_209_500e3,
+            semiMajorAxis: meters(108_209_500e3),
             eccentricity: 0.0067,
             plane: {
                 inclination: degreesToRadians(3.39),
                 longitudeOfAscendingNode: degreesToRadians(76.68),
             },
             argumentOfPeriapsis: degreesToRadians(54.88),
-            initialMeanAnomaly: 0,
+            initialMeanAnomaly: radians(0),
             p: 2,
         },
         terrainSettings: {
@@ -134,10 +138,10 @@ export function getSolSystemModel(): StarSystemModel {
             continents_frequency: 1,
 
             bumps_frequency: 10,
-            max_bump_height: 15e3,
+            max_bump_height: meters(15e3),
 
-            max_mountain_height: 20e3,
-            continent_base_height: 0,
+            max_mountain_height: meters(20e3),
+            continent_base_height: meters(0),
 
             mountains_frequency: 5,
         },
@@ -147,7 +151,7 @@ export function getSolSystemModel(): StarSystemModel {
             greenHouseEffectFactor: 0.99,
         },
         clouds: {
-            layerRadius: 6_051.8e3 + 10e3,
+            layerRadius: meters(6_051.8e3 + 10e3),
             smoothness: 0.7,
             specularPower: 2,
             frequency: 4,
@@ -167,16 +171,16 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Earth",
         type: "telluricPlanet",
         magneticField: {
-            north: { latitude: degreesToRadians(79), longitude: 0 },
+            north: { latitude: degreesToRadians(79), longitude: radians(0) },
             magnitude: EarthMagneticDipoleMoment,
         },
-        radius: 6_371e3,
-        mass: 5.972e24,
+        radius: meters(6_371e3),
+        mass: kilograms(5.972e24),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 23, minutes: 56, seconds: 4 }),
             axialTilt: degreesToRadians(23.44),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         composition: {
             rock: 0.9998,
@@ -188,14 +192,14 @@ export function getSolSystemModel(): StarSystemModel {
         },
         orbit: {
             parentIds: [sun.id],
-            semiMajorAxis: 149_597_870e3,
+            semiMajorAxis: meters(149_597_870e3),
             eccentricity: 0.0167,
             plane: {
                 inclination: degreesToRadians(0),
                 longitudeOfAscendingNode: degreesToRadians(0),
             },
             argumentOfPeriapsis: degreesToRadians(114.20783),
-            initialMeanAnomaly: 0,
+            initialMeanAnomaly: radians(0),
             p: 2,
         },
         terrainSettings: {
@@ -204,9 +208,9 @@ export function getSolSystemModel(): StarSystemModel {
 
             bumps_frequency: 30,
 
-            max_bump_height: 1.5e3,
-            max_mountain_height: 10e3,
-            continent_base_height: 10e3 * 1.9,
+            max_bump_height: meters(1.5e3),
+            max_mountain_height: meters(10e3),
+            continent_base_height: meters(10e3 * 1.9),
 
             mountains_frequency: 360,
         },
@@ -216,7 +220,7 @@ export function getSolSystemModel(): StarSystemModel {
             greenHouseEffectFactor: 0.5,
         },
         clouds: {
-            layerRadius: 6_371e3 + 30e3,
+            layerRadius: meters(6_371e3 + 30e3),
             smoothness: 0.7,
             specularPower: 2,
             frequency: 4,
@@ -228,7 +232,7 @@ export function getSolSystemModel(): StarSystemModel {
             detailSpeed: 0.003,
         },
         ocean: {
-            depth: 10e3,
+            depth: meters(10e3),
         },
         seed: 0,
     };
@@ -238,31 +242,31 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Moon",
         type: "telluricSatellite",
         magneticField: null,
-        radius: 1_737.1e3,
-        mass: 7.342e22,
+        radius: meters(1_737.1e3),
+        mass: kilograms(7.342e22),
         spin: {
             siderealPeriod: durationToSeconds({ days: 27.321_661 }),
             axialTilt: degreesToRadians(6.687),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         composition: {
             rock: 1,
         },
         temperature: {
-            min: 100,
-            max: 100,
+            min: kelvin(100),
+            max: kelvin(100),
         },
         orbit: {
             parentIds: [earth.id],
-            semiMajorAxis: 384_400e3,
+            semiMajorAxis: meters(384_400e3),
             eccentricity: 0.0549,
             plane: {
                 inclination: degreesToRadians(5.145),
                 longitudeOfAscendingNode: degreesToRadians(125.08),
             },
             argumentOfPeriapsis: degreesToRadians(318.15),
-            initialMeanAnomaly: 0,
+            initialMeanAnomaly: radians(0),
             p: 2,
         },
         terrainSettings: {
@@ -270,10 +274,10 @@ export function getSolSystemModel(): StarSystemModel {
             continents_frequency: 1,
 
             bumps_frequency: 10,
-            max_bump_height: 15e3,
+            max_bump_height: meters(15e3),
 
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
+            max_mountain_height: meters(0e3),
+            continent_base_height: meters(0),
 
             mountains_frequency: 0,
         },
@@ -288,13 +292,13 @@ export function getSolSystemModel(): StarSystemModel {
         name: "Mars",
         type: "telluricPlanet",
         magneticField: null,
-        radius: 3_389.5e3,
-        mass: 6.4171e23,
+        radius: meters(3_389.5e3),
+        mass: kilograms(6.4171e23),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 24, minutes: 37, seconds: 23 }),
             axialTilt: degreesToRadians(25.19),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         composition: {
             rock: 1,
@@ -305,14 +309,14 @@ export function getSolSystemModel(): StarSystemModel {
         },
         orbit: {
             parentIds: [sun.id],
-            semiMajorAxis: 227_939_200e3,
+            semiMajorAxis: meters(227_939_200e3),
             eccentricity: 0.0934,
             plane: {
                 inclination: degreesToRadians(1.85),
                 longitudeOfAscendingNode: degreesToRadians(49.558),
             },
             argumentOfPeriapsis: degreesToRadians(286.502),
-            initialMeanAnomaly: 0,
+            initialMeanAnomaly: radians(0),
             p: 2,
         },
         terrainSettings: {
@@ -320,10 +324,10 @@ export function getSolSystemModel(): StarSystemModel {
             continents_frequency: 1,
 
             bumps_frequency: 10,
-            max_bump_height: 15e3,
+            max_bump_height: meters(15e3),
 
-            max_mountain_height: 0e3,
-            continent_base_height: 0,
+            max_mountain_height: meters(0e3),
+            continent_base_height: meters(0),
 
             mountains_frequency: 0,
         },
@@ -345,28 +349,28 @@ export function getSolSystemModel(): StarSystemModel {
         id: "uranus",
         name: "Uranus",
         type: "gasPlanet",
-        radius: 25_362e3,
-        mass: 8.681e25,
+        radius: meters(25_362e3),
+        mass: kilograms(8.681e25),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 17, minutes: 14, seconds: 52 }),
             axialTilt: degreesToRadians(97.77),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         orbit: {
             parentIds: [sun.id],
-            semiMajorAxis: 2_872_463_270e3,
+            semiMajorAxis: meters(2_872_463_270e3),
             eccentricity: 0.0565,
             plane: {
                 inclination: degreesToRadians(0.77),
                 longitudeOfAscendingNode: degreesToRadians(74.229),
             },
             argumentOfPeriapsis: degreesToRadians(96.541),
-            initialMeanAnomaly: 0,
+            initialMeanAnomaly: radians(0),
             p: 2,
         },
         magneticField: {
-            north: { latitude: degreesToRadians(31), longitude: 0 },
+            north: { latitude: degreesToRadians(31), longitude: radians(0) },
             magnitude: UranusMagneticDipoleMoment,
         },
         colorPalette: {
@@ -378,8 +382,8 @@ export function getSolSystemModel(): StarSystemModel {
             greenHouseEffectFactor: 0.5,
         },
         rings: {
-            innerRadius: 50_724e3,
-            outerRadius: 62_000e3,
+            innerRadius: meters(50_724e3),
+            outerRadius: meters(62_000e3),
             type: "textured",
             textureId: "uranus",
         },
@@ -390,28 +394,28 @@ export function getSolSystemModel(): StarSystemModel {
         id: "neptune",
         name: "Neptune",
         type: "gasPlanet",
-        radius: 24_622e3,
-        mass: 1.024e26,
+        radius: meters(24_622e3),
+        mass: kilograms(1.024e26),
         spin: {
             siderealPeriod: durationToSeconds({ hours: 16, minutes: 6, seconds: 36 }),
             axialTilt: degreesToRadians(28.32),
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
         orbit: {
             parentIds: [sun.id],
-            semiMajorAxis: 4_495_060_000e3,
+            semiMajorAxis: meters(4_495_060_000e3),
             eccentricity: 0.0086,
             plane: {
                 inclination: degreesToRadians(1.77),
                 longitudeOfAscendingNode: degreesToRadians(131.72169),
             },
             argumentOfPeriapsis: degreesToRadians(265.646853),
-            initialMeanAnomaly: 0,
+            initialMeanAnomaly: radians(0),
             p: 2,
         },
         magneticField: {
-            north: { latitude: degreesToRadians(43), longitude: 0 },
+            north: { latitude: degreesToRadians(43), longitude: radians(0) },
             magnitude: NeptuneMagneticDipoleMoment,
         },
         colorPalette: {

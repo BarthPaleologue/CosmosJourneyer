@@ -21,6 +21,11 @@ import {
     getSphereIrradianceAtDistance,
     km2ToM2,
     kwhPerYearToWatts,
+    meters,
+    squareMeters,
+    wattsPerSquareMeter,
+    radians,
+    seconds,
 } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, randomPieChart, wheelOfFortune, normalRandom } from "@cosmos-journeyer/random";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
@@ -72,7 +77,7 @@ export function generateSpaceStationModel(
 
     let parentMaxRadius = getCelestialBodyRadius(parentBody);
     if (parentBody.type === "blackHole") {
-        parentMaxRadius += parentBody.accretionDiskRadius;
+        parentMaxRadius = meters(parentMaxRadius + parentBody.accretionDiskRadius);
     }
 
     if (
@@ -88,24 +93,24 @@ export function generateSpaceStationModel(
 
     const orbit: Orbit = {
         parentIds: [parentBody.id],
-        semiMajorAxis: orbitRadius,
+        semiMajorAxis: meters(orbitRadius),
         p: 2,
         plane: {
             inclination: degreesToRadians(normalRandom(0, 10, rng, GenerationSteps.ORBIT + 10)),
-            longitudeOfAscendingNode: 0,
+            longitudeOfAscendingNode: radians(0),
         },
         eccentricity: 0,
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0,
+        argumentOfPeriapsis: radians(0),
+        initialMeanAnomaly: radians(0),
     };
 
     const mass = DefaultOrbitalFacilityMass;
 
     const spin: SpinModel = {
-        siderealPeriod: 0,
-        axialTilt: 2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI,
-        axisAzimuth: 0,
-        initialRotationAngle: 0,
+        siderealPeriod: seconds(0),
+        axialTilt: radians(2 * rng(GenerationSteps.AXIAL_TILT) * Math.PI),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
     };
 
     const population = 250_000 + Math.floor(rng(GenerationSteps.POPULATION) * 500_000);
@@ -149,7 +154,7 @@ export function generateSpaceStationModel(
             totalIrradiance += getSphereIrradianceAtDistance(
                 model.blackBodyTemperature,
                 getCelestialBodyRadius(model),
-                distance,
+                meters(distance),
             );
         }
     }
@@ -159,7 +164,7 @@ export function generateSpaceStationModel(
     const solarPanelSurfaceM2 = getSolarPanelSurfaceFromEnergyRequirement(
         solarPanelEfficiency,
         totalPowerRequirementW,
-        totalIrradiance,
+        wattsPerSquareMeter(totalIrradiance),
     );
 
     const maxSolarPanelSurfaceM2 = km2ToM2(150);
@@ -200,7 +205,7 @@ export function generateSpaceStationModel(
             sections.push(
                 generateRingHabitatModel(SeedHalfRange * rng(27), {
                     housing: housingSurface,
-                    agriculture: agricultureSurface,
+                    agriculture: squareMeters(agricultureSurface),
                 }),
             );
             break;
@@ -208,7 +213,7 @@ export function generateSpaceStationModel(
             sections.push(
                 generateHelixHabitatModel(SeedHalfRange * rng(19), {
                     housing: housingSurface,
-                    agriculture: agricultureSurface,
+                    agriculture: squareMeters(agricultureSurface),
                 }),
             );
             break;
@@ -216,7 +221,7 @@ export function generateSpaceStationModel(
             sections.push(
                 generateCylinderHabitatModel(SeedHalfRange * rng(13), {
                     housing: housingSurface,
-                    agriculture: agricultureSurface,
+                    agriculture: squareMeters(agricultureSurface),
                 }),
             );
             break;
@@ -250,7 +255,7 @@ export function generateSpaceStationModel(
             mass,
             attitude: {
                 spin,
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };

@@ -17,7 +17,7 @@
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { PhysicsRaycastResult } from "@babylonjs/core/Physics/physicsRaycastResult";
-import { lightYearsToMeters } from "@cosmos-journeyer/physics";
+import { lightYears, lightYearsToMeters } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals, universeObjectIdEquals } from "@cosmos-journeyer/universe-model";
 import type { StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
@@ -160,7 +160,10 @@ export class MissionTerminatorLandingNode implements MissionNodeBase<MissionTerm
         return t("missions:sightseeing:describeTerminatorLanding", {
             objectName: objectModel.object.name,
             systemName: systemModel.system.name,
-            distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy), t) : t("missions:common:here"),
+            distance:
+                distanceLy > 0
+                    ? parseDistance(lightYearsToMeters(lightYears(distanceLy)), t)
+                    : t("missions:common:here"),
         });
     }
 

@@ -18,6 +18,7 @@
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import type { Scene } from "@babylonjs/core/scene";
+import { seconds } from "@cosmos-journeyer/physics";
 import { ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 import type { UniverseObjectId } from "@cosmos-journeyer/universe-model";
@@ -77,7 +78,7 @@ export class MainMenu {
 
     private readonly universeObjectId: UniverseObjectId;
 
-    private readonly startAnimationDurationSeconds = 5;
+    private readonly startAnimationDurationSeconds = seconds(5);
 
     private createMainMenuHTML(t: TFunction): {
         htmlRoot: HTMLElement;

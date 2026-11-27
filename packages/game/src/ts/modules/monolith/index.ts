@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { meters } from "@cosmos-journeyer/physics";
 import { ok } from "@cosmos-journeyer/typescript";
 
 import { makeSystemContentType } from "@/frontend/systemEntity/systemEntity";
@@ -45,7 +46,7 @@ export const MonolithModule: GameModule = {
                     type: TargetType.ANOMALY,
                     properName: monolith.model.name,
                     getTransform: () => monolith.content.getTransform(),
-                    getBoundingRadius: () => 10e3,
+                    getBoundingRadius: () => meters(10e3),
                 },
             ];
         });

@@ -23,6 +23,8 @@ export * from "./physics";
 export * from "./solarPanels";
 export * from "./stellarTypes";
 export * from "./thermodynamics";
+export * from "./units";
+export * from "./unitSchemas";
 export * from "./unitConversions";
 export * from "./gasGiants";
 export * from "./aurora";

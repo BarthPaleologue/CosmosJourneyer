@@ -21,7 +21,15 @@ import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
-import { EarthG } from "@cosmos-journeyer/physics";
+import {
+    EarthG,
+    meters,
+    metersPerSecond,
+    metersPerSecondSquared,
+    quantity,
+    radians,
+    seconds,
+} from "@cosmos-journeyer/physics";
 
 import { lerp, lerpAngle, lerpSmooth, smoothstep } from "@/utils/math";
 
@@ -121,19 +129,19 @@ export class VehicleControls implements Controls {
     private resetCamera(presetName: ThirdPersonCameraPresetNames): void {
         this.thirdPersonCameraAnimation = CustomAnimation.FromTo(
             {
-                alpha: this.thirdPersonCamera.alpha,
-                beta: this.thirdPersonCamera.beta,
-                radius: this.thirdPersonCamera.radius,
+                alpha: radians(this.thirdPersonCamera.alpha),
+                beta: radians(this.thirdPersonCamera.beta),
+                radius: meters(this.thirdPersonCamera.radius),
                 target: this.thirdPersonCamera.target.clone(),
             },
             thirdPersonCameraPresets[presetName],
             (from, to, progress) => ({
                 alpha: lerpAngle(from.alpha, to.alpha, progress),
                 beta: lerpAngle(from.beta, to.beta, progress),
-                radius: lerp(from.radius, to.radius, progress),
+                radius: meters(lerp(from.radius, to.radius, progress)),
                 target: Vector3.Lerp(from.target, to.target, progress),
             }),
-            1.0,
+            seconds(1.0),
             {
                 easing: easeInOutCubic,
             },
@@ -221,7 +229,7 @@ export class VehicleControls implements Controls {
             Vector3.Dot(velocity, this.thirdPersonTransform.up),
         );
         const horizontalVelocity = velocity.subtract(verticalVelocity);
-        const horizontalSpeed = horizontalVelocity.length();
+        const horizontalSpeed = metersPerSecond(horizontalVelocity.length());
         if (horizontalSpeed > 0.1) {
             const horizontalDirection = horizontalVelocity.normalizeToNew();
 
@@ -251,7 +259,7 @@ export class VehicleControls implements Controls {
 
         this.getActiveCamera().getViewMatrix(true);
 
-        const steeringRate = VehicleInputs.map.steer.value * 1.8;
+        const steeringRate = quantity<"rad/s">(VehicleInputs.map.steer.value * 1.8);
         vehicle.turn(steeringRate, deltaSeconds, { horizontalSpeed });
         vehicle.setBoostEnabled(VehicleInputs.map.boost.value > 0);
 
@@ -260,7 +268,7 @@ export class VehicleControls implements Controls {
             vehicle.brake();
         } else {
             const vehicleMaxAcceleration = 0.7 * EarthG;
-            const vehicleAcceleration = throttle * vehicleMaxAcceleration;
+            const vehicleAcceleration = metersPerSecondSquared(throttle * vehicleMaxAcceleration);
             vehicle.accelerate(vehicleAcceleration, deltaSeconds);
         }
 

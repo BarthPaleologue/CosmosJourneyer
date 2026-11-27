@@ -18,6 +18,7 @@
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
+import { seconds } from "@cosmos-journeyer/physics";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
 import { CosmosJourneyerBackendLocal } from "@/backend/backendLocal";
@@ -168,7 +169,7 @@ export async function createCustomSystemScene(
         throw loadResult.error;
     }
 
-    starSystemView.initStarSystem(0);
+    starSystemView.initStarSystem(seconds(0));
 
     const spawnEntityId = urlParams.get("spawnAtEntity");
     const spawnEntity = starSystemView

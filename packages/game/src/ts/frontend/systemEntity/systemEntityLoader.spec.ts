@@ -2,6 +2,7 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
+import { kilograms, meters, radians, seconds } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -36,22 +37,27 @@ describe("system entity content factories", () => {
         content: { type: "factory-test" },
         placement: {
             type: "inOrbit",
-            mass: 1,
+            mass: kilograms(1),
             orbit: {
                 parentIds: [],
-                semiMajorAxis: 0,
+                semiMajorAxis: meters(0),
                 eccentricity: 0,
                 plane: {
-                    inclination: 0,
-                    longitudeOfAscendingNode: 0,
+                    inclination: radians(0),
+                    longitudeOfAscendingNode: radians(0),
                 },
-                argumentOfPeriapsis: 0,
-                initialMeanAnomaly: 0,
+                argumentOfPeriapsis: radians(0),
+                initialMeanAnomaly: radians(0),
                 p: 2,
             },
             attitude: {
-                spin: { axialTilt: 0, axisAzimuth: 0, siderealPeriod: 0, initialRotationAngle: 0 },
-                localFrameOrientation: { yaw: 0.2, pitch: 0.3, roll: 0.4 },
+                spin: {
+                    axialTilt: radians(0),
+                    axisAzimuth: radians(0),
+                    siderealPeriod: seconds(0),
+                    initialRotationAngle: radians(0),
+                },
+                localFrameOrientation: { yaw: radians(0.2), pitch: radians(0.3), roll: radians(0.4) },
             },
         },
     };
@@ -130,7 +136,7 @@ describe("system entity content factories", () => {
             type: "custom",
             id: "parent",
             name: "Parent",
-            mass: 1,
+            mass: kilograms(1),
             orbit: model.placement.orbit,
             spin: model.placement.attitude.spin,
         });
@@ -195,7 +201,7 @@ describe("system entity content factories", () => {
             type: "custom",
             id: "parent",
             name: "Parent",
-            mass: 1,
+            mass: kilograms(1),
             orbit: model.placement.orbit,
             spin: model.placement.attitude.spin,
         });
@@ -260,8 +266,8 @@ describe("system entity content factories", () => {
                     placement: {
                         type: "onSurface",
                         parentId: "missing",
-                        position: { latitude: 0, longitude: 0, heightAboveGround: 0 },
-                        rotation: { heading: 0, pitch: 0, roll: 0 },
+                        position: { latitude: radians(0), longitude: radians(0), heightAboveGround: meters(0) },
+                        rotation: { heading: radians(0), pitch: radians(0), roll: radians(0) },
                     },
                 },
             ],

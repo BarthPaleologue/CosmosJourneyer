@@ -24,6 +24,8 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
 import { isSizeOnScreenEnough } from "@/frontend/helpers/isObjectVisibleOnScreen";
@@ -57,7 +59,7 @@ export class SpaceElevator implements SystemContent {
 
     private readonly scene: Scene;
 
-    private readonly boundingRadius: number;
+    private readonly boundingRadius: Meters;
 
     private elapsedSeconds = 0;
 
@@ -143,7 +145,7 @@ export class SpaceElevator implements SystemContent {
             .forEach((transform) => transform.position.addInPlace(deltaPosition));
 
         const extendSize = boundingVectors.max.subtract(boundingVectors.min).scale(0.5);
-        this.boundingRadius = Math.max(extendSize.x, extendSize.y, extendSize.z);
+        this.boundingRadius = meters(Math.max(extendSize.x, extendSize.y, extendSize.z));
     }
 
     getLights(): ReadonlyArray<Light> {
@@ -162,7 +164,7 @@ export class SpaceElevator implements SystemContent {
         return this.landingBays;
     }
 
-    public getBoundingRadius(): number {
+    public getBoundingRadius(): Meters {
         return this.boundingRadius;
     }
 

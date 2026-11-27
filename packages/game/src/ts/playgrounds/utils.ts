@@ -40,7 +40,7 @@ export type EnablePhysicsOptions = Partial<{
  * @returns Havok engine with the playground velocity limits applied.
  */
 export async function enablePhysics(scene: Scene, options?: EnablePhysicsOptions): Promise<PhysicsEngineV2> {
-    const { gravity = new Vector3(0, -EarthG, 0), havokInstance } = options ?? {};
+    const { gravity = new Vector3(0, EarthG * -1, 0), havokInstance } = options ?? {};
     const havokPlugin = new HavokPlugin(true, havokInstance ?? (await HavokPhysics()));
     havokPlugin.setVelocityLimits(10_000, 10_000);
     scene.enablePhysics(gravity, havokPlugin);

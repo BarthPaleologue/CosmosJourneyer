@@ -15,7 +15,18 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { degreesToRadians, getShadowRadius, solarMassToKg } from "@cosmos-journeyer/physics";
+import {
+    degreesToRadians,
+    getShadowRadius,
+    kelvin,
+    kilograms,
+    meters,
+    radians,
+    seconds,
+    solarMassToKg,
+    squareMeters,
+    watts,
+} from "@cosmos-journeyer/physics";
 import type { StarSystemModel, BlackHoleModel, StarSystemCoordinates } from "@cosmos-journeyer/universe-model";
 
 import type { SystemEntityModel } from "@/backend/systemEntity/systemEntityModel";
@@ -46,24 +57,24 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         name: "Chronos",
         orbit: {
             parentIds: [],
-            semiMajorAxis: 0,
+            semiMajorAxis: meters(0),
             eccentricity: 0,
             plane: {
-                inclination: 0,
-                longitudeOfAscendingNode: 0,
+                inclination: radians(0),
+                longitudeOfAscendingNode: radians(0),
             },
-            argumentOfPeriapsis: 0,
-            initialMeanAnomaly: 0,
+            argumentOfPeriapsis: radians(0),
+            initialMeanAnomaly: radians(0),
             p: 2,
         },
         mass: chronosMass,
-        blackBodyTemperature: 6000,
-        accretionDiskRadius: chronosShadowRadius * 4,
+        blackBodyTemperature: kelvin(6000),
+        accretionDiskRadius: meters(chronosShadowRadius * 4),
         spin: {
-            siderealPeriod: 1e-3,
-            axialTilt: 0,
-            axisAzimuth: 0,
-            initialRotationAngle: 0,
+            siderealPeriod: seconds(1e-3),
+            axialTilt: radians(0),
+            axisAzimuth: radians(0),
+            initialRotationAngle: radians(0),
         },
     };
 
@@ -81,9 +92,13 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             sections: [
                 { type: "engineBay" },
                 { type: "utility", hasTanks: true },
-                { type: "cylinderHabitat", radius: 10e3, surface: { housing: 0.5, agriculture: 0.5 } },
+                {
+                    type: "cylinderHabitat",
+                    radius: meters(10e3),
+                    surface: { housing: squareMeters(0.5), agriculture: squareMeters(0.5) },
+                },
                 { type: "utility", hasTanks: true },
-                { type: "fusion", netPowerOutput: 500_000 * 2000 * 10 },
+                { type: "fusion", netPowerOutput: watts(500_000 * 2000 * 10) },
                 { type: "utility", hasTanks: true },
                 { type: "landingBay", heightFactor: 2 },
             ],
@@ -92,25 +107,25 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             type: "inOrbit",
             orbit: {
                 parentIds: ["chronos"],
-                semiMajorAxis: chronos.accretionDiskRadius * 4,
+                semiMajorAxis: meters(chronos.accretionDiskRadius * 4),
                 eccentricity: 0,
                 plane: {
                     inclination: degreesToRadians(40),
                     longitudeOfAscendingNode: degreesToRadians(120),
                 },
-                argumentOfPeriapsis: 0,
-                initialMeanAnomaly: Math.PI,
+                argumentOfPeriapsis: radians(0),
+                initialMeanAnomaly: radians(Math.PI),
                 p: 2,
             },
             mass: DefaultOrbitalFacilityMass,
             attitude: {
                 spin: {
-                    siderealPeriod: 0,
-                    axialTilt: 0,
-                    axisAzimuth: 0,
-                    initialRotationAngle: 0,
+                    siderealPeriod: seconds(0),
+                    axialTilt: radians(0),
+                    axisAzimuth: radians(0),
+                    initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };
@@ -123,27 +138,27 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
         },
         placement: {
             type: "inOrbit",
-            mass: 1e15,
+            mass: kilograms(1e15),
             orbit: {
                 parentIds: ["chronos"],
-                semiMajorAxis: chronos.accretionDiskRadius * 2,
+                semiMajorAxis: meters(chronos.accretionDiskRadius * 2),
                 eccentricity: 0,
                 plane: {
                     inclination: degreesToRadians(70),
-                    longitudeOfAscendingNode: 0,
+                    longitudeOfAscendingNode: radians(0),
                 },
-                argumentOfPeriapsis: 0,
-                initialMeanAnomaly: 0,
+                argumentOfPeriapsis: radians(0),
+                initialMeanAnomaly: radians(0),
                 p: 2,
             },
             attitude: {
                 spin: {
-                    siderealPeriod: 0,
-                    axialTilt: 0,
-                    axisAzimuth: 0,
-                    initialRotationAngle: 0,
+                    siderealPeriod: seconds(0),
+                    axialTilt: radians(0),
+                    axisAzimuth: radians(0),
+                    initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };
@@ -160,9 +175,13 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             population: 200,
             populationDensity: 1,
             sections: [
-                { type: "cylinderHabitat", radius: 5e3, surface: { housing: 0.5, agriculture: 0.1 } },
+                {
+                    type: "cylinderHabitat",
+                    radius: meters(5e3),
+                    surface: { housing: squareMeters(0.5), agriculture: squareMeters(0.1) },
+                },
                 { type: "utility", hasTanks: true },
-                { type: "fusion", netPowerOutput: 2000 * 200 },
+                { type: "fusion", netPowerOutput: watts(2000 * 200) },
                 { type: "utility", hasTanks: true },
                 { type: "landingBay", heightFactor: 2 },
             ],
@@ -171,25 +190,25 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             type: "inOrbit",
             orbit: {
                 parentIds: ["ananke"],
-                semiMajorAxis: 150e3,
+                semiMajorAxis: meters(150e3),
                 eccentricity: 0,
                 plane: {
-                    inclination: 0,
-                    longitudeOfAscendingNode: 0,
+                    inclination: radians(0),
+                    longitudeOfAscendingNode: radians(0),
                 },
-                argumentOfPeriapsis: 0,
-                initialMeanAnomaly: 0,
+                argumentOfPeriapsis: radians(0),
+                initialMeanAnomaly: radians(0),
                 p: 2,
             },
             mass: DefaultOrbitalFacilityMass,
             attitude: {
                 spin: {
-                    siderealPeriod: 0,
-                    axialTilt: 0,
-                    axisAzimuth: 0,
-                    initialRotationAngle: 0,
+                    siderealPeriod: seconds(0),
+                    axialTilt: radians(0),
+                    axisAzimuth: radians(0),
+                    initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };
@@ -206,9 +225,13 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             population: 5_000_000,
             populationDensity: 1,
             sections: [
-                { type: "cylinderHabitat", radius: 8e3, surface: { housing: 0.5, agriculture: 0.5 } },
+                {
+                    type: "cylinderHabitat",
+                    radius: meters(8e3),
+                    surface: { housing: squareMeters(0.5), agriculture: squareMeters(0.5) },
+                },
                 { type: "utility", hasTanks: true },
-                { type: "fusion", netPowerOutput: 5_000_000 * 1000 },
+                { type: "fusion", netPowerOutput: watts(5_000_000 * 1000) },
                 { type: "utility", hasTanks: true },
                 { type: "landingBay", heightFactor: 2 },
             ],
@@ -217,25 +240,25 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             type: "inOrbit",
             orbit: {
                 parentIds: ["chronos"],
-                semiMajorAxis: chronos.accretionDiskRadius * 6,
+                semiMajorAxis: meters(chronos.accretionDiskRadius * 6),
                 eccentricity: 0,
                 plane: {
                     inclination: degreesToRadians(20),
                     longitudeOfAscendingNode: degreesToRadians(240),
                 },
-                argumentOfPeriapsis: 0,
-                initialMeanAnomaly: Math.PI / 2,
+                argumentOfPeriapsis: radians(0),
+                initialMeanAnomaly: radians(Math.PI / 2),
                 p: 2,
             },
             mass: DefaultOrbitalFacilityMass,
             attitude: {
                 spin: {
-                    siderealPeriod: 0,
-                    axialTilt: 0,
-                    axisAzimuth: 0,
-                    initialRotationAngle: 0,
+                    siderealPeriod: seconds(0),
+                    axialTilt: radians(0),
+                    axisAzimuth: radians(0),
+                    initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };
@@ -252,7 +275,7 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             population: 50_000,
             populationDensity: 1,
             sections: [
-                { type: "fusion", netPowerOutput: 50_000 * 10_000 },
+                { type: "fusion", netPowerOutput: watts(50_000 * 10_000) },
                 { type: "utility", hasTanks: true },
                 { type: "landingBay", heightFactor: 2 },
             ],
@@ -261,25 +284,25 @@ export function getChronosModel(): { systemModel: StarSystemModel; systemEntityM
             type: "inOrbit",
             orbit: {
                 parentIds: ["chronos"],
-                semiMajorAxis: chronos.accretionDiskRadius * 4,
+                semiMajorAxis: meters(chronos.accretionDiskRadius * 4),
                 eccentricity: 0,
                 plane: {
                     inclination: degreesToRadians(40),
                     longitudeOfAscendingNode: degreesToRadians(120),
                 },
-                argumentOfPeriapsis: 0,
-                initialMeanAnomaly: 0,
+                argumentOfPeriapsis: radians(0),
+                initialMeanAnomaly: radians(0),
                 p: 2,
             },
             mass: DefaultOrbitalFacilityMass,
             attitude: {
                 spin: {
-                    siderealPeriod: 0,
-                    axialTilt: 0,
-                    axisAzimuth: 0,
-                    initialRotationAngle: 0,
+                    siderealPeriod: seconds(0),
+                    axialTilt: radians(0),
+                    axisAzimuth: radians(0),
+                    initialRotationAngle: radians(0),
                 },
-                localFrameOrientation: { yaw: 0, pitch: 0, roll: 0 },
+                localFrameOrientation: { yaw: radians(0), pitch: radians(0), roll: radians(0) },
             },
         },
     };

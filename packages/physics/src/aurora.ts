@@ -18,10 +18,23 @@
 import { ProtonMass, SolarRadius, VacuumPermeability } from "./constants";
 import { getEscapeVelocity } from "./physics";
 import { astronomicalUnitToMeters } from "./unitConversions";
+import type {
+    AmpereSquareMeters,
+    Kilograms,
+    Meters,
+    MetersPerSecond,
+    Pascals,
+    PerCubicMeter,
+    Radians,
+    SquareMeters,
+    Watts,
+    WattsPerSquareMeter,
+} from "./units";
+import { meters, pascals, perCubicMeter, radians, squareMeters, watts, wattsPerSquareMeter } from "./units";
 
 export type LocalStellarWindModel = {
-    speed: number;
-    protonNumberDensity: number;
+    speed: MetersPerSecond;
+    protonNumberDensity: PerCubicMeter;
 };
 
 /**
@@ -34,12 +47,12 @@ export type LocalStellarWindModel = {
  * @param distance Distance from the stellar center in meters, outside the star.
  * @returns Wind speed in m/s and proton number density in m^-3.
  */
-export function getStellarWind(mass: number, radius: number, distance: number): LocalStellarWindModel {
+export function getStellarWind(mass: Kilograms, radius: Meters, distance: Meters): LocalStellarWindModel {
     const solarMassLossRate = 4 * Math.PI * astronomicalUnitToMeters(1) ** 2 * ProtonMass * 5e6 * 400_000;
     const massLossRate = solarMassLossRate * (radius / SolarRadius) ** 2;
     const speed = getEscapeVelocity(mass, radius);
     const protonNumberDensity = massLossRate / (4 * Math.PI * distance ** 2 * ProtonMass * speed);
-    return { speed, protonNumberDensity };
+    return { speed, protonNumberDensity: perCubicMeter(protonNumberDensity) };
 }
 
 /**
@@ -50,10 +63,11 @@ export function getStellarWind(mass: number, radius: number, distance: number): 
  * @returns The polar cap boundary latitude in radians.
  */
 export function getPolarCapLatitude(
-    planetRadius: number,
-    planetMoment: number,
+    planetRadius: Meters,
+    planetMoment: AmpereSquareMeters,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     stellarWind: Readonly<LocalStellarWindModel>,
-): number {
+): Radians {
     const standoffDistance = getMagnetopauseStandoffDistance(planetMoment, getStellarWindDynamicPressure(stellarWind));
     return getDipoleFieldLineLatitude(standoffDistance, planetRadius);
 }
@@ -64,8 +78,8 @@ export function getPolarCapLatitude(
  * @param planetRadius The planet radius in meters.
  * @returns The northern intersection latitude in radians.
  */
-export function getDipoleFieldLineLatitude(lineMaxDistance: number, planetRadius: number): number {
-    return Math.acos(Math.sqrt(planetRadius / lineMaxDistance));
+export function getDipoleFieldLineLatitude(lineMaxDistance: Meters, planetRadius: Meters): Radians {
+    return radians(Math.acos(Math.sqrt(planetRadius / lineMaxDistance)));
 }
 
 /**
@@ -75,9 +89,9 @@ export function getDipoleFieldLineLatitude(lineMaxDistance: number, planetRadius
  * @param theta Magnetic colatitude in radians, 0 at the north pole, π/2 at the equator.
  * @returns The distance from the dipole center in meters.
  */
-export function getDipoleFieldLineRadius(lineMaxDistance: number, theta: number): number {
+export function getDipoleFieldLineRadius(lineMaxDistance: Meters, theta: Radians): Meters {
     const sinTheta = Math.sin(theta);
-    return lineMaxDistance * sinTheta * sinTheta;
+    return meters(lineMaxDistance * sinTheta * sinTheta);
 }
 
 /**
@@ -87,7 +101,7 @@ export function getDipoleFieldLineRadius(lineMaxDistance: number, theta: number)
  * @returns The distance from the planet center to the substellar magnetopause in meters.
  * @see https://en.wikipedia.org/wiki/Magnetopause#Estimating_the_standoff_distance_to_the_magnetopause
  */
-export function getMagnetopauseStandoffDistance(moment: number, stellarWindPressure: number) {
+export function getMagnetopauseStandoffDistance(moment: AmpereSquareMeters, stellarWindPressure: Pascals): Meters {
     // Magnetic field needed to balance stellar wind pressure
     const requiredStrength = Math.sqrt(2 * VacuumPermeability * stellarWindPressure);
 
@@ -95,7 +109,7 @@ export function getMagnetopauseStandoffDistance(moment: number, stellarWindPress
     const chapmanFerraroFactor = 2;
 
     // From magneticPressure === stellarWindPressure
-    return Math.cbrt((VacuumPermeability * chapmanFerraroFactor * moment) / (4 * Math.PI * requiredStrength));
+    return meters(Math.cbrt((VacuumPermeability * chapmanFerraroFactor * moment) / (4 * Math.PI * requiredStrength)));
 }
 
 /**
@@ -106,19 +120,27 @@ export function getMagnetopauseStandoffDistance(moment: number, stellarWindPress
  * @returns The stellar wind dynamic pressure in pascals.
  * @see https://en.wikipedia.org/wiki/Solar_wind#Pressure
  */
-export function getStellarWindDynamicPressure({ speed, protonNumberDensity }: Readonly<LocalStellarWindModel>) {
+// eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
+export function getStellarWindDynamicPressure({
+    speed,
+    protonNumberDensity,
+}: Readonly<LocalStellarWindModel>): Pascals {
     const massDensity = protonNumberDensity * ProtonMass;
-    return massDensity * speed ** 2;
+    return pascals(massDensity * speed ** 2);
 }
 
 /**
  * Estimates the kinetic power of the stellar wind intercepted
- * by the planetary magnetosphere (W).
+ * by the planetary magnetosphere.
  * @param moment Planetary magnetic dipole moment (A·m²)
  * @param stellarWind Stellar wind properties (SI units)
- * @returns Incident kinetic power (W)
+ * @returns Incident kinetic power in watts
  */
-export function getInterceptedStellarWindPower(moment: number, stellarWind: Readonly<LocalStellarWindModel>): number {
+export function getInterceptedStellarWindPower(
+    moment: AmpereSquareMeters,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
+    stellarWind: Readonly<LocalStellarWindModel>,
+): Watts {
     const { speed, protonNumberDensity } = stellarWind;
 
     const standoffDistance = getMagnetopauseStandoffDistance(moment, getStellarWindDynamicPressure(stellarWind));
@@ -127,26 +149,27 @@ export function getInterceptedStellarWindPower(moment: number, stellarWind: Read
     const massDensity = protonNumberDensity * ProtonMass;
     const massFlowRate = massDensity * speed * crossSection;
 
-    return 0.5 * massFlowRate * speed ** 2;
+    return watts(0.5 * massFlowRate * speed ** 2);
 }
 
 /**
- * Computes the combined surface area of two symmetric auroral ovals (m²).
- * @param planetRadius Planetary radius (m)
+ * Computes the combined surface area of two symmetric auroral ovals.
+ * @param planetRadius Planetary radius in meters.
  * @param auroralRange Absolute equatorward and poleward magnetic latitudes in radians.
- * @returns Total auroral area across both hemispheres (m²)
+ * @returns Total auroral area across both hemispheres in m².
  */
 export function getAuroralOvalArea(
-    planetRadius: number,
-    auroralRange: readonly [equatorward: number, poleward: number],
-): number {
+    planetRadius: Meters,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in tuple types.
+    auroralRange: readonly [equatorward: Radians, poleward: Radians],
+): SquareMeters {
     const areaPerHemisphere = 2 * Math.PI * planetRadius ** 2 * (Math.sin(auroralRange[1]) - Math.sin(auroralRange[0]));
 
-    return 2 * areaPerHemisphere;
+    return squareMeters(2 * areaPerHemisphere);
 }
 
 /**
- * Estimates the mean visible auroral radiant energy flux (W/m²).
+ * Estimates the mean visible auroral radiant energy flux.
  * Uses empirical terrestrial efficiencies and assumes two symmetric auroral ovals.
  * @param planetRadius Planet radius in meters.
  * @param planetMoment Planetary magnetic dipole moment in A·m².
@@ -155,11 +178,13 @@ export function getAuroralOvalArea(
  * @returns Mean visible auroral radiant energy flux in W/m².
  */
 export function getAuroralVisibleEnergyFlux(
-    planetRadius: number,
-    planetMoment: number,
+    planetRadius: Meters,
+    planetMoment: AmpereSquareMeters,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     stellarWind: Readonly<LocalStellarWindModel>,
-    auroralRange: readonly [equatorward: number, poleward: number],
-): number {
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in tuple types.
+    auroralRange: readonly [equatorward: Radians, poleward: Radians],
+): WattsPerSquareMeter {
     // Empirical Earth values for HILDCAA events (Hajra et al., 2014)
     // Adjusted for our kinetic power convention: P_ours = (π/2) * P_Hajra
     const couplingEfficiency = (0.0097 * 2) / Math.PI;
@@ -178,5 +203,5 @@ export function getAuroralVisibleEnergyFlux(
 
     const precipitationEnergyFlux = precipitationPower / auroralArea;
 
-    return precipitationEnergyFlux * visibleRadiativeEfficiency;
+    return wattsPerSquareMeter(precipitationEnergyFlux * visibleRadiativeEfficiency);
 }

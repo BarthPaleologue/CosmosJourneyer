@@ -127,7 +127,7 @@ export async function createSolScene(engine: AbstractEngine, progressMonitor: IL
         starSystemController.update(deltaSeconds, terrainSystem);
         camera.getViewMatrix();
         targetingSystem.update(camera.globalPosition);
-        targetCursorLayer.update(camera, null);
+        targetCursorLayer.update(camera, null, deltaSeconds);
     });
 
     scene.onBeforeCameraRenderObservable.add((cam) => {

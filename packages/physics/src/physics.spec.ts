@@ -35,6 +35,7 @@ import {
     waterBoilingTemperature,
 } from "./physics";
 import { astronomicalUnitToMeters } from "./unitConversions";
+import { kelvin, kilograms, meters, metersPerSecondSquared, pascals, seconds } from "./units";
 
 describe("getEscapeVelocity", () => {
     it("estimates the solar surface escape speed", () => {
@@ -47,9 +48,9 @@ describe("getEscapeVelocity", () => {
 });
 
 test("computeEffectiveTemperature", () => {
-    const sunTemperature = 5778; // in Kelvin
-    const sunRadius = 6.9634e8; // in meters
-    const sunEarthDistance = 1.496e11; // in meters
+    const sunTemperature = kelvin(5778); // in Kelvin
+    const sunRadius = meters(6.9634e8); // in meters
+    const sunEarthDistance = meters(1.496e11); // in meters
     const earthAlbedo = 0.3;
 
     const effectiveTemperature = computeEffectiveTemperature(
@@ -62,9 +63,9 @@ test("computeEffectiveTemperature", () => {
 });
 
 test("computeEffectiveTemperature with two identical stars", () => {
-    const starTemperature = 5778; // in Kelvin
-    const starRadius = 6.9634e8; // in meters
-    const starDistance = 1.496e11; // in meters
+    const starTemperature = kelvin(5778); // in Kelvin
+    const starRadius = meters(6.9634e8); // in meters
+    const starDistance = meters(1.496e11); // in meters
     const planetAlbedo = 0.3;
 
     const singleStarTemperature = computeEffectiveTemperature(
@@ -83,7 +84,7 @@ test("computeEffectiveTemperature with two identical stars", () => {
 });
 
 test("computeGrayAtmosphereTemperature", () => {
-    const effectiveTemperature = 255; // in Kelvin
+    const effectiveTemperature = kelvin(255); // in Kelvin
     const earthOpticalDepth = 1.5;
     const surfaceTemperature = computeGrayAtmosphereTemperature(effectiveTemperature, earthOpticalDepth);
     const targetEarthTemperatureWithGreenHouseEffect = 289; // in Kelvin
@@ -93,14 +94,14 @@ test("computeGrayAtmosphereTemperature", () => {
 
 describe("waterBoilingPointCelsius", () => {
     test("earth", () => {
-        const earthPressure = 101325; // in pascal
+        const earthPressure = pascals(101325); // in pascal
         const boilingPoint = waterBoilingTemperature(earthPressure);
         expect(boilingPoint).toBeGreaterThan(273.15 + 99);
         expect(boilingPoint).toBeLessThan(273.15 + 101);
     });
 
     test("moon", () => {
-        const moonPressure = 0; // in pascal
+        const moonPressure = pascals(0); // in pascal
         const boilingPoint = waterBoilingTemperature(moonPressure);
         expect(boilingPoint).toBe(0);
     });
@@ -108,7 +109,7 @@ describe("waterBoilingPointCelsius", () => {
 
 describe("getWaterSaturationPressure", () => {
     test("matches an Earth-like freezing-point reference value", () => {
-        const freezingPoint = 273.15; // in Kelvin
+        const freezingPoint = kelvin(273.15); // in Kelvin
         const saturationPressure = getWaterSaturationPressure(freezingPoint);
 
         expect(saturationPressure).toBeGreaterThan(600);
@@ -116,9 +117,9 @@ describe("getWaterSaturationPressure", () => {
     });
 
     test("increases with temperature", () => {
-        const coldPressure = getWaterSaturationPressure(260);
-        const temperatePressure = getWaterSaturationPressure(293.15);
-        const hotPressure = getWaterSaturationPressure(320);
+        const coldPressure = getWaterSaturationPressure(kelvin(260));
+        const temperatePressure = getWaterSaturationPressure(kelvin(293.15));
+        const hotPressure = getWaterSaturationPressure(kelvin(320));
 
         expect(temperatePressure).toBeGreaterThan(coldPressure);
         expect(hotPressure).toBeGreaterThan(temperatePressure);
@@ -126,8 +127,8 @@ describe("getWaterSaturationPressure", () => {
 });
 
 test("estimateStarRadiusFromMass", () => {
-    const solarMass = 1.989e30; // in kg
-    const solarRadius = 6.9634e8; // in meters
+    const solarMass = kilograms(1.989e30); // in kg
+    const solarRadius = meters(6.9634e8); // in meters
 
     const estimatedRadius = estimateStarRadiusFromMass(solarMass);
     expect(estimatedRadius).toBeGreaterThan(solarRadius - 0.1 * solarRadius);
@@ -135,8 +136,8 @@ test("estimateStarRadiusFromMass", () => {
 });
 
 test("gravitationalLensing", () => {
-    const solarMass = 1.989e30; // in kg
-    const solarRadius = 6.9634e8; // in meters
+    const solarMass = kilograms(1.989e30); // in kg
+    const solarRadius = meters(6.9634e8); // in meters
 
     const focalLength = getGravitationalLensFocalDistance(solarMass, solarRadius);
     expect(focalLength).toBeGreaterThan(astronomicalUnitToMeters(530));
@@ -145,45 +146,45 @@ test("gravitationalLensing", () => {
 
 describe("hasLiquidWater", () => {
     test("earth-like planet", () => {
-        const pressure = 101325; // in pascal
-        const minTemperature = 273.15 - 20; // in Kelvin
-        const maxTemperature = 273.15 + 100; // in Kelvin
+        const pressure = pascals(101325); // in pascal
+        const minTemperature = kelvin(273.15 - 20); // in Kelvin
+        const maxTemperature = kelvin(273.15 + 100); // in Kelvin
 
         const canHaveLiquidWater = hasLiquidWater(pressure, minTemperature, maxTemperature);
         expect(canHaveLiquidWater).toBe(true);
     });
 
     test("mars-like planet", () => {
-        const pressure = 610; // in pascal
-        const minTemperature = 273.15 - 60; // in Kelvin
-        const maxTemperature = 273.15 + 20; // in Kelvin
+        const pressure = pascals(610); // in pascal
+        const minTemperature = kelvin(273.15 - 60); // in Kelvin
+        const maxTemperature = kelvin(273.15 + 20); // in Kelvin
 
         const canHaveLiquidWater = hasLiquidWater(pressure, minTemperature, maxTemperature);
         expect(canHaveLiquidWater).toBe(false);
     });
 
     test("venus-like planet", () => {
-        const pressure = 9.2e6; // in pascal
-        const minTemperature = 273.15 + 400; // in Kelvin
-        const maxTemperature = 273.15 + 800; // in Kelvin
+        const pressure = pascals(9.2e6); // in pascal
+        const minTemperature = kelvin(273.15 + 400); // in Kelvin
+        const maxTemperature = kelvin(273.15 + 800); // in Kelvin
 
         const canHaveLiquidWater = hasLiquidWater(pressure, minTemperature, maxTemperature);
         expect(canHaveLiquidWater).toBe(false);
     });
 
     test("ice world", () => {
-        const pressure = 101325; // in pascal
-        const minTemperature = 273.15 - 60; // in Kelvin
-        const maxTemperature = 273.15 - 20; // in Kelvin
+        const pressure = pascals(101325); // in pascal
+        const minTemperature = kelvin(273.15 - 60); // in Kelvin
+        const maxTemperature = kelvin(273.15 - 20); // in Kelvin
 
         const canHaveLiquidWater = hasLiquidWater(pressure, minTemperature, maxTemperature);
         expect(canHaveLiquidWater).toBe(false);
     });
 
     test("airless world", () => {
-        const pressure = 0.0; // in pascal
-        const minTemperature = 273.15 - 20; // in Kelvin
-        const maxTemperature = 273.15 + 100; // in Kelvin
+        const pressure = pascals(0.0); // in pascal
+        const minTemperature = kelvin(273.15 - 20); // in Kelvin
+        const maxTemperature = kelvin(273.15 + 100); // in Kelvin
 
         const canHaveLiquidWater = hasLiquidWater(pressure, minTemperature, maxTemperature);
         expect(canHaveLiquidWater).toBe(false);
@@ -191,8 +192,8 @@ describe("hasLiquidWater", () => {
 });
 
 test("getRotationPeriodForArtificialGravity", () => {
-    const ringRadius = 1000; // in meters
-    const desiredGravity = 9.81; // in m/s^2
+    const ringRadius = meters(1000); // in meters
+    const desiredGravity = metersPerSecondSquared(9.81); // in m/s²
 
     const period = getRotationPeriodForArtificialGravity(ringRadius, desiredGravity);
 
@@ -202,9 +203,9 @@ test("getRotationPeriodForArtificialGravity", () => {
 
 describe("getApparentGravityOnSpaceTether", () => {
     test("earth geostationary orbit", () => {
-        const earthMass = 5.972e24; // in kg
-        const earthSiderealDayDuration = 86164.1; // in seconds
-        const geostationaryOrbitRadius = 42_164e3; // in meters
+        const earthMass = kilograms(5.972e24); // in kg
+        const earthSiderealDayDuration = seconds(86164.1); // in seconds
+        const geostationaryOrbitRadius = meters(42_164e3); // in meters
         const apparentGravity = getApparentGravityOnSpaceTether(
             earthSiderealDayDuration,
             earthMass,
@@ -218,7 +219,7 @@ describe("getApparentGravityOnSpaceTether", () => {
         const apparentGravityAboveGeoOrbit = getApparentGravityOnSpaceTether(
             earthSiderealDayDuration,
             earthMass,
-            geostationaryOrbitRadius + 10_000e3,
+            meters(geostationaryOrbitRadius + 10_000e3),
         );
         expect(apparentGravityAboveGeoOrbit).toBeGreaterThan(0);
 
@@ -226,7 +227,7 @@ describe("getApparentGravityOnSpaceTether", () => {
         const apparentGravityBelowGeoOrbit = getApparentGravityOnSpaceTether(
             earthSiderealDayDuration,
             earthMass,
-            geostationaryOrbitRadius - 10_000e3,
+            meters(geostationaryOrbitRadius - 10_000e3),
         );
         expect(apparentGravityBelowGeoOrbit).toBeLessThan(0);
     });
@@ -234,8 +235,8 @@ describe("getApparentGravityOnSpaceTether", () => {
 
 describe("getWaterIceFrostLine", () => {
     test("sol places the water ice line inside the asteroid belt", () => {
-        const sunTemperature = 5778; // in Kelvin
-        const sunRadius = 6.9634e8; // in meters
+        const sunTemperature = kelvin(5778); // in Kelvin
+        const sunRadius = meters(6.9634e8); // in meters
 
         const frostLine = getWaterIceFrostLine(sunTemperature, sunRadius);
 
@@ -246,8 +247,8 @@ describe("getWaterIceFrostLine", () => {
 
 describe("getSilicateRockSublimationLine", () => {
     test("sol places the silicate sublimation line well inside Mercury's orbit", () => {
-        const sunTemperature = 5778; // in Kelvin
-        const sunRadius = 6.9634e8; // in meters
+        const sunTemperature = kelvin(5778); // in Kelvin
+        const sunRadius = meters(6.9634e8); // in meters
 
         const sublimationLine = getSilicateRockSublimationLine(sunTemperature, sunRadius);
 
@@ -258,9 +259,9 @@ describe("getSilicateRockSublimationLine", () => {
 
 describe("getTemperatureLine", () => {
     test("matches the equilibrium distance for Earth-like stellar heating", () => {
-        const sunTemperature = 5778; // in Kelvin
-        const sunRadius = 6.9634e8; // in meters
-        const earthEffectiveTemperature = 278; // in Kelvin for a simple black-body estimate
+        const sunTemperature = kelvin(5778); // in Kelvin
+        const sunRadius = meters(6.9634e8); // in meters
+        const earthEffectiveTemperature = kelvin(278); // in Kelvin for a simple black-body estimate
 
         const temperatureLine = getTemperatureLine(sunTemperature, sunRadius, earthEffectiveTemperature);
 
@@ -269,11 +270,11 @@ describe("getTemperatureLine", () => {
     });
 
     test("scales with the inverse square of the target temperature", () => {
-        const stellarTemperature = 5778;
-        const stellarRadius = 6.9634e8;
+        const stellarTemperature = kelvin(5778);
+        const stellarRadius = meters(6.9634e8);
 
-        const coolLine = getTemperatureLine(stellarTemperature, stellarRadius, 300);
-        const hotLine = getTemperatureLine(stellarTemperature, stellarRadius, 600);
+        const coolLine = getTemperatureLine(kelvin(stellarTemperature), meters(stellarRadius), kelvin(300));
+        const hotLine = getTemperatureLine(kelvin(stellarTemperature), meters(stellarRadius), kelvin(600));
 
         expect(coolLine).toBeCloseTo(hotLine * 4, 10);
     });
@@ -281,8 +282,8 @@ describe("getTemperatureLine", () => {
 
 describe("getOceanDepth", () => {
     test("earth", () => {
-        const earthRadius = 6_371e3; // in meters
-        const earthMass = 5.972e24; // in kilograms
+        const earthRadius = meters(6_371e3); // in meters
+        const earthMass = kilograms(5.972e24); // in kilograms
         const earthLiquidWaterMassFraction = 1.4e21 / earthMass; // total water mass relative to Earth mass
         const earthOceanCoverage = 0.71; // about 71% ocean coverage
 
@@ -294,8 +295,8 @@ describe("getOceanDepth", () => {
     });
 
     test("gets shallower as ocean coverage increases for the same water inventory", () => {
-        const planetRadius = 6_371e3;
-        const planetMass = 5.972e24;
+        const planetRadius = meters(6_371e3);
+        const planetMass = kilograms(5.972e24);
         const liquidWaterMassFraction = 1.4e21 / planetMass;
 
         const deepOcean = getOceanDepth(planetRadius, planetMass, liquidWaterMassFraction, 0.1);

@@ -15,6 +15,9 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { radians } from "@cosmos-journeyer/physics";
+import type { Radians } from "@cosmos-journeyer/physics";
+
 /**
  * @param value - Scalar to constrain.
  * @param min - Lower bound.
@@ -141,9 +144,9 @@ export const Tau = 2 * Math.PI;
  * @param t - Interpolation factor, normally between zero and one.
  * @returns The interpolated angle in radians without normalizing the final value.
  */
-export function lerpAngle(a: number, b: number, t: number): number {
+export function lerpAngle(a: Radians, b: Radians, t: number): Radians {
     const shortestAngleDelta = mod(b - a + Math.PI, Tau) - Math.PI;
-    return a + shortestAngleDelta * t;
+    return radians(a + shortestAngleDelta * t);
 }
 
 /**

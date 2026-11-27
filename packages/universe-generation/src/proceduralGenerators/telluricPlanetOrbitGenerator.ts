@@ -15,7 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { getSilicateRockSublimationLine, getWaterIceFrostLine } from "@cosmos-journeyer/physics";
+import { getSilicateRockSublimationLine, getWaterIceFrostLine, meters } from "@cosmos-journeyer/physics";
+import type { Kelvin, Meters } from "@cosmos-journeyer/physics";
 
 /**
  * Uses stellar luminosity to determine a plausible semi-major axis range for a Telluric planet then samples it
@@ -25,10 +26,10 @@ import { getSilicateRockSublimationLine, getWaterIceFrostLine } from "@cosmos-jo
  * @returns Semi-major axis of the telluric planet orbit in meters
  */
 export function getTelluricPlanetOrbitRadius(
-    stellarTemperature: number,
-    stellarRadius: number,
+    stellarTemperature: Kelvin,
+    stellarRadius: Meters,
     rng: () => number,
-): number {
+): Meters {
     // Telluric worlds cannot exist where silicate rocks sublimate
     const lowerBound = getSilicateRockSublimationLine(stellarTemperature, stellarRadius);
 
@@ -38,5 +39,5 @@ export function getTelluricPlanetOrbitRadius(
 
     // Log-uniform sample in [aMin, aMax] (from empirical Kepler data as found in https://www.pnas.org/doi/10.1073/pnas.1319909110)
     const uniformRandom = rng();
-    return lowerBound * Math.exp(Math.log(upperBound / lowerBound) * uniformRandom);
+    return meters(lowerBound * Math.exp(Math.log(upperBound / lowerBound) * uniformRandom));
 }

@@ -25,6 +25,7 @@ import {
     Vector3,
 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core";
+import { meters } from "@cosmos-journeyer/physics";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { loadAsteroids } from "@/frontend/assets/objects/asteroids";
@@ -78,7 +79,13 @@ export async function createAsteroidFieldScene(
 
     AsteroidPatch.BATCH_SIZE = 10_000;
 
-    const belt = new AsteroidField(42, sphere, beltRadius - beltSpread / 2, beltRadius + beltRadius / 2, scene);
+    const belt = new AsteroidField(
+        42,
+        sphere,
+        meters(beltRadius - beltSpread / 2),
+        meters(beltRadius + beltRadius / 2),
+        scene,
+    );
 
     const torus = MeshBuilder.CreateTorus(
         "torus",

@@ -17,6 +17,8 @@
 
 import { C, G, SolarMass, SolarRadius } from "./constants";
 import { celsiusToKelvin } from "./unitConversions";
+import type { Kelvin, Kilograms, Meters, MetersPerSecond, MetersPerSecondSquared, Pascals, Seconds } from "./units";
+import { kelvin, meters, metersPerSecond, metersPerSecondSquared, pascals, seconds } from "./units";
 
 /**
  * Calculates the escape speed at the surface of a spherical body.
@@ -24,100 +26,103 @@ import { celsiusToKelvin } from "./unitConversions";
  * @param radius Body radius in meters.
  * @returns Escape speed in meters per second.
  */
-export function getEscapeVelocity(mass: number, radius: number): number {
-    return Math.sqrt((2 * G * mass) / radius);
+export function getEscapeVelocity(mass: Kilograms, radius: Meters): MetersPerSecond {
+    return metersPerSecond(Math.sqrt((2 * G * mass) / radius));
 }
 
 /**
  * Calculates the boiling point of water at a given pressure.
- * @param pressure The pressure of the atmosphere in pascal.
+ * @param pressure The pressure of the atmosphere in pascals.
  * @returns The boiling point of water at the given pressure in Kelvin
  * @see https://en.wikipedia.org/wiki/Boiling_point?oldformat=true#Saturation_temperature_and_pressure
  * @see https://www.omnicalculator.com/chemistry/boiling-point
  * @see https://www.desmos.com/calculator/ctxerbh48s
  */
-export function waterBoilingTemperature(pressure: number): number {
+export function waterBoilingTemperature(pressure: Pascals): Kelvin {
     const P1 = 101325.0; // sea level pressure on Earth in pascal
     const P2 = pressure;
     const T1 = celsiusToKelvin(100.0); // boiling point of water at sea level on Earth in Kelvin
     const DH = 40660.0;
     const R = 8.314;
     if (P2 <= 0.0) {
-        return 0.0;
+        return kelvin(0.0);
     } // when pressure is 0, water cannot exist in liquid state
-    return 1.0 / (1.0 / T1 + Math.log(P1 / P2) * (R / DH));
+    return kelvin(1.0 / (1.0 / T1 + Math.log(P1 / P2) * (R / DH)));
 }
 
 /**
  * Returns the saturation pressure of water vapor at a given temperature using the Clausius-Clapeyron relation.
  * @param temperature The temperature in Kelvin
- * @returns The saturation pressure in pascal
+ * @returns The saturation pressure in pascals
  */
-export function getWaterSaturationPressure(temperature: number): number {
+export function getWaterSaturationPressure(temperature: Kelvin): Pascals {
     const latentHeatOfVaporization = 2_260_000; // J/kg
     const waterVaporSpecificGasConstant = 461.5; // J/(kg·K)
     const calibrationPressure = 37_960_000_000; // Pa
-    return calibrationPressure * Math.exp(-latentHeatOfVaporization / (waterVaporSpecificGasConstant * temperature));
+    return pascals(
+        calibrationPressure * Math.exp(-latentHeatOfVaporization / (waterVaporSpecificGasConstant * temperature)),
+    );
 }
 
 export type EffectiveTemperatureStar = {
-    readonly temperature: number;
-    readonly radius: number;
-    readonly distance: number;
+    readonly temperature: Kelvin;
+    readonly radius: Meters;
+    readonly distance: Meters;
 };
 
 /**
  * Computes the effective temperature of a planet from stellar irradiation and albedo.
  * @param stars The irradiating stars
- * @param planetAlbedo The albedo of the planet (0 = black, 1 = white)
+ * @param planetAlbedo The albedo of the planet (0 = black, 1 = white, dimensionless)
  * @returns The effective temperature of the planet in Kelvin
  */
 export function computeEffectiveTemperature(
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     stars: ReadonlyArray<EffectiveTemperatureStar>,
     planetAlbedo: number,
-): number {
+): Kelvin {
     let totalFlux = 0;
     for (const { temperature, radius, distance } of stars) {
         totalFlux += (temperature ** 4 * radius ** 2) / distance ** 2;
     }
 
-    return Math.pow(((1 - planetAlbedo) * totalFlux) / 4, 0.25);
+    return kelvin(Math.pow(((1 - planetAlbedo) * totalFlux) / 4, 0.25));
 }
 
 /**
  * Computes the temperature at optical depth tau using the gray-atmosphere / Eddington approximation.
  * @param effectiveTemperature The effective temperature in Kelvin
- * @param opticalDepth The infrared optical depth tau at the level of interest
+ * @param opticalDepth The infrared optical depth tau at the level of interest (dimensionless)
  * @returns The gray-atmosphere temperature in Kelvin
  */
-export function computeGrayAtmosphereTemperature(effectiveTemperature: number, opticalDepth: number): number {
-    return effectiveTemperature * Math.pow((3 / 4) * (opticalDepth + 2 / 3), 0.25);
+export function computeGrayAtmosphereTemperature(effectiveTemperature: Kelvin, opticalDepth: number): Kelvin {
+    return kelvin(effectiveTemperature * Math.pow((3 / 4) * (opticalDepth + 2 / 3), 0.25));
 }
 
 /**
  * Returns an estimate of the radius of a star given its mass. This is only an approximation!
  * This can be used to estimate the angular momentum of a black hole.
- * @param mass The mass of the object in kg
+ * @param mass The mass of the object in kilograms
  * @returns The estimated radius of the object in meters
  * @see https://en.wikipedia.org/wiki/Main_sequence#Sample_parameters
  */
-export function estimateStarRadiusFromMass(mass: number): number {
+export function estimateStarRadiusFromMass(mass: Kilograms): Meters {
     const massInSolarUnits = mass / SolarMass;
 
     const estimatedRadiusInSolarUnits = Math.pow(massInSolarUnits, 0.78);
 
-    return estimatedRadiusInSolarUnits * SolarRadius;
+    return meters(estimatedRadiusInSolarUnits * SolarRadius);
 }
 
 /**
  * Returns the minimal distance from an object at which the gravitational lensing effect becomes visible and eventually usable for magnification.
- * @param mass The mass of the object in kg
+ * @param mass The mass of the object in kilograms
  * @param radius The radius of the object in meters
  * @returns The computed distance in meters
  * @see https://astronomy.stackexchange.com/questions/33498/what-is-the-gravitational-lensing-focal-distance-of-a-white-dwarf-star
  */
-export function getGravitationalLensFocalDistance(mass: number, radius: number): number {
-    return (C * radius) ** 2 / (4 * G * mass);
+export function getGravitationalLensFocalDistance(mass: Kilograms, radius: Meters): Meters {
+    return meters((C * radius) ** 2 / (4 * G * mass));
 }
 
 /**
@@ -126,19 +131,19 @@ export function getGravitationalLensFocalDistance(mass: number, radius: number):
  * @param gravity The gravity to simulate at the inner surface of the ring in m/s²
  * @returns Rotation period in seconds.
  */
-export function getRotationPeriodForArtificialGravity(radius: number, gravity: number): number {
+export function getRotationPeriodForArtificialGravity(radius: Meters, gravity: MetersPerSecondSquared): Seconds {
     // g = v² / r and T = 2 * pi * r / v => v = sqrt(g * r) and T = 2 * pi * r / sqrt(g * r) = 2 * pi * sqrt(r / g)
-    return 2 * Math.PI * Math.sqrt(radius / gravity);
+    return seconds(2 * Math.PI * Math.sqrt(radius / gravity));
 }
 
 /**
  * Determines if the temperature range of a planet overlaps with the liquid water range given its pressure
- * @param pressure The pressure of the atmosphere in pascal
+ * @param pressure The pressure of the atmosphere in pascals
  * @param minTemperature The minimum temperature of the planet in Kelvin
  * @param maxTemperature The maximum temperature of the planet in Kelvin
  * @returns Whether liquid water can exist within the planet's temperature range.
  */
-export function hasLiquidWater(pressure: number, minTemperature: number, maxTemperature: number): boolean {
+export function hasLiquidWater(pressure: Pascals, minTemperature: Kelvin, maxTemperature: Kelvin): boolean {
     const waterBoilingPoint = waterBoilingTemperature(pressure);
     const waterFreezingPoint = celsiusToKelvin(0);
     const epsilon = 0.05;
@@ -174,9 +179,13 @@ export function hasLiquidWater(pressure: number, minTemperature: number, maxTemp
  * @returns Apparent gravitational acceleration in meters per second squared.
  * @see https://en.wikipedia.org/wiki/Space_elevator#Apparent_gravitational_field
  */
-export function getApparentGravityOnSpaceTether(period: number, mass: number, distance: number): number {
+export function getApparentGravityOnSpaceTether(
+    period: Seconds,
+    mass: Kilograms,
+    distance: Meters,
+): MetersPerSecondSquared {
     const omega = (2 * Math.PI) / period;
-    return (-G * mass) / (distance * distance) + distance * omega * omega;
+    return metersPerSecondSquared(distance * omega * omega - (G * mass) / (distance * distance));
 }
 
 /**
@@ -186,8 +195,8 @@ export function getApparentGravityOnSpaceTether(period: number, mass: number, di
  * @returns An estimation of the distance beyond which water ice can exist in solid form even in the presence of stellar radiation, in meters
  * @see https://en.wikipedia.org/wiki/Frost_line_(astrophysics)
  */
-export function getWaterIceFrostLine(stellarTemperature: number, stellarRadius: number): number {
-    const iceSublimationTemperature = 170;
+export function getWaterIceFrostLine(stellarTemperature: Kelvin, stellarRadius: Meters): Meters {
+    const iceSublimationTemperature = kelvin(170);
     return getTemperatureLine(stellarTemperature, stellarRadius, iceSublimationTemperature);
 }
 
@@ -197,8 +206,8 @@ export function getWaterIceFrostLine(stellarTemperature: number, stellarRadius: 
  * @param stellarRadius The radius of the star in meters
  * @returns An estimation of the distance inside which silicate rock sublimates under stellar radiation, in meters
  */
-export function getSilicateRockSublimationLine(stellarTemperature: number, stellarRadius: number): number {
-    const rockSublimationTemperature = 1500;
+export function getSilicateRockSublimationLine(stellarTemperature: Kelvin, stellarRadius: Meters): Meters {
+    const rockSublimationTemperature = kelvin(1500);
     return getTemperatureLine(stellarTemperature, stellarRadius, rockSublimationTemperature);
 }
 
@@ -210,29 +219,29 @@ export function getSilicateRockSublimationLine(stellarTemperature: number, stell
  * @returns The distance from the star at which the target temperature is reached, in meters
  */
 export function getTemperatureLine(
-    stellarTemperature: number,
-    stellarRadius: number,
-    targetTemperature: number,
-): number {
-    return 0.5 * stellarRadius * (stellarTemperature / targetTemperature) ** 2;
+    stellarTemperature: Kelvin,
+    stellarRadius: Meters,
+    targetTemperature: Kelvin,
+): Meters {
+    return meters(0.5 * stellarRadius * (stellarTemperature / targetTemperature) ** 2);
 }
 
 /**
  * Estimates ocean depth from a planet's water inventory and ocean coverage.
  * @param planetRadius The planet radius in meters
  * @param planetMass The planet mass in kilograms
- * @param surfaceLiquidWaterMassRatio The fraction of planet mass made of surface liquid water
- * @param oceanCoverage The fraction of the surface covered by oceans, between 0 and 1
+ * @param surfaceLiquidWaterMassRatio The fraction of planet mass made of surface liquid water (dimensionless)
+ * @param oceanCoverage The fraction of the surface covered by oceans, between 0 and 1 (dimensionless)
  * @returns Ocean depth in meters.
  */
 export function getOceanDepth(
-    planetRadius: number,
-    planetMass: number,
+    planetRadius: Meters,
+    planetMass: Kilograms,
     surfaceLiquidWaterMassRatio: number,
     oceanCoverage: number,
-): number {
+): Meters {
     const liquidWaterDensity = 1000; // kg/m³
     const oceanMass = surfaceLiquidWaterMassRatio * planetMass;
     const oceanVolume = oceanMass / liquidWaterDensity;
-    return Math.cbrt(planetRadius ** 3 + (3 * oceanVolume) / (4 * Math.PI * oceanCoverage)) - planetRadius;
+    return meters(Math.cbrt(planetRadius ** 3 + (3 * oceanVolume) / (4 * Math.PI * oceanCoverage)) - planetRadius);
 }

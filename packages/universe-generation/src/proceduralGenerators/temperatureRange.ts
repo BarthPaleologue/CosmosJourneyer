@@ -16,7 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { clamp, lerp } from "#/utils/math";
-import { EarthSeaLevelPressure } from "@cosmos-journeyer/physics";
+import { EarthSeaLevelPressure, kelvin } from "@cosmos-journeyer/physics";
+import type { Kelvin, Pascals } from "@cosmos-journeyer/physics";
 
 /**
  * @param effectiveTemperature Effective temperature in kelvins.
@@ -25,12 +26,12 @@ import { EarthSeaLevelPressure } from "@cosmos-journeyer/physics";
  * @returns Minimum and maximum surface temperatures in kelvins.
  */
 export function getTemperatureRange(
-    effectiveTemperature: number,
-    greenHouseOffset: number,
-    atmospherePressure: number,
-): { min: number; max: number } {
+    effectiveTemperature: Kelvin,
+    greenHouseOffset: Kelvin,
+    atmospherePressure: Pascals,
+): { min: Kelvin; max: Kelvin } {
     const heatRedistribution = clamp(atmospherePressure / (2 * EarthSeaLevelPressure), 0, 1);
-    const meanSurfaceTemperature = effectiveTemperature + greenHouseOffset;
+    const meanSurfaceTemperature = kelvin(effectiveTemperature + greenHouseOffset);
 
     const latitudinalSpan = lerp(60.0, 15.0, heatRedistribution);
     const poleTemperatureOffset = -0.65 * latitudinalSpan;
@@ -39,7 +40,7 @@ export function getTemperatureRange(
     const equatorTemperature = meanSurfaceTemperature + equatorTemperatureOffset;
 
     return {
-        min: poleTemperature,
-        max: equatorTemperature,
+        min: kelvin(poleTemperature),
+        max: kelvin(equatorTemperature),
     };
 }

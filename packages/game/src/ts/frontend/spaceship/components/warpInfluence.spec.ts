@@ -1,20 +1,21 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { meters, metersPerSecond } from "@cosmos-journeyer/physics";
 import { describe, expect, it } from "vitest";
 
 import { computeMaxTargetSpeedFromWarpInfluences } from "./warpInfluence";
 import type { RingWarpInfluence, SolidWarpInfluence } from "./warpInfluence";
 
-const minWarpSpeed = 30_000;
-const maxWarpSpeed = 1_000_000;
+const minWarpSpeed = metersPerSecond(30_000);
+const maxWarpSpeed = metersPerSecond(1_000_000);
 
 const ringInfluence: RingWarpInfluence = {
     type: "ring",
     volume: {
         center: Vector3.Zero(),
         normal: Vector3.Up(),
-        innerRadius: 1_000,
-        outerRadius: 2_000,
-        halfThickness: 100,
+        innerRadius: meters(1_000),
+        outerRadius: meters(2_000),
+        halfThickness: meters(100),
     },
 };
 
@@ -30,7 +31,7 @@ describe("warpInfluence", () => {
             type: "solid",
             volume: {
                 center: new Vector3(200_000, 0, 0),
-                radius: 1_000,
+                radius: meters(1_000),
             },
         };
 
@@ -74,7 +75,7 @@ describe("warpInfluence", () => {
             type: "solid",
             volume: {
                 center: new Vector3(2_000_000, 0, 0),
-                radius: 1_000,
+                radius: meters(1_000),
             },
         };
 

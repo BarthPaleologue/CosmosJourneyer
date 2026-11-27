@@ -27,7 +27,11 @@ import {
     getMagnetopauseStandoffDistance,
     getStellarWind,
     getStellarWindDynamicPressure,
+    meters,
+    pascals,
+    radians,
 } from "@cosmos-journeyer/physics";
+import type { AmpereSquareMeters, Meters, Radians } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { MagneticFieldModel } from "@cosmos-journeyer/universe-model";
 
@@ -57,11 +61,11 @@ type FieldLine = {
  */
 export class MagnetosphereGizmo implements SystemContent {
     private readonly root: TransformNode;
-    private readonly planetRadius: number;
-    private readonly moment: number;
+    private readonly planetRadius: Meters;
+    private readonly moment: AmpereSquareMeters;
     private readonly lines: Array<FieldLine> = [];
 
-    constructor(planetRadius: number, magneticField: DeepReadonly<MagneticFieldModel>, scene: Scene) {
+    constructor(planetRadius: Meters, magneticField: DeepReadonly<MagneticFieldModel>, scene: Scene) {
         this.root = new TransformNode("MagnetosphereGizmo", scene);
         this.planetRadius = planetRadius;
         this.moment = magneticField.magnitude;
@@ -85,7 +89,7 @@ export class MagnetosphereGizmo implements SystemContent {
                 const shape = new Float32Array(pointsPerLine * 3);
                 for (let i = 0; i < pointsPerLine; i++) {
                     const theta = (Math.PI * (i + 0.5)) / pointsPerLine;
-                    const r = getDipoleFieldLineRadius(1, theta);
+                    const r = getDipoleFieldLineRadius(meters(1), radians(theta));
                     const x = r * Math.sin(theta);
                     const y = r * Math.cos(theta);
                     shape[i * 3] = x * cosPhi;
@@ -118,10 +122,10 @@ export class MagnetosphereGizmo implements SystemContent {
         let pressure = 0;
         for (const source of sources) {
             const distance = Vector3.Distance(position, source.position);
-            pressure += getStellarWindDynamicPressure(getStellarWind(source.mass, source.radius, distance));
+            pressure += getStellarWindDynamicPressure(getStellarWind(source.mass, source.radius, meters(distance)));
         }
 
-        const standoffDistance = getMagnetopauseStandoffDistance(this.moment, pressure);
+        const standoffDistance = getMagnetopauseStandoffDistance(this.moment, pascals(pressure));
         if (pressure <= 0 || standoffDistance <= this.planetRadius) {
             // A crushed magnetosphere has no closed field lines above the surface.
             this.root.setEnabled(false);
@@ -130,7 +134,7 @@ export class MagnetosphereGizmo implements SystemContent {
         this.root.setEnabled(true);
 
         for (const line of this.lines) {
-            const scaled = scaleShapeToRef(line.shape, line.fraction * standoffDistance, line.positions);
+            const scaled = scaleShapeToRef(line.shape, meters(line.fraction * standoffDistance), line.positions);
             line.mesh.updateVerticesData(VertexBuffer.PositionKind, scaled, true, false);
         }
     }
@@ -150,7 +154,7 @@ export class MagnetosphereGizmo implements SystemContent {
  * @param ref Buffer to write the scaled positions into, reused across updates.
  * @returns The same buffer as `ref`, filled with the scaled positions, 3 floats per point.
  */
-function scaleShapeToRef(shape: Float32Array, lineMaxDistance: number, ref: Float32Array): Float32Array {
+function scaleShapeToRef(shape: Float32Array, lineMaxDistance: Meters, ref: Float32Array): Float32Array {
     for (let i = 0; i < shape.length; i++) {
         ref[i] = (shape[i] ?? 0) * lineMaxDistance;
     }
@@ -174,7 +178,7 @@ function toVector3Array(positions: Float32Array): Array<Vector3> {
  * @param longitude Longitude in radians.
  * @returns The unit direction as a vector.
  */
-function geographicToCartesian(latitude: number, longitude: number): Vector3 {
+function geographicToCartesian(latitude: Radians, longitude: Radians): Vector3 {
     const cosLatitude = Math.cos(latitude);
     return new Vector3(cosLatitude * Math.cos(longitude), Math.sin(latitude), cosLatitude * Math.sin(longitude));
 }

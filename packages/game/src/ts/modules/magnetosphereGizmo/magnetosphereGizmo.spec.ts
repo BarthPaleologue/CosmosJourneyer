@@ -27,16 +27,19 @@ import {
     getStellarWindDynamicPressure,
     SolarMass,
     SolarRadius,
+    ampereSquareMeters,
+    meters,
+    radians,
 } from "@cosmos-journeyer/physics";
 import type { MagneticFieldModel } from "@cosmos-journeyer/universe-model";
 import { describe, expect, it } from "vitest";
 
 import { MagnetosphereGizmo } from "./magnetosphereGizmo";
 
-const planetRadius = 1000e3;
+const planetRadius = meters(1000e3);
 const magneticField: MagneticFieldModel = {
-    north: { latitude: Math.PI / 2, longitude: 0 },
-    magnitude: EarthMagneticDipoleMoment / 6 ** 3,
+    north: { latitude: radians(Math.PI / 2), longitude: radians(0) },
+    magnitude: ampereSquareMeters(EarthMagneticDipoleMoment / 6 ** 3),
 };
 
 const sunSource = {

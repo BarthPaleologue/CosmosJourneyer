@@ -20,12 +20,13 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsMotionType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import type { Scene } from "@babylonjs/core/scene";
+import type { Kilograms, Meters } from "@cosmos-journeyer/physics";
 
 type CelestialBody = {
     name: string;
     position: Vector3;
-    radius: number;
-    mass: number;
+    radius: Meters;
+    mass: Kilograms;
 };
 
 export class GravitySystem {

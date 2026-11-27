@@ -18,6 +18,8 @@
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters, Radians } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
 
@@ -225,7 +227,7 @@ function createOnSurfacePlacement(
 ): OnSurfacePlacement {
     const { latitude, longitude, heightAboveGround } = model.position;
 
-    const radius = planet.model.radius + terrainHeight + heightAboveGround;
+    const radius = meters(planet.model.radius + terrainHeight + heightAboveGround);
 
     const transform = new TransformNode(`${entityId}_on_surface_placement`, scene);
 
@@ -251,9 +253,9 @@ function createOnSurfacePlacement(
  * @returns Position and orientation in the planet's local coordinate system.
  */
 export function createSurfaceTransform(
-    latitude: number,
-    longitude: number,
-    radius: number,
+    latitude: Radians,
+    longitude: Radians,
+    radius: Meters,
     rotation: DeepReadonly<OnSurfacePlacementRotation>,
 ): { position: Vector3; rotation: Quaternion } {
     const { heading, pitch, roll } = rotation;

@@ -32,19 +32,21 @@ import type { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
+import { kilograms, radians } from "@cosmos-journeyer/physics";
+import type { Kilograms, Meters } from "@cosmos-journeyer/physics";
 
 import { CollisionMask } from "@/settings";
 
 import { CreateTorusVertexData } from "../assets/procedural/helpers/torusBuilder";
 import { filterVehicleShape } from "./filterVehicleShape";
 
-const SteerableAxleAngleLimit = Math.PI / 3;
+const SteerableAxleAngleLimit = radians(Math.PI / 3);
 
 export type WheelModel = {
     position: Vector3;
     geometry: {
-        radius: number;
-        thickness: number;
+        radius: Meters;
+        thickness: Meters;
     };
     behavior: {
         powered: boolean;
@@ -61,7 +63,7 @@ type WheelDraft = {
 };
 
 export class Wheel {
-    readonly radius: number;
+    readonly radius: Meters;
 
     /** Immutable geometry relative to the chassis, independent of its world pose. */
     readonly frameLocalPosition: Readonly<IVector3Like>;
@@ -89,7 +91,13 @@ export class Wheel {
         const { radius, thickness } = model.geometry;
         const { powered, steerable } = model.behavior;
 
-        const { physicsBody: axleBody, physicsShape: axleShape } = AddAxlePhysics(axleMesh, 190, 0, 0, scene);
+        const { physicsBody: axleBody, physicsShape: axleShape } = AddAxlePhysics(
+            axleMesh,
+            kilograms(190),
+            0,
+            0,
+            scene,
+        );
         filterVehicleShape(axleShape, CollisionMask.VEHICLE_PARTS);
 
         this.axle = {
@@ -105,7 +113,7 @@ export class Wheel {
             wheelMesh,
             radius,
             thickness,
-            150,
+            kilograms(150),
             0.2,
             3,
             scene,
@@ -162,7 +170,7 @@ export class Wheel {
  */
 function AddAxlePhysics(
     mesh: TransformNode,
-    mass: number,
+    mass: Kilograms,
     bounce: number,
     friction: number,
     scene: Scene,
@@ -196,9 +204,9 @@ function AddAxlePhysics(
  */
 function AddWheelPhysics(
     mesh: Mesh,
-    radius: number,
-    thickness: number,
-    mass: number,
+    radius: Meters,
+    thickness: Meters,
+    mass: Kilograms,
     bounce: number,
     friction: number,
     scene: Scene,
@@ -210,7 +218,7 @@ function AddWheelPhysics(
             mass: mass,
             restitution: bounce,
             friction: friction,
-            pointA: new Vector3(-thickness / 2, 0, 0),
+            pointA: new Vector3((thickness * -1) / 2, 0, 0),
             pointB: new Vector3(thickness / 2, 0, 0),
             radius: radius,
         },
@@ -318,7 +326,7 @@ function AttachAxleToFrame(
             {
                 // Steering
                 axis: PhysicsConstraintAxis.ANGULAR_Y,
-                minLimit: steerable ? -SteerableAxleAngleLimit : 0,
+                minLimit: steerable ? SteerableAxleAngleLimit * -1 : 0,
                 maxLimit: steerable ? SteerableAxleAngleLimit : 0,
             },
             {
@@ -347,7 +355,7 @@ function AttachAxleToFrame(
  * @param scene Scene that owns the axle mesh.
  * @returns The axle transform node.
  */
-export function CreateAxle(position: Vector3, radius: number, scene: Scene): TransformNode {
+export function CreateAxle(position: Vector3, radius: Meters, scene: Scene): TransformNode {
     const axleMesh = new TransformNode("Axle", scene);
     axleMesh.rotation = new Vector3(0, 0, Math.PI / 2);
     axleMesh.position.copyFrom(position);
@@ -368,8 +376,8 @@ export function CreateAxle(position: Vector3, radius: number, scene: Scene): Tra
  */
 export function CreateWheel(
     position: Vector3,
-    radius: number,
-    thickness: number,
+    radius: Meters,
+    thickness: Meters,
     materials: {
         wheel: Material;
         tire: Material;

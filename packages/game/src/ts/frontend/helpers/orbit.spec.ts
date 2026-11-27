@@ -17,18 +17,19 @@
 
 import { Axis } from "@babylonjs/core/Maths/math.axis";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { radians, seconds } from "@cosmos-journeyer/physics";
 import type { SpinModel } from "@cosmos-journeyer/universe-model";
 import { describe, expect, it } from "vitest";
 
 import { computeAbsoluteOrientation, computeSpinAxisOrientation } from "./orbit";
 
-const baseOrbitalPlane = { inclination: 0, longitudeOfAscendingNode: 0 };
+const baseOrbitalPlane = { inclination: radians(0), longitudeOfAscendingNode: radians(0) };
 
 const baseSpin = {
-    axialTilt: 0,
-    axisAzimuth: 0,
-    siderealPeriod: 0,
-    initialRotationAngle: 0,
+    axialTilt: radians(0),
+    axisAzimuth: radians(0),
+    siderealPeriod: seconds(0),
+    initialRotationAngle: radians(0),
 } satisfies SpinModel;
 
 /**
@@ -54,21 +55,21 @@ function expectVectorCloseTo(actual: Vector3, expected: Vector3): void {
 
 describe("computeAbsoluteOrientation", () => {
     it.each([0, 2, 4, 8])("keeps the spin axis fixed as spin advances to t=%s", (time) => {
-        const orbitalPlane = { inclination: 0.3, longitudeOfAscendingNode: 0.7 };
+        const orbitalPlane = { inclination: radians(0.3), longitudeOfAscendingNode: radians(0.7) };
         const spin = {
             ...baseSpin,
-            axialTilt: 0.6,
-            axisAzimuth: 1.2,
-            initialRotationAngle: 0.4,
-            siderealPeriod: 8,
+            axialTilt: radians(0.6),
+            axisAzimuth: radians(1.2),
+            initialRotationAngle: radians(0.4),
+            siderealPeriod: seconds(8),
         };
-        const orientation = computeAbsoluteOrientation(orbitalPlane, spin, time);
+        const orientation = computeAbsoluteOrientation(orbitalPlane, spin, seconds(time));
         const spinAxis = computeSpinAxisOrientation(orbitalPlane, spin);
         expectVectorCloseTo(Axis.Y.applyRotationQuaternion(orientation), Axis.Y.applyRotationQuaternion(spinAxis));
     });
 
     it("returns the identity orientation when the orbit and spin parameters are neutral", () => {
-        const orientation = computeAbsoluteOrientation(baseOrbitalPlane, baseSpin, 0);
+        const orientation = computeAbsoluteOrientation(baseOrbitalPlane, baseSpin, seconds(0));
 
         expectQuaternionCloseTo(orientation, Quaternion.Identity());
     });
@@ -78,9 +79,9 @@ describe("computeAbsoluteOrientation", () => {
             baseOrbitalPlane,
             {
                 ...baseSpin,
-                initialRotationAngle: Math.PI / 2,
+                initialRotationAngle: radians(Math.PI / 2),
             },
-            0,
+            seconds(0),
         );
 
         expectVectorCloseTo(Axis.X.applyRotationQuaternion(orientation), new Vector3(0, 0, -1));
@@ -91,10 +92,10 @@ describe("computeAbsoluteOrientation", () => {
             baseOrbitalPlane,
             {
                 ...baseSpin,
-                siderealPeriod: 8,
-                initialRotationAngle: Math.PI / 4,
+                siderealPeriod: seconds(8),
+                initialRotationAngle: radians(Math.PI / 4),
             },
-            1,
+            seconds(1),
         );
 
         expectVectorCloseTo(Axis.X.applyRotationQuaternion(orientation), new Vector3(0, 0, -1));
@@ -102,12 +103,12 @@ describe("computeAbsoluteOrientation", () => {
 
     it("applies the local spin-axis orientation before the orbital inclination", () => {
         const orientation = computeAbsoluteOrientation(
-            { ...baseOrbitalPlane, inclination: Math.PI / 2 },
+            { ...baseOrbitalPlane, inclination: radians(Math.PI / 2) },
             {
                 ...baseSpin,
-                axisAzimuth: Math.PI / 2,
+                axisAzimuth: radians(Math.PI / 2),
             },
-            0,
+            seconds(0),
         );
 
         expectVectorCloseTo(Axis.X.applyRotationQuaternion(orientation), new Vector3(0, 0, -1));
@@ -121,7 +122,10 @@ describe("computeSpinAxisOrientation", () => {
         { inclination: Math.PI / 2, node: Math.PI / 2, axis: new Vector3(0, 0, 1) },
         { inclination: Math.PI / 2, node: Math.PI, axis: new Vector3(1, 0, 0) },
     ])("aligns an untilted spin axis with the orbital normal for %j", ({ inclination, node, axis }) => {
-        const orientation = computeSpinAxisOrientation({ inclination, longitudeOfAscendingNode: node }, baseSpin);
+        const orientation = computeSpinAxisOrientation(
+            { inclination: radians(inclination), longitudeOfAscendingNode: radians(node) },
+            baseSpin,
+        );
         expectVectorCloseTo(Axis.Y.applyRotationQuaternion(orientation), axis);
     });
 
@@ -134,8 +138,8 @@ describe("computeSpinAxisOrientation", () => {
             Math.sin(inclination) * Math.sin(node),
         );
         const orientation = computeSpinAxisOrientation(
-            { inclination, longitudeOfAscendingNode: node },
-            { ...baseSpin, axialTilt, axisAzimuth: 1.1 },
+            { inclination: radians(inclination), longitudeOfAscendingNode: radians(node) },
+            { ...baseSpin, axialTilt: radians(axialTilt), axisAzimuth: radians(1.1) },
         );
         const axis = Axis.Y.applyRotationQuaternion(orientation);
         expect(Vector3.Dot(axis, orbitalNormal)).toBeCloseTo(Math.cos(axialTilt), 10);
@@ -149,20 +153,20 @@ describe("computeSpinAxisOrientation", () => {
     ])("sets the tilted spin-axis direction for azimuth $azimuth", ({ azimuth, axis }) => {
         const orientation = computeSpinAxisOrientation(baseOrbitalPlane, {
             ...baseSpin,
-            axialTilt: Math.PI / 2,
-            axisAzimuth: azimuth,
+            axialTilt: radians(Math.PI / 2),
+            axisAzimuth: radians(azimuth),
         });
         expectVectorCloseTo(Axis.Y.applyRotationQuaternion(orientation), axis);
     });
 
     it("returns only the spin-axis orientation without the sidereal spin phase", () => {
         const spinAxisOrientation = computeSpinAxisOrientation(
-            { ...baseOrbitalPlane, inclination: Math.PI / 2 },
+            { ...baseOrbitalPlane, inclination: radians(Math.PI / 2) },
             {
                 ...baseSpin,
-                axisAzimuth: Math.PI / 2,
-                siderealPeriod: 8,
-                initialRotationAngle: Math.PI / 2,
+                axisAzimuth: radians(Math.PI / 2),
+                siderealPeriod: seconds(8),
+                initialRotationAngle: radians(Math.PI / 2),
             },
         );
 

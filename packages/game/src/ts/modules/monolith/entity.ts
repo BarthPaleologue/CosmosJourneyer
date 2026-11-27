@@ -23,6 +23,7 @@ import type { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
+import type { Meters } from "@cosmos-journeyer/physics";
 
 import { getBoundingRadius } from "@/frontend/helpers/boundingRadius";
 import type { SystemContent } from "@/frontend/systemEntity/systemEntity";
@@ -34,7 +35,7 @@ export type MonolithModel = {
 };
 
 export class Monolith implements SystemContent {
-    readonly radius: number;
+    readonly radius: Meters;
 
     private readonly mesh: Mesh;
 

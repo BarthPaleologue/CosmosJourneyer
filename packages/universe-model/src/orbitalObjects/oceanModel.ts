@@ -15,6 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Meters } from "@cosmos-journeyer/physics";
+
 export type OceanModel = {
-    depth: number;
+    depth: Meters;
 };

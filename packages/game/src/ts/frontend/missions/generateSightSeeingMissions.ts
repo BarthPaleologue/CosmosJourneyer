@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import type { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { lightYears } from "@cosmos-journeyer/physics";
+import type { LightYears } from "@cosmos-journeyer/physics";
 import { uniformRandBool, getRngFromSeed } from "@cosmos-journeyer/random";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, Result } from "@cosmos-journeyer/typescript";
@@ -66,7 +68,7 @@ export function generateSightseeingMissions(
 
     const neighborSystems = getNeighborStarSystemCoordinates(
         systemContentModel.system.coordinates,
-        75,
+        lightYears(75),
         universeBackend,
     );
     neighborSystems.forEach(({ coordinates: systemCoordinates, position: systemPosition, distance }) => {
@@ -115,7 +117,7 @@ function generateSightseeingMissionsInSystem(
     systemModel: DeepReadonly<StarSystemContentModel>,
     systemPosition: Vector3,
     spaceStationUniverseId: UniverseObjectId,
-    distance: number,
+    distance: LightYears,
     rng: (seed: number) => number,
     universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {
@@ -153,7 +155,7 @@ function generateAnomalyFlyByMissionsInSystem(
     systemContentModel: DeepReadonly<StarSystemContentModel>,
     systemPosition: Vector3,
     spaceStationUniverseId: UniverseObjectId,
-    distance: number,
+    distance: LightYears,
     rng: (seed: number) => number,
     universeBackend: UniverseBackend,
 ): ReadonlyArray<Mission> {

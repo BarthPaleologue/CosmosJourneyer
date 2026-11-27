@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { MagneticFieldModel, StarSystemModel } from "@cosmos-journeyer/universe-model";
 
@@ -22,7 +23,7 @@ import type { InFramePlacementModel, SystemEntityModel } from "@/backend/systemE
 
 export type AuroraModel = {
     type: "aurora";
-    radius: number;
+    radius: Meters;
     magneticField: MagneticFieldModel;
     /** Seed driving the deterministic ribbon placement. */
     seed: number;

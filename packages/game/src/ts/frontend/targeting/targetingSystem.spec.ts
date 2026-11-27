@@ -2,6 +2,8 @@ import { NullEngine } from "@babylonjs/core/Engines/nullEngine";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { TargetType } from "./target";
@@ -35,7 +37,7 @@ describe("TargetingSystem", () => {
     function createTarget(x: number, z: number): Target {
         const transform = new TransformNode("target", scene);
         transform.position.set(x, 0, z);
-        return { type: TargetType.CUSTOM, getTransform: () => transform, getBoundingRadius: (): number => 1 };
+        return { type: TargetType.CUSTOM, getTransform: () => transform, getBoundingRadius: (): Meters => meters(1) };
     }
 
     it("registers one canonical target per transform", () => {
@@ -171,7 +173,7 @@ describe("TargetingSystem", () => {
             ...createTarget(0, 201),
             padIdentifier: "1",
             type: TargetType.LANDING_PAD,
-            getBoundingRadius: (): number => 2,
+            getBoundingRadius: (): Meters => meters(2),
         };
         const facility = { ...createTarget(1, 1000), type: TargetType.SPACE_STATION };
         system.addContacts([
@@ -199,7 +201,7 @@ describe("TargetingSystem", () => {
         system.onTargetsAddedObservable.add(() => {
             additions++;
         });
-        system.setKnownTargets([{ ...target, getBoundingRadius: (): number => 10000 }]);
+        system.setKnownTargets([{ ...target, getBoundingRadius: (): Meters => meters(10000) }]);
         expect(system.isKnown({ ...target })).toBe(true);
         expect(system.isAvailable(target)).toBe(true);
         expect([...system.getTargets()]).toEqual([target]);

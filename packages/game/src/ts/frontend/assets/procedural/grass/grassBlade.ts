@@ -19,6 +19,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import { VertexData } from "@babylonjs/core/Meshes/mesh.vertexData";
 import type { Scene } from "@babylonjs/core/scene";
+import { radians } from "@cosmos-journeyer/physics";
+import type { Radians } from "@cosmos-journeyer/physics";
 
 // rotation using https://www.wikiwand.com/en/Rodrigues%27_rotation_formula
 /**
@@ -28,7 +30,7 @@ import type { Scene } from "@babylonjs/core/scene";
  * @param theta Rotation angle in radians.
  * @returns A new vector oriented by the requested angle.
  */
-function rotateAround(vector: Vector3, axis: Vector3, theta: number): Vector3 {
+function rotateAround(vector: Vector3, axis: Vector3, theta: Radians): Vector3 {
     // Please note that unit vector are required, i did not divide by the norms
     return vector
         .scale(Math.cos(theta))
@@ -51,8 +53,8 @@ export function createGrassBlade(scene: Scene, nbStacks: number): Mesh {
     const indices = new Uint32Array(nbTriangles * 3);
 
     const normal = new Vector3(0, 0, 1);
-    const curvyNormal1 = rotateAround(normal, new Vector3(0, 1, 0), Math.PI * 0.3);
-    const curvyNormal2 = rotateAround(normal, new Vector3(0, 1, 0), -Math.PI * 0.3);
+    const curvyNormal1 = rotateAround(normal, new Vector3(0, 1, 0), radians(Math.PI * 0.3));
+    const curvyNormal2 = rotateAround(normal, new Vector3(0, 1, 0), radians(-Math.PI * 0.3));
 
     const width = 0.08;
     const height = 1;

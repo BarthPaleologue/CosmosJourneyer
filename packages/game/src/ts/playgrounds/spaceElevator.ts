@@ -19,7 +19,7 @@ import { CreateSphere, DirectionalLight, GlowLayer, PBRMaterial } from "@babylon
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-import { astronomicalUnitToMeters } from "@cosmos-journeyer/physics";
+import { astronomicalUnitToMeters, meters } from "@cosmos-journeyer/physics";
 import { generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
@@ -126,7 +126,7 @@ export async function createSpaceElevatorScene(
         orbit: {
             ...planet.orbit,
             parentIds: [],
-            semiMajorAxis: 0,
+            semiMajorAxis: meters(0),
         },
     });
 

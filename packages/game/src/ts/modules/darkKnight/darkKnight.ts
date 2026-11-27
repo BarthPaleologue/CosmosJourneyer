@@ -23,13 +23,15 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 
 import type { SystemContent } from "@/frontend/systemEntity/systemEntity";
 
 import { CollisionMask } from "@/settings";
 
 export class DarkKnight implements SystemContent {
-    readonly radius: number;
+    readonly radius: Meters;
 
     private readonly mesh: Mesh;
 
@@ -40,7 +42,7 @@ export class DarkKnight implements SystemContent {
     private readonly scene: Scene;
 
     constructor(scene: Scene) {
-        this.radius = 100e3;
+        this.radius = meters(100e3);
 
         this.mesh = MeshBuilder.CreateSphere("DarkKnight", { diameter: this.radius * 2, segments: 256 }, scene);
         this.mesh.receiveShadows = true;

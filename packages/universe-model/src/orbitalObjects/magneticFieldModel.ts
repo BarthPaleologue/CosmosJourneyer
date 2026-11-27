@@ -15,14 +15,16 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { AmpereSquareMeters, Radians } from "@cosmos-journeyer/physics";
+
 /** Dipole magnetic field model */
 export type MagneticFieldModel = {
     north: {
         /** Latitude above the planet's equatorial plane, in radians. */
-        latitude: number;
+        latitude: Radians;
         /** Longitude in the planet-fixed frame, in radians. */
-        longitude: number;
+        longitude: Radians;
     };
     /** Magnetic dipole moment in A·m². */
-    magnitude: number;
+    magnitude: AmpereSquareMeters;
 };

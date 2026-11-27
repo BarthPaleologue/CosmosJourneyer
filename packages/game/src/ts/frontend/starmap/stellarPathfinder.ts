@@ -16,6 +16,8 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { lightYears } from "@cosmos-journeyer/physics";
+import type { LightYears } from "@cosmos-journeyer/physics";
 import { err, ok } from "@cosmos-journeyer/typescript";
 import type { Result } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
@@ -54,7 +56,7 @@ export class StellarPathfinder {
     private readonly openList = new PriorityQueue<Node>((a, b) => a.G + a.H < b.G + b.H);
     private closedList: Array<Node> = [];
 
-    private jumpRange = 10;
+    private jumpRange: LightYears = lightYears(10);
 
     private hasPath = false;
     private nbIterations = 0;
@@ -76,7 +78,7 @@ export class StellarPathfinder {
     public init(
         startSystemCoordinates: StarSystemCoordinates,
         targetSystemCoordinates: StarSystemCoordinates,
-        jumpRange: number,
+        jumpRange: LightYears,
     ): void {
         this.coordinatesToPrevious.clear();
         this.openList.clear();
@@ -102,7 +104,7 @@ export class StellarPathfinder {
         return this.startSystem !== null && this.targetSystem !== null;
     }
 
-    private getHeuristic(node: Node): number {
+    private getHeuristic(node: Node): LightYears {
         const position = node.position;
 
         if (this.targetSystem === null) {
@@ -110,16 +112,16 @@ export class StellarPathfinder {
         }
         const targetPosition = this.targetSystem.position;
 
-        return Vector3.Distance(position, targetPosition);
+        return lightYears(Vector3.Distance(position, targetPosition));
     }
 
-    private getNeighbors(node: Node): Array<{ node: Node; distance: number }> {
+    private getNeighbors(node: Node): Array<{ node: Node; distance: LightYears }> {
         const stellarNeighbors = getNeighborStarSystemCoordinates(
             node.coordinates,
             this.jumpRange,
             this.universeBackend,
         );
-        return stellarNeighbors.map<{ node: Node; distance: number }>(({ coordinates, position, distance }) => {
+        return stellarNeighbors.map<{ node: Node; distance: LightYears }>(({ coordinates, position, distance }) => {
             return {
                 node: {
                     coordinates: coordinates,

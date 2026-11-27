@@ -24,6 +24,8 @@ import { TransformNode } from "@babylonjs/core/Meshes";
 import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters, metersPerSecond, radians, seconds } from "@cosmos-journeyer/physics";
+import type { Radians } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -149,7 +151,7 @@ export class ShipControls implements Controls {
                 return;
             }
 
-            if (warpDrive.isDisabled() && !spaceship.canEngageWarpDrive(0)) {
+            if (warpDrive.isDisabled() && !spaceship.canEngageWarpDrive(metersPerSecond(0))) {
                 tts.sayNow("Charlotte", "cannot_engage_warp_drive");
                 return;
             }
@@ -160,10 +162,10 @@ export class ShipControls implements Controls {
             if (warpDrive.isEnabled()) {
                 tts.sayNow("Charlotte", "engaging_warp_drive");
                 spaceship.setMainEngineThrottle(0);
-                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, 1.0);
+                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, seconds(1.0));
             } else {
                 tts.sayNow("Charlotte", "warp_drive_disengaged");
-                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, 0.5);
+                this.cameraShakeAnimation = createCameraShakeAnimation(this.thirdPersonCamera, 0.006, seconds(0.5));
 
                 if (this.closestLandableFacility !== null) {
                     const distanceToLandingFacility = Vector3.Distance(
@@ -258,19 +260,19 @@ export class ShipControls implements Controls {
         this.resetCameraHandler = (presetName: ThirdPersonCameraPresetNames): void => {
             this.thirdPersonCameraAnimation = CustomAnimation.FromTo(
                 {
-                    alpha: this.thirdPersonCamera.alpha,
-                    beta: this.thirdPersonCamera.beta,
-                    radius: this.thirdPersonCamera.radius,
+                    alpha: radians(this.thirdPersonCamera.alpha),
+                    beta: radians(this.thirdPersonCamera.beta),
+                    radius: meters(this.thirdPersonCamera.radius),
                     target: this.thirdPersonCamera.target.clone(),
                 },
                 thirdPersonCameraPresets[presetName],
                 (from, to, progress) => ({
                     alpha: lerpAngle(from.alpha, to.alpha, progress),
                     beta: lerpAngle(from.beta, to.beta, progress),
-                    radius: lerp(from.radius, to.radius, progress),
+                    radius: meters(lerp(from.radius, to.radius, progress)),
                     target: Vector3.Lerp(from.target, to.target, progress),
                 }),
-                1.0,
+                seconds(1.0),
                 {
                     easing: easeInOutCubic,
                 },
@@ -404,15 +406,15 @@ export class ShipControls implements Controls {
             inputPitch *= 0;
         }
 
-        let spaceDotsYawIntent = 0;
-        let spaceDotsPitchIntent = 0;
+        let spaceDotsYawIntent: Radians = radians(0);
+        let spaceDotsPitchIntent: Radians = radians(0);
 
         const warpDrive = spaceship.getInternals().getWarpDrive();
         if (warpDrive !== null && warpDrive.isEnabled()) {
             const nextRotationInertiaX = lerpSmooth(this.rotationInertia.x, inputRoll, 0.07, deltaSeconds);
             const nextRotationInertiaY = lerpSmooth(this.rotationInertia.y, inputPitch, 0.07, deltaSeconds);
-            spaceDotsYawIntent = this.spaceDotsYawResponse * nextRotationInertiaX;
-            spaceDotsPitchIntent = this.spaceDotsPitchResponse * nextRotationInertiaY;
+            spaceDotsYawIntent = radians(this.spaceDotsYawResponse * nextRotationInertiaX);
+            spaceDotsPitchIntent = radians(this.spaceDotsPitchResponse * nextRotationInertiaY);
         }
 
         spaceship.spaceDots.setSteering(spaceDotsYawIntent, spaceDotsPitchIntent);
@@ -463,9 +465,9 @@ export class ShipControls implements Controls {
             this.rotationInertia.x = lerpSmooth(this.rotationInertia.x, inputRoll, 0.07, deltaSeconds);
             this.rotationInertia.y = lerpSmooth(this.rotationInertia.y, inputPitch, 0.07, deltaSeconds);
 
-            roll(this.getTransform(), this.spaceship.maxRollSpeed * this.rotationInertia.x * deltaSeconds);
-            yaw(this.getTransform(), -this.spaceship.maxYawSpeed * this.rotationInertia.x * deltaSeconds);
-            pitch(this.getTransform(), this.spaceship.maxPitchSpeed * this.rotationInertia.y * deltaSeconds);
+            roll(this.getTransform(), radians(this.spaceship.maxRollSpeed * this.rotationInertia.x * deltaSeconds));
+            yaw(this.getTransform(), radians(-this.spaceship.maxYawSpeed * this.rotationInertia.x * deltaSeconds));
+            pitch(this.getTransform(), radians(this.spaceship.maxPitchSpeed * this.rotationInertia.y * deltaSeconds));
         }
 
         this.thirdPersonCameraTransform.position.copyFrom(this.getTransform().getAbsolutePosition());

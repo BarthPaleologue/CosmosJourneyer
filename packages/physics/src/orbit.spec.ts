@@ -26,43 +26,44 @@ import {
     getSemiMajorAxisFromPeriod,
     keplerEquation,
 } from "./orbit";
+import { kilograms, meters, radians, seconds } from "./units";
 
 describe("getSemiMajorAxis", () => {
     it("should average periapsis and apoapsis", () => {
-        const periapsis = 100_000;
-        const apoapsis = 300_000;
+        const periapsis = meters(100_000);
+        const apoapsis = meters(300_000);
         expect(getSemiMajorAxis(periapsis, apoapsis)).toBe(200_000);
     });
 
     it("should return periapsis for circular orbits", () => {
-        const periapsis = 150_000;
+        const periapsis = meters(150_000);
         expect(getSemiMajorAxis(periapsis, periapsis)).toBe(periapsis);
     });
 });
 
 describe("getEccentricity", () => {
     it("should compute eccentricity for an elliptical orbit", () => {
-        const periapsis = 147_100_000_000; // Earth at perihelion (m)
-        const apoapsis = 152_100_000_000; // Earth at aphelion (m)
+        const periapsis = meters(147_100_000_000); // Earth at perihelion (m)
+        const apoapsis = meters(152_100_000_000); // Earth at aphelion (m)
         const eccentricity = getEccentricity(periapsis, apoapsis);
         expect(eccentricity).toBeCloseTo(0.0167, 4);
     });
 
     it("should return zero for a circular orbit", () => {
-        expect(getEccentricity(50_000, 50_000)).toBe(0);
+        expect(getEccentricity(meters(50_000), meters(50_000))).toBe(0);
     });
 });
 
 describe("keplerEquation", () => {
     it("should be satisfied for matching anomalies", () => {
-        const trueAnomaly = 1.2;
+        const trueAnomaly = radians(1.2);
         const eccentricity = 0.25;
-        const meanAnomaly = trueAnomaly - eccentricity * Math.sin(trueAnomaly);
+        const meanAnomaly = radians(trueAnomaly - eccentricity * Math.sin(trueAnomaly));
         expect(keplerEquation(trueAnomaly, meanAnomaly, eccentricity)).toBeCloseTo(0, 10);
     });
 
     it("should return zero when anomalies are zero", () => {
-        expect(keplerEquation(0, 0, 0.5)).toBe(0);
+        expect(keplerEquation(radians(0), radians(0), 0.5)).toBe(0);
     });
 });
 
@@ -79,12 +80,12 @@ describe("computeLpFactor", () => {
 
 describe("getOrbitalPeriod", () => {
     it("should return zero when the parent mass is zero", () => {
-        expect(getOrbitalPeriod(1_000_000, 0)).toBe(0);
+        expect(getOrbitalPeriod(meters(1_000_000), kilograms(0))).toBe(0);
     });
 
     it("should compute the Earth year from the semi-major axis", () => {
-        const semiMajorAxis = 1.496e11; // meters
-        const sunMass = 1.989e30; // kg
+        const semiMajorAxis = meters(1.496e11); // meters
+        const sunMass = kilograms(1.989e30); // kg
         const orbitalPeriod = getOrbitalPeriod(semiMajorAxis, sunMass);
         const earthYearInSeconds = 365.25 * 24 * 60 * 60;
         expect(orbitalPeriod).toBeGreaterThan(earthYearInSeconds * 0.99);
@@ -94,12 +95,12 @@ describe("getOrbitalPeriod", () => {
 
 describe("getSemiMajorAxisFromPeriod", () => {
     it("should return zero when the parent mass is zero", () => {
-        expect(getSemiMajorAxisFromPeriod(60, 0)).toBe(0);
+        expect(getSemiMajorAxisFromPeriod(seconds(60), kilograms(0))).toBe(0);
     });
 
     it("should invert getOrbitalPeriod for Earth", () => {
-        const sunMass = 1.989e30; // kg
-        const earthPeriod = 365.25 * 24 * 60 * 60; // seconds
+        const sunMass = kilograms(1.989e30); // kg
+        const earthPeriod = seconds(365.25 * 24 * 60 * 60); // seconds
         const semiMajorAxis = getSemiMajorAxisFromPeriod(earthPeriod, sunMass);
         expect(semiMajorAxis).toBeGreaterThan(1.49e11 - 1e9);
         expect(semiMajorAxis).toBeLessThan(1.49e11 + 1e9);
@@ -108,8 +109,8 @@ describe("getSemiMajorAxisFromPeriod", () => {
 
 describe("getOrbitRadiusFromPeriod", () => {
     it("should match the Earth's orbital radius", () => {
-        const sunMass = 1.989e30; // in kg
-        const earthPeriod = 365.25 * 24 * 60 * 60; // in seconds
+        const sunMass = kilograms(1.989e30); // in kg
+        const earthPeriod = seconds(365.25 * 24 * 60 * 60); // in seconds
         const earthOrbitRadius = getOrbitRadiusFromPeriod(earthPeriod, sunMass);
 
         expect(earthOrbitRadius).toBeGreaterThan(1.49e11 - 1e9);
@@ -117,8 +118,8 @@ describe("getOrbitRadiusFromPeriod", () => {
     });
 
     it("should match the Moon's orbital radius", () => {
-        const earthMass = 5.972e24;
-        const moonPeriod = 27.3 * 24 * 60 * 60; // in seconds
+        const earthMass = kilograms(5.972e24);
+        const moonPeriod = seconds(27.3 * 24 * 60 * 60); // in seconds
         const moonOrbitRadius = getOrbitRadiusFromPeriod(moonPeriod, earthMass);
 
         expect(moonOrbitRadius).toBeGreaterThan(3.84e8 - 2e6);

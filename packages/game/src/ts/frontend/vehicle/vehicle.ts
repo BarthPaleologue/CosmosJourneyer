@@ -21,7 +21,16 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsConstraintAxis } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Physics6DoFConstraint } from "@babylonjs/core/Physics/v2/physicsConstraint";
-import { degreesToRadians, EarthG, kmhToMetersPerSecond } from "@cosmos-journeyer/physics";
+import {
+    degreesToRadians,
+    EarthG,
+    kmhToMetersPerSecond,
+    meters,
+    metersPerSecond,
+    quantity,
+    radians,
+} from "@cosmos-journeyer/physics";
+import type { Meters, MetersPerSecond, MetersPerSecondSquared, Quantity, Radians } from "@cosmos-journeyer/physics";
 
 import { clamp, lerp, lerpSmooth } from "@/utils/math";
 
@@ -37,16 +46,16 @@ export type SteeringMode = "counterPhase" | "inPhase";
 
 export type VehicleOptions = {
     /** Initial tuning budget in m/s², independent of the local gravity system. */
-    readonly maxLateralAcceleration: number;
+    readonly maxLateralAcceleration: MetersPerSecondSquared;
     /** Explicit turning reference for layouts with incompatible fixed axles. */
-    readonly steeringReferenceZ: number;
+    readonly steeringReferenceZ: Meters;
     /** Torque in N·m on powered wheels when throttle is released; zero means freewheel. */
-    readonly engineBrakeTorque: number;
+    readonly engineBrakeTorque: Quantity<"N·m">;
 };
 
 export type VehicleSteeringOptions = {
     /** Ground-plane speed in m/s; omit to use the magnitude of the 3D velocity. */
-    readonly horizontalSpeed: number;
+    readonly horizontalSpeed: MetersPerSecond;
 };
 
 export type FixedVehiclePart = {
@@ -69,12 +78,12 @@ export class Vehicle {
     private steeringMode: SteeringMode = "counterPhase";
 
     readonly steeringGeometry: SteeringGeometry | undefined;
-    readonly maxLateralAcceleration: number;
+    readonly maxLateralAcceleration: MetersPerSecondSquared;
 
-    readonly engineBrakeTorque: number;
+    readonly engineBrakeTorque: Quantity<"N·m">;
 
-    private targetLongitudinalSpeed: number | undefined;
-    private steeringCommandAngle = 0;
+    private targetLongitudinalSpeed: MetersPerSecond | undefined;
+    private steeringCommandAngle = radians(0);
 
     readonly maxSpeed = {
         forward: kmhToMetersPerSecond(40),
@@ -89,7 +98,7 @@ export class Vehicle {
 
     readonly allMeshes: ReadonlyArray<AbstractMesh>;
 
-    private readonly boundingRadius: number;
+    private readonly boundingRadius: Meters;
 
     constructor(
         name: string,
@@ -107,10 +116,10 @@ export class Vehicle {
         this.fixedParts = [...fixedParts];
         this.allMeshes = [...allMeshes];
 
-        this.engineBrakeTorque = options?.engineBrakeTorque ?? 0;
+        this.engineBrakeTorque = options?.engineBrakeTorque ?? quantity<"N·m">(0);
         this.maxLateralAcceleration = options?.maxLateralAcceleration ?? EarthG;
         const wheelGeometry = this.wheels.map((wheel) => ({
-            position: wheel.frameLocalPosition,
+            position: { x: meters(wheel.frameLocalPosition.x), z: meters(wheel.frameLocalPosition.z) },
             steerable: wheel.steering !== null,
         }));
         this.steeringGeometry = deriveSteeringGeometry(wheelGeometry, this.mechanicalSteeringAngleLimit, {
@@ -139,7 +148,7 @@ export class Vehicle {
         }
         this.steeringMode = mode;
         // A command in one mode cannot be carried into a different wheel motion.
-        this.setTargetSteeringAngle(0);
+        this.setTargetSteeringAngle(radians(0));
     }
 
     /**
@@ -147,10 +156,12 @@ export class Vehicle {
      * @param requestedSteeringAngle Requested steering angle in radians.
      * @param options Optional horizontal speed used for the speed-based steering limit.
      */
-    setTargetSteeringAngle(requestedSteeringAngle: number, options?: Partial<VehicleSteeringOptions>): void {
-        const speed = Math.abs(options?.horizontalSpeed ?? this.frame.body.getLinearVelocity().length());
+    setTargetSteeringAngle(requestedSteeringAngle: Radians, options?: Partial<VehicleSteeringOptions>): void {
+        const speed = metersPerSecond(
+            Math.abs(options?.horizontalSpeed ?? this.frame.body.getLinearVelocity().length()),
+        );
         const geometry = this.steeringMode === "counterPhase" ? this.steeringGeometry : undefined;
-        let curvature = 0;
+        let curvature = quantity<"1/m">(0);
         if (geometry !== undefined) {
             curvature = computeSpeedLimitedCurvature(
                 requestedSteeringAngle,
@@ -159,20 +170,22 @@ export class Vehicle {
                 this.maxLateralAcceleration,
                 this.mechanicalSteeringAngleLimit,
             );
-            curvature = clamp(
-                curvature,
-                geometry.mechanicalCurvatureLimits.minCurvature,
-                geometry.mechanicalCurvatureLimits.maxCurvature,
+            curvature = quantity<"1/m">(
+                clamp(
+                    curvature,
+                    geometry.mechanicalCurvatureLimits.minCurvature,
+                    geometry.mechanicalCurvatureLimits.maxCurvature,
+                ),
             );
             // Store the applied virtual angle so keyboard integration cannot wind up.
-            this.steeringCommandAngle = Math.atan(curvature * geometry.referenceLeverArm);
+            this.steeringCommandAngle = radians(Math.atan(curvature * geometry.referenceLeverArm));
         } else {
             const maxSteeringAngle = lerp(
                 this.legacyHighSpeedSteeringAngleLimit,
                 this.mechanicalSteeringAngleLimit,
-                2 ** (-speed / kmhToMetersPerSecond(10)),
+                2 ** ((speed * -1) / kmhToMetersPerSecond(10)),
             );
-            this.steeringCommandAngle = clamp(requestedSteeringAngle, -maxSteeringAngle, maxSteeringAngle);
+            this.steeringCommandAngle = radians(clamp(requestedSteeringAngle, maxSteeringAngle * -1, maxSteeringAngle));
         }
         for (const wheel of this.wheels) {
             const steering = wheel.steering;
@@ -184,24 +197,26 @@ export class Vehicle {
                 geometry !== undefined
                     ? getWheelSteeringAngle(
                           curvature,
-                          wheel.frameLocalPosition.z - geometry.steeringReferenceZ,
+                          meters(wheel.frameLocalPosition.z - geometry.steeringReferenceZ),
                           this.mechanicalSteeringAngleLimit,
-                          wheel.frameLocalPosition.x,
+                          meters(wheel.frameLocalPosition.x),
                       )
-                    : this.steeringCommandAngle *
-                      (this.steeringMode === "counterPhase" && steering.position === "rear" ? -1 : 1);
+                    : radians(
+                          this.steeringCommandAngle *
+                              (this.steeringMode === "counterPhase" && steering.position === "rear" ? -1 : 1),
+                      );
             steering.constraint.setAxisMotorMaxForce(PhysicsConstraintAxis.ANGULAR_Y, SteeringMotorMaxForce);
             steering.constraint.setAxisMotorTarget(PhysicsConstraintAxis.ANGULAR_Y, wheelSteeringAngle);
         }
     }
 
-    setTargetSpeed(speed: number): void {
+    setTargetSpeed(speed: MetersPerSecond): void {
         const speedUpperBound = this.boostEnabled ? this.maxSpeed.forwardBoost : this.maxSpeed.forward;
-        this.targetLongitudinalSpeed = clamp(speed, -this.maxSpeed.reverse, speedUpperBound);
-        this.setDriveMotorTargets(this.targetLongitudinalSpeed, this.boostEnabled ? 15_000 : 5_000);
+        this.targetLongitudinalSpeed = metersPerSecond(clamp(speed, this.maxSpeed.reverse * -1, speedUpperBound));
+        this.setDriveMotorTargets(this.targetLongitudinalSpeed, quantity<"N·m">(this.boostEnabled ? 15_000 : 5_000));
     }
 
-    private setDriveMotorTargets(speed: number, torque: number): void {
+    private setDriveMotorTargets(speed: MetersPerSecond, torque: Quantity<"N·m">): void {
         for (const wheel of this.wheels) {
             if (wheel.motor === null) {
                 continue;
@@ -211,7 +226,7 @@ export class Vehicle {
         }
     }
 
-    accelerate(acceleration: number, deltaSeconds: number): void {
+    accelerate(acceleration: MetersPerSecondSquared, deltaSeconds: number): void {
         if (acceleration === 0) {
             this.releaseThrottle();
             return;
@@ -219,26 +234,27 @@ export class Vehicle {
         if (this.targetLongitudinalSpeed === undefined) {
             // Resume from actual longitudinal motion rather than a stale command or zero.
             const forward = this.getTransform().getDirection(Vector3.Forward());
-            this.targetLongitudinalSpeed = Vector3.Dot(this.frame.body.getLinearVelocity(), forward);
+            this.targetLongitudinalSpeed = metersPerSecond(Vector3.Dot(this.frame.body.getLinearVelocity(), forward));
         }
-        this.setTargetSpeed(this.targetLongitudinalSpeed + acceleration * deltaSeconds);
+        this.setTargetSpeed(metersPerSecond(this.targetLongitudinalSpeed + acceleration * deltaSeconds));
     }
 
     releaseThrottle(): void {
         this.targetLongitudinalSpeed = undefined;
-        this.setDriveMotorTargets(0, this.engineBrakeTorque);
+        this.setDriveMotorTargets(metersPerSecond(0), this.engineBrakeTorque);
     }
 
     brake(): void {
         this.targetLongitudinalSpeed = undefined;
-        this.setDriveMotorTargets(0, 20_000);
+        this.setDriveMotorTargets(metersPerSecond(0), quantity<"N·m">(20_000));
     }
 
-    turn(steeringRate: number, deltaSeconds: number, options?: Partial<VehicleSteeringOptions>): void {
-        const angle =
+    turn(steeringRate: Quantity<"rad/s">, deltaSeconds: number, options?: Partial<VehicleSteeringOptions>): void {
+        const angle = radians(
             steeringRate === 0
                 ? lerpSmooth(this.steeringCommandAngle, 0, 0.225, deltaSeconds)
-                : this.steeringCommandAngle + steeringRate * deltaSeconds;
+                : this.steeringCommandAngle + steeringRate * deltaSeconds,
+        );
         this.setTargetSteeringAngle(angle, options);
     }
 
@@ -250,7 +266,7 @@ export class Vehicle {
         return this.frame.transformNode;
     }
 
-    getBoundingRadius(): number {
+    getBoundingRadius(): Meters {
         return this.boundingRadius;
     }
 

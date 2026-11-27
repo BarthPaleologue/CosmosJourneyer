@@ -15,19 +15,20 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { MetersSchema, SquareMetersSchema } from "@cosmos-journeyer/physics";
 import { z } from "zod";
 
 export const HelixHabitatModelSchema = z.object({
     type: z.literal("helixHabitat"),
-    baseRadius: z.number().positive(),
-    deltaRadius: z.number().positive(),
+    baseRadius: z.number().positive().pipe(MetersSchema),
+    deltaRadius: z.number().positive().pipe(MetersSchema),
     helixCount: z.number().int().positive(),
     thicknessFactor: z.number().int().positive(),
     helixPitchMultiplier: z.number().positive(),
     attachmentTessellation: z.number().int().positive(),
     surface: z.object({
-        housing: z.number().positive(),
-        agriculture: z.number().positive(),
+        housing: z.number().positive().pipe(SquareMetersSchema),
+        agriculture: z.number().positive().pipe(SquareMetersSchema),
     }),
 });
 

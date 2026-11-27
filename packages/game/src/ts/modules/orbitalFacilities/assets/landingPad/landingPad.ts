@@ -26,6 +26,8 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 
 import type { ILandingPad, LandingPadSize } from "@/frontend/universe/orbitalFacility/landingPadProvider";
 
@@ -40,12 +42,12 @@ export class LandingPad implements ILandingPad {
 
     private readonly padSize: LandingPadSize;
 
-    private readonly boundingRadius: number;
+    private readonly boundingRadius: Meters;
 
-    readonly padHeight = 0.5;
+    readonly padHeight = meters(0.5);
 
     private readonly width: number;
-    private readonly depth: number;
+    private readonly depth: Meters;
 
     private readonly decal: {
         mesh: Mesh;
@@ -64,9 +66,9 @@ export class LandingPad implements ILandingPad {
         this.padSize = padSize;
 
         this.width = 40 * padSize;
-        this.depth = this.width * Settings.LANDING_PAD_ASPECT_RATIO;
+        this.depth = meters(this.width * Settings.LANDING_PAD_ASPECT_RATIO);
 
-        this.boundingRadius = this.depth / 2;
+        this.boundingRadius = meters(this.depth / 2);
 
         this.deckMaterial = material;
 
@@ -138,7 +140,7 @@ export class LandingPad implements ILandingPad {
         return this.padSize;
     }
 
-    getPadHeight(): number {
+    getPadHeight(): Meters {
         return this.padHeight;
     }
 
@@ -146,7 +148,7 @@ export class LandingPad implements ILandingPad {
         return this.deck;
     }
 
-    getBoundingRadius(): number {
+    getBoundingRadius(): Meters {
         return this.boundingRadius;
     }
 

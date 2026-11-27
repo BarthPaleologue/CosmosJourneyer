@@ -1,18 +1,20 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 
 import { clamp } from "./math";
 
 export type RingVolume = {
     readonly center: Vector3;
     readonly normal: Vector3;
-    readonly innerRadius: number;
-    readonly outerRadius: number;
-    readonly halfThickness: number;
+    readonly innerRadius: Meters;
+    readonly outerRadius: Meters;
+    readonly halfThickness: Meters;
 };
 
 export type RingProjection = {
-    readonly signedHeight: number;
-    readonly planarDistance: number;
+    readonly signedHeight: Meters;
+    readonly planarDistance: Meters;
     readonly planarPosition: Vector3;
 };
 
@@ -29,8 +31,8 @@ export function projectPositionOnRingPlane(position: Vector3, ring: RingVolume):
     const planarPosition = relativePosition.subtract(normal.scale(signedHeight));
 
     return {
-        signedHeight,
-        planarDistance: planarPosition.length(),
+        signedHeight: meters(signedHeight),
+        planarDistance: meters(planarPosition.length()),
         planarPosition,
     };
 }
@@ -41,7 +43,7 @@ export function projectPositionOnRingPlane(position: Vector3, ring: RingVolume):
  * @param ring Ring supplying the inner and outer radii.
  * @returns Whether the distance is greater than `innerRadius` and less than `outerRadius`.
  */
-export function isInsideRingRadialBounds(planarDistance: number, ring: RingVolume): boolean {
+export function isInsideRingRadialBounds(planarDistance: Meters, ring: RingVolume): boolean {
     return planarDistance > ring.innerRadius && planarDistance < ring.outerRadius;
 }
 
@@ -73,7 +75,7 @@ export function getNearestPointOnRingVolume(position: Vector3, ring: RingVolume)
         projection.planarDistance > 0
             ? projection.planarPosition.scale(nearestPlanarDistance / projection.planarDistance)
             : getFallbackRingPlanarDirection(normal).scale(ring.innerRadius);
-    const nearestHeight = clamp(projection.signedHeight, -ring.halfThickness, ring.halfThickness);
+    const nearestHeight = clamp(projection.signedHeight, ring.halfThickness * -1, ring.halfThickness);
 
     return ring.center.add(nearestPlanarPosition).add(normal.scale(nearestHeight));
 }
@@ -84,8 +86,8 @@ export function getNearestPointOnRingVolume(position: Vector3, ring: RingVolume)
  * @param ring Ring volume used to find the nearest point.
  * @returns Distance in the same world units as the ring dimensions.
  */
-export function distanceToRingVolume(position: Vector3, ring: RingVolume): number {
-    return Vector3.Distance(position, getNearestPointOnRingVolume(position, ring));
+export function distanceToRingVolume(position: Vector3, ring: RingVolume): Meters {
+    return meters(Vector3.Distance(position, getNearestPointOnRingVolume(position, ring)));
 }
 
 /**

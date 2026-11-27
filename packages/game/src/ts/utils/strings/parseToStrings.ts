@@ -21,7 +21,9 @@ import {
     metersToLightMinutes,
     metersToLightSeconds,
     metersToLightYears,
+    lightYears,
 } from "@cosmos-journeyer/physics";
+import type { Meters, MetersPerSecond, Seconds } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 /**
@@ -29,7 +31,7 @@ import type { TFunction } from "i18next";
  * @param speed - Speed in metres per second.
  * @returns Rounded speed with units of m/s, km/s, Mm/s, or a fraction of light speed.
  */
-export function parseSpeed(speed: number): string {
+export function parseSpeed(speed: MetersPerSecond): string {
     if (speed < 1_000) {
         return `${speed.toFixed(0)} m/s`;
     } else if (speed < 1_000_000) {
@@ -47,7 +49,7 @@ export function parseSpeed(speed: number): string {
  * @param t - The translation function used to localize player-facing text.
  * @returns Localized distance with units from metres through light-years.
  */
-export function parseDistance(distance: number, t: TFunction): string {
+export function parseDistance(distance: Meters, t: TFunction): string {
     if (distance < 1_000) {
         return t("units:shortM", { value: distance.toFixed(0) });
     } else if (distance < 1_000_000) {
@@ -56,7 +58,7 @@ export function parseDistance(distance: number, t: TFunction): string {
         return t("units:shortMm", { value: (distance / 1_000_000).toFixed(2) });
     } else if (distance < C * 120) {
         return t("units:shortLs", { value: metersToLightSeconds(distance).toFixed(2) });
-    } else if (distance < lightYearsToMeters(0.1)) {
+    } else if (distance < lightYearsToMeters(lightYears(0.1))) {
         return t("units:shortLm", { value: metersToLightMinutes(distance).toFixed(2) });
     } else {
         return t("units:shortLy", {
@@ -71,7 +73,7 @@ export function parseDistance(distance: number, t: TFunction): string {
  * @param t - The translation function used to localize player-facing text.
  * @returns Rounded seconds, minutes, hours, days, or years; durations of ten years or more display as infinity.
  */
-export function parseSecondsRough(seconds: number, t: TFunction): string {
+export function parseSecondsRough(seconds: Seconds, t: TFunction): string {
     if (seconds < 60) {
         return t("units:shortSeconds", { count: Number(seconds.toFixed(0)) });
     } else if (seconds < 60 * 60) {
@@ -95,8 +97,8 @@ export function parseSecondsRough(seconds: number, t: TFunction): string {
  * @param t - The translation function used to localize player-facing text.
  * @returns Localized years, days, hours, minutes, and seconds, omitting zero-valued units.
  */
-export function parseSecondsPrecise(seconds: number, t: TFunction): string {
-    let secondsLeft = seconds;
+export function parseSecondsPrecise(seconds: Seconds, t: TFunction): string {
+    let secondsLeft: number = seconds;
     const nbYears = Math.floor(secondsLeft / (60 * 60 * 24 * 365.25));
     secondsLeft -= nbYears * 365.25 * 24 * 60 * 60;
     const nbDays = Math.floor(secondsLeft / (24 * 60 * 60));

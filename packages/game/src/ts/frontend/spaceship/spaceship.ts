@@ -25,7 +25,8 @@ import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/
 import type { IPhysicsCollisionEvent } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import { C } from "@cosmos-journeyer/physics";
+import { C, meters, metersPerSecond, radians } from "@cosmos-journeyer/physics";
+import type { Meters, MetersPerSecond } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 
@@ -84,7 +85,7 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
     private readonly altimeter: Altimeter;
 
     private mainEngineThrottle = 0;
-    private mainEngineTargetSpeed = 0;
+    private mainEngineTargetSpeed = metersPerSecond(0);
 
     private readonly thrusterForce = 8_000_000;
 
@@ -284,8 +285,8 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
         return this.aggregate.transformNode;
     }
 
-    public getBoundingRadius(): number {
-        return this.boundingExtent.length() / 2;
+    public getBoundingRadius(): Meters {
+        return meters(this.boundingExtent.length() / 2);
     }
 
     public getLights(): ReadonlyArray<Light> {
@@ -397,12 +398,12 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
      * If warp drive is disabled, returns the linear velocity of the ship
      * @returns The speed of the ship in m/s
      */
-    public getSpeed(): number {
+    public getSpeed(): MetersPerSecond {
         const warpDrive = this.getInternals().getWarpDrive();
 
         return warpDrive !== null && warpDrive.isEnabled()
             ? warpDrive.getWarpSpeed()
-            : this.aggregate.body.getLinearVelocity().dot(this.getTransform().forward);
+            : metersPerSecond(this.aggregate.body.getLinearVelocity().dot(this.getTransform().forward));
     }
 
     public getThrottle(): number {
@@ -422,7 +423,7 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
      * @param currentVelocity Forward speed used to predict clearance, in meters per second.
      * @returns Whether both nearby geometry and celestial rings permit warp.
      */
-    public canEngageWarpDrive(currentVelocity: number): boolean {
+    public canEngageWarpDrive(currentVelocity: MetersPerSecond): boolean {
         const transform = this.getTransform();
         const altimeter = this.getAltimeter();
         return (
@@ -653,7 +654,7 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
             this.spaceDots.setThrottle(1 - Math.exp(-0.2 - (0.05 * warpDrive.getWarpSpeed()) / C));
         } else {
             this.spaceDots.setThrottle(0);
-            this.spaceDots.setSteering(0, 0);
+            this.spaceDots.setSteering(radians(0), radians(0));
         }
     }
 
@@ -688,9 +689,9 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
     public update(deltaSeconds: number): void {
         this.getTransform().computeWorldMatrix(true);
         const thrusters = this.getInternals().getThrusters();
-        this.mainEngineTargetSpeed = this.mainEngineThrottle * (thrusters?.maxSpeed ?? 0);
+        this.mainEngineTargetSpeed = metersPerSecond(this.mainEngineThrottle * (thrusters?.maxSpeed ?? 0));
         if (this.targetLandingPad !== null) {
-            this.mainEngineTargetSpeed /= 8;
+            this.mainEngineTargetSpeed = metersPerSecond(this.mainEngineTargetSpeed / 8);
         }
 
         const warpDrive = this.getInternals().getWarpDrive();
@@ -732,7 +733,7 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
         if ((warpDrive === null || warpDrive.isDisabled()) && this.state !== "landed") {
             const linearVelocity = this.aggregate.body.getLinearVelocity();
             const forwardDirection = this.getTransform().forward;
-            const forwardSpeed = Vector3.Dot(linearVelocity, forwardDirection);
+            const forwardSpeed = metersPerSecond(Vector3.Dot(linearVelocity, forwardDirection));
 
             this.applyMainEngineForces(forwardSpeed, linearVelocity, forwardDirection);
 
@@ -784,7 +785,11 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
         }
     }
 
-    private applyMainEngineForces(forwardSpeed: number, linearVelocity: Vector3, forwardDirection: Vector3): void {
+    private applyMainEngineForces(
+        forwardSpeed: MetersPerSecond,
+        linearVelocity: Vector3,
+        forwardDirection: Vector3,
+    ): void {
         if (this.mainEngineThrottle !== 0) {
             const throttleVolume = Math.abs(this.mainEngineThrottle) * this.thrusterSoundMaxVolume;
             this.soundInstances.thruster.setVolume(throttleVolume);

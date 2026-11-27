@@ -21,6 +21,8 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { CreateBox, CreateTube, TransformNode } from "@babylonjs/core/Meshes";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 
 import type { PBRTextures } from "@/frontend/assets/textures/materials";
 
@@ -33,7 +35,7 @@ export class SpaceElevatorClimber {
     private readonly solarPanelMaterial: Material;
     private readonly metalSectionMaterial: Material;
 
-    private readonly boundingRadius: number;
+    private readonly boundingRadius: Meters;
 
     constructor(solarPanelMaterial: Material, climberTextures: PBRTextures, metalTextures: PBRTextures, scene: Scene) {
         this.transform = new TransformNode("SpaceElevatorClimber", scene);
@@ -133,10 +135,10 @@ export class SpaceElevatorClimber {
             solarPanel2.rotateAround(Vector3.Zero(), Axis.Y, angle);
         });
 
-        this.boundingRadius = globalRadius + solarPanelWidth;
+        this.boundingRadius = meters(globalRadius + solarPanelWidth);
     }
 
-    getBoundingRadius(): number {
+    getBoundingRadius(): Meters {
         return this.boundingRadius;
     }
 

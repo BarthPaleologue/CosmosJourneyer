@@ -17,77 +17,83 @@
 
 import { StefanBoltzmannConstant } from "./constants/derived";
 import { BoltzmannConstant, C, PlanckConstant } from "./constants/fundamental";
+import type { Kelvin, Meters, Quantity, SquareMeters, Watts, WattsPerSquareMeter } from "./units";
+import { quantity, squareMeters, watts, wattsPerSquareMeter } from "./units";
 
 /**
  * Applies Planck's law to calculate black body spectral exitance Mλ = 2πhc² / (λ⁵ expm1(hc/(λkT))).
  * @param temperature The black body temperature in kelvin.
- * @param wavelength The wavelength in metres.
- * @returns The hemispherically integrated spectral exitance per unit wavelength in W/m²/m.
+ * @param wavelength The wavelength in meters.
+ * @returns The hemispherically integrated spectral exitance per unit wavelength in W/m³.
  */
-export function getBlackBodySpectralExitance(temperature: number, wavelength: number): number {
-    return (
+export function getBlackBodySpectralExitance(temperature: Kelvin, wavelength: Meters): Quantity<"W/m³"> {
+    return quantity(
         (2 * Math.PI * PlanckConstant * C ** 2) /
-        (wavelength ** 5 * Math.expm1((PlanckConstant * C) / (wavelength * BoltzmannConstant * temperature)))
+            (wavelength ** 5 * Math.expm1((PlanckConstant * C) / (wavelength * BoltzmannConstant * temperature))),
     );
 }
 
 /**
  * Applies Stefan-Boltzmann law to calculate the radiative flux of a black body.
- * @param temperatureKelvin The temperature of the black body in Kelvin.
+ * @param temperature The temperature of the black body in Kelvin.
  * @returns The radiative flux in W/m².
  */
-export function getBlackBodyRadiatedFlux(temperatureKelvin: number): number {
-    return StefanBoltzmannConstant * temperatureKelvin ** 4;
+export function getBlackBodyRadiatedFlux(temperature: Kelvin): WattsPerSquareMeter {
+    return wattsPerSquareMeter(StefanBoltzmannConstant * temperature ** 4);
 }
 
 /**
  * Calculates the emitted radiative flux of a surface at a given temperature and emissivity.
- * @param temperatureKelvin The temperature of the surface in Kelvin.
- * @param emissivity The emissivity of the surface (between 0=perfect reflector and 1=perfect radiator).
+ * @param temperature The temperature of the surface in Kelvin.
+ * @param emissivity The emissivity of the surface (between 0=perfect reflector and 1=perfect radiator, dimensionless).
  * @returns The emitted radiative flux in W/m².
  */
-export function getRadiatedFlux(temperatureKelvin: number, emissivity: number): number {
-    return emissivity * getBlackBodyRadiatedFlux(temperatureKelvin);
+export function getRadiatedFlux(temperature: Kelvin, emissivity: number): WattsPerSquareMeter {
+    return wattsPerSquareMeter(emissivity * getBlackBodyRadiatedFlux(temperature));
 }
 
 /**
  * Calculates the total radiated power (luminosity) of a blackbody sphere of a given radius and temperature (typically a star) using the Stefan-Boltzmann law.
- * @param temperatureKelvin The temperature of the sphere in Kelvin.
+ * @param temperature The temperature of the sphere in Kelvin.
  * @param radius The radius of the sphere in meters.
  * @returns The total radiated power in Watts.
  */
-export function getBlackBodyLuminosity(temperatureKelvin: number, radius: number): number {
-    return getBlackBodyRadiatedFlux(temperatureKelvin) * 4 * Math.PI * radius ** 2;
+export function getBlackBodyLuminosity(temperature: Kelvin, radius: Meters): Watts {
+    return watts(getBlackBodyRadiatedFlux(temperature) * 4 * Math.PI * radius ** 2);
 }
 
 /**
  * Calculates the irradiance (received radiative power per unit area)
  * at a given distance from a blackbody sphere assuming isotropic emission.
  * Assumes distance is large compared to the radius of the sphere.
- * @param temperatureKelvin The surface temperature of the sphere in Kelvin.
+ * @param temperature The surface temperature of the sphere in Kelvin.
  * @param radius The radius of the sphere in meters.
  * @param distance The distance from the sphere center in meters.
  * @returns The irradiance in W/m² at the given distance.
  */
-export function getSphereIrradianceAtDistance(temperatureKelvin: number, radius: number, distance: number): number {
-    return getBlackBodyLuminosity(temperatureKelvin, radius) / (4 * Math.PI * distance ** 2);
+export function getSphereIrradianceAtDistance(
+    temperature: Kelvin,
+    radius: Meters,
+    distance: Meters,
+): WattsPerSquareMeter {
+    return wattsPerSquareMeter(getBlackBodyLuminosity(temperature, radius) / (4 * Math.PI * distance ** 2));
 }
 
 /**
- * @param heatToDissipate The amount of heat to dissipate in W
- * @param targetTemperature The target radiator temperature in K
- * @param emissivity The radiator emissivity (between 0 and 1)
+ * @param heatToDissipate The amount of heat to dissipate in Watts
+ * @param targetTemperature The target radiator temperature in Kelvin
+ * @param emissivity The radiator emissivity (between 0 and 1, dimensionless)
  * @param doubleSided Whether the radiator is double-sided (radiates on both sides)
- * @returns The area necessary to dissipate the given heat at the target temperature and emissivity
+ * @returns The area necessary to dissipate the given heat at the target temperature and emissivity, in square meters
  */
 export function getRadiatorAreaForHeat(
-    heatToDissipate: number,
-    targetTemperature: number,
+    heatToDissipate: Watts,
+    targetTemperature: Kelvin,
     emissivity: number,
     doubleSided: boolean,
-): number {
+): SquareMeters {
     const radiatorFlux = getRadiatedFlux(targetTemperature, emissivity);
     const singleSidedArea = heatToDissipate / radiatorFlux;
 
-    return doubleSided ? singleSidedArea / 2 : singleSidedArea;
+    return squareMeters(doubleSided ? singleSidedArea / 2 : singleSidedArea);
 }

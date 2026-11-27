@@ -17,6 +17,8 @@
 
 import type { Camera } from "@babylonjs/core/Cameras/camera";
 import { Vector3 } from "@babylonjs/core/Maths/math";
+import { radians } from "@cosmos-journeyer/physics";
+import type { Meters, Radians } from "@cosmos-journeyer/physics";
 
 import type { HasBoundingSphere } from "@/frontend/universe/architecture/hasBoundingSphere";
 import type { Transformable } from "@/frontend/universe/architecture/transformable";
@@ -32,9 +34,9 @@ export const DefaultMinProjectedDiameter = 0.005;
  */
 export function getProjectedDiameter01(
     position: Vector3,
-    radius: number,
+    radius: Meters,
     cameraPosition: Vector3,
-    fov: number,
+    fov: Radians,
 ): number {
     const distance = Vector3.Distance(position, cameraPosition);
     if (distance <= radius) {
@@ -65,7 +67,7 @@ export function isSizeOnScreenEnough(
         object.getTransform().getAbsolutePosition(),
         object.getBoundingRadius(),
         camera.globalPosition,
-        camera.fov,
+        radians(camera.fov),
     );
 
     return angularSize > threshold;

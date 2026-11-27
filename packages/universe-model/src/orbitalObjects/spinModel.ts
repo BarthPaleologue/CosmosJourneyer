@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { RadiansSchema, SecondsSchema } from "@cosmos-journeyer/physics";
 import { z } from "zod";
 
 export const SpinModelSchema = z.object({
@@ -22,10 +23,10 @@ export const SpinModelSchema = z.object({
      * The angle between the planet's spin axis and its orbital axis (in radians)
      * @see https://en.wikipedia.org/wiki/Axial_tilt
      */
-    axialTilt: z.number(),
+    axialTilt: RadiansSchema,
 
     /** Azimuth around orbital +Y, measured from the tilt direction -X (in radians). */
-    axisAzimuth: z.number(),
+    axisAzimuth: RadiansSchema,
 
     /**
      * Time needed for the object to rotate 360° on its axis in seconds.
@@ -33,10 +34,10 @@ export const SpinModelSchema = z.object({
      * which is the time it takes for the sun to be at the same position in the sky.
      * @see https://en.wikipedia.org/wiki/Sidereal_time
      */
-    siderealPeriod: z.number(),
+    siderealPeriod: SecondsSchema,
 
     /** The initial rotation angle of the planet (in radians) */
-    initialRotationAngle: z.number(),
+    initialRotationAngle: RadiansSchema,
 });
 
 export type SpinModel = z.infer<typeof SpinModelSchema>;

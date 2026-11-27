@@ -17,6 +17,7 @@
 
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { getStellarTypeFromTemperature } from "@cosmos-journeyer/physics";
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { starSystemCoordinatesEquals } from "@cosmos-journeyer/universe-model";
 import type { OrbitalObjectId, StarSystemCoordinates, UniverseObjectId } from "@cosmos-journeyer/universe-model";
@@ -103,7 +104,7 @@ export function createOrbitalObjectTarget(orbitalObject: OrbitalObject): Target 
     }
     const baseTarget = {
         getTransform: (): TransformNode => orbitalObject.getTransform(),
-        getBoundingRadius: (): number => orbitalObject.getBoundingRadius(),
+        getBoundingRadius: (): Meters => orbitalObject.getBoundingRadius(),
         properName: orbitalObject.model.name,
     };
 

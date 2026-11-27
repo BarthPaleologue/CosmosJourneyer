@@ -26,8 +26,14 @@ import {
     getOceanDepth,
     getOrbitalPeriod,
     hasLiquidWater,
+    kelvin,
+    kilograms,
+    meters,
     MoonMass,
+    pascals,
+    radians,
 } from "@cosmos-journeyer/physics";
+import type { Kilograms, Meters } from "@cosmos-journeyer/physics";
 import { getRngFromSeed, normalRandom } from "@cosmos-journeyer/random";
 import type { DeepReadonly, NonEmptyArray } from "@cosmos-journeyer/typescript";
 import { getCelestialBodyRadius } from "@cosmos-journeyer/universe-model";
@@ -58,7 +64,9 @@ export function generateTelluricSatelliteModel(
     id: string,
     seed: number,
     name: string,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     parentBodies: DeepReadonly<NonEmptyArray<PlanetModel>>,
+    // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     stellarObjects: DeepReadonly<Array<StellarObjectModel>>,
 ): TelluricSatelliteModel {
     const rng = getRngFromSeed(seed);
@@ -66,31 +74,30 @@ export function generateTelluricSatelliteModel(
     const isSatelliteOfTelluric = parentBodies.some((parent) => parent.type === "telluricPlanet");
     const isSatelliteOfGas = parentBodies.some((parent) => parent.type === "gasPlanet");
 
-    let radius: number;
+    let radius: Meters;
     if (isSatelliteOfTelluric) {
-        radius = Math.max(0.03, normalRandom(0.06, 0.03, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius;
+        radius = meters(Math.max(0.03, normalRandom(0.06, 0.03, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius);
     } else if (isSatelliteOfGas) {
-        radius = Math.max(0.03, normalRandom(0.25, 0.15, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius;
+        radius = meters(Math.max(0.03, normalRandom(0.25, 0.15, rng, GenerationSteps.RADIUS)) * ScaledEarthRadius);
     } else {
         throw new Error("Satellite is not around telluric or gas planet. Something is missing!");
     }
 
-    let mass;
+    let mass: Kilograms;
     if (isSatelliteOfTelluric) {
-        mass = MoonMass * (radius / 1_735e3) ** 3;
+        mass = kilograms(MoonMass * (radius / 1_735e3) ** 3);
     } else {
-        mass = EarthMass * (radius / 6_371e3) ** 3;
+        mass = kilograms(EarthMass * (radius / 6_371e3) ** 3);
     }
 
-    let pressure = Math.max(
-        normalRandom(EarthSeaLevelPressure, 0.2 * EarthSeaLevelPressure, rng, GenerationSteps.PRESSURE),
-        0,
+    let pressure = pascals(
+        Math.max(normalRandom(EarthSeaLevelPressure, 0.2 * EarthSeaLevelPressure, rng, GenerationSteps.PRESSURE), 0),
     );
     if (isSatelliteOfTelluric || radius <= 0.3 * ScaledEarthRadius) {
-        pressure = 0;
+        pressure = pascals(0);
     }
 
-    const stellarParents: Array<{ stellarObject: DeepReadonly<StellarObjectModel>; distance: number }> = [];
+    const stellarParents: Array<{ stellarObject: DeepReadonly<StellarObjectModel>; distance: Meters }> = [];
     for (const stellarObject of stellarObjects) {
         let averageSemiMajorAxis = 0;
         let count = 0;
@@ -101,7 +108,7 @@ export function generateTelluricSatelliteModel(
             }
         }
         if (count > 0) {
-            stellarParents.push({ stellarObject, distance: averageSemiMajorAxis / count });
+            stellarParents.push({ stellarObject, distance: meters(averageSemiMajorAxis / count) });
         }
     }
 
@@ -109,12 +116,12 @@ export function generateTelluricSatelliteModel(
         stellarParents.map(({ stellarObject, distance }) => ({
             temperature: stellarObject.blackBodyTemperature,
             radius: getCelestialBodyRadius(stellarObject),
-            distance: distance,
+            distance,
         })),
         0.3,
     );
 
-    const temperatureRange = getTemperatureRange(effectiveTemperature, 40, pressure);
+    const temperatureRange = getTemperatureRange(effectiveTemperature, kelvin(40), pressure);
 
     const waterAmount = clamp(normalRandom(0.5, 0.1, rng, GenerationSteps.WATER_AMOUNT), 0, 1);
 
@@ -164,31 +171,38 @@ export function generateTelluricSatelliteModel(
 
     const orbit: Orbit = {
         parentIds: parentIds,
-        semiMajorAxis: orbitRadius,
+        semiMajorAxis: meters(orbitRadius),
         p: 2,
         plane: {
-            inclination:
+            inclination: radians(
                 parentAverageInclination +
-                parentAverageAxialTilt +
-                degreesToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
-            longitudeOfAscendingNode: 0,
+                    parentAverageAxialTilt +
+                    degreesToRadians(normalRandom(0, 5, rng, GenerationSteps.ORBIT + 10)),
+            ),
+            longitudeOfAscendingNode: radians(0),
         },
         eccentricity: 0,
-        argumentOfPeriapsis: 0,
-        initialMeanAnomaly: 0,
+        argumentOfPeriapsis: radians(0),
+        initialMeanAnomaly: radians(0),
     };
 
     const spin: SpinModel = {
-        siderealPeriod: getOrbitalPeriod(orbit.semiMajorAxis, parentMassSum),
-        axialTilt: 0,
-        axisAzimuth: 0,
-        initialRotationAngle: 0,
+        siderealPeriod: getOrbitalPeriod(orbit.semiMajorAxis, kilograms(parentMassSum)),
+        axialTilt: radians(0),
+        axisAzimuth: radians(0),
+        initialRotationAngle: radians(0),
     };
 
     const averageTemperature = (temperatureRange.min + temperatureRange.max) / 2;
     const clouds: CloudsModel | null =
         ocean !== null
-            ? generateCloudsModel(radius + ocean.depth, CloudLayerHeight, oceanCoverage, averageTemperature, pressure)
+            ? generateCloudsModel(
+                  meters(radius + ocean.depth),
+                  CloudLayerHeight,
+                  oceanCoverage,
+                  kelvin(averageTemperature),
+                  pascals(pressure),
+              )
             : null;
 
     const terrainSettings = {
@@ -196,9 +210,9 @@ export function generateTelluricSatelliteModel(
         continents_fragmentation: oceanCoverage,
         bumps_frequency: (30 * radius) / ScaledEarthRadius,
 
-        max_bump_height: 1.5e3,
-        max_mountain_height: 10e3,
-        continent_base_height: 5e3 + (ocean?.depth ?? 0),
+        max_bump_height: meters(1.5e3),
+        max_mountain_height: meters(10e3),
+        continent_base_height: meters(5e3 + (ocean?.depth ?? 0)),
 
         mountains_frequency: (60 * radius) / ScaledEarthRadius,
     };

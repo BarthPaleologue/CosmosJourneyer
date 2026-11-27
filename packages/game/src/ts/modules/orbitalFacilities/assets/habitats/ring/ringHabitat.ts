@@ -27,7 +27,8 @@ import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import { EarthG, getRotationPeriodForArtificialGravity } from "@cosmos-journeyer/physics";
+import { EarthG, getRotationPeriodForArtificialGravity, meters, squareMeters } from "@cosmos-journeyer/physics";
+import type { Meters, SquareMeters } from "@cosmos-journeyer/physics";
 
 import { createRing } from "@/frontend/assets/procedural/helpers/ringBuilder";
 import type { Textures } from "@/frontend/assets/textures";
@@ -43,7 +44,7 @@ import { createRingHabitatMaterial } from "./ringHabitatMaterial";
 export class RingHabitat implements Transformable {
     private readonly root: TransformNode;
 
-    private readonly radius: number;
+    private readonly radius: Meters;
 
     private readonly ringMaterial: Material;
     private readonly metalSectionMaterial: Material;
@@ -57,7 +58,7 @@ export class RingHabitat implements Transformable {
     private readonly arms: Array<Mesh> = [];
     private readonly armAggregates: Array<PhysicsAggregate> = [];
 
-    readonly habitableSurface: number;
+    readonly habitableSurface: SquareMeters;
 
     private readonly lights: Array<PointLight> = [];
 
@@ -75,7 +76,7 @@ export class RingHabitat implements Transformable {
         const height = yScaling * deltaRadius;
 
         // adjust the radius to fit the required habitable surface
-        this.radius = requiredHabitableSurface / (height * 2 * Math.PI) - deltaRadius / 2;
+        this.radius = meters(requiredHabitableSurface / (height * 2 * Math.PI) - deltaRadius / 2);
 
         const attachmentTessellation = model.attachmentTessellation;
 
@@ -85,7 +86,7 @@ export class RingHabitat implements Transformable {
             scene,
         );
 
-        this.habitableSurface = height * (2 * Math.PI * (this.radius + deltaRadius / 2));
+        this.habitableSurface = squareMeters(height * (2 * Math.PI * (this.radius + deltaRadius / 2)));
 
         const attachmentLength = height * 1.5;
         const attachmentRadius = 50;
@@ -139,8 +140,8 @@ export class RingHabitat implements Transformable {
 
         this.ringMaterial = createRingHabitatMaterial(
             this.radius,
-            deltaRadius,
-            yScaling * deltaRadius,
+            meters(deltaRadius),
+            meters(yScaling * deltaRadius),
             textures.materials.spaceStation,
             scene,
         );

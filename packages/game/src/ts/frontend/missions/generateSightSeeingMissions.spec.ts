@@ -1,4 +1,5 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
+import { lightYears } from "@cosmos-journeyer/physics";
 import { generateMandelbulbModel } from "@cosmos-journeyer/universe-generation";
 import type { UniverseObjectId } from "@cosmos-journeyer/universe-model";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -31,7 +32,7 @@ describe("station mission generation by universe ID", () => {
         backend.registerAuthoredSystem(system);
         backend.registerAuthoredSystem(neighbor);
         vi.mocked(getNeighborStarSystemCoordinates).mockReturnValue([
-            { coordinates: neighbor.coordinates, position: new Vector3(1, 0, 0), distance: 1 },
+            { coordinates: neighbor.coordinates, position: new Vector3(1, 0, 0), distance: lightYears(1) },
         ]);
         player = Player.Default(backend);
         stationId = { systemCoordinates: system.coordinates, idInSystem: "module-station" };

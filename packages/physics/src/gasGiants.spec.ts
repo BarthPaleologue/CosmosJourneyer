@@ -19,6 +19,7 @@ import { describe, expect, it } from "vitest";
 
 import { JupiterMass, JupiterRadius } from "./constants/astrophysics";
 import { getCoolGasGiantRadiusFromMass } from "./gasGiants";
+import { kilograms } from "./units";
 
 describe("getCoolGasGiantRadiusFromMass", () => {
     it("returns the calibrated radius for a one-Jupiter-mass gas giant", () => {
@@ -26,23 +27,25 @@ describe("getCoolGasGiantRadiusFromMass", () => {
     });
 
     it("matches representative values across the fitted cool gas giant mass range", () => {
-        expect(getCoolGasGiantRadiusFromMass(0.1 * JupiterMass)).toBeCloseTo(0.55 * JupiterRadius);
-        expect(getCoolGasGiantRadiusFromMass(0.3 * JupiterMass)).toBeCloseTo(0.795515027037941 * JupiterRadius);
-        expect(getCoolGasGiantRadiusFromMass(10 * JupiterMass)).toBeCloseTo(0.97 * JupiterRadius);
+        expect(getCoolGasGiantRadiusFromMass(kilograms(0.1 * JupiterMass))).toBeCloseTo(0.55 * JupiterRadius);
+        expect(getCoolGasGiantRadiusFromMass(kilograms(0.3 * JupiterMass))).toBeCloseTo(
+            0.795515027037941 * JupiterRadius,
+        );
+        expect(getCoolGasGiantRadiusFromMass(kilograms(10 * JupiterMass))).toBeCloseTo(0.97 * JupiterRadius);
     });
 
     it("captures the super-jovian radius peak before the curve turns over", () => {
         const oneJupiterMassRadius = getCoolGasGiantRadiusFromMass(JupiterMass);
-        const threeJupiterMassRadius = getCoolGasGiantRadiusFromMass(3 * JupiterMass);
-        const tenJupiterMassRadius = getCoolGasGiantRadiusFromMass(10 * JupiterMass);
+        const threeJupiterMassRadius = getCoolGasGiantRadiusFromMass(kilograms(3 * JupiterMass));
+        const tenJupiterMassRadius = getCoolGasGiantRadiusFromMass(kilograms(10 * JupiterMass));
 
         expect(threeJupiterMassRadius).toBeGreaterThan(oneJupiterMassRadius);
         expect(threeJupiterMassRadius).toBeGreaterThan(tenJupiterMassRadius);
     });
 
     it("increases from sub-saturn masses up to about jovian masses", () => {
-        const r01 = getCoolGasGiantRadiusFromMass(0.1 * JupiterMass);
-        const r03 = getCoolGasGiantRadiusFromMass(0.3 * JupiterMass);
+        const r01 = getCoolGasGiantRadiusFromMass(kilograms(0.1 * JupiterMass));
+        const r03 = getCoolGasGiantRadiusFromMass(kilograms(0.3 * JupiterMass));
         const r1 = getCoolGasGiantRadiusFromMass(JupiterMass);
 
         expect(r03).toBeGreaterThan(r01);
