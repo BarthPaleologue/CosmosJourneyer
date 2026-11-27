@@ -88,7 +88,7 @@ export class TargetCursorLayer {
         return this.hoveredTarget;
     }
 
-    public update(camera: Camera, controlledObject: Transformable | null): void {
+    public update(camera: Camera, controlledObject: Transformable | null, deltaSeconds: number): void {
         if (!this.isEnabled()) {
             return;
         }
@@ -136,7 +136,7 @@ export class TargetCursorLayer {
         for (const { target, cursor, opacity } of frame) {
             cursor.setTarget(target === selected);
             cursor.setInformationEnabled(target === selected || target === this.hoveredTarget);
-            cursor.update(camera, opacity);
+            cursor.update(camera, opacity, deltaSeconds);
         }
     }
 

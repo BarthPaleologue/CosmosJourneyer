@@ -31,8 +31,15 @@ import {
     meters,
     pascals,
     radians,
+    wattsPerSquareMeter,
 } from "@cosmos-journeyer/physics";
-import type { AmpereSquareMeters, LocalStellarWindModel, Meters, Radians } from "@cosmos-journeyer/physics";
+import type {
+    AmpereSquareMeters,
+    LocalStellarWindModel,
+    Meters,
+    Radians,
+    WattsPerSquareMeter,
+} from "@cosmos-journeyer/physics";
 import type { IndexedRng } from "@cosmos-journeyer/random";
 import { randRange, seededSquirrelNoise } from "@cosmos-journeyer/random";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
@@ -116,12 +123,12 @@ export class Aurora implements SystemContent {
         if (pressure <= 0 || standoffDistance <= this.planetRadius) {
             // A crushed magnetosphere has no closed dipole field lines above the surface.
             this.root.setEnabled(false);
-            this.material.setEnergyFlux(0);
+            this.material.setEnergyFlux(wattsPerSquareMeter(0));
             return;
         }
         this.root.setEnabled(true);
 
-        let energyFlux = 0;
+        let energyFlux: WattsPerSquareMeter = wattsPerSquareMeter(0);
         if (dominantWind !== null) {
             const capLatitude = getPolarCapLatitude(this.planetRadius, this.moment, dominantWind);
             energyFlux = getAuroralVisibleEnergyFlux(this.planetRadius, this.moment, dominantWind, [

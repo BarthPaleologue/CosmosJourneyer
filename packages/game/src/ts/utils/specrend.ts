@@ -1,5 +1,5 @@
-import { integrateBlackBodySpectrum, kelvin, normalizeLinearSrgb, xyzToLinearSrgb } from "@cosmos-journeyer/physics";
-import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
+import { integrateBlackBodySpectrum, normalizeLinearSrgb, xyzToLinearSrgb } from "@cosmos-journeyer/physics";
+import type { Kelvin, LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 export {
     integrateBlackBodySpectrum,
@@ -14,7 +14,7 @@ export {
  * @param temperature The positive black body temperature in kelvin.
  * @returns Linear sRGB normalized so that the brightest channel equals 1.
  */
-export function getRgbFromTemperature(temperature: number): LinearSrgbColor {
-    const xyz = integrateBlackBodySpectrum(kelvin(temperature));
+export function getRgbFromTemperature(temperature: Kelvin): LinearSrgbColor {
+    const xyz = integrateBlackBodySpectrum(temperature);
     return normalizeLinearSrgb(xyzToLinearSrgb(xyz));
 }

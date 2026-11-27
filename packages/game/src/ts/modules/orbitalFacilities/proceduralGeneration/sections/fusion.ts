@@ -15,7 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { watts } from "@cosmos-journeyer/physics";
+import type { Watts } from "@cosmos-journeyer/physics";
 
 import type { FusionSectionModel } from "../../sections/fusion";
 
@@ -23,9 +23,9 @@ import type { FusionSectionModel } from "../../sections/fusion";
  * @param netPowerOutput Net electrical power available to the fusion section, in watts.
  * @returns A fusion section model sized for the available power.
  */
-export function generateFusionSectionModel(netPowerOutput: number): FusionSectionModel {
+export function generateFusionSectionModel(netPowerOutput: Watts): FusionSectionModel {
     return {
         type: "fusion",
-        netPowerOutput: watts(netPowerOutput),
+        netPowerOutput,
     };
 }

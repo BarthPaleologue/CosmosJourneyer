@@ -73,9 +73,9 @@ describe("stellar spectral colorimetry", () => {
     });
 
     it("progresses from orange through near-white to blue without shared temperature state", () => {
-        const orange = getRgbFromTemperature(3000);
-        const white = getRgbFromTemperature(6500);
-        const blue = getRgbFromTemperature(10000);
+        const orange = getRgbFromTemperature(kelvin(3000));
+        const white = getRgbFromTemperature(kelvin(6500));
+        const blue = getRgbFromTemperature(kelvin(10000));
         expect(orange.r).toBe(1);
         expect(orange.g).toBeGreaterThan(orange.b);
         expect(orange.b).toBeLessThan(0.2);
@@ -83,7 +83,7 @@ describe("stellar spectral colorimetry", () => {
         expect(blue.b).toBe(1);
         expect(blue.b).toBeGreaterThan(blue.g);
         expect(blue.g).toBeGreaterThan(blue.r);
-        expect(getRgbFromTemperature(3000)).toEqual(orange);
+        expect(getRgbFromTemperature(kelvin(3000))).toEqual(orange);
     });
 
     it("integrates equal energy in SI units and retains absolute spectral amplitude", () => {
@@ -143,7 +143,7 @@ describe("stellar spectral colorimetry", () => {
     it("adds only the minimum white once before chromaticity normalization", () => {
         expect(normalizeLinearSrgb({ r: -0.5, g: 0.5, b: 1.5 })).toEqual({ r: 0, g: 0.5, b: 1 });
         expect(normalizeLinearSrgb({ r: 4, g: 2, b: 1 })).toEqual({ r: 1, g: 0.5, b: 0.25 });
-        const cold = getRgbFromTemperature(1000);
+        const cold = getRgbFromTemperature(kelvin(1000));
         expect(cold.b).toBe(0);
         expect(cold.r).toBe(1);
     });
@@ -154,7 +154,7 @@ describe("stellar spectral colorimetry", () => {
         for (const component of Object.values(xyz)) {
             expect(Number.isFinite(component)).toBe(true);
         }
-        for (const channel of Object.values(getRgbFromTemperature(temperature))) {
+        for (const channel of Object.values(getRgbFromTemperature(kelvin(temperature)))) {
             expect(Number.isFinite(channel)).toBe(true);
             expect(channel).toBeGreaterThanOrEqual(0);
             expect(channel).toBeLessThanOrEqual(1);

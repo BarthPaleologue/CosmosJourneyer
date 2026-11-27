@@ -21,6 +21,7 @@ import type { InputBlock } from "@babylonjs/core/Materials/Node/Blocks/Input/inp
 import { NodeMaterial } from "@babylonjs/core/Materials/Node/nodeMaterial";
 import { Color3 } from "@babylonjs/core/Maths/math.color";
 import type { Scene } from "@babylonjs/core/scene";
+import type { WattsPerSquareMeter } from "@cosmos-journeyer/physics";
 import {
     add,
     builtinAttribute,
@@ -158,7 +159,7 @@ export class AuroraMaterial {
     /**
      * @param flux Mean visible auroral radiant energy flux in W/m². Zero disables the glow.
      */
-    public setEnergyFlux(flux: number): void {
+    public setEnergyFlux(flux: WattsPerSquareMeter): void {
         this.uEnergyFlux.value = flux;
     }
 

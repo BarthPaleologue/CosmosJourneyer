@@ -1415,7 +1415,7 @@ export class StarSystemView implements View {
                   : null;
         targetingCamera.getViewMatrix();
         this.targetingSystem.update(targetingCamera.globalPosition);
-        this.targetCursorLayer.update(targetingCamera, controlledObject);
+        this.targetCursorLayer.update(targetingCamera, controlledObject, deltaSeconds);
         const targetLandingPad = spaceship.getTargetLandingPad();
         if (
             targetLandingPad !== null &&

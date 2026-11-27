@@ -16,6 +16,7 @@
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import { Color3 } from "@babylonjs/core/Maths/math.color";
+import type { Kelvin } from "@cosmos-journeyer/physics";
 
 import { getRgbFromTemperature } from "@/utils/specrend";
 
@@ -23,7 +24,7 @@ import type { LightEmitter } from "../../architecture/lightEmitter";
 
 export class AccretionDisk implements LightEmitter {
     private readonly emissiveColor: Color3;
-    constructor(temperature: number) {
+    constructor(temperature: Kelvin) {
         const rgb = getRgbFromTemperature(temperature);
         this.emissiveColor = new Color3(rgb.r, rgb.g, rgb.b);
     }

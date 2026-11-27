@@ -18,13 +18,15 @@
 import { Color4, FreeCamera, GlowLayer, Quaternion, TransformNode, Vector3 } from "@babylonjs/core";
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Scene } from "@babylonjs/core/scene";
+import { radians } from "@cosmos-journeyer/physics";
+import type { Radians } from "@cosmos-journeyer/physics";
 
 import type { ILoadingProgressMonitor } from "@/frontend/assets/loadingProgressMonitor";
 import { SpaceDots } from "@/frontend/assets/procedural/spaceDots";
 
 const DEFAULT_THROTTLE = 0.6;
-const DEFAULT_YAW = 0;
-const DEFAULT_PITCH = 0;
+const DEFAULT_YAW: Radians = radians(0);
+const DEFAULT_PITCH: Radians = radians(0);
 const DEFAULT_ROLL = 0;
 
 /**
@@ -178,7 +180,7 @@ function createControlPanel(
 
     panel.appendChild(
         createSlider("Yaw bend", -1, 1, 0.01, DEFAULT_YAW, (value) => {
-            yaw = value;
+            yaw = radians(value);
             spaceDots.setSteering(yaw, pitch);
             return `yaw = ${value.toFixed(2)}`;
         }),
@@ -186,7 +188,7 @@ function createControlPanel(
 
     panel.appendChild(
         createSlider("Pitch bend", -1, 1, 0.01, DEFAULT_PITCH, (value) => {
-            pitch = value;
+            pitch = radians(value);
             spaceDots.setSteering(yaw, pitch);
             return `pitch = ${value.toFixed(2)}`;
         }),

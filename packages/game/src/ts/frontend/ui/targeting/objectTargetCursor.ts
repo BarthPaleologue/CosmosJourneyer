@@ -112,7 +112,7 @@ export class ObjectTargetCursor {
         this.isInformationEnabled = enabled;
     }
 
-    update(camera: Camera, opacity: number): void {
+    update(camera: Camera, opacity: number, deltaSeconds: number): void {
         this.object.getTransform().computeWorldMatrix(true);
         const objectRay = this.object.getTransform().getAbsolutePosition().subtract(camera.globalPosition);
         const distance = meters(objectRay.length());
@@ -138,9 +138,7 @@ export class ObjectTargetCursor {
         }
 
         const deltaDistance = this.lastDistance - distance;
-        const speed = metersPerSecond(
-            deltaDistance !== 0 ? deltaDistance / (camera.getScene().getEngine().getDeltaTime() / 1000) : 0,
-        );
+        const speed = metersPerSecond(deltaDistance !== 0 ? deltaDistance / deltaSeconds : 0);
         objectRay.scaleInPlace(1 / distance);
 
         const screenSize = getProjectedDiameter01(

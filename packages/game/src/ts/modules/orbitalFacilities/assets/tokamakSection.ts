@@ -134,14 +134,9 @@ export class TokamakSection implements StationSection {
 
         const heatOutput = requiredEnergyOutput - requiredNetEnergyOutput;
         // see DOI 10.1140/epja/i2008-10666-6 "Emissivity measurements of opaque gray bodies up to 2000 ◦C by a dual-frequency pyrometer"
-        const radiatorTargetTemperature = 1300;
+        const radiatorTargetTemperature = kelvin(1300);
         const emissivity = 0.8;
-        const radiatorArea = getRadiatorAreaForHeat(
-            watts(heatOutput),
-            kelvin(radiatorTargetTemperature),
-            emissivity,
-            true,
-        );
+        const radiatorArea = getRadiatorAreaForHeat(watts(heatOutput), radiatorTargetTemperature, emissivity, true);
         const radiatorEmissiveColor = getRgbFromTemperature(radiatorTargetTemperature);
 
         this.radiatorMaterial = new PBRMaterial("RadiatorMaterial", scene);

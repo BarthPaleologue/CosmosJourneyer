@@ -42,11 +42,11 @@ export class SpaceDots implements Transformable {
     private readonly material: SpaceDotsMaterial;
 
     private throttle = 0;
-    private targetYawIntent = 0;
-    private targetPitchIntent = 0;
-    private currentYawBend = 0;
-    private currentPitchBend = 0;
-    private currentRollCompensation = 0;
+    private targetYawIntent: Radians = radians(0);
+    private targetPitchIntent: Radians = radians(0);
+    private currentYawBend: Radians = radians(0);
+    private currentPitchBend: Radians = radians(0);
+    private currentRollCompensation: Radians = radians(0);
     private readonly warpForward = new Vector3(0, 0, 1);
     private readonly warpUp = new Vector3(0, 1, 0);
     private readonly steeringUp = new Vector3(0, 1, 0);
@@ -77,8 +77,8 @@ export class SpaceDots implements Transformable {
         this.mesh.material = this.material.get();
         this.material.setWarpFrame(this.warpForward);
         this.material.setSteeringFrame(this.steeringUp);
-        this.material.setRollCompensationAngle(0);
-        this.material.setSteeringBend(0, 0);
+        this.material.setRollCompensationAngle(radians(0));
+        this.material.setSteeringBend(radians(0), radians(0));
     }
 
     public setThrottle(throttle: number): void {
@@ -87,7 +87,7 @@ export class SpaceDots implements Transformable {
         this.material.setThrottle(this.throttle);
     }
 
-    public setSteering(yawIntent: number, pitchIntent: number): void {
+    public setSteering(yawIntent: Radians, pitchIntent: Radians): void {
         this.targetYawIntent = yawIntent;
         this.targetPitchIntent = pitchIntent;
     }
@@ -158,12 +158,11 @@ export class SpaceDots implements Transformable {
         const targetYawBend = this.targetYawIntent;
         const targetPitchBend = this.targetPitchIntent;
 
-        this.currentYawBend = lerpSmooth(this.currentYawBend, targetYawBend, DEFAULT_BEND_HALF_LIFE, deltaSeconds);
-        this.currentPitchBend = lerpSmooth(
-            this.currentPitchBend,
-            targetPitchBend,
-            DEFAULT_BEND_HALF_LIFE,
-            deltaSeconds,
+        this.currentYawBend = radians(
+            lerpSmooth(this.currentYawBend, targetYawBend, DEFAULT_BEND_HALF_LIFE, deltaSeconds),
+        );
+        this.currentPitchBend = radians(
+            lerpSmooth(this.currentPitchBend, targetPitchBend, DEFAULT_BEND_HALF_LIFE, deltaSeconds),
         );
 
         this.material.setSteeringBend(this.currentYawBend, this.currentPitchBend);

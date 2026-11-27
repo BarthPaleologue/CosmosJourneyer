@@ -25,7 +25,7 @@ import { PhysicsMotionType, PhysicsShapeType } from "@babylonjs/core/Physics/v2/
 import type { IPhysicsCollisionEvent } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
-import { C, meters, metersPerSecond } from "@cosmos-journeyer/physics";
+import { C, meters, metersPerSecond, radians } from "@cosmos-journeyer/physics";
 import type { Meters, MetersPerSecond } from "@cosmos-journeyer/physics";
 import { assertUnreachable } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
@@ -654,7 +654,7 @@ export class Spaceship implements Transformable, ClusteredLightingRegion {
             this.spaceDots.setThrottle(1 - Math.exp(-0.2 - (0.05 * warpDrive.getWarpSpeed()) / C));
         } else {
             this.spaceDots.setThrottle(0);
-            this.spaceDots.setSteering(0, 0);
+            this.spaceDots.setSteering(radians(0), radians(0));
         }
     }
 

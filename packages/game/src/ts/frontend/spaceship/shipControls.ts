@@ -25,6 +25,7 @@ import { Observable } from "@babylonjs/core/Misc/observable";
 import { Tools } from "@babylonjs/core/Misc/tools";
 import type { Scene } from "@babylonjs/core/scene";
 import { metersPerSecond, radians, seconds } from "@cosmos-journeyer/physics";
+import type { Radians } from "@cosmos-journeyer/physics";
 import type { TFunction } from "i18next";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
@@ -405,15 +406,15 @@ export class ShipControls implements Controls {
             inputPitch *= 0;
         }
 
-        let spaceDotsYawIntent = 0;
-        let spaceDotsPitchIntent = 0;
+        let spaceDotsYawIntent: Radians = radians(0);
+        let spaceDotsPitchIntent: Radians = radians(0);
 
         const warpDrive = spaceship.getInternals().getWarpDrive();
         if (warpDrive !== null && warpDrive.isEnabled()) {
             const nextRotationInertiaX = lerpSmooth(this.rotationInertia.x, inputRoll, 0.07, deltaSeconds);
             const nextRotationInertiaY = lerpSmooth(this.rotationInertia.y, inputPitch, 0.07, deltaSeconds);
-            spaceDotsYawIntent = this.spaceDotsYawResponse * nextRotationInertiaX;
-            spaceDotsPitchIntent = this.spaceDotsPitchResponse * nextRotationInertiaY;
+            spaceDotsYawIntent = radians(this.spaceDotsYawResponse * nextRotationInertiaX);
+            spaceDotsPitchIntent = radians(this.spaceDotsPitchResponse * nextRotationInertiaY);
         }
 
         spaceship.spaceDots.setSteering(spaceDotsYawIntent, spaceDotsPitchIntent);

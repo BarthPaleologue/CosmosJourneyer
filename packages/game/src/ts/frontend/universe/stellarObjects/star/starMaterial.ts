@@ -18,7 +18,7 @@
 import { Effect } from "@babylonjs/core/Materials/effect";
 import { ShaderMaterial } from "@babylonjs/core/Materials/shaderMaterial";
 import type { Scene } from "@babylonjs/core/scene";
-import type { LinearSrgbColor } from "@cosmos-journeyer/physics";
+import type { Kelvin, LinearSrgbColor } from "@cosmos-journeyer/physics";
 
 import { createEmptyTexture } from "@/frontend/assets/procedural/proceduralTexture";
 
@@ -50,7 +50,7 @@ export class StarMaterial {
 
     private elapsedSeconds = 0;
 
-    constructor(seed: number, temperature: number, starLutPool: ItemPool<StarMaterialLut>, scene: Scene) {
+    constructor(seed: number, temperature: Kelvin, starLutPool: ItemPool<StarMaterialLut>, scene: Scene) {
         const shaderName = "starMaterial";
         Effect.ShadersStore[`${shaderName}FragmentShader`] ??= starMaterialFragment;
         Effect.ShadersStore[`${shaderName}VertexShader`] ??= starMaterialVertex;
