@@ -120,7 +120,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         },
         orbit: {
             parentIds: ["vesta"],
-            semiMajorAxis: meters(janusOrbitRadius),
+            semiMajorAxis: janusOrbitRadius,
             eccentricity: 0,
             plane: {
                 inclination: degreesToRadians(8),
@@ -290,7 +290,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
         seed: 62,
         orbit: {
             parentIds: ["aphrodite"],
-            semiMajorAxis: meters(phileasOrbitRadius),
+            semiMajorAxis: phileasOrbitRadius,
             eccentricity: 0,
             plane: {
                 inclination: degreesToRadians(1),
@@ -469,7 +469,7 @@ export function getVestaModel(): { starSystem: StarSystemModel; systemEntities: 
             mass: kilograms(100_000),
             orbit: {
                 parentIds: [vesta.id],
-                semiMajorAxis: meters(spaceTelescopeOrbitRadius),
+                semiMajorAxis: spaceTelescopeOrbitRadius,
                 eccentricity: 0,
                 plane: {
                     inclination: radians(0),

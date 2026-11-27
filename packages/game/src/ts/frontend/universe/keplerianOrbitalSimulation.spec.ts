@@ -105,7 +105,7 @@ describe("KeplerianOrbitalSimulation", () => {
         const moon = createTestOrbitalObject(scene, { id: "moon", parentIds: ["planet"], semiMajorAxis: 3 });
 
         const simulation = new KeplerianOrbitalSimulation([star, planet, moon]);
-        simulation.update(0);
+        simulation.update(seconds(0));
 
         const planetTransform = simulation.getTransform("planet");
         const moonTransform = simulation.getTransform("moon");
@@ -129,7 +129,7 @@ describe("KeplerianOrbitalSimulation", () => {
         });
 
         const simulation = new KeplerianOrbitalSimulation([reference]);
-        simulation.update(1);
+        simulation.update(seconds(1));
 
         const relativeTransform = simulation.getRelativeTransform("reference", "reference", "reference");
 
@@ -160,7 +160,7 @@ describe("KeplerianOrbitalSimulation", () => {
         });
 
         const simulation = new KeplerianOrbitalSimulation([reference, target]);
-        simulation.update(1);
+        simulation.update(seconds(1));
 
         const relativeTransform = simulation.getRelativeTransform("target", "reference", "inertial");
 

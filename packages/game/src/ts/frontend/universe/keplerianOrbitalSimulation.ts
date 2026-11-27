@@ -18,7 +18,7 @@
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { Quaternion } from "@babylonjs/core/Maths/math.vector";
 import { kilograms, seconds } from "@cosmos-journeyer/physics";
-import type { Kilograms } from "@cosmos-journeyer/physics";
+import type { Kilograms, Seconds } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import type { Orbit, SpinModel } from "@cosmos-journeyer/universe-model";
 
@@ -105,8 +105,8 @@ export class KeplerianOrbitalSimulation {
         return this.orbitalObjects;
     }
 
-    public update(elapsedSeconds: number): void {
-        this.elapsedSeconds = seconds(elapsedSeconds);
+    public update(elapsedSeconds: Seconds): void {
+        this.elapsedSeconds = elapsedSeconds;
         this.transformCache.clear();
     }
 

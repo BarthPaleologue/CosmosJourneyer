@@ -23,7 +23,7 @@ import { Texture } from "@babylonjs/core/Materials/Textures/texture";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { Scene } from "@babylonjs/core/scene";
-import { astronomicalUnitToMeters, getOrbitalPeriod, kilograms, radians } from "@cosmos-journeyer/physics";
+import { astronomicalUnitToMeters, getOrbitalPeriod, kilograms, radians, seconds } from "@cosmos-journeyer/physics";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { CrateMaterial } from "@/frontend/assets/materials/crate";
@@ -226,7 +226,7 @@ describe("space telescope module in Vesta", () => {
         expect(initial?.position.length()).toBeCloseTo(astronomicalUnitToMeters(3), 0);
         const parent = starSystem.stellarObjects[0];
         const orbitalPeriod = getOrbitalPeriod(astronomicalUnitToMeters(3), parent.mass);
-        orbitalSimulation.update(orbitalPeriod / 4);
+        orbitalSimulation.update(seconds(orbitalPeriod / 4));
         const advanced = orbitalSimulation.getTransform(entity.model.id);
         expect(advanced?.position.length()).toBeCloseTo(astronomicalUnitToMeters(3), 0);
         expect(advanced?.position.equalsWithEpsilon(initial?.position ?? entity.content.getTransform().position)).toBe(
@@ -234,7 +234,7 @@ describe("space telescope module in Vesta", () => {
         );
         expect(advanced?.orientation.asArray()).not.toEqual(initial?.orientation.asArray());
         [0, 0.125, 0.25, 0.5, 0.75, 1].forEach((phase) => {
-            orbitalSimulation.update(orbitalPeriod * phase);
+            orbitalSimulation.update(seconds(orbitalPeriod * phase));
             const telescopeTransform = orbitalSimulation.getTransform(entity.model.id);
             const starTransform = orbitalSimulation.getTransform(parent.id);
             expect(telescopeTransform).toBeDefined();

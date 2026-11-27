@@ -21,7 +21,6 @@ import {
     getSphereIrradianceAtDistance,
     km2ToM2,
     kwhPerYearToWatts,
-    meters,
     squareMeters,
     wattsPerSquareMeter,
     radians,
@@ -188,7 +187,7 @@ export function generateSpaceElevatorModel(
         totalIrradiance += getSphereIrradianceAtDistance(
             model.blackBodyTemperature,
             getCelestialBodyRadius(model),
-            meters(distance),
+            distance,
         );
     }
 

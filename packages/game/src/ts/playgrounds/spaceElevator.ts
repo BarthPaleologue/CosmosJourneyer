@@ -19,7 +19,7 @@ import { CreateSphere, DirectionalLight, GlowLayer, PBRMaterial } from "@babylon
 import type { AbstractEngine } from "@babylonjs/core/Engines/abstractEngine";
 import { Quaternion, Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { Scene } from "@babylonjs/core/scene";
-import { astronomicalUnitToMeters, meters } from "@cosmos-journeyer/physics";
+import { astronomicalUnitToMeters, meters, seconds } from "@cosmos-journeyer/physics";
 import { generateTelluricPlanetModel } from "@cosmos-journeyer/universe-generation";
 import type { StarSystemModel } from "@cosmos-journeyer/universe-model";
 
@@ -143,7 +143,7 @@ export async function createSpaceElevatorScene(
     const keplerianObjects = [toKeplerian(planetImpostor), spaceElevatorPlacement];
     const orbitalSimulation = new KeplerianOrbitalSimulation(keplerianObjects);
 
-    orbitalSimulation.update(elapsedSeconds);
+    orbitalSimulation.update(seconds(elapsedSeconds));
     for (const object of keplerianObjects) {
         const orbitalTransform = orbitalSimulation.getTransform(object.id);
         if (orbitalTransform === undefined) {
@@ -174,7 +174,7 @@ export async function createSpaceElevatorScene(
 
         const cameraWorldPosition = camera.globalPosition;
 
-        orbitalSimulation.update(elapsedSeconds);
+        orbitalSimulation.update(seconds(elapsedSeconds));
         for (const object of keplerianObjects) {
             const orbitalTransform = orbitalSimulation.getTransform(object.id);
             if (orbitalTransform === undefined) {

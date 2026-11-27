@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import type { Meters } from "@cosmos-journeyer/physics";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
 import { getObjectModelById } from "@cosmos-journeyer/universe-model";
 import type { Orbit, StellarObjectModel, StarSystemModel } from "@cosmos-journeyer/universe-model";
@@ -30,8 +31,8 @@ export function getDistancesToStellarObjects(
     orbit: DeepReadonly<Orbit>,
     // eslint-disable-next-line @typescript-eslint/prefer-readonly-parameter-types -- Branded quantities are immutable; the rule does not recognize brands nested in object types.
     systemModel: DeepReadonly<StarSystemModel>,
-): DeepReadonly<Map<StellarObjectModel, number>> {
-    const distances = new Map<DeepReadonly<StellarObjectModel>, number>();
+): DeepReadonly<Map<StellarObjectModel, Meters>> {
+    const distances = new Map<DeepReadonly<StellarObjectModel>, Meters>();
 
     for (const parentId of orbit.parentIds) {
         const parent = getObjectModelById(parentId, systemModel);

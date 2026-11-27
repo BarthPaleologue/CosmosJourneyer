@@ -201,7 +201,7 @@ export function generateTelluricSatelliteModel(
                   CloudLayerHeight,
                   oceanCoverage,
                   kelvin(averageTemperature),
-                  pascals(pressure),
+                  pressure,
               )
             : null;
 

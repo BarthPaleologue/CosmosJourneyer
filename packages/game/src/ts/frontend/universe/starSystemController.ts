@@ -20,7 +20,7 @@ import type { Color3 } from "@babylonjs/core/Maths/math";
 import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import type { Scene } from "@babylonjs/core/scene";
-import { lightYears, lightYearsToMeters } from "@cosmos-journeyer/physics";
+import { lightYears, lightYearsToMeters, seconds } from "@cosmos-journeyer/physics";
 import { ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly, NonEmptyArray, Result } from "@cosmos-journeyer/typescript";
 import type { OrbitalObjectId, StarSystemCoordinates, StarSystemModel } from "@cosmos-journeyer/universe-model";
@@ -95,7 +95,7 @@ export class StarSystemController {
      */
     private readonly systemTargets: Array<SystemTarget> = [];
 
-    private elapsedSeconds = 0;
+    private elapsedSeconds = seconds(0);
 
     private readonly orbitalSimulationTimeMultiplier = 1;
 
@@ -436,7 +436,7 @@ export class StarSystemController {
      * @param deltaSeconds The time elapsed since the last update
      */
     private updateOrbitalSimulation(referenceObject: KeplerianObject, deltaSeconds: number): void {
-        this.elapsedSeconds += deltaSeconds;
+        this.elapsedSeconds = seconds(this.elapsedSeconds + deltaSeconds);
 
         this.referenceAnchorPosition.copyFrom(referenceObject.getTransform().position);
 

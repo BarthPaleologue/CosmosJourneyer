@@ -104,7 +104,7 @@ describe("orbital reference selection", () => {
     function placeModels(models: ReadonlyArray<KeplerianObjectSummary>, time: number): KeplerianOrbitalSimulation {
         const objects = models.map((model) => ({ ...object(model.id, model.mass, Vector3.Zero()), ...model }));
         const simulation = new KeplerianOrbitalSimulation(objects);
-        simulation.update(time);
+        simulation.update(seconds(time));
         for (const entry of simulation.getObjects()) {
             const transform = simulation.getTransform(entry.id);
             if (transform !== undefined) {

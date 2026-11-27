@@ -154,7 +154,7 @@ export function generateSpaceStationModel(
             totalIrradiance += getSphereIrradianceAtDistance(
                 model.blackBodyTemperature,
                 getCelestialBodyRadius(model),
-                meters(distance),
+                distance,
             );
         }
     }

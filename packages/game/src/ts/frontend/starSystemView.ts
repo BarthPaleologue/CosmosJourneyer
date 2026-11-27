@@ -1135,7 +1135,7 @@ export class StarSystemView implements View {
             this.universeBackend.getSystemGalacticPosition(target.systemCoordinates),
         );
 
-        const distanceLY = Vector3.Distance(currentSystemPosition, targetSystemPosition);
+        const distanceLY = lightYears(Vector3.Distance(currentSystemPosition, targetSystemPosition));
         const fuelForJump = warpDrive.getHyperJumpFuelConsumption(lightYears(distanceLY));
 
         if (spaceship.getRemainingFuel() < fuelForJump) {

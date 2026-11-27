@@ -154,7 +154,7 @@ export async function createOrbitalDemoScene(
         elapsedSeconds += deltaSeconds;
         defaultControls.update(deltaSeconds);
 
-        orbitalSimulation.update(elapsedSeconds);
+        orbitalSimulation.update(seconds(elapsedSeconds));
         bodies.forEach((body) => {
             const orbitalTransform = orbitalSimulation.getTransform(body.id);
             if (orbitalTransform === undefined) {
