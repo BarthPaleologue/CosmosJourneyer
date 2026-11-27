@@ -316,7 +316,7 @@ export function createWolfMk2(
                 roofSolarPanelZOffset,
             ),
             kilograms(100),
-            { rotation: { z: radians(roofSolarPanelRotationAngle * -1) } },
+            { rotation: { z: radians(0 - roofSolarPanelRotationAngle) } },
         )
         .addFixedPart(
             roofSolarPanel2,

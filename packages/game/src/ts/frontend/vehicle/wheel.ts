@@ -218,7 +218,7 @@ function AddWheelPhysics(
             mass: mass,
             restitution: bounce,
             friction: friction,
-            pointA: new Vector3((thickness * -1) / 2, 0, 0),
+            pointA: new Vector3((0 - thickness) / 2, 0, 0),
             pointB: new Vector3(thickness / 2, 0, 0),
             radius: radius,
         },
@@ -326,7 +326,7 @@ function AttachAxleToFrame(
             {
                 // Steering
                 axis: PhysicsConstraintAxis.ANGULAR_Y,
-                minLimit: steerable ? SteerableAxleAngleLimit * -1 : 0,
+                minLimit: steerable ? 0 - SteerableAxleAngleLimit : 0,
                 maxLimit: steerable ? SteerableAxleAngleLimit : 0,
             },
             {

@@ -104,9 +104,9 @@ export class TerrainChunkMesh implements Transformable, HasBoundingSphere, Culla
 
         const faceRotation = getQuaternionFromFaceIndex(faceIndex);
         this.positionOnCube = new Vector3(
-            planetModel.radius * -1 + (this.indices.x + 0.5) * this.sideLength,
-            planetModel.radius * -1 + (this.indices.y + 0.5) * this.sideLength,
-            planetModel.radius * -1,
+            0 - planetModel.radius + (this.indices.x + 0.5) * this.sideLength,
+            0 - planetModel.radius + (this.indices.y + 0.5) * this.sideLength,
+            0 - planetModel.radius,
         ).applyRotationQuaternionInPlace(faceRotation);
 
         this.positionOnSphere = this.positionOnCube.normalizeToNew().scaleInPlace(planetModel.radius);

@@ -15,8 +15,8 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import { radians } from "@cosmos-journeyer/physics";
-import type { Radians } from "@cosmos-journeyer/physics";
+import { quantity, radians } from "@cosmos-journeyer/physics";
+import type { Quantity, Radians } from "@cosmos-journeyer/physics";
 
 /**
  * @param value - Scalar to constrain.
@@ -92,11 +92,11 @@ export function gcd(a: number, b: number): number {
  * @param maxIterations - Maximum number of Newton steps.
  * @returns The final root estimate, without a convergence guarantee.
  */
-export function findMinimumNewtonRaphson(
-    f: (x: number) => number,
-    startingPoint: number,
+export function findMinimumNewtonRaphson<U extends string>(
+    f: (x: Quantity<U>) => number,
+    startingPoint: Quantity<U>,
     maxIterations: number,
-): number {
+): Quantity<U> {
     const delta = 1e-4;
     const tolerance = 1e-8;
 
@@ -107,9 +107,10 @@ export function findMinimumNewtonRaphson(
             break;
         }
 
-        const derivative = (f(x + delta) - fx) / delta;
+        // Arithmetic erases the brand, re-apply it to keep the quantity type flowing.
+        const derivative = (f(quantity<U>(x + delta)) - fx) / delta;
         const step = fx / derivative;
-        x -= step;
+        x = quantity<U>(x - step);
     }
 
     return x;

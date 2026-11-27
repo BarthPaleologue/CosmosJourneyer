@@ -208,7 +208,7 @@ export class SpaceDotsMaterial {
 
     public setSteeringBend(yaw: Radians, pitch: Radians): void {
         this.uBendYaw.value = yaw;
-        this.uBendPitch.value = pitch * -1;
+        this.uBendPitch.value = 0 - pitch;
     }
 
     public dispose(): void {

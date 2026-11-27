@@ -154,7 +154,7 @@ export class Aurora implements SystemContent {
         );
 
         createRibbonMatrixBuffer(
-            [radians(latitudeNorthPolward * -1), radians(latitudeNorthEquatorward * -1)],
+            [radians(0 - latitudeNorthPolward), radians(0 - latitudeNorthEquatorward)],
             this.planetRadius,
             ribbonCountPerHemisphere,
             this.matrixBuffer,
@@ -218,7 +218,7 @@ function createRibbonMatrixBuffer(
 
         Quaternion.RotationAxisToRef(
             localUp,
-            randRange(tangentialMaxDivergence * -1, tangentialMaxDivergence, rng, baseRngIndex + 2),
+            randRange(0 - tangentialMaxDivergence, tangentialMaxDivergence, rng, baseRngIndex + 2),
             localYaw,
         );
 

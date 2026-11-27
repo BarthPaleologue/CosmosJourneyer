@@ -135,6 +135,6 @@ export function sampleConic(
     const discriminant = 1 - ((1 + conicConstant) * radialSquared) / (radius * radius);
     const root = Math.sqrt(discriminant);
     const height = radialSquared / (radius * (1 + root));
-    const normal = new Vector3((x * -1) / (radius * root), 1, (z * -1) / (radius * root)).normalize();
+    const normal = new Vector3((0 - x) / (radius * root), 1, (0 - z) / (radius * root)).normalize();
     return { height: meters(height), normal };
 }

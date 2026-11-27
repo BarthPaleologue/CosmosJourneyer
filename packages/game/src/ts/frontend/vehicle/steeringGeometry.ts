@@ -116,7 +116,7 @@ export function computeSpeedLimitedCurvature(
     if (referenceLeverArm <= AxleTolerance) {
         return quantity<"1/m">(0);
     }
-    const angle = clamp(requestedSteeringAngle, mechanicalAngleLimit * -1, mechanicalAngleLimit);
+    const angle = clamp(requestedSteeringAngle, 0 - mechanicalAngleLimit, mechanicalAngleLimit);
     const requestedCurvature = Math.tan(angle) / referenceLeverArm;
     const maxCurvature = Math.abs(speed) < 0.001 ? Infinity : maxLateralAcceleration / (speed * speed);
     return quantity<"1/m">(clamp(requestedCurvature, -maxCurvature, maxCurvature));
@@ -177,7 +177,7 @@ export function getWheelSteeringAngle(
     return radians(
         clamp(
             Math.atan2(curvature * leverArm, 1 - curvature * lateralPosition),
-            mechanicalAngleLimit * -1,
+            0 - mechanicalAngleLimit,
             mechanicalAngleLimit,
         ),
     );

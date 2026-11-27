@@ -75,7 +75,7 @@ export function getNearestPointOnRingVolume(position: Vector3, ring: RingVolume)
         projection.planarDistance > 0
             ? projection.planarPosition.scale(nearestPlanarDistance / projection.planarDistance)
             : getFallbackRingPlanarDirection(normal).scale(ring.innerRadius);
-    const nearestHeight = clamp(projection.signedHeight, ring.halfThickness * -1, ring.halfThickness);
+    const nearestHeight = clamp(projection.signedHeight, 0 - ring.halfThickness, ring.halfThickness);
 
     return ring.center.add(nearestPlanarPosition).add(normal.scale(nearestHeight));
 }

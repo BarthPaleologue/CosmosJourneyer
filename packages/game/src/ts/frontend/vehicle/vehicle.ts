@@ -183,9 +183,9 @@ export class Vehicle {
             const maxSteeringAngle = lerp(
                 this.legacyHighSpeedSteeringAngleLimit,
                 this.mechanicalSteeringAngleLimit,
-                2 ** ((speed * -1) / kmhToMetersPerSecond(10)),
+                2 ** ((0 - speed) / kmhToMetersPerSecond(10)),
             );
-            this.steeringCommandAngle = radians(clamp(requestedSteeringAngle, maxSteeringAngle * -1, maxSteeringAngle));
+            this.steeringCommandAngle = radians(clamp(requestedSteeringAngle, 0 - maxSteeringAngle, maxSteeringAngle));
         }
         for (const wheel of this.wheels) {
             const steering = wheel.steering;
@@ -212,7 +212,7 @@ export class Vehicle {
 
     setTargetSpeed(speed: MetersPerSecond): void {
         const speedUpperBound = this.boostEnabled ? this.maxSpeed.forwardBoost : this.maxSpeed.forward;
-        this.targetLongitudinalSpeed = metersPerSecond(clamp(speed, this.maxSpeed.reverse * -1, speedUpperBound));
+        this.targetLongitudinalSpeed = metersPerSecond(clamp(speed, 0 - this.maxSpeed.reverse, speedUpperBound));
         this.setDriveMotorTargets(this.targetLongitudinalSpeed, quantity<"N·m">(this.boostEnabled ? 15_000 : 5_000));
     }
 

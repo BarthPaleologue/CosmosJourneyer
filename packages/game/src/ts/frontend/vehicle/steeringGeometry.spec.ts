@@ -82,7 +82,7 @@ describe("steering geometry", () => {
         const front = steeringAngle(curvature, 2.6, mechanicalLimit, 0);
         const rear = steeringAngle(curvature, -2.6, mechanicalLimit, 0);
         expect(front / degreesToRadians(1)).toBeCloseTo(5.9, 1);
-        expect(rear).toBe(front * -1);
+        expect(rear).toBe(0 - front);
     });
 
     it("averages approximately coincident fixed wheels", () => {
@@ -196,8 +196,8 @@ describe("Ackermann steering", () => {
         for (const x of [-2.2, 2.2]) {
             const front = steeringAngle(0.1, 2.6, mechanicalLimit, x);
             const rear = steeringAngle(0.1, -2.6, mechanicalLimit, x);
-            expect(rear).toBe(front * -1);
-            expect(steeringAngle(-0.1, 2.6, mechanicalLimit, -x)).toBe(front * -1);
+            expect(rear).toBe(0 - front);
+            expect(steeringAngle(-0.1, 2.6, mechanicalLimit, -x)).toBe(0 - front);
             expect(x - 2.6 / Math.tan(rear)).toBeCloseTo(10);
         }
     });
@@ -211,7 +211,7 @@ describe("Ackermann steering", () => {
         ];
         const limits = getMechanicalCurvatureLimits(wheels, meters(0), mechanicalLimit);
         expect(limits.maxCurvature).toBeCloseTo(1 / 4.8);
-        expect(limits.minCurvature).toBeCloseTo(limits.maxCurvature * -1);
+        expect(limits.minCurvature).toBeCloseTo(0 - limits.maxCurvature);
         expect(steeringAngle(limits.maxCurvature, 2.6, mechanicalLimit, 2.2)).toBeCloseTo(mechanicalLimit);
         expect(steeringAngle(limits.maxCurvature, 2.6, mechanicalLimit, -2.2)).toBeCloseTo(Math.atan(2.6 / 7));
         for (const positioned of wheels) {
@@ -236,7 +236,7 @@ describe("Ackermann steering", () => {
             const reference = frontSteering ? -2.6 : 2.6;
             const limits = getMechanicalCurvatureLimits(wheels, meters(reference), mechanicalLimit);
             expect(limits.maxCurvature).toBeCloseTo(1 / 6.2);
-            expect(limits.minCurvature).toBeCloseTo(limits.maxCurvature * -1);
+            expect(limits.minCurvature).toBeCloseTo(0 - limits.maxCurvature);
         }
         const asymmetric = getMechanicalCurvatureLimits(
             [positionedWheel(2, 4, true), positionedWheel(-1, -2, true)],
