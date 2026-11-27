@@ -142,9 +142,11 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
     }
 
     describe(originSystemCoordinates: StarSystemCoordinates, universeBackend: UniverseBackend, t: TFunction): string {
-        const distanceLy = Vector3.Distance(
-            wrapVector3(universeBackend.getSystemGalacticPosition(originSystemCoordinates)),
-            wrapVector3(universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates)),
+        const distanceLy = lightYears(
+            Vector3.Distance(
+                wrapVector3(universeBackend.getSystemGalacticPosition(originSystemCoordinates)),
+                wrapVector3(universeBackend.getSystemGalacticPosition(this.targetSystemCoordinates)),
+            ),
         );
         const objectModel = universeBackend.getObjectModel(this.objectId);
         const systemModel = universeBackend.getSystemContentModelAt(this.targetSystemCoordinates);
@@ -154,10 +156,7 @@ export class MissionAsteroidFieldNode implements MissionNodeBase<MissionAsteroid
         return t("missions:sightseeing:describeAsteroidFieldTrek", {
             objectName: objectModel.object.name,
             systemName: systemModel.system.name,
-            distance:
-                distanceLy > 0
-                    ? parseDistance(lightYearsToMeters(lightYears(distanceLy)), t)
-                    : t("missions:common:here"),
+            distance: distanceLy > 0 ? parseDistance(lightYearsToMeters(distanceLy), t) : t("missions:common:here"),
         });
     }
 

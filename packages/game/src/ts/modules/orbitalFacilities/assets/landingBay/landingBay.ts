@@ -313,7 +313,9 @@ export class LandingBay {
             }
         });
 
-        const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
+        const distanceToCamera = meters(
+            Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition()),
+        );
 
         if (distanceToCamera < 350e3 && this.ringAggregate === null) {
             this.ringAggregate = createEnvironmentAggregate(

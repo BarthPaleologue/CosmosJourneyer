@@ -571,9 +571,8 @@ export class StarSystemController {
         );
         const targetSystemUniversePosition = wrapVector3(universeBackend.getSystemGalacticPosition(targetCoordinates));
 
-        const distance = lightYearsToMeters(
-            lightYears(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition)),
-        );
+        const distanceLy = lightYears(Vector3.Distance(currentSystemUniversePosition, targetSystemUniversePosition));
+        const distance = lightYearsToMeters(distanceLy);
 
         const direction = targetSystemUniversePosition.subtract(currentSystemUniversePosition).normalize();
 

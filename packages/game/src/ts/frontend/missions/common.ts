@@ -60,14 +60,16 @@ export function getGoToSystemInstructions(
             return t("missions:common:corruptedItinerary");
         }
 
-        const distanceToNextSystemLy = Vector3.Distance(
-            wrapVector3(universeBackend.getSystemGalacticPosition(nextSystemModel.system.coordinates)),
-            currentSystemPosition,
+        const distanceToNextSystemLy = lightYears(
+            Vector3.Distance(
+                wrapVector3(universeBackend.getSystemGalacticPosition(nextSystemModel.system.coordinates)),
+                currentSystemPosition,
+            ),
         );
 
         return t("missions:common:travelToNextSystem", {
             systemName: nextSystemModel.system.name,
-            distance: parseDistance(lightYearsToMeters(lightYears(distanceToNextSystemLy)), t),
+            distance: parseDistance(lightYearsToMeters(distanceToNextSystemLy), t),
             nbJumps: itinerary.length - 1,
         });
     }

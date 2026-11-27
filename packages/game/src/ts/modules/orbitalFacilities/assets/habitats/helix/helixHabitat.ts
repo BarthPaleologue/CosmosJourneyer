@@ -342,7 +342,9 @@ export class HelixHabitat implements Transformable {
     update(cameraWorldPosition: Vector3, deltaSeconds: number): void {
         this.getTransform().rotate(Axis.Y, deltaSeconds / getRotationPeriodForArtificialGravity(this.radius, EarthG));
 
-        const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
+        const distanceToCamera = meters(
+            Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition()),
+        );
 
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
             this.attachmentAggregate = createEnvironmentAggregate(

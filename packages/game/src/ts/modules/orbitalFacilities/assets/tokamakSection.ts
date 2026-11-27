@@ -183,7 +183,9 @@ export class TokamakSection implements StationSection {
     }
 
     update(cameraWorldPosition: Vector3): void {
-        const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
+        const distanceToCamera = meters(
+            Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition()),
+        );
 
         const toggleDistance = 20e3;
         const hysteresisDistance = 10e3;

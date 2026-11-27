@@ -27,6 +27,7 @@ import type { TransformNode } from "@babylonjs/core/Meshes/transformNode";
 import { PhysicsShapeType } from "@babylonjs/core/Physics/v2/IPhysicsEnginePlugin";
 import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggregate";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
@@ -413,7 +414,9 @@ export class SolarSection implements StationSection {
     }
 
     update(cameraWorldPosition: Vector3): void {
-        const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
+        const distanceToCamera = meters(
+            Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition()),
+        );
 
         if (distanceToCamera < 350e3 && this.attachmentAggregate === null) {
             this.attachmentAggregate = createEnvironmentAggregate(

@@ -28,6 +28,7 @@ import type { PhysicsAggregate } from "@babylonjs/core/Physics/v2/physicsAggrega
 import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 import { createEnvironmentAggregate } from "@/frontend/helpers/havok";
@@ -103,7 +104,9 @@ export class EngineBay implements StationSection {
     }
 
     update(cameraWorldPosition: Vector3): void {
-        const distanceToCamera = Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition());
+        const distanceToCamera = meters(
+            Vector3.Distance(cameraWorldPosition, this.getTransform().getAbsolutePosition()),
+        );
         if (distanceToCamera < 350e3 && this.skirtAggregate === null) {
             this.skirtAggregate = createEnvironmentAggregate(this.skirt, PhysicsShapeType.MESH, this.scene);
             this.engines.forEach((engine) => {

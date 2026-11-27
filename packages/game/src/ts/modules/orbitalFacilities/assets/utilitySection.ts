@@ -30,6 +30,7 @@ import { PhysicsBody } from "@babylonjs/core/Physics/v2/physicsBody";
 import { PhysicsShapeSphere } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { PhysicsShape } from "@babylonjs/core/Physics/v2/physicsShape";
 import type { Scene } from "@babylonjs/core/scene";
+import { meters } from "@cosmos-journeyer/physics";
 
 import type { RenderingAssets } from "@/frontend/assets/renderingAssets";
 
@@ -138,7 +139,9 @@ export class UtilitySection implements StationSection {
     }
 
     update(cameraWorldPosition: Vector3): void {
-        const distanceToCamera = cameraWorldPosition.subtract(this.getTransform().getAbsolutePosition()).length();
+        const distanceToCamera = meters(
+            cameraWorldPosition.subtract(this.getTransform().getAbsolutePosition()).length(),
+        );
 
         const toggleDistance = 20e3;
         const hysteresisDistance = 5e3;

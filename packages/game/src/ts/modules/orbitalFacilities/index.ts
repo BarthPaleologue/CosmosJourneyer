@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU Affero General Public License
 //  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import { lightYears } from "@cosmos-journeyer/physics";
 import { centeredRand, getRngFromSeed, uniformRandBool } from "@cosmos-journeyer/random";
 import { ok } from "@cosmos-journeyer/typescript";
 import type { DeepReadonly } from "@cosmos-journeyer/typescript";
@@ -218,7 +219,7 @@ function setupSpaceElevator(api: GameModuleApi) {
  * @returns Whether facilities may be procedurally generated here.
  */
 function isSystemInHumanBubble(systemPosition: Readonly<Vector3Like>): boolean {
-    const distanceToSolLy = Math.hypot(systemPosition.x, systemPosition.y, systemPosition.z);
+    const distanceToSolLy = lightYears(Math.hypot(systemPosition.x, systemPosition.y, systemPosition.z));
 
     return distanceToSolLy < Settings.HUMAN_BUBBLE_RADIUS_LY;
 }
